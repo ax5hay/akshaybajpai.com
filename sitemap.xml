@@ -1,83 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-    <!-- Homepage -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://akshaybajpai.com/</loc>
         <lastmod>2025-12-30</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
-    </url>
-
-    <!-- About Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#about</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <!-- Experience Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#experience</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <!-- Projects Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#projects</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <!-- Education Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#education</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <!-- Publications Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#publications</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <!-- Volunteering Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#volunteering</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <!-- Awards Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#awards</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <!-- Ventures & Products Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#ventures</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <!-- Contact Section -->
-    <url>
-        <loc>https://akshaybajpai.com/#contact</loc>
-        <lastmod>2025-12-30</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
     </url>
 </urlset>
