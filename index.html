@@ -1169,12 +1169,24 @@
                 position: fixed;
                 pointer-events: none;
                 z-index: 9999;
-                transition: all 0.15s cubic-bezier(0.22, 1, 0.36, 1);
                 opacity: 0;
+                transform: translate(-50%, -50%);
+                will-change: transform;
+                transition: transform 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
+                            opacity 0.3s ease,
+                            width 0.3s cubic-bezier(0.165, 0.84, 0.44, 1),
+                            height 0.3s cubic-bezier(0.165, 0.84, 0.44, 1),
+                            border-color 0.3s ease;
             }
 
             .custom-cursor.active {
                 opacity: 1;
+            }
+
+            .custom-cursor.hover {
+                width: 40px;
+                height: 40px;
+                border-color: var(--accent-cyan);
             }
 
             .custom-cursor-dot {
@@ -1185,18 +1197,14 @@
                 position: fixed;
                 pointer-events: none;
                 z-index: 10000;
-                transition: all 0.05s ease;
                 opacity: 0;
+                transform: translate(-50%, -50%);
+                will-change: transform;
+                transition: opacity 0.3s ease;
             }
 
             .custom-cursor-dot.active {
                 opacity: 1;
-            }
-
-            a:hover ~ .custom-cursor,
-            button:hover ~ .custom-cursor {
-                transform: scale(1.5);
-                border-color: var(--accent-cyan);
             }
         }
 
@@ -1934,19 +1942,57 @@
     </div>
 
     <script>
-        // Custom Cursor
+        // Custom Cursor with smooth animation
         const cursor = document.querySelector('.custom-cursor');
         const cursorDot = document.querySelector('.custom-cursor-dot');
 
         if (window.matchMedia("(pointer: fine)").matches) {
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+            let dotX = 0, dotY = 0;
+
+            // Update mouse position
             document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX - 10 + 'px';
-                cursor.style.top = e.clientY - 10 + 'px';
-                cursorDot.style.left = e.clientX - 3 + 'px';
-                cursorDot.style.top = e.clientY - 3 + 'px';
-                
-                cursor.classList.add('active');
-                cursorDot.classList.add('active');
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+
+                if (!cursor.classList.contains('active')) {
+                    cursor.classList.add('active');
+                    cursorDot.classList.add('active');
+                }
+            });
+
+            // Smooth cursor animation using requestAnimationFrame
+            function animateCursor() {
+                // Smooth following with easing
+                const speed = 0.15;
+                const dotSpeed = 1; // Dot follows instantly
+
+                cursorX += (mouseX - cursorX) * speed;
+                cursorY += (mouseY - cursorY) * speed;
+                dotX += (mouseX - dotX) * dotSpeed;
+                dotY += (mouseY - dotY) * dotSpeed;
+
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                cursorDot.style.left = dotX + 'px';
+                cursorDot.style.top = dotY + 'px';
+
+                requestAnimationFrame(animateCursor);
+            }
+
+            animateCursor();
+
+            // Handle hover states
+            const interactiveElements = document.querySelectorAll('a, button, .btn, .project-card, .stat-card, .skill-item, .timeline-item, .education-card, .contact-link');
+
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('hover');
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('hover');
+                });
             });
 
             document.addEventListener('mouseenter', () => {
