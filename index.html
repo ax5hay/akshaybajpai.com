@@ -63,7 +63,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
+
+    <!-- Analytics Placeholder - Replace with your tracking code -->
+    <!-- Example: Google Analytics, Plausible, or Fathom Analytics -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR-GA-ID"></script> -->
+    <!-- Or for privacy-focused analytics: -->
+    <!-- <script defer data-domain="akshaybajpai.com" src="https://plausible.io/js/script.js"></script> -->
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -219,8 +227,8 @@
             --accent-indigo: #6366f1;
             --text-primary: #ffffff;
             --text-secondary: #b4b4c5;
-            --text-tertiary: #7d7d8f;
-            --text-muted: #52525e;
+            --text-tertiary: #9a9aab;
+            --text-muted: #7a7a87;
             --gradient-warmth: linear-gradient(135deg, #f5c563 0%, #ff8a5b 50%, #ff6b9d 100%);
             --gradient-cool: linear-gradient(135deg, #667eea 0%, #6366f1 50%, #764ba2 100%);
             --gradient-neon: linear-gradient(135deg, #00e5ff 0%, #00b4d8 50%, #0077b6 100%);
@@ -423,6 +431,41 @@
             gap: 3rem;
             list-style: none;
             align-items: center;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 10001;
+            position: relative;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 28px;
+            height: 2px;
+            background: var(--gradient-warmth);
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            transform-origin: center;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
         }
 
         .nav-links a {
@@ -1340,6 +1383,255 @@
             transform: scale(1.2) rotate(10deg);
         }
 
+        /* Contact Form Styles */
+        .contact-form-container {
+            max-width: 700px;
+            margin: 4rem auto 3rem;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-amber);
+            box-shadow: 0 0 0 3px rgba(245, 197, 99, 0.1), var(--shadow-glow-amber);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-submit {
+            background: var(--gradient-warmth);
+            border: none;
+            padding: 1.25rem 3rem;
+            border-radius: 12px;
+            color: #0d0d12;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-top: 1rem;
+        }
+
+        .form-submit::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #ffffff 0%, #f5c563 100%);
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .form-submit:hover::before {
+            opacity: 0.3;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-heavy), var(--shadow-glow-amber);
+        }
+
+        .form-submit:active {
+            transform: translateY(0);
+        }
+
+        .form-submit span {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .form-message {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .form-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .form-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .contact-divider {
+            text-align: center;
+            margin: 3rem 0 2rem;
+            position: relative;
+            color: var(--text-muted);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+        }
+
+        .contact-divider::before,
+        .contact-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        .contact-divider::before {
+            left: 0;
+        }
+
+        .contact-divider::after {
+            right: 0;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-warmth);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(245, 197, 99, 0.3);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium), 0 0 40px rgba(245, 197, 99, 0.1);
+        }
+
+        .service-number {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-warmth);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .service-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .service-desc {
+            color: var(--text-tertiary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .service-features li {
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .service-features li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-amber);
+            font-weight: 700;
+        }
+
         /* Ventures & Products Section */
         .ventures-grid {
             display: grid;
@@ -1661,8 +1953,67 @@
                 padding: 1.25rem 5%;
             }
 
+            .menu-toggle {
+                display: flex;
+            }
+
             .nav-links {
-                display: none;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: min(80vw, 400px);
+                background: rgba(13, 13, 18, 0.98);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: center;
+                gap: 2rem;
+                padding: 2rem;
+                transition: right 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+                z-index: 10000;
+                border-left: 1px solid rgba(245, 197, 99, 0.1);
+                box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                opacity: 0;
+                transform: translateX(30px);
+                animation: none;
+            }
+
+            .nav-links.active li {
+                animation: slideInNav 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            }
+
+            .nav-links.active li:nth-child(1) { animation-delay: 0.1s; }
+            .nav-links.active li:nth-child(2) { animation-delay: 0.15s; }
+            .nav-links.active li:nth-child(3) { animation-delay: 0.2s; }
+            .nav-links.active li:nth-child(4) { animation-delay: 0.25s; }
+            .nav-links.active li:nth-child(5) { animation-delay: 0.3s; }
+            .nav-links.active li:nth-child(6) { animation-delay: 0.35s; }
+
+            @keyframes slideInNav {
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            .nav-links a {
+                font-size: 1.2rem;
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+
+            .nav-links a:hover {
+                background: rgba(245, 197, 99, 0.1);
+                transform: translateX(-10px);
             }
 
             .hero {
@@ -1743,6 +2094,42 @@
                 padding: 2rem;
             }
         }
+
+        /* Accessibility: Respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            .custom-cursor,
+            .custom-cursor-dot {
+                display: none !important;
+            }
+
+            .bg-canvas,
+            .bg-gradient-orbs,
+            .grain {
+                animation: none !important;
+            }
+
+            .orb {
+                animation: none !important;
+                opacity: 0.3;
+            }
+        }
+
+        /* Accessibility: Respect reduced contrast */
+        @media (prefers-contrast: more) {
+            :root {
+                --text-tertiary: #b8b8c5;
+                --text-muted: #9a9aab;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1763,14 +2150,19 @@
         <!-- Navigation -->
         <nav id="nav" role="navigation" aria-label="Main navigation">
             <div class="logo" aria-label="Akshay Bajpai logo">
-                <img src="logo.png" alt="Akshay Bajpai Logo">
+                <img src="logo.png" alt="Akshay Bajpai Logo" width="50" height="50" loading="eager">
             </div>
+            <button class="menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <ul class="nav-links" role="menubar">
                 <li role="none"><a href="#about" data-text="About" role="menuitem">About</a></li>
+                <li role="none"><a href="#services" data-text="Services" role="menuitem">Services</a></li>
                 <li role="none"><a href="#experience" data-text="Experience" role="menuitem">Experience</a></li>
                 <li role="none"><a href="#ventures" data-text="Ventures" role="menuitem">Ventures</a></li>
                 <li role="none"><a href="#projects" data-text="Projects" role="menuitem">Projects</a></li>
-                <li role="none"><a href="#publications" data-text="Publications" role="menuitem">Publications</a></li>
                 <li role="none"><a href="#contact" data-text="Contact" role="menuitem">Contact</a></li>
             </ul>
         </nav>
@@ -1862,6 +2254,74 @@
                         <div class="skill-title">System Architecture</div>
                         <div class="skill-desc">Distributed systems fail in creative ways. I design architectures that degrade gracefully, scale economically, and survive the chaos of production—because elegance under normal conditions is easy; resilience under failure is what separates amateurs from professionals.</div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="reveal" aria-labelledby="services-title">
+            <div class="section-header">
+                <div class="section-eyebrow">What I Do</div>
+                <h2 id="services-title" class="section-title">Services That Move Your Business Forward</h2>
+                <p class="section-subtitle">
+                    I don't do cookie-cutter solutions. Every engagement is tailored to your specific challenges, leveraging AI to create competitive advantages that compound over time.
+                </p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-number">01</div>
+                    <h3 class="service-title">AI Strategy & Architecture</h3>
+                    <p class="service-desc">
+                        Transform AI from buzzword to business driver. I architect intelligent systems that align with your strategic objectives and deliver measurable ROI.
+                    </p>
+                    <ul class="service-features">
+                        <li>LLM pipeline design & optimization</li>
+                        <li>RAG system architecture</li>
+                        <li>ML model selection & deployment</li>
+                        <li>Production-ready AI infrastructure</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-number">02</div>
+                    <h3 class="service-title">Technical Leadership & Advisory</h3>
+                    <p class="service-desc">
+                        Bridge the gap between AI potential and business reality. Strategic guidance that turns proof-of-concepts into production systems.
+                    </p>
+                    <ul class="service-features">
+                        <li>CTO-level strategic consulting</li>
+                        <li>Team augmentation & mentorship</li>
+                        <li>Technology stack optimization</li>
+                        <li>Build vs buy decisions</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-number">03</div>
+                    <h3 class="service-title">Full-Stack AI Development</h3>
+                    <p class="service-desc">
+                        From ideation to deployment, I build production AI systems that scale. Clean code, robust architecture, measurable outcomes.
+                    </p>
+                    <ul class="service-features">
+                        <li>Custom AI solution development</li>
+                        <li>API design & implementation</li>
+                        <li>Performance optimization</li>
+                        <li>Testing & quality assurance</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-number">04</div>
+                    <h3 class="service-title">Product & Platform Engineering</h3>
+                    <p class="service-desc">
+                        Build products users love powered by AI they trust. I combine technical excellence with product thinking to create competitive advantages.
+                    </p>
+                    <ul class="service-features">
+                        <li>AI-powered product development</li>
+                        <li>Platform architecture & scaling</li>
+                        <li>User experience optimization</li>
+                        <li>System integration & automation</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -2437,6 +2897,34 @@
                 <p class="contact-text">
                     Your competitors are implementing AI right now. The gap between organizations with strategic AI advantage and those playing catch-up widens daily. I'm selective about partnerships—I work with leaders who understand that AI isn't an IT project, it's a strategic imperative. If you're ready to transform talk into execution, and you need someone who's done this before, let's have a conversation. No sales pitch. Just an honest assessment of whether I can help you win.
                 </p>
+
+                <div class="contact-form-container">
+                    <form class="contact-form" id="contactForm" action="https://formspree.io/f/xlgeqele" method="POST">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" placeholder="Jane Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="jane@company.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company (Optional)</label>
+                            <input type="text" id="company" name="company" placeholder="Acme Corp">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Tell Me About Your Project</label>
+                            <textarea id="message" name="message" placeholder="I'm looking for help with..." required></textarea>
+                        </div>
+                        <button type="submit" class="form-submit">
+                            <span>Send Message →</span>
+                        </button>
+                        <div class="form-message" id="formMessage"></div>
+                    </form>
+                </div>
+
+                <div class="contact-divider">OR CONNECT VIA</div>
+
                 <div class="contact-links" role="group" aria-label="Contact information">
                     <a href="mailto:contact@akshaybajpai.com" class="contact-link" aria-label="Send email to contact@akshaybajpai.com">
                         <span class="contact-icon" aria-hidden="true">📧</span>
@@ -2476,6 +2964,39 @@
     </div>
 
     <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        const navItems = document.querySelectorAll('.nav-links a');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            const isExpanded = menuToggle.classList.contains('active');
+            menuToggle.setAttribute('aria-expanded', isExpanded);
+            document.body.style.overflow = isExpanded ? 'hidden' : '';
+        });
+
+        // Close menu when clicking nav items
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navLinks.contains(e.target) && !menuToggle.contains(e.target) && navLinks.classList.contains('active')) {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+        });
+
         // Custom Cursor with smooth animation
         const cursor = document.querySelector('.custom-cursor');
         const cursorDot = document.querySelector('.custom-cursor-dot');
@@ -2548,7 +3069,7 @@
         canvas.height = window.innerHeight;
 
         const particles = [];
-        const particleCount = 120;
+        const particleCount = window.innerWidth < 768 ? 60 : 120;
 
         class Particle {
             constructor() {
@@ -2605,7 +3126,23 @@
             }
         }
 
+        let isAnimating = true;
+        let animationId;
+
+        // Pause animation when tab is hidden to save performance
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                isAnimating = false;
+                if (animationId) cancelAnimationFrame(animationId);
+            } else {
+                isAnimating = true;
+                animate();
+            }
+        });
+
         function animate() {
+            if (!isAnimating) return;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             particles.forEach(particle => {
@@ -2614,7 +3151,7 @@
             });
 
             connect();
-            requestAnimationFrame(animate);
+            animationId = requestAnimationFrame(animate);
         }
 
         init();
@@ -2654,6 +3191,67 @@
         window.addEventListener('scroll', revealOnScroll);
         window.addEventListener('load', revealOnScroll);
         revealOnScroll();
+
+        // Contact Form Handling
+        const contactForm = document.getElementById('contactForm');
+        const formMessage = document.getElementById('formMessage');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const submitBtn = contactForm.querySelector('.form-submit');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span>Sending...</span>';
+                submitBtn.disabled = true;
+
+                const formData = new FormData(contactForm);
+
+                try {
+                    // For GitHub Pages: using Formspree or similar service
+                    // Users should replace YOUR_FORM_ID with their actual Formspree ID
+                    // Or use mailto fallback
+                    const response = await fetch(contactForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        formMessage.textContent = 'Message sent successfully! I\'ll get back to you soon.';
+                        formMessage.className = 'form-message success';
+                        formMessage.style.display = 'block';
+                        contactForm.reset();
+                    } else {
+                        throw new Error('Form submission failed');
+                    }
+                } catch (error) {
+                    // Fallback to mailto
+                    const name = formData.get('name');
+                    const email = formData.get('email');
+                    const company = formData.get('company');
+                    const message = formData.get('message');
+
+                    const subject = `Contact from ${name}${company ? ' (' + company + ')' : ''}`;
+                    const body = `From: ${name}\nEmail: ${email}\n${company ? 'Company: ' + company + '\n' : ''}\n\nMessage:\n${message}`;
+
+                    window.location.href = `mailto:contact@akshaybajpai.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                    formMessage.textContent = 'Opening your email client...';
+                    formMessage.className = 'form-message success';
+                    formMessage.style.display = 'block';
+                }
+
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                setTimeout(() => {
+                    formMessage.style.display = 'none';
+                }, 5000);
+            });
+        }
 
         // Smooth Scroll with offset for fixed nav
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
