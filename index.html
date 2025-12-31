@@ -54,11 +54,8 @@
     <meta name="format-detection" content="telephone=no">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#f5c563">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
     <meta name="msapplication-TileColor" content="#0d0d12">
 
     <!-- Preconnect for Performance -->
@@ -382,19 +379,18 @@
         }
 
         .logo {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: -0.04em;
-            background: var(--gradient-warmth);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
             position: relative;
             display: flex;
             align-items: center;
             gap: 0.75rem;
             transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .logo img {
+            height: 50px;
+            width: 50px;
+            object-fit: contain;
+            border-radius: 8px;
         }
 
         .logo:hover {
@@ -1766,7 +1762,9 @@
     <div class="content-wrapper">
         <!-- Navigation -->
         <nav id="nav" role="navigation" aria-label="Main navigation">
-            <div class="logo" aria-label="Akshay Bajpai logo">AB</div>
+            <div class="logo" aria-label="Akshay Bajpai logo">
+                <img src="logo.png" alt="Akshay Bajpai Logo">
+            </div>
             <ul class="nav-links" role="menubar">
                 <li role="none"><a href="#about" data-text="About" role="menuitem">About</a></li>
                 <li role="none"><a href="#experience" data-text="Experience" role="menuitem">Experience</a></li>
