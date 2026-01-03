@@ -68,10 +68,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 
-    <!-- Analytics Placeholder - Replace with your tracking code -->
-    <!-- Example: Google Analytics, Plausible, or Fathom Analytics -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR-GA-ID"></script> -->
-    <!-- Or for privacy-focused analytics: -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=xx"></script> -->
+
     <!-- <script defer data-domain="akshaybajpai.com" src="https://plausible.io/js/script.js"></script> -->
 
     <!-- Structured Data (JSON-LD) -->
@@ -3209,9 +3207,7 @@
                 const formData = new FormData(contactForm);
 
                 try {
-                    // For GitHub Pages: using Formspree or similar service
-                    // Users should replace YOUR_FORM_ID with their actual Formspree ID
-                    // Or use mailto fallback
+                   
                     const response = await fetch(contactForm.action, {
                         method: 'POST',
                         body: formData,
