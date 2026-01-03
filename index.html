@@ -63,10 +63,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
+    <!-- Fonts - optimized with swap and reduced weights -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;600&family=Outfit:wght@400;600;700&family=Source+Code+Pro:wght@400;500&display=swap&subset=latin&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%20.,!?@-_&/" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;600&family=Outfit:wght@400;600;700&family=Source+Code+Pro:wght@400;500&display=swap&subset=latin&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%20.,!?@-_&/" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;600&family=Outfit:wght@400;600;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
     <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=xx"></script> -->
 
@@ -290,6 +290,7 @@
             border-radius: 50%;
             filter: blur(80px);
             animation: float 20s ease-in-out infinite;
+            will-change: transform;
         }
 
         .orb-1 {
@@ -662,6 +663,10 @@
             gap: 0.75rem;
         }
 
+        .btn:hover {
+            will-change: transform, box-shadow;
+        }
+
         .btn::before {
             content: '';
             position: absolute;
@@ -784,6 +789,10 @@
             overflow: hidden;
         }
 
+        .stat-card:hover {
+            will-change: transform, box-shadow;
+        }
+
         .stat-card::before {
             content: '';
             position: absolute;
@@ -838,6 +847,7 @@
             padding: 10rem 6% 6rem;
             max-width: 1600px;
             margin: 0 auto;
+            contain: layout style paint; /* CSS containment for better rendering performance */
         }
 
         .section-header {
@@ -1111,6 +1121,10 @@
             position: relative;
             overflow: hidden;
             cursor: pointer;
+        }
+
+        .project-card:hover {
+            will-change: transform;
         }
 
         .project-card::before {
@@ -1894,13 +1908,13 @@
                 border: 2px solid var(--accent-amber);
                 border-radius: 50%;
                 position: fixed;
+                top: 0;
+                left: 0;
                 pointer-events: none;
                 z-index: 9999;
                 opacity: 0;
-                transform: translate(-50%, -50%);
                 will-change: transform;
-                transition: transform 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
-                            opacity 0.3s ease,
+                transition: opacity 0.3s ease,
                             width 0.3s cubic-bezier(0.165, 0.84, 0.44, 1),
                             height 0.3s cubic-bezier(0.165, 0.84, 0.44, 1),
                             border-color 0.3s ease;
@@ -1922,10 +1936,11 @@
                 background: var(--accent-amber);
                 border-radius: 50%;
                 position: fixed;
+                top: 0;
+                left: 0;
                 pointer-events: none;
                 z-index: 10000;
                 opacity: 0;
-                transform: translate(-50%, -50%);
                 will-change: transform;
                 transition: opacity 0.3s ease;
             }
@@ -2996,7 +3011,7 @@
             }
         });
 
-        // Custom Cursor with smooth animation
+        // Custom Cursor with smooth animation (optimized with transform and will-change)
         const cursor = document.querySelector('.custom-cursor');
         const cursorDot = document.querySelector('.custom-cursor-dot');
 
@@ -3014,7 +3029,7 @@
                     cursor.classList.add('active');
                     cursorDot.classList.add('active');
                 }
-            });
+            }, { passive: true });
 
             // Smooth cursor animation using requestAnimationFrame
             function animateCursor() {
@@ -3022,15 +3037,20 @@
                 const speed = 0.15;
                 const dotSpeed = 1; // Dot follows instantly
 
-                cursorX += (mouseX - cursorX) * speed;
-                cursorY += (mouseY - cursorY) * speed;
-                dotX += (mouseX - dotX) * dotSpeed;
-                dotY += (mouseY - dotY) * dotSpeed;
+                const dx = mouseX - cursorX;
+                const dy = mouseY - cursorY;
 
-                cursor.style.left = cursorX + 'px';
-                cursor.style.top = cursorY + 'px';
-                cursorDot.style.left = dotX + 'px';
-                cursorDot.style.top = dotY + 'px';
+                // Only update if movement is significant (threshold optimization)
+                if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+                    cursorX += dx * speed;
+                    cursorY += dy * speed;
+                    dotX += (mouseX - dotX) * dotSpeed;
+                    dotY += (mouseY - dotY) * dotSpeed;
+
+                    // Use transform with centering offset for better performance
+                    cursor.style.transform = `translate(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%))`;
+                    cursorDot.style.transform = `translate(calc(${dotX}px - 50%), calc(${dotY}px - 50%))`;
+                }
 
                 requestAnimationFrame(animateCursor);
             }
@@ -3105,15 +3125,21 @@
             }
         }
 
+        // Optimized connection using distance squared to avoid sqrt calculations
         function connect() {
+            const maxDistance = 150;
+            const maxDistanceSquared = maxDistance * maxDistance; // Pre-calculate to avoid sqrt
+
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const distanceSquared = dx * dx + dy * dy;
 
-                    if (distance < 150) {
-                        const opacity = 0.15 * (1 - distance / 150);
+                    // Skip if too far (no sqrt needed for comparison)
+                    if (distanceSquared < maxDistanceSquared) {
+                        const distance = Math.sqrt(distanceSquared); // Only calculate when needed
+                        const opacity = 0.15 * (1 - distance / maxDistance);
                         ctx.strokeStyle = `rgba(0, 229, 255, ${opacity})`;
                         ctx.lineWidth = 0.5;
                         ctx.beginPath();
@@ -3161,35 +3187,47 @@
             canvas.height = window.innerHeight;
         });
 
-        // Scroll-based navigation background
+        // Scroll-based navigation background (throttled for performance)
         const nav = document.getElementById('nav');
+        let navTicking = false;
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
+            if (!navTicking) {
+                window.requestAnimationFrame(() => {
+                    if (window.scrollY > 100) {
+                        nav.classList.add('scrolled');
+                    } else {
+                        nav.classList.remove('scrolled');
+                    }
+                    navTicking = false;
+                });
+                navTicking = true;
             }
-        });
+        }, { passive: true });
 
-        // Scroll Reveal Animation
+        // Scroll Reveal Animation (using Intersection Observer for better performance)
         const revealElements = document.querySelectorAll('.reveal');
 
-        const revealOnScroll = () => {
-            const windowHeight = window.innerHeight;
-            const revealPoint = 100;
+        if ('IntersectionObserver' in window) {
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optionally unobserve after revealing to save resources
+                        // revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            });
 
             revealElements.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-
-                if (elementTop < windowHeight - revealPoint) {
-                    element.classList.add('active');
-                }
+                revealObserver.observe(element);
             });
-        };
-
-        window.addEventListener('scroll', revealOnScroll);
-        window.addEventListener('load', revealOnScroll);
-        revealOnScroll();
+        } else {
+            // Fallback for older browsers
+            revealElements.forEach(element => element.classList.add('active'));
+        }
 
         // Contact Form Handling
         const contactForm = document.getElementById('contactForm');
@@ -3265,15 +3303,22 @@
             });
         });
 
-        // Add parallax effect to orbs
+        // Add parallax effect to orbs (throttled for smooth performance)
+        const orbs = document.querySelectorAll('.orb');
+        let orbTicking = false;
         window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const orbs = document.querySelectorAll('.orb');
-            orbs.forEach((orb, index) => {
-                const speed = (index + 1) * 0.1;
-                orb.style.transform = `translateY(${scrolled * speed}px)`;
-            });
-        });
+            if (!orbTicking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.pageYOffset;
+                    orbs.forEach((orb, index) => {
+                        const speed = (index + 1) * 0.1;
+                        orb.style.transform = `translateY(${scrolled * speed}px)`;
+                    });
+                    orbTicking = false;
+                });
+                orbTicking = true;
+            }
+        }, { passive: true });
 
         // Interactive hover effect for project cards
         const projectCards = document.querySelectorAll('.project-card');
