@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
     <title>Akshay Bajpai — AI Architect & Technology Leader | Expert in LLMs, RAG Systems & ML</title>
@@ -256,6 +256,11 @@
             font-weight: 400;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            /* Mobile optimizations */
+            -webkit-tap-highlight-color: rgba(245, 197, 99, 0.1);
+            -webkit-touch-callout: none;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         ::selection {
@@ -281,7 +286,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.15;
+            opacity: 0.08;
             overflow: hidden;
         }
 
@@ -519,6 +524,67 @@
             opacity: 1;
         }
 
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-warmth);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(245, 197, 99, 0.3), 0 0 0 0 rgba(245, 197, 99, 0.4);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(100px) scale(0.8);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(245, 197, 99, 0.4), 0 0 0 8px rgba(245, 197, 99, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        .back-to-top:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .back-to-top svg {
+            color: var(--primary-dark);
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .back-to-top:hover svg {
+            transform: translateY(-3px);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 15px 40px rgba(245, 197, 99, 0.4), 0 0 0 0 rgba(245, 197, 99, 0.4);
+            }
+            50% {
+                box-shadow: 0 15px 40px rgba(245, 197, 99, 0.4), 0 0 0 15px rgba(245, 197, 99, 0);
+            }
+        }
+
         /* Hero Section */
         .hero {
             min-height: 100vh;
@@ -661,6 +727,10 @@
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
+            /* Mobile touch optimization */
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .btn:hover {
@@ -701,6 +771,7 @@
             color: var(--text-primary);
             border-color: rgba(255, 255, 255, 0.15);
             backdrop-filter: var(--blur-glass);
+            -webkit-backdrop-filter: var(--blur-glass);
         }
 
         .btn-secondary:hover {
@@ -848,6 +919,7 @@
             max-width: 1600px;
             margin: 0 auto;
             contain: layout style paint; /* CSS containment for better rendering performance */
+            background: transparent; /* Prevent floating box effect */
         }
 
         .section-header {
@@ -1959,16 +2031,21 @@
         }
 
         @media (max-width: 768px) {
+            /* Improved mobile navigation */
             nav {
-                padding: 1.5rem 5%;
+                padding: 1.25rem 5%;
             }
 
             nav.scrolled {
-                padding: 1.25rem 5%;
+                padding: 1rem 5%;
             }
 
             .menu-toggle {
                 display: flex;
+                padding: 0.75rem;
+                /* Larger touch target */
+                min-width: 44px;
+                min-height: 44px;
             }
 
             .nav-links {
@@ -1976,14 +2053,14 @@
                 top: 0;
                 right: -100%;
                 height: 100vh;
-                width: min(80vw, 400px);
+                width: min(85vw, 400px);
                 background: rgba(13, 13, 18, 0.98);
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
                 flex-direction: column;
                 justify-content: center;
-                gap: 2rem;
-                padding: 2rem;
+                gap: 1.5rem;
+                padding: 2rem 1.5rem;
                 transition: right 0.4s cubic-bezier(0.22, 1, 0.36, 1);
                 z-index: 10000;
                 border-left: 1px solid rgba(245, 197, 99, 0.1);
@@ -2019,93 +2096,392 @@
             }
 
             .nav-links a {
-                font-size: 1.2rem;
-                padding: 0.75rem 1.5rem;
-                border-radius: 8px;
+                font-size: 1.1rem;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
                 transition: all 0.3s ease;
+                /* Better touch target */
+                min-height: 48px;
+                display: flex;
+                align-items: center;
             }
 
-            .nav-links a:hover {
+            .nav-links a:hover,
+            .nav-links a:active {
                 background: rgba(245, 197, 99, 0.1);
                 transform: translateX(-10px);
             }
 
+            /* Optimized hero for mobile */
             .hero {
-                padding: 7rem 5% 3rem;
+                padding: 6rem 5% 2.5rem;
+                min-height: 0;
             }
 
             .hero-eyebrow {
-                font-size: 0.65rem;
+                font-size: 0.7rem;
+                margin-bottom: 1rem;
             }
 
+            .hero-title {
+                margin-bottom: 1.25rem;
+                line-height: 1.1;
+            }
+
+            .hero-subtitle {
+                margin-bottom: 1.5rem;
+                line-height: 1.6;
+            }
+
+            .hero-description {
+                margin-bottom: 2rem;
+                line-height: 1.7;
+            }
+
+            .hero-cta {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            /* Improved content spacing */
             .about-content {
                 grid-template-columns: 1fr;
-                gap: 3rem;
+                gap: 2.5rem;
+            }
+
+            .about-text p {
+                margin-bottom: 1.5rem;
+                line-height: 1.8;
             }
 
             .about-text p:first-letter {
-                font-size: 3rem;
+                font-size: 2.5rem;
+                line-height: 1;
             }
 
+            /* Better grid layouts */
             .projects-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .education-card {
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
 
-            .timeline {
-                padding-left: 2.5rem;
+            .skills-grid {
+                gap: 1.5rem;
             }
 
-            .timeline-item {
+            .services-grid {
+                gap: 2rem;
+            }
+
+            .education-card {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 2rem 1.5rem;
+            }
+
+            /* Timeline optimization */
+            .timeline {
                 padding-left: 2rem;
             }
 
-            .timeline-item::before {
-                left: -3rem;
+            .timeline-item {
+                padding-left: 1.75rem;
+                margin-bottom: 3.5rem;
             }
 
+            .timeline-item::before {
+                left: -2.5rem;
+                width: 14px;
+                height: 14px;
+            }
+
+            .timeline-title {
+                font-size: 1.5rem;
+                line-height: 1.3;
+            }
+
+            .timeline-desc {
+                line-height: 1.75;
+                margin-bottom: 1.25rem;
+            }
+
+            .timeline-skills {
+                gap: 0.5rem;
+            }
+
+            .skill-tag {
+                font-size: 0.7rem;
+                padding: 0.4rem 1rem;
+            }
+
+            /* Contact improvements */
             .contact-links {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 1rem;
             }
 
+            .contact-link {
+                padding: 1.25rem;
+                min-height: 60px;
+            }
+
+            /* General spacing */
             section {
-                padding: 6rem 5% 3rem;
+                padding: 5rem 5% 2.5rem;
+            }
+
+            .section-header {
+                margin-bottom: 3rem;
+            }
+
+            .section-eyebrow {
+                margin-bottom: 1rem;
+            }
+
+            .section-title {
+                margin-bottom: 1rem;
+                line-height: 1.2;
+            }
+
+            .section-subtitle {
+                line-height: 1.65;
             }
 
             .stats {
-                padding: 4rem 5% 3rem;
+                padding: 3.5rem 5% 2.5rem;
+                gap: 1.5rem;
             }
 
+            .stat-card {
+                padding: 2.5rem 2rem;
+            }
+
+            /* Button improvements */
             .btn {
                 width: 100%;
                 justify-content: center;
+                padding: 1.25rem 2rem;
+                min-height: 56px;
+                font-size: 1rem;
+            }
+
+            /* Service cards */
+            .service-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .service-title {
+                font-size: 1.4rem;
+                line-height: 1.3;
+            }
+
+            .service-desc {
+                line-height: 1.7;
+            }
+
+            .service-features {
+                gap: 0.75rem;
+            }
+
+            .service-features li {
+                padding: 0.75rem 0;
+            }
+
+            /* Project cards */
+            .project-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .project-title {
+                font-size: 1.4rem;
+                line-height: 1.3;
+            }
+
+            .project-desc {
+                line-height: 1.7;
+            }
+
+            .project-stats {
+                gap: 1.5rem;
+            }
+
+            /* Venture cards */
+            .venture-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .venture-title {
+                font-size: 1.5rem;
+            }
+
+            .venture-desc {
+                line-height: 1.7;
+            }
+
+            /* Form improvements */
+            .contact-form input,
+            .contact-form textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 1rem;
+                min-height: 48px;
+            }
+
+            .contact-form textarea {
+                min-height: 140px;
+            }
+
+            .form-submit {
+                min-height: 56px;
+                font-size: 1rem;
+            }
+
+            /* Back to top button mobile */
+            .back-to-top {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 52px;
+                height: 52px;
+            }
+
+            .back-to-top svg {
+                width: 22px;
+                height: 22px;
             }
         }
 
         @media (max-width: 480px) {
+            /* Extra small mobile optimization */
+            nav {
+                padding: 1rem 4%;
+            }
+
+            .logo img {
+                height: 42px;
+                width: 42px;
+            }
+
+            .hero {
+                padding: 5rem 4% 2rem;
+            }
+
             .hero-title {
-                font-size: clamp(2.5rem, 12vw, 4rem);
+                font-size: clamp(2.25rem, 11vw, 3.5rem);
+                margin-bottom: 1rem;
+            }
+
+            .hero-subtitle {
+                font-size: clamp(1rem, 3.5vw, 1.25rem);
+                margin-bottom: 1.25rem;
+            }
+
+            .hero-description {
+                font-size: clamp(0.95rem, 3vw, 1.1rem);
+                margin-bottom: 1.75rem;
             }
 
             .section-title {
-                font-size: clamp(2rem, 8vw, 3rem);
+                font-size: clamp(1.85rem, 7.5vw, 2.75rem);
+                line-height: 1.15;
+            }
+
+            .section-subtitle {
+                font-size: clamp(1rem, 3.5vw, 1.25rem);
+            }
+
+            .section-eyebrow {
+                font-size: 0.65rem;
+            }
+
+            section {
+                padding: 4rem 4% 2rem;
+            }
+
+            .stats {
+                padding: 3rem 4% 2rem;
+                gap: 1.25rem;
+            }
+
+            .stat-card {
+                padding: 2rem 1.5rem;
             }
 
             .stat-number {
-                font-size: 2.5rem;
+                font-size: 2.25rem;
             }
 
-            .project-card {
-                padding: 2rem;
+            .stat-label {
+                font-size: 0.85rem;
             }
 
-            .education-card {
-                padding: 2rem;
+            .project-card,
+            .service-card,
+            .education-card,
+            .venture-card {
+                padding: 1.75rem 1.25rem;
+            }
+
+            .project-title,
+            .service-title {
+                font-size: 1.3rem;
+            }
+
+            .timeline {
+                padding-left: 1.5rem;
+            }
+
+            .timeline-item {
+                padding-left: 1.5rem;
+                margin-bottom: 3rem;
+            }
+
+            .timeline-item::before {
+                left: -2rem;
+                width: 12px;
+                height: 12px;
+            }
+
+            .timeline-title {
+                font-size: 1.35rem;
+            }
+
+            .timeline-company {
+                font-size: 0.95rem;
+            }
+
+            .timeline-desc {
+                font-size: 0.95rem;
+            }
+
+            .skill-tag {
+                font-size: 0.65rem;
+                padding: 0.35rem 0.85rem;
+            }
+
+            .btn {
+                padding: 1.125rem 1.75rem;
+                font-size: 0.95rem;
+            }
+
+            .contact-title {
+                font-size: clamp(1.75rem, 7vw, 2.5rem);
+            }
+
+            .contact-text {
+                font-size: clamp(0.95rem, 3vw, 1.1rem);
+            }
+
+            /* Back to top button extra small mobile */
+            .back-to-top {
+                bottom: 1rem;
+                right: 1rem;
+                width: 48px;
+                height: 48px;
+            }
+
+            .back-to-top svg {
+                width: 20px;
+                height: 20px;
             }
         }
 
@@ -2181,6 +2557,13 @@
             </ul>
         </nav>
 
+        <!-- Back to Top Button -->
+        <button id="backToTop" class="back-to-top" aria-label="Back to top">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+        </button>
+
         <!-- Hero Section -->
         <section class="hero" role="banner" aria-label="Introduction">
             <div class="hero-content">
@@ -2189,10 +2572,10 @@
                     <span class="gradient-text">Akshay Bajpai</span>
                 </h1>
                 <p class="hero-subtitle">
-                    <span class="highlight">Co-Founder</span> of Aiximius, Merakiel & RudeCorp | <span class="highlight">Ex-CTO</span> @ PYVOT | Specialist in <span class="highlight">Applied AI</span>, <span class="highlight">Scalable Systems</span> & <span class="highlight">Product Strategy</span>
+                    <span class="highlight">Co-Founder & CEO</span> at Aiximius | <span class="highlight">Co-Founder</span> at Merakiel & RudeCorp | <span class="highlight">Ex-CTO</span> at PYVOT
                 </p>
                 <p class="hero-description">
-                    Your competitors are already implementing AI. The question isn't whether to act—it's whether you have the right architect to make it count. I turn theoretical AI into revenue-generating systems that don't just work—they dominate. Zero fluff. Pure execution. Measurable ROI.
+                    I turn messy data and ambitious ideas into AI systems that actually work. From healthcare diagnostics achieving 85%+ accuracy to social platforms serving thousands—I build, ship, and scale intelligent products that solve problems worth solving.
                 </p>
                 <div class="hero-cta" role="group" aria-label="Call to action buttons">
                     <a href="#contact" class="btn btn-primary" aria-label="Contact Akshay Bajpai">
@@ -2230,43 +2613,40 @@
         <!-- About Section -->
         <section id="about" class="reveal" aria-labelledby="about-title">
             <div class="section-header">
-                <div class="section-eyebrow">The Truth About AI Implementation</div>
-                <h2 id="about-title" class="section-title">Most AI Projects Fail. Mine Don't.</h2>
+                <div class="section-eyebrow">The Story</div>
+                <h2 id="about-title" class="section-title">From Medical AI Research to Building Products People Use Daily</h2>
                 <p class="section-subtitle">
-                    While others drown in proof-of-concepts, I ship production systems that move metrics. Here's why companies bet their competitive edge on my work—and why you might need to as well.
+                    Most AI engineers can build models. Few can ship products that survive real users, messy data, and production chaos.
                 </p>
             </div>
             <div class="about-content">
                 <div class="about-text">
                     <p>
-                        Here's what separates talk from results: I don't just advise on AI—I build it, scale it, and make it profitable. As Co-Founder of <a href="https://aiximius.com" target="_blank" rel="noopener noreferrer" class="inline-link">Aiximius</a>, <a href="https://rudecorp.com" target="_blank" rel="noopener noreferrer" class="inline-link">RudeCorp</a>, and <a href="https://merakiel.in" target="_blank" rel="noopener noreferrer" class="inline-link">Merakiel</a>, I've proven that sophisticated AI can drive real business outcomes. Products like <a href="https://docurix.com" target="_blank" rel="noopener noreferrer" class="inline-link">Docurix</a> and <a href="https://parenxly.com" target="_blank" rel="noopener noreferrer" class="inline-link">Parenxly</a> aren't portfolio pieces—they're market validation.
+                        In 2023, I graduated with a <span class="emphasis">97.5% distinction in AI & Intelligent Systems</span>—but my real education came from watching my first production ML system crash at 2 AM. That's when I learned: the math is the easy part. The hard part is building systems that don't fall apart when users do unexpected things.
                     </p>
                     <p>
-                        The difference? <span class="emphasis">I speak both languages fluently</span>—the language of cutting-edge research and the language of sustainable revenue. While most architects choose one or the other, I architect LLM pipelines, RAG systems, and intelligent infrastructures that satisfy both your engineering team and your CFO.
+                        Today, I run <a href="https://aiximius.com" target="_blank" rel="noopener noreferrer" class="inline-link">Aiximius</a>, <a href="https://rudecorp.com" target="_blank" rel="noopener noreferrer" class="inline-link">RudeCorp</a>, and <a href="https://merakiel.in" target="_blank" rel="noopener noreferrer" class="inline-link">Merakiel</a>—companies where we're building AI products like <a href="https://docurix.com" target="_blank" rel="noopener noreferrer" class="inline-link">Docurix</a> (intelligent document management) and <a href="https://parenxly.com" target="_blank" rel="noopener noreferrer" class="inline-link">Parenxly</a> (AI-powered parenting insights). Not demos. Not proofs-of-concept. Products that people rely on.
                     </p>
                     <p>
-                        My tenure as <span class="emphasis">CTO and Director of Engineering</span> wasn't spent in meetings—it was spent in the trenches, shipping systems that served thousands while mentoring teams to think beyond the next sprint. I've learned that the hardest problems in AI aren't technical—they're about aligning breakthrough capability with genuine business need. That's where I excel.
-                    </p>
-                    <p>
-                        A <span class="emphasis">Master's in AI & Intelligent Systems with 97.5% distinction</span> and published research in medical ML gave me the foundation. A decade building production systems gave me the scars. Together? They've given me an unfair advantage in turning your AI ambitions into competitive weapons. Not incrementally better. <span class="emphasis">Categorically different</span>.
+                        My journey from <span class="emphasis">publishing Alzheimer's diagnosis research in Springer</span> to being a <span class="emphasis">CTO managing engineering teams</span> taught me something crucial: great AI isn't about the fanciest algorithm. It's about understanding the problem deeply enough to build the simplest solution that actually works. And then having the grit to make it work at scale.
                     </p>
                 </div>
                 <div class="skills-grid">
                     <div class="skill-item">
-                        <div class="skill-title">Technical Leadership</div>
-                        <div class="skill-desc">I don't manage engineers—I multiply their impact. Strategy that teams actually execute, roadmaps that survive first contact with reality, and cultures where shipping excellence becomes the default, not the exception.</div>
+                        <div class="skill-title">AI That Ships</div>
+                        <div class="skill-desc">Built production LLM pipelines, RAG systems, and deep learning models that handle real-world chaos—not just clean Kaggle datasets. From NLP to computer vision, I specialize in making research-grade AI actually work in production.</div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-title">AI & Machine Learning</div>
-                        <div class="skill-desc">LLMs, RAG pipelines, NLP, Computer Vision, Deep Learning—not as buzzwords, but as production systems handling real load. I know the difference between demo-quality and deployment-ready, and I only ship the latter.</div>
+                        <div class="skill-title">Leading Teams</div>
+                        <div class="skill-desc">As CTO at PYVOT, I learned that the best technical leadership isn't about being the smartest person in the room—it's about building systems and culture where great work happens naturally.</div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-title">Product & Platform Engineering</div>
-                        <div class="skill-desc">Beautiful code that nobody uses is just expensive art. I build platforms users actually need, with architecture that scales when demand spikes, and UX that turns skeptics into advocates.</div>
+                        <div class="skill-title">Products People Love</div>
+                        <div class="skill-desc">Beautiful code that nobody uses is worthless. I build full-stack platforms where the AI is invisible but indispensable—the kind of products where users wonder how they ever lived without them.</div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-title">System Architecture</div>
-                        <div class="skill-desc">Distributed systems fail in creative ways. I design architectures that degrade gracefully, scale economically, and survive the chaos of production—because elegance under normal conditions is easy; resilience under failure is what separates amateurs from professionals.</div>
+                        <div class="skill-title">Architecture That Survives</div>
+                        <div class="skill-desc">Distributed systems fail in creative ways at 3 AM. I design architectures that degrade gracefully, scale without breaking the bank, and actually work when everything goes wrong.</div>
                     </div>
                 </div>
             </div>
@@ -2275,66 +2655,66 @@
         <!-- Services Section -->
         <section id="services" class="reveal" aria-labelledby="services-title">
             <div class="section-header">
-                <div class="section-eyebrow">What I Do</div>
-                <h2 id="services-title" class="section-title">Services That Move Your Business Forward</h2>
+                <div class="section-eyebrow">How We Work Together</div>
+                <h2 id="services-title" class="section-title">From "That's Impossible" to "How Did We Live Without This?"</h2>
                 <p class="section-subtitle">
-                    I don't do cookie-cutter solutions. Every engagement is tailored to your specific challenges, leveraging AI to create competitive advantages that compound over time.
+                    Whether you need someone to architect your AI strategy or roll up their sleeves and build it—I've done both, often simultaneously.
                 </p>
             </div>
             <div class="services-grid">
                 <div class="service-card">
                     <div class="service-number">01</div>
-                    <h3 class="service-title">AI Strategy & Architecture</h3>
+                    <h3 class="service-title">AI Architecture That Actually Works</h3>
                     <p class="service-desc">
-                        Transform AI from buzzword to business driver. I architect intelligent systems that align with your strategic objectives and deliver measurable ROI.
+                        You have a vision. I'll show you the path from "wouldn't it be cool if..." to production-ready AI that handles real users and messy data. No hand-waving, no theoretical frameworks—just battle-tested architectures that scale.
                     </p>
                     <ul class="service-features">
-                        <li>LLM pipeline design & optimization</li>
-                        <li>RAG system architecture</li>
-                        <li>ML model selection & deployment</li>
-                        <li>Production-ready AI infrastructure</li>
+                        <li>LLM & RAG pipeline design</li>
+                        <li>Model selection for real-world constraints</li>
+                        <li>Infrastructure that doesn't bankrupt you</li>
+                        <li>Performance optimization for production</li>
                     </ul>
                 </div>
 
                 <div class="service-card">
                     <div class="service-number">02</div>
-                    <h3 class="service-title">Technical Leadership & Advisory</h3>
+                    <h3 class="service-title">Technical Leadership You Can Trust</h3>
                     <p class="service-desc">
-                        Bridge the gap between AI potential and business reality. Strategic guidance that turns proof-of-concepts into production systems.
+                        Sometimes you need a CTO's perspective without the full-time commitment. I help teams make decisions that compound positively: technology choices, architecture patterns, team structures, and that tricky build-vs-buy calculus.
                     </p>
                     <ul class="service-features">
-                        <li>CTO-level strategic consulting</li>
-                        <li>Team augmentation & mentorship</li>
-                        <li>Technology stack optimization</li>
-                        <li>Build vs buy decisions</li>
+                        <li>Strategic technical direction</li>
+                        <li>Team mentorship & capability building</li>
+                        <li>Technology stack decisions</li>
+                        <li>Rescue missions for stuck projects</li>
                     </ul>
                 </div>
 
                 <div class="service-card">
                     <div class="service-number">03</div>
-                    <h3 class="service-title">Full-Stack AI Development</h3>
+                    <h3 class="service-title">Building It From Scratch</h3>
                     <p class="service-desc">
-                        From ideation to deployment, I build production AI systems that scale. Clean code, robust architecture, measurable outcomes.
+                        Need hands on keyboard, not just advice? I'll build your AI system from the ground up—clean code, proper testing, documentation that doesn't lie, and architecture that makes future developers grateful, not vengeful.
                     </p>
                     <ul class="service-features">
-                        <li>Custom AI solution development</li>
-                        <li>API design & implementation</li>
-                        <li>Performance optimization</li>
-                        <li>Testing & quality assurance</li>
+                        <li>End-to-end AI solution development</li>
+                        <li>API design that developers actually like</li>
+                        <li>Performance that survives real traffic</li>
+                        <li>Code quality you won't regret later</li>
                     </ul>
                 </div>
 
                 <div class="service-card">
                     <div class="service-number">04</div>
-                    <h3 class="service-title">Product & Platform Engineering</h3>
+                    <h3 class="service-title">Products That Users Actually Want</h3>
                     <p class="service-desc">
-                        Build products users love powered by AI they trust. I combine technical excellence with product thinking to create competitive advantages.
+                        AI is only interesting when it solves real problems elegantly. I build products where the intelligence is invisible but essential—where users can't quite explain how it works, but know they'd be lost without it.
                     </p>
                     <ul class="service-features">
                         <li>AI-powered product development</li>
-                        <li>Platform architecture & scaling</li>
-                        <li>User experience optimization</li>
-                        <li>System integration & automation</li>
+                        <li>Scaling from prototype to production</li>
+                        <li>UX that makes complexity feel simple</li>
+                        <li>Integration with existing systems</li>
                     </ul>
                 </div>
             </div>
@@ -2343,10 +2723,10 @@
         <!-- Experience Section -->
         <section id="experience" class="reveal" aria-labelledby="experience-title">
             <div class="section-header">
-                <div class="section-eyebrow">Career Journey</div>
-                <h2 id="experience-title" class="section-title">Where I Learned to Ship Under Pressure</h2>
+                <div class="section-eyebrow">The Journey</div>
+                <h2 id="experience-title" class="section-title">A Decade of Shipping AI in the Real World</h2>
                 <p class="section-subtitle">
-                    A decade isn't just tenure—it's pattern recognition across startups, enterprises, research labs, and production crises. These experiences taught me what works, what fails, and why most AI initiatives never escape the lab. Here's the education you can't get from courses.
+                    From research internships to founding companies, from midnight debugging sessions to published papers—here's where I learned that building great AI is 10% algorithm and 90% everything else.
                 </p>
             </div>
             <div class="timeline">
@@ -2355,7 +2735,7 @@
                     <h3 class="timeline-title">Co-Founder & CEO</h3>
                     <div class="timeline-company"><a href="https://aiximius.com" target="_blank" rel="noopener noreferrer" class="company-link">Aiximius</a> • Self-employed • New Delhi, India</div>
                     <p class="timeline-desc">
-                        Leading strategic vision and execution for an AI-focused venture, driving innovation in scalable AI solutions and intelligent system architecture. Orchestrating product development, go-to-market strategy, and building a team dedicated to pushing the boundaries of what's possible with modern AI.
+                        Building the parent organization for everything I've learned about shipping AI products. This is where theory meets reality—where we take ambitious ideas and turn them into systems that people actually use and pay for.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">Start-up Leadership</span>
@@ -2370,7 +2750,7 @@
                     <h3 class="timeline-title">Consulting AI SME</h3>
                     <div class="timeline-company">Falqor Technologies Pvt. Ltd. • Freelance • Remote</div>
                     <p class="timeline-desc">
-                        Providing expert AI consulting services to organizations seeking to leverage cutting-edge AI capabilities. Architecting sophisticated AI solutions, optimizing technology stacks, and guiding strategic implementation of LLMs, RAG systems, and intelligent automation.
+                        Consulting on AI architecture and implementation. Helping clients build LLM systems, RAG pipelines, and intelligent automation.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">AI Consulting</span>
@@ -2384,7 +2764,7 @@
                     <h3 class="timeline-title">Co-Founder & Technology Strategy Director</h3>
                     <div class="timeline-company"><a href="https://merakiel.in" target="_blank" rel="noopener noreferrer" class="company-link">Merakiel</a> • Self-employed • New Delhi, India</div>
                     <p class="timeline-desc">
-                        Driving technology strategy and innovation for a premium marketing company. Leveraging AI and modern web technologies to create exceptional digital experiences that help brands connect authentically with their audiences.
+                        Leading technology strategy for a marketing company. Building digital products using AI and modern web technologies.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">Technology Strategy</span>
@@ -2398,7 +2778,7 @@
                     <h3 class="timeline-title">Co-Founder</h3>
                     <div class="timeline-company"><a href="https://rudecorp.com" target="_blank" rel="noopener noreferrer" class="company-link">Rude Corp</a> • Self-employed • Ukraine</div>
                     <p class="timeline-desc">
-                        Co-founded an AI-powered social platform reimagining modern matchmaking through intelligent, behavior-driven personalization. Leveraged advanced machine learning and user-centric design to craft seamless, secure experiences deeply resonating with individual preferences. Our data-first approach enabled continuous optimization, driving unmatched accuracy and engagement—delivering a transformative, AI-native solution for meaningful digital connections. Products include <a href="https://parenxly.com" target="_blank" rel="noopener noreferrer" class="inline-link">Parenxly</a>, an innovative parenting experience platform.
+                        What if social platforms actually understood human behavior instead of optimizing for engagement metrics? We're building AI-powered matching that learns what meaningful connection looks like. Also home to <a href="https://parenxly.com" target="_blank" rel="noopener noreferrer" class="inline-link">Parenxly</a>—because parenting deserves better than generic forum advice.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">Artificial Intelligence</span>
@@ -2413,7 +2793,7 @@
                     <h3 class="timeline-title">Chief Technology Officer & Director of Engineering</h3>
                     <div class="timeline-company">PYVOT • Full-time • Kolkata, India</div>
                     <p class="timeline-desc">
-                        Led technology strategy and engineering teams for an innovative restaurant management SaaS platform. Architected scalable cloud infrastructure, established engineering best practices, and drove technical excellence across the organization. Successfully aligned product roadmap with business objectives while building a high-performing engineering culture.
+                        Learned the hard way that being CTO means making decisions with incomplete information, building teams that can ship without you, and turning "the system is down" into "we've implemented monitoring so this never happens again." Restaurant tech meets AI—messier than you'd think, more rewarding than you'd expect.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">CTO Leadership</span>
@@ -2428,7 +2808,7 @@
                     <h3 class="timeline-title">Machine Learning Engineer & Data Scientist</h3>
                     <div class="timeline-company">CoreValue Technologies • Full-time • Noida, India</div>
                     <p class="timeline-desc">
-                        Developed advanced ML solutions and implemented sophisticated RAG pipelines for enterprise clients. Led LLM operations initiatives, built scalable data analytics platforms, and drove AI innovation across multiple high-impact projects. Specialized in NLP, generative AI, and production ML systems serving millions of users.
+                        This is where I got my hands dirty with LLMs and RAG systems at scale. Enterprise clients have... interesting data. The kind that makes you question every assumption from your textbooks. Built systems that survived contact with reality.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">LLMs</span>
@@ -2445,7 +2825,7 @@
                     <h3 class="timeline-title">Senior Software Development Engineer (ML)</h3>
                     <div class="timeline-company">Haulkload • Freelance • Remote</div>
                     <p class="timeline-desc">
-                        Developed and maintained sophisticated web applications using Python and Django framework. Integrated cutting-edge ML methodologies to enhance application functionality, optimized database performance with MySQL, and delivered seamless user experiences. Conducted comprehensive testing and ensured high-quality software delivery.
+                        Built web applications with Python and Django. Integrated ML models and optimized database performance.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">Django</span>
@@ -2461,7 +2841,7 @@
                     <h3 class="timeline-title">MLOps Trainee</h3>
                     <div class="timeline-company">blackthorn.ai • Internship • Lviv, Ukraine</div>
                     <p class="timeline-desc">
-                        Achieved over 90% accuracy in Graph Neural Network classification problems. Strengthened datasets through meticulous labeling for medical imaging classification. Optimized GPU environments across Linux and Windows platforms, and implemented seamless CI/CD workflows using GitHub Actions for ML pipelines.
+                        My first real taste of production ML—Graph Neural Networks on medical imaging data, GPU optimization across platforms, and learning that 90% accuracy means nothing if your pipeline can't run reliably. Built CI/CD workflows that actually worked.
                     </p>
                     <div class="timeline-skills">
                         <span class="skill-tag">Neural Networks</span>
@@ -2477,9 +2857,9 @@
         <section id="projects" class="reveal" aria-labelledby="projects-title">
             <div class="section-header">
                 <div class="section-eyebrow">Research & Innovation</div>
-                <h2 id="projects-title" class="section-title">Proof Over Promises</h2>
+                <h2 id="projects-title" class="section-title">When Models Meet Reality</h2>
                 <p class="section-subtitle">
-                    Anyone can claim AI expertise. I'll show you the systems I've built, the problems I've solved, and the results I've delivered. Judge for yourself whether this is the caliber of work your organization needs.
+                    Academic research that escaped the lab and became published papers. Real problems, messy data, production constraints—this is where theory proved itself or died trying.
                 </p>
             </div>
             <div class="projects-grid">
@@ -2487,7 +2867,7 @@
                     <div class="project-icon">🧠</div>
                     <h3 class="project-title">Alzheimer's Disease Diagnosis Using Machine Learning</h3>
                     <p class="project-desc">
-                        <span class="emphasis">Published research that matters.</span> When 50 million people worldwide live with Alzheimer's and early detection changes outcomes, theoretical accuracy isn't enough. I engineered 8 production-grade ML models—SVM, Random Forest, AdaBoost—that achieved breakthrough diagnostic precision on 150+ patient records. Cut pipeline runtime by 25% (6 to 4.5 hours) because in healthcare, speed saves lives. This wasn't just my thesis—it's in peer-reviewed journals, advancing actual medical practice.
+                        <span class="emphasis">Published in Springer.</span> When early detection can change outcomes for 50 million people worldwide, "good enough" isn't good enough. Engineered 8 ML models that achieved 85%+ diagnostic accuracy on 150+ patient records, then optimized the pipeline from 6 hours to 4.5—because in healthcare, faster inference literally saves lives. This wasn't just my thesis; it's peer-reviewed research advancing actual medical practice.
                     </p>
                     <div class="project-stats">
                         <div class="project-stat">
@@ -2509,7 +2889,7 @@
                     <div class="project-icon">💬</div>
                     <h3 class="project-title">Sentiment Classification using RNN</h3>
                     <p class="project-desc">
-                        <span class="emphasis">Real-time sentiment at scale.</span> Built an RNN architecture that doesn't just classify Twitter sentiment—it processes the chaos of unfiltered social data and extracts signal from noise. The hard part wasn't the model; it was the preprocessing pipeline that handles edge cases, slang, sarcasm, and the beautiful mess of how humans actually communicate online. Exceptional accuracy because I engineered for reality, not clean datasets.
+                        <span class="emphasis">98% accuracy on chaos.</span> Twitter isn't a clean dataset—it's slang, sarcasm, typos, and the beautiful mess of how humans actually communicate. Built an RNN that doesn't just classify sentiment; it understands the preprocessing nightmare that is real social data. The hard part wasn't the neural network; it was making it robust enough to handle reality.
                     </p>
                     <div class="project-stats">
                         <div class="project-stat">
@@ -2527,7 +2907,7 @@
                     <div class="project-icon">🎨</div>
                     <h3 class="project-title">AI Anime Face Generation using GAN</h3>
                     <p class="project-desc">
-                        <span class="emphasis">89% generation quality isn't luck—it's architecture.</span> Training GANs is notoriously unstable; most implementations collapse or generate garbage. I designed adversarial training strategies and hyperparameter configurations that consistently produce photorealistic anime faces. This project proved I don't just implement papers—I understand the mathematics deeply enough to make temperamental models perform reliably.
+                        <span class="emphasis">Taming the chaos of GANs.</span> Training GANs is notoriously unstable—most implementations collapse into mode collapse or generate garbage. I designed adversarial training strategies that consistently produce photorealistic anime faces with 89% quality. This project proved I don't just implement papers; I understand the math deeply enough to make temperamental models actually perform.
                     </p>
                     <div class="project-stats">
                         <div class="project-stat">
@@ -2545,7 +2925,7 @@
                     <div class="project-icon">🔤</div>
                     <h3 class="project-title">Chinese MNIST Classification using CNN</h3>
                     <p class="project-desc">
-                        <span class="emphasis">Systematic experimentation over guesswork.</span> Chinese character recognition is exponentially harder than Western digits—15,000+ unique classes versus 10. I engineered three CNN architectures and methodically benchmarked activation functions, optimizers, and depths to find what actually works. This is how you derisk ML projects: controlled experiments, reproducible results, and decisions backed by data, not intuition.
+                        <span class="emphasis">15,000 classes, not 10.</span> Chinese character recognition makes MNIST look trivial. Built three CNN architectures and systematically benchmarked every variable—activation functions, optimizers, network depth—until I found what actually works. This is how you de-risk ML: controlled experiments, reproducible results, decisions backed by data instead of intuition.
                     </p>
                     <div class="project-stats">
                         <div class="project-stat">
@@ -2600,10 +2980,10 @@
         <!-- Education & Publications -->
         <section id="education" class="reveal" aria-labelledby="education-title">
             <div class="section-header">
-                <div class="section-eyebrow">Academic Excellence</div>
-                <h2 id="education-title" class="section-title">The Academic Foundation That Actually Mattered</h2>
+                <div class="section-eyebrow">The Foundation</div>
+                <h2 id="education-title" class="section-title">Where Theory Met Practice</h2>
                 <p class="section-subtitle">
-                    97.5% doesn't just signal intelligence—it signals discipline, systematic thinking, and the ability to master complex domains under pressure. Here's the theoretical foundation that powers practical execution.
+                    97.5% isn't just a number—it's proof that I understand the fundamentals deeply enough to know when to follow them and when to break them.
                 </p>
             </div>
             <div class="education-grid">
@@ -2614,7 +2994,7 @@
                         <div class="education-degree">Master's degree, Artificial Intelligence & Intelligent Systems</div>
                         <div class="education-date">Sep 2021 - Jul 2023 • Grade: 97.5% (Distinction)</div>
                         <p class="education-details">
-                            Comprehensive advanced study in Machine Learning Foundations, Deep Learning and Neural Networks, Natural Language Processing, Computer Vision, Reinforcement Learning, Big Data Analytics, Ethics and Bias in AI, Data Visualization and Interpretability, AI in Business and Industry, and Advanced Mathematics for AI. Graduated with highest distinction, demonstrating mastery of both theoretical foundations and practical applications.
+                            From neural network theory to the ethics of AI deployment—this is where I learned to think like a researcher while keeping one foot in reality. Advanced coursework in ML, Deep Learning, NLP, Computer Vision, Reinforcement Learning, and Big Data Analytics. <span class="emphasis">Graduated with 97.5% distinction</span>—because understanding the fundamentals deeply is how you know when to break the rules intelligently.
                         </p>
                     </div>
                 </div>
@@ -2626,7 +3006,7 @@
                         <div class="education-degree">Bachelor of Technology - BTech, Computer Science and Engineering</div>
                         <div class="education-date">2017 - Aug 2021 • Graduated With Honors</div>
                         <p class="education-details">
-                            Rigorous foundation in Data Structures and Algorithms, Database Systems, Operating Systems, Computer Networks, Software Engineering, Programming Languages, Web Development, Computer Architecture, Artificial Intelligence, Cybersecurity, Software Testing and Quality Assurance, and Mobile App Development. Active participation in Debate Team, serving as Orator and Presentation Expert. Graduated with honors, recognized for academic excellence and leadership.
+                            The fundamentals that every engineer needs: Data Structures, Algorithms, Operating Systems, Networks, Software Engineering. This is where I learned that clever code is worthless if it doesn't solve real problems. <span class="emphasis">Graduated with honors</span>, with a debate team background that taught me how to explain complex technical decisions to people who just want to know if it'll work.
                         </p>
                     </div>
                 </div>
@@ -2636,10 +3016,10 @@
         <!-- Publications Section -->
         <section id="publications" class="reveal" aria-labelledby="publications-title">
             <div class="section-header">
-                <div class="section-eyebrow">Research Contributions</div>
-                <h2 id="publications-title" class="section-title">Research That Passed Peer Review</h2>
+                <div class="section-eyebrow">Published Research</div>
+                <h2 id="publications-title" class="section-title">Work That Survived Peer Review</h2>
                 <p class="section-subtitle">
-                    Anyone can claim breakthroughs. Peer-reviewed publications mean other experts scrutinized my work and found it worthy of advancing the field. These aren't blog posts—they're contributions to medical AI that met academic rigor.
+                    Anyone can write a blog post. Peer-reviewed publications mean other experts scrutinized my work, challenged every assumption, and decided it was worthy of advancing the field.
                 </p>
             </div>
             <div class="education-grid">
@@ -2650,7 +3030,7 @@
                         <div class="education-degree">Springer Publication • Volume 3</div>
                         <div class="education-date">Published: October 31, 2024</div>
                         <p class="education-details">
-                            Research paper published as the closing chapter in Volume 3 of "Data-Centric Business and Applications" by Springer. Presents comprehensive analysis of machine learning applications in medical diagnosis, exploring innovative approaches to leveraging AI for improved healthcare outcomes. Contributes to the growing body of knowledge at the intersection of AI, healthcare, and data science.
+                            The closing chapter of Springer's "Data-Centric Business and Applications" Volume 3—because they wanted practical insights on how ML actually works in medical diagnosis, not just theoretical frameworks. This bridges the gap between academic research and real-world healthcare applications.
                         </p>
                     </div>
                 </div>
@@ -2662,7 +3042,7 @@
                         <div class="education-degree">ICCSEEA2023 Conference Proceedings • Springer</div>
                         <div class="education-date">Published: January 28, 2023</div>
                         <p class="education-details">
-                            Master's thesis research paper published in "Lecture Notes on Data Engineering and Communications Technologies" by Springer Publisher. Presents novel machine learning methodologies for early and accurate diagnosis of Alzheimer's disease, combining advanced statistical analysis with ensemble learning techniques. Research demonstrates significant improvements in diagnostic accuracy while reducing computational complexity.
+                            My Master's thesis that proved ensemble learning could significantly improve early Alzheimer's diagnosis while reducing computational complexity. Published in Springer's "Lecture Notes on Data Engineering and Communications Technologies"—peer-reviewed research that contributed to advancing medical AI practice, not just theory.
                         </p>
                     </div>
                 </div>
@@ -2673,9 +3053,9 @@
         <section id="volunteering" class="reveal" aria-labelledby="volunteering-title">
             <div class="section-header">
                 <div class="section-eyebrow">Community Impact</div>
-                <h2 id="volunteering-title" class="section-title">Beyond Code: Leadership That Matters</h2>
+                <h2 id="volunteering-title" class="section-title">Volunteering & Leadership</h2>
                 <p class="section-subtitle">
-                    Technical skills are table stakes. Character reveals itself in what you do when there's no paycheck involved. 240+ hours of environmental service, youth mentorship, and community leadership—because impact isn't measured solely in revenue.
+                    240+ hours of community service in environmental initiatives, youth mentorship, and cultural programs.
                 </p>
             </div>
             <div class="projects-grid">
@@ -2683,7 +3063,7 @@
                     <div class="project-icon">🌟</div>
                     <h3 class="project-title">Cultural Team Lead</h3>
                     <p class="project-desc">
-                        Led cultural initiatives at National Service Scheme's CIAT School CRPF Camp—not just organizing events, but building bridges between diverse communities. Real leadership isn't about titles; it's about creating spaces where understanding replaces division, one thoughtfully designed interaction at a time.
+                        Led cultural initiatives at National Service Scheme's CIAT School CRPF Camp, organizing events and building community connections.
                     </p>
                     <div class="project-stats">
                         <div class="project-stat">
@@ -2701,7 +3081,7 @@
                     <div class="project-icon">🚀</div>
                     <h3 class="project-title">Settlement Designer - ISRO Competition</h3>
                     <p class="project-desc">
-                        Designed future space habitats for ISRO's prestigious competition—thinking through problems humanity hasn't faced yet. This taught me that the best solutions come from first-principles thinking, not incremental improvements. Whether it's space settlements or AI architecture, the methodology stays the same: question assumptions, solve for constraints, design for the future.
+                        Designed future space habitats for ISRO's competition, applying first-principles thinking to solve novel engineering challenges.
                     </p>
                     <div class="project-stats">
                         <div class="project-stat">
@@ -2761,7 +3141,7 @@
                     <div class="project-icon">🌱</div>
                     <h3 class="project-title">NSS Volunteer - Environmental Campaigns</h3>
                     <p class="project-desc">
-                        240 hours of environmental service earned me a Grade "A" certification, but more importantly, taught me that sustainable change requires systems thinking. You don't clean up a community once—you build the systems and culture that keep it clean. Same principle applies to code, to organizations, to any complex problem worth solving.
+                        Completed 240 hours of environmental service, earning Grade "A" certification. Participated in cleanup campaigns and sustainability initiatives.
                     </p>
                     <div class="project-stats">
                         <div class="project-stat">
@@ -2781,9 +3161,9 @@
         <section id="awards" class="reveal" aria-labelledby="awards-title">
             <div class="section-header">
                 <div class="section-eyebrow">Recognition & Achievements</div>
-                <h2 id="awards-title" class="section-title">External Validation</h2>
+                <h2 id="awards-title" class="section-title">Honors & Awards</h2>
                 <p class="section-subtitle">
-                    I don't need awards to validate my work—results do that. But when external organizations recognize excellence, it confirms what the data already showed: consistent performance under scrutiny.
+                    Recognition for academic excellence, leadership, and community service.
                 </p>
             </div>
             <div class="education-grid">
@@ -2794,7 +3174,7 @@
                         <div class="education-degree">Jiwaji University, Gwalior</div>
                         <div class="education-date">Issued: June 2017</div>
                         <p class="education-details">
-                            Awarded Grade "A" certification in recognition of exceptional commitment and dedication to volunteer service through the National Service Scheme. Completed 240+ hours of community service encompassing environmental campaigns, social welfare initiatives, and public awareness programs.
+                            Awarded Grade "A" certification for 240+ hours of volunteer service through the National Service Scheme, including environmental campaigns and social welfare initiatives.
                         </p>
                     </div>
                 </div>
@@ -2806,7 +3186,7 @@
                         <div class="education-degree">Central Board of Secondary Education</div>
                         <div class="education-date">Issued by Director: April 2017</div>
                         <p class="education-details">
-                            Selected as Head Boy, the highest student leadership position, demonstrating exceptional leadership qualities, academic excellence, and strong interpersonal skills. Represented the student body, coordinated school activities, and served as a liaison between students and administration.
+                            Selected as Head Boy, representing the student body and coordinating school activities.
                         </p>
                     </div>
                 </div>
@@ -2828,10 +3208,10 @@
         <!-- Ventures & Products Section -->
         <section id="ventures" class="reveal" aria-labelledby="ventures-title">
             <div class="section-header">
-                <div class="section-eyebrow">Portfolio</div>
-                <h2 id="ventures-title" class="section-title">Where I'm Placing My Bets</h2>
+                <div class="section-eyebrow">Building in Public</div>
+                <h2 id="ventures-title" class="section-title">Where I'm Putting My Own Skin in the Game</h2>
                 <p class="section-subtitle">
-                    Talk is cheap. I'm investing my time, expertise, and reputation into these ventures. When you risk your own success on an idea, you build differently. These aren't side projects—they're my proof of concept for the future I'm building.
+                    Talk is cheap. These are the companies where I'm risking my own time, reputation, and sanity—because the best way to learn what works is to build it yourself.
                 </p>
             </div>
             <div class="ventures-grid">
@@ -2840,7 +3220,7 @@
                     <h3 class="venture-title">Aiximius</h3>
                     <p class="venture-type">Parent Organization</p>
                     <p class="venture-desc">
-                        The parent organization where we turn AI theory into market dominance. Not "AI consulting" that delivers PowerPoints—we architect, build, and deploy systems that move revenue. If you're betting your competitive edge on AI, this is where that edge gets built.
+                        The umbrella for everything I'm building. Not a consulting shop that delivers PowerPoints—we architect, build, and deploy AI systems that actually move revenue. If you're betting your competitive edge on AI, this is where we build that edge together.
                     </p>
                     <div class="venture-link-indicator">
                         <span>Visit Aiximius</span>
@@ -2853,7 +3233,7 @@
                     <h3 class="venture-title">RudeCorp</h3>
                     <p class="venture-type">AI-Powered Social Platform</p>
                     <p class="venture-desc">
-                        We're rebuilding social connection from first principles using AI that actually understands human behavior. No swiping fatigue. No algorithm mystery. Just intelligent matchmaking that learns what meaningful connection looks like for you. The dating app industry is ripe for disruption—we're the disruptor.
+                        What if social platforms understood human behavior instead of just maximizing engagement? We're rebuilding connection from first principles—intelligent matchmaking that learns what meaningful connection actually looks like for you. No swiping fatigue. No algorithm mystery. Just AI that gets better at understanding humans.
                     </p>
                     <div class="venture-link-indicator">
                         <span>Visit RudeCorp</span>
@@ -2866,7 +3246,7 @@
                     <h3 class="venture-title">Merakiel</h3>
                     <p class="venture-type">Premium Marketing</p>
                     <p class="venture-desc">
-                        Premium marketing isn't about louder messages—it's about smarter targeting. We leverage AI to help brands cut through noise and connect with audiences who actually care. Real engagement, measurable ROI, zero fluff. Marketing that respects intelligence—yours and your customers'.
+                        Premium marketing isn't about louder messages—it's about smarter targeting. We use AI to help brands cut through noise and connect with audiences who actually care. Measurable ROI, real engagement, zero fluff. Marketing that respects everyone's intelligence.
                     </p>
                     <div class="venture-link-indicator">
                         <span>Visit Merakiel</span>
@@ -2879,7 +3259,7 @@
                     <h3 class="venture-title">Docurix</h3>
                     <p class="venture-type">Product</p>
                     <p class="venture-desc">
-                        Your team drowns in documents while AI sits idle. Docurix fixes that. Intelligent automation that actually understands your documents, learns your workflows, and eliminates the busywork that's killing productivity. Not another glorified OCR tool—actual intelligence that scales with your needs.
+                        Your team drowns in documents while AI sits idle. Docurix fixes that—intelligent automation that actually understands your documents, learns your workflows, and eliminates the busywork killing productivity. Not another OCR tool; actual intelligence that scales with your needs.
                     </p>
                     <div class="venture-link-indicator">
                         <span>Visit Docurix</span>
@@ -2892,7 +3272,7 @@
                     <h3 class="venture-title">Parenxly</h3>
                     <p class="venture-type">Product</p>
                     <p class="venture-desc">
-                        Parenting is the hardest job with the least training. Parenxly delivers AI-driven insights personalized to your family's unique dynamics—not generic advice from forums, but intelligent guidance that evolves with your children. Because raising humans deserves better than guesswork.
+                        Parenting is the hardest job with the least training. Parenxly delivers AI-driven insights personalized to your family's unique dynamics—not generic forum advice, but intelligent guidance that evolves as your children grow. Because raising humans deserves better than guesswork.
                     </p>
                     <div class="venture-link-indicator">
                         <span>Visit Parenxly</span>
@@ -2907,9 +3287,9 @@
         <!-- Contact Section -->
         <section id="contact" class="reveal" aria-labelledby="contact-title">
             <div class="contact-content">
-                <h2 id="contact-title" class="contact-title">Your Next Move Determines Your Competitive Position</h2>
+                <h2 id="contact-title" class="contact-title">Let's Build Something That Matters</h2>
                 <p class="contact-text">
-                    Your competitors are implementing AI right now. The gap between organizations with strategic AI advantage and those playing catch-up widens daily. I'm selective about partnerships—I work with leaders who understand that AI isn't an IT project, it's a strategic imperative. If you're ready to transform talk into execution, and you need someone who's done this before, let's have a conversation. No sales pitch. Just an honest assessment of whether I can help you win.
+                    Have an AI challenge that keeps you up at 3 AM? A vision that everyone says is impossible? Or maybe you just want to talk about why your current ML system isn't working? I'm selective about projects—I work with people who care about building things that last, not just shipping fast. If that's you, let's talk.
                 </p>
 
                 <div class="contact-form-container">
@@ -3204,10 +3584,40 @@
             }
         }, { passive: true });
 
+        // Back to Top Button (shows after scrolling past hero section)
+        const backToTopBtn = document.getElementById('backToTop');
+        const heroSection = document.querySelector('.hero');
+        let backToTopTicking = false;
+
+        window.addEventListener('scroll', () => {
+            if (!backToTopTicking) {
+                window.requestAnimationFrame(() => {
+                    const heroHeight = heroSection.offsetHeight;
+                    if (window.scrollY > heroHeight) {
+                        backToTopBtn.classList.add('visible');
+                    } else {
+                        backToTopBtn.classList.remove('visible');
+                    }
+                    backToTopTicking = false;
+                });
+                backToTopTicking = true;
+            }
+        }, { passive: true });
+
+        // Smooth scroll to top when button is clicked
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
         // Scroll Reveal Animation (using Intersection Observer for better performance)
         const revealElements = document.querySelectorAll('.reveal');
 
         if ('IntersectionObserver' in window) {
+            // Adjust threshold based on screen size for better mobile support
+            const isMobile = window.innerWidth <= 768;
             const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -3217,8 +3627,8 @@
                     }
                 });
             }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -100px 0px'
+                threshold: isMobile ? 0.05 : 0.1,
+                rootMargin: isMobile ? '0px 0px -20px 0px' : '0px 0px -100px 0px'
             });
 
             revealElements.forEach(element => {
