@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -36,9 +36,13 @@ jobs:
 
       - name: Preserve CNAME
         run: |
-          if [ -f CNAME ]; then
-            cp CNAME dist/
-          fi
+          echo "www.akshaybajpai.com" > dist/CNAME
+
+      - name: Verify artifact
+        run: |
+          ls -la dist/
+          test -f dist/index.html
+          test -f dist/CNAME
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
