@@ -1,0 +1,63 @@
+---
+// Lightweight background: gradient + grid. WebGL constellation lazy-loads via client island.
+// No previous particle engine. Fallback is editorial (gradient + grid).
+---
+
+<div class="canvas-wrap" aria-hidden="true">
+  <div class="canvas-fallback">
+    <div class="grid-bg"></div>
+    <div class="gradient-overlay"></div>
+  </div>
+  <div id="neural-mount" class="neural-mount"></div>
+</div>
+
+<style>
+  .canvas-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .canvas-fallback {
+    position: absolute;
+    inset: 0;
+    background: var(--color-bg);
+  }
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: var(--gradient-edge);
+    mask-composite: intersect;
+  }
+  .gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-bg);
+    pointer-events: none;
+  }
+  .neural-mount {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-out-expo);
+  }
+  .neural-mount.ready {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Lazy-load 3D neural scene (Three.js) when idle.
+  const mount = document.getElementById('neural-mount');
+  if (mount && 'requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      import('@components/NeuralScene.ts').then(({ initNeuralScene }) => {
+        initNeuralScene(mount).then(() => { mount.classList.add('ready'); }).catch(() => {});
+      }).catch(() => {});
+    }, { timeout: 2500 });
+  }
+</script>

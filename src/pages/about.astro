@@ -1,0 +1,73 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="About — Akshay Bajpai"
+  description="From medical AI research to building products people use daily. Architect of systems, builder of intelligence."
+>
+  <article class="about-page">
+    <header class="about-header">
+      <h1 class="about-title">About</h1>
+      <p class="about-lead">Architect of systems. Builder of intelligence.</p>
+    </header>
+    <div class="about-prose">
+      <p>
+        I operate at the intersection of AI infrastructure, systems thinking, and product. My work spans
+        medical AI research, restaurant automation, DNS-level ad blocking, healthcare AI architecture,
+        and zero-dependency SaaS—each system designed with explicit tradeoffs and long-term maintainability
+        in mind.
+      </p>
+      <p>
+        I co-founded Aiximius, Merakiel, and Rude Corp; served as CTO at PYVOT; and hold a Master's with
+        97.5% distinction in Artificial Intelligence & Intelligent Systems from Lviv Polytechnic. I have
+        published research and shipped products that people use daily. I prefer building with minimal
+        dependencies, clear architecture, and performance as a non-negotiable.
+      </p>
+      <p>
+        This site is a thinking laboratory: essays, case studies, and technical writing that reflect how
+        I approach problems. No fluff, no placeholders. If you want to collaborate on AI systems,
+        architecture, or performance-critical products, <a href="/contact">get in touch</a>.
+      </p>
+    </div>
+  </article>
+</PageLayout>
+
+<style>
+  .about-page {
+    max-width: var(--content-narrow);
+    margin: 0 auto;
+    padding: var(--space-24) var(--space-8);
+  }
+  .about-header {
+    margin-bottom: var(--space-16);
+  }
+  .about-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-5xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-4);
+    color: var(--color-text);
+  }
+  .about-lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+  .about-prose {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+  }
+  .about-prose p {
+    margin: 0 0 var(--space-6);
+    color: var(--color-text-secondary);
+  }
+  .about-prose a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .about-prose a:hover {
+    color: var(--color-text);
+  }
+</style>

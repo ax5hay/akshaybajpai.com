@@ -1,0 +1,55 @@
+---
+// No previous hero layout. Centered typography, no gradient orbs, no particle clone.
+---
+
+<section class="hero" aria-label="Introduction">
+  <h1 class="hero-title">
+    <span class="hero-name">Akshay Bajpai</span>
+    <span class="hero-role">Architect of Systems</span>
+    <span class="hero-role">Builder of Intelligence</span>
+  </h1>
+  <p class="hero-sub">A digital mind palace for structured thought.</p>
+</section>
+
+<style>
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    position: relative;
+    z-index: 2;
+  }
+  .hero-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 0 var(--space-6);
+  }
+  .hero-name {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    line-height: var(--leading-tight);
+  }
+  .hero-role {
+    font-family: var(--font-sans);
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+  .hero-sub {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+    margin: 0;
+  }
+</style>

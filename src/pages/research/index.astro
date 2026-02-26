@@ -1,0 +1,67 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Research — Akshay Bajpai"
+  description="Published research and experimental work in AI, ML, and intelligent systems."
+>
+  <article class="research-page">
+    <header class="research-header">
+      <h1 class="research-title">Research</h1>
+      <p class="research-lead">Published work and experimental directions.</p>
+    </header>
+    <div class="research-prose">
+      <p>
+        My research background spans medical AI, computer vision, and intelligent systems. I hold a
+        Master's with 97.5% distinction in Artificial Intelligence & Intelligent Systems from Lviv
+        Polytechnic National University, with thesis and published work in applied ML.
+      </p>
+      <p>
+        Current interests include: robust AI infrastructure, minimal-dependency systems, performance
+        engineering for static and edge deployments, and the intersection of systems thinking with
+        product design. I treat research as a discipline of clear hypotheses, measurable outcomes,
+        and reproducible setup—whether in academia or in production systems.
+      </p>
+      <p>
+        For publications and citations, see <a href="https://linkedin.com/in/ax5hay">LinkedIn</a> or
+        <a href="/contact">reach out</a>. Selected technical writing is in <a href="/blog">Blog</a> and
+        <a href="/essays">Essays</a>.
+      </p>
+    </div>
+  </article>
+</PageLayout>
+
+<style>
+  .research-page {
+    max-width: var(--content-narrow);
+    margin: 0 auto;
+    padding: var(--space-24) var(--space-8);
+  }
+  .research-header {
+    margin-bottom: var(--space-16);
+  }
+  .research-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-5xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-4);
+    color: var(--color-text);
+  }
+  .research-lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+  .research-prose p {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-6);
+  }
+  .research-prose a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>

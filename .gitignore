@@ -1,3 +1,10 @@
 SEO-GUIDE.md
 INTEGRATION-SUMMARY.md
 .claude/settings.local.json
+node_modules
+dist
+.astro
+*.local
+.env
+.env.*
+.DS_Store

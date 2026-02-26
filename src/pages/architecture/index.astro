@@ -1,0 +1,69 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+---
+
+<PageLayout
+  title="Architecture — Akshay Bajpai"
+  description="System design, infrastructure patterns, and architectural thinking for AI and product."
+>
+  <article class="arch-page">
+    <header class="arch-header">
+      <h1 class="arch-title">Architecture</h1>
+      <p class="arch-lead">System design, infrastructure patterns, and how I think about structure.</p>
+    </header>
+    <div class="arch-prose">
+      <p>
+        Architecture is the set of decisions that outlast implementation. I approach it as explicit
+        tradeoffs: consistency vs. availability, latency vs. throughput, dependency count vs. speed
+        of delivery. Every system I build has a documented rationale—often in <a href="/work">case
+        studies</a>—so that future readers (including myself) can understand why things are the way
+        they are.
+      </p>
+      <p>
+        Recurring themes: minimal surface area, clear boundaries, performance as a requirement from
+        day one, and the conviction that the best dependency is the one you don't add. I prefer
+        static output, edge-friendly APIs, and databases that match the access pattern—not the other
+        way around.
+      </p>
+      <p>
+        For deep dives into specific systems—DNS-level ad blocking, healthcare AI pipelines,
+        restaurant automation—see <a href="/work">Work</a>. For essays on architectural thinking,
+        see <a href="/essays">Essays</a>.
+      </p>
+    </div>
+  </article>
+</PageLayout>
+
+<style>
+  .arch-page {
+    max-width: var(--content-narrow);
+    margin: 0 auto;
+    padding: var(--space-24) var(--space-8);
+  }
+  .arch-header {
+    margin-bottom: var(--space-16);
+  }
+  .arch-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-5xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-4);
+    color: var(--color-text);
+  }
+  .arch-lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+  .arch-prose p {
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-6);
+  }
+  .arch-prose a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>

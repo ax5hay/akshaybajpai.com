@@ -1,0 +1,50 @@
+---
+// Scroll progress indicator. Only transform/opacity; respects prefers-reduced-motion.
+---
+
+<div class="scroll-progress" aria-hidden="true" role="presentation">
+  <div class="scroll-progress-bar" data-scroll-progress></div>
+</div>
+
+<style>
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 101;
+    opacity: 0;
+    transition: opacity var(--duration-fast);
+  }
+  .scroll-progress.visible {
+    opacity: 1;
+  }
+  .scroll-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--color-accent);
+    transform-origin: left;
+    transition: transform var(--duration-instant) var(--ease-out-expo);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-progress-bar {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const bar = document.querySelector('[data-scroll-progress]');
+  const wrap = document.querySelector('.scroll-progress');
+  if (bar && wrap) {
+    const update = () => {
+      const max = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      bar.style.transform = `scaleX(${pct / 100})`;
+      wrap.classList.toggle('visible', window.scrollY > 80);
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>

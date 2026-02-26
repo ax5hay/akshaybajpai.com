@@ -1,0 +1,79 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import HeroManifesto from '@components/HeroManifesto.astro';
+import NeuralCanvas from '@components/NeuralCanvas.astro';
+---
+
+<PageLayout
+  title="Akshay Bajpai — Architect of Systems, Builder of Intelligence"
+  description="The Architecture of Intelligence. AI infrastructure, systems thinking, performance engineering. A digital mind palace for structured thought."
+  mainClass="page-main--hero"
+>
+  <NeuralCanvas />
+  <HeroManifesto />
+  <section class="manifesto-block" aria-label="Manifesto">
+    <div class="prose">
+      <p class="lead">
+        This space is a map of how I think: systems as architecture, intelligence as infrastructure,
+        and products as the intersection of constraint and possibility.
+      </p>
+      <p>
+        I build AI systems that ship. From medical research to restaurant automation, from DNS-level
+        ad blocking to zero-dependency SaaS—each system is a set of deliberate tradeoffs. Here you
+        will find the reasoning behind those tradeoffs, the diagrams that explain them, and the
+        lessons that outlast the code.
+      </p>
+      <p>
+        No templates. No placeholders. No iteration on the same idea. This is a reinvention: a
+        thinking laboratory and a performance-conscious showcase of what happens when engineering
+        discipline meets creative direction.
+      </p>
+    </div>
+    <nav class="manifesto-nav" aria-label="Explore">
+      <a href="/about" class="manifesto-link">About</a>
+      <a href="/work" class="manifesto-link">Work & case studies</a>
+      <a href="/blog" class="manifesto-link">Blog</a>
+      <a href="/essays" class="manifesto-link">Essays</a>
+      <a href="/research" class="manifesto-link">Research</a>
+      <a href="/architecture" class="manifesto-link">Architecture</a>
+      <a href="/contact" class="manifesto-link">Contact</a>
+    </nav>
+  </section>
+</PageLayout>
+
+<style>
+  .manifesto-block {
+    max-width: var(--content-narrow);
+    margin: 0 auto;
+    padding: var(--space-32) var(--space-8);
+  }
+  .prose {
+    margin-bottom: var(--space-16);
+  }
+  .prose p {
+    margin: 0 0 var(--space-6);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+  }
+  .lead {
+    font-family: var(--font-serif);
+    font-size: var(--text-2xl);
+    color: var(--color-text);
+    margin-bottom: var(--space-8);
+  }
+  .manifesto-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-8);
+  }
+  .manifesto-link {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    transition: color var(--duration-fast), transform var(--duration-fast);
+  }
+  .manifesto-link:hover {
+    color: var(--color-accent);
+  }
+</style>
