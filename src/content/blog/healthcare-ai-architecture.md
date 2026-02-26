@@ -16,7 +16,7 @@ Automation that cannot be overridden or ignored is dangerous. The clinician must
 
 ## Compliance and data
 
-HIPAA, GDPR, and local regulations constrain where data lives, how it’s transmitted, and how long it’s retained. Architecture choices—on-prem vs. cloud, which cloud, how data is tokenized or de-identified—depend on the jurisdiction and the use case. Build with compliance in mind: encrypt in transit and at rest, minimize retention, and document data flows. Assume you will be audited.
+HIPAA, GDPR, and local regulations constrain where data lives, how it’s transmitted, and how long it’s retained. Architecture choices, on-prem vs. cloud, which cloud, how data is tokenized or de-identified, depend on the jurisdiction and the use case. Build with compliance in mind: encrypt in transit and at rest, minimize retention, and document data flows. Assume you will be audited.
 
 ## Reliability and fallbacks
 
@@ -24,4 +24,4 @@ Healthcare workflows often run 24/7. The AI component should fail gracefully: if
 
 ## Summary
 
-Healthcare AI architecture prioritizes safety, accountability, clinician-in-the-loop, compliance, and reliability. The model is one component; the surrounding system—data pipeline, API, UI, and ops—must be designed for the domain. Get that right before chasing accuracy alone.
+Healthcare AI architecture prioritizes safety, accountability, clinician-in-the-loop, compliance, and reliability. The model is one component; the surrounding system, data pipeline, API, UI, and ops, must be designed for the domain. Get that right before chasing accuracy alone.

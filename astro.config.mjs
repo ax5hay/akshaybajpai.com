@@ -1,8 +1,12 @@
 import { defineConfig } from 'astro/config';
+import { remarkSvgBlock } from './src/plugins/remark-svg-block.mjs';
 
 export default defineConfig({
   site: 'https://www.akshaybajpai.com',
   output: 'static',
+  markdown: {
+    remarkPlugins: [remarkSvgBlock],
+  },
   build: {
     inlineStylesheets: 'auto',
   },

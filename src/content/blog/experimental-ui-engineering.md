@@ -1,10 +1,10 @@
 ---
 title: "Experimental UI as an Engineering Discipline"
-description: "Why treating experimental UI and creative front-end as engineering—not “designer code”—raises the bar for both art and performance."
+description: "Why treating experimental UI and creative front-end as engineering, not “designer code”, raises the bar for both art and performance."
 pubDate: 2025-03-08
 ---
 
-Experimental UI—custom layouts, generative art, spatial navigation—is often dismissed as eye candy or “designer code.” When it’s done as engineering, it becomes repeatable, maintainable, and fast. This post is about how to do it that way.
+Experimental UI, custom layouts, generative art, spatial navigation, is often dismissed as eye candy or “designer code.” When it’s done as engineering, it becomes repeatable, maintainable, and fast. This post is about how to do it that way.
 
 ## Constraints as creativity
 
@@ -12,7 +12,7 @@ The best experimental UI works within constraints: a performance budget, accessi
 
 ## Technique over trend
 
-Trends (e.g. glassmorphism, parallax everywhere) age badly. Technique—how you use transform and opacity, how you structure your animation loop, how you lazy-load and dispose—lasts. Invest in understanding the platform: compositor, requestAnimationFrame, IntersectionObserver, and the visibility API. That knowledge transfers to every project.
+Trends (e.g. glassmorphism, parallax everywhere) age badly. Technique, how you use transform and opacity, how you structure your animation loop, how you lazy-load and dispose, lasts. Invest in understanding the platform: compositor, requestAnimationFrame, IntersectionObserver, and the visibility API. That knowledge transfers to every project.
 
 ## Measurable outcomes
 

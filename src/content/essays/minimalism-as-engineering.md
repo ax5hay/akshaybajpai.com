@@ -1,10 +1,10 @@
 ---
 title: "Minimalism as Engineering"
-description: "Why less is more in system design: fewer dependencies, fewer features, fewer moving parts—and how to get there without sacrificing capability."
+description: "Why less is more in system design: fewer dependencies, fewer features, fewer moving parts, and how to get there without sacrificing capability."
 pubDate: 2025-03-05
 ---
 
-Minimalism in engineering is not austerity for its own sake. It’s the recognition that every addition—every dependency, every feature, every configuration option—has a cost: in complexity, in failure modes, and in the cognitive load on the team. This essay is about when and how to choose less.
+Minimalism in engineering is not austerity for its own sake. It’s the recognition that every addition, every dependency, every feature, every configuration option, has a cost: in complexity, in failure modes, and in the cognitive load on the team. This essay is about when and how to choose less.
 
 ## The cost of more
 
@@ -26,7 +26,7 @@ Start with a budget. For dependencies: we allow N new dependencies per quarter, 
 
 Then, make removal a first-class action. Sunset features that aren’t used. Remove dependencies that are redundant. Prune options that nobody touches. Removal is not failure; it’s maintenance. Schedule it.
 
-Finally, default to “no.” When someone proposes an addition, the burden of proof is on them. What problem does it solve? What’s the cost? Can we solve it with what we have? Often the answer is yes—we just hadn’t looked.
+Finally, default to “no.” When someone proposes an addition, the burden of proof is on them. What problem does it solve? What’s the cost? Can we solve it with what we have? Often the answer is yes, we just hadn’t looked.
 
 ## When minimalism isn’t enough
 
@@ -34,4 +34,4 @@ There are domains where you need more: compliance, integration with legacy syste
 
 ## Summary
 
-Minimalism as engineering is the habit of counting the full cost of additions—dependencies, features, options, code—and adding only when the benefit is clear. It pays off in maintainability, debuggability, and team cognition. Get there with budgets, with removal as a first-class action, and with a default of “no.” Even when you can’t be fully minimal, minimize where it matters. Less is more when “less” means less to break, less to maintain, and less to think about.
+Minimalism as engineering is the habit of counting the full cost of additions, dependencies, features, options, code, and adding only when the benefit is clear. It pays off in maintainability, debuggability, and team cognition. Get there with budgets, with removal as a first-class action, and with a default of “no.” Even when you can’t be fully minimal, minimize where it matters. Less is more when “less” means less to break, less to maintain, and less to think about.

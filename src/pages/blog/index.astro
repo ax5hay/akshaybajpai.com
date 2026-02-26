@@ -5,7 +5,7 @@ const posts = (await getCollection('blog')).filter((p) => !p.data.draft).sort((a
 ---
 
 <PageLayout
-  title="Blog — Akshay Bajpai"
+  title="Blog · Akshay Bajpai"
   description="Technical writing on AI infrastructure, systems design, performance engineering, and building products that ship."
 >
   <div class="blog-page section-surface">
@@ -32,14 +32,20 @@ const posts = (await getCollection('blog')).filter((p) => !p.data.draft).sort((a
 
 <style>
   .blog-page {
-    padding: var(--space-24) var(--space-8);
+    padding: var(--space-32) var(--space-8);
   }
   .blog-inner {
     max-width: var(--content-width);
     margin: 0 auto;
   }
   .blog-header {
-    margin-bottom: var(--space-16);
+    margin-bottom: var(--space-20);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+    transition: border-color var(--duration-slow) var(--ease-out-expo);
+  }
+  .blog-header.reveal-visible {
+    border-color: var(--color-border-strong);
   }
   .blog-title {
     font-family: var(--font-serif);
@@ -52,6 +58,7 @@ const posts = (await getCollection('blog')).filter((p) => !p.data.draft).sort((a
     font-size: var(--text-lg);
     color: var(--color-text-secondary);
     margin: 0;
+    letter-spacing: 0.02em;
   }
   .post-list {
     list-style: none;
@@ -60,6 +67,11 @@ const posts = (await getCollection('blog')).filter((p) => !p.data.draft).sort((a
   }
   .post-item {
     border-bottom: 1px solid var(--color-border);
+    transition: border-color var(--duration-fast), background-color var(--duration-fast);
+  }
+  .post-item:hover {
+    border-color: var(--color-border-strong);
+    background: rgba(255,255,255,0.02);
   }
   .post-link {
     display: flex;
@@ -76,7 +88,7 @@ const posts = (await getCollection('blog')).filter((p) => !p.data.draft).sort((a
     font-size: var(--text-lg);
     font-weight: 500;
     color: var(--color-text);
-    transition: color var(--duration-fast);
+    transition: color var(--duration-fast) var(--ease-out-expo);
   }
   .post-date {
     font-size: var(--text-sm);

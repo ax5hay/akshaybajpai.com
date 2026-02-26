@@ -4,7 +4,7 @@ description: "Performance is not a nice-to-have. It’s a product requirement th
 pubDate: 2025-02-05
 ---
 
-Performance is often relegated to “we’ll optimize later.” Later never comes, or it comes as a fire drill when users complain or when a competitor is faster. This essay makes the case that performance is a feature—one that should be specified, measured, and shipped like any other—and outlines how to treat it that way.
+Performance is often relegated to “we’ll optimize later.” Later never comes, or it comes as a fire drill when users complain or when a competitor is faster. This essay makes the case that performance is a feature, one that should be specified, measured, and shipped like any other, and outlines how to treat it that way.
 
 ## The case for performance as feature
 
@@ -18,7 +18,7 @@ If performance is a feature, it needs a spec. That means: define the metrics (e.
 
 ## Measure and enforce
 
-Measurement has to be continuous. Use Lighthouse in CI and fail or warn when scores drop below the bar. Use real-user metrics (e.g. CrUX) when you can, so you see what users actually experience. Track trends: are we getting faster or slower over time? If a release regresses performance, it’s a bug, not a tradeoff—unless the tradeoff is explicit and agreed.
+Measurement has to be continuous. Use Lighthouse in CI and fail or warn when scores drop below the bar. Use real-user metrics (e.g. CrUX) when you can, so you see what users actually experience. Track trends: are we getting faster or slower over time? If a release regresses performance, it’s a bug, not a tradeoff, unless the tradeoff is explicit and agreed.
 
 Enforcement means: no ship if we’re below the bar, unless there’s an exception and a plan to fix. That sounds strict, but it’s the only way to prevent the slow creep of “we’ll fix it later.” Performance regressions are easy to introduce and painful to fix in bulk. Catching them at merge time is cheap.
 

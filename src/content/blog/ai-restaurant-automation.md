@@ -1,6 +1,6 @@
 ---
 title: "AI in Restaurant Automation"
-description: "Where AI actually helps in restaurant operations—order prediction, inventory, and kitchen flow—and where it’s hype."
+description: "Where AI actually helps in restaurant operations, order prediction, inventory, and kitchen flow, and where it’s hype."
 pubDate: 2025-02-25
 ---
 
@@ -12,7 +12,7 @@ Restaurants run on thin margins and chaotic inputs: weather, events, no-shows, a
 
 **Inventory and ordering:** Similar idea: predict what you’ll need and suggest order quantities. The constraint is lead time and minimum order sizes. The model has to respect those and surface confidence so humans can override.
 
-**Kitchen flow:** Optimizing sequence or timing of tickets is harder—the state space is large and the cost of being wrong (late food, wrong order) is high. Here AI is more assistive: suggest a sequence, but let the expediter decide. Full autonomy in the kitchen is a long way off.
+**Kitchen flow:** Optimizing sequence or timing of tickets is harder, the state space is large and the cost of being wrong (late food, wrong order) is high. Here AI is more assistive: suggest a sequence, but let the expediter decide. Full autonomy in the kitchen is a long way off.
 
 ## Where it’s hype
 
@@ -20,7 +20,7 @@ Replacing the human at the register or in the dining room with a chatbot is ofte
 
 ## Implementation notes
 
-Data quality is the bottleneck. You need consistent point-of-sale and inventory data, and you need to align it with outcomes (waste, stockouts, satisfaction). Start with one workflow—e.g. prep list for the next day—and prove value before expanding. Use simple models first; complexity is rarely justified in this domain. And always have a fallback: when the model is down or wrong, the restaurant should still run.
+Data quality is the bottleneck. You need consistent point-of-sale and inventory data, and you need to align it with outcomes (waste, stockouts, satisfaction). Start with one workflow, e.g. prep list for the next day, and prove value before expanding. Use simple models first; complexity is rarely justified in this domain. And always have a fallback: when the model is down or wrong, the restaurant should still run.
 
 ## Summary
 

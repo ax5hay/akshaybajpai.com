@@ -9,7 +9,7 @@ metrics: ["~2M queries/day", "p99 latency under 50ms", "Block rate ~25%"]
 
 ## Problem
 
-We needed a single point of control for blocking ads and trackers across devices and networks—without per-device apps or browser extensions. The system had to handle high query volume, support encrypted DNS (DoH/DoT), allow custom allowlists, and degrade gracefully when blocklists were stale or the resolver was under load.
+We needed a single point of control for blocking ads and trackers across devices and networks, without per-device apps or browser extensions. The system had to handle high query volume, support encrypted DNS (DoH/DoT), allow custom allowlists, and degrade gracefully when blocklists were stale or the resolver was under load.
 
 ## Architecture
 

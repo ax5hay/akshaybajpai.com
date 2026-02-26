@@ -3,7 +3,7 @@ import PageLayout from '@layouts/PageLayout.astro';
 ---
 
 <PageLayout
-  title="About — Akshay Bajpai"
+  title="About · Akshay Bajpai"
   description="From medical AI research to building products people use daily. Architect of systems, builder of intelligence."
 >
   <article class="about-page section-surface">
@@ -12,7 +12,7 @@ import PageLayout from '@layouts/PageLayout.astro';
         <h1 class="about-title">About</h1>
         <p class="about-lead">Architect of systems. Builder of intelligence.</p>
       </header>
-      <div class="about-prose" data-reveal>
+      <div class="about-prose" data-reveal-stagger>
         <p>
           I operate at the intersection of AI infrastructure, systems thinking, and product. My work spans
           research, architecture, and shipping—each system designed with explicit tradeoffs and long-term
@@ -35,7 +35,7 @@ import PageLayout from '@layouts/PageLayout.astro';
 
 <style>
   .about-page {
-    padding: var(--space-24) var(--space-8);
+    padding: var(--space-32) var(--space-8);
     position: relative;
   }
   .about-inner {
@@ -43,7 +43,13 @@ import PageLayout from '@layouts/PageLayout.astro';
     margin: 0 auto;
   }
   .about-header {
-    margin-bottom: var(--space-16);
+    margin-bottom: var(--space-20);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+    transition: border-color var(--duration-slow) var(--ease-out-expo);
+  }
+  .about-header.reveal-visible {
+    border-color: var(--color-border-strong);
   }
   .about-title {
     font-family: var(--font-serif);
@@ -56,17 +62,20 @@ import PageLayout from '@layouts/PageLayout.astro';
     font-size: var(--text-lg);
     color: var(--color-text-secondary);
     margin: 0;
+    letter-spacing: 0.02em;
   }
   .about-prose {
     font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
   }
   .about-prose p {
-    margin: 0 0 var(--space-6);
+    margin: 0 0 var(--space-8);
     color: var(--color-text-secondary);
+    transition: opacity var(--duration-slow) var(--ease-out-expo), transform var(--duration-slow) var(--ease-out-expo);
   }
   .about-prose a {
     color: var(--color-accent);
+    transition: color var(--duration-fast);
   }
   .about-prose a:hover {
     color: var(--color-text);

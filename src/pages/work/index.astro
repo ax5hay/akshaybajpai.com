@@ -5,7 +5,7 @@ const cases = (await getCollection('work')).filter((c) => !c.data.draft).sort((a
 ---
 
 <PageLayout
-  title="Work & Case Studies — Akshay Bajpai"
+  title="Work · Akshay Bajpai"
   description="Case studies in AI systems, architecture, and performance. Problem, solution, tradeoffs, metrics."
 >
   <div class="work-page section-surface">
@@ -32,16 +32,29 @@ const cases = (await getCollection('work')).filter((c) => !c.data.draft).sort((a
 </PageLayout>
 
 <style>
-  .work-page { padding: var(--space-24) var(--space-8); }
+  .work-page { padding: var(--space-32) var(--space-8); }
   .work-inner { max-width: var(--content-width); margin: 0 auto; }
-  .work-header { margin-bottom: var(--space-16); }
+  .work-header {
+    margin-bottom: var(--space-20);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+    transition: border-color var(--duration-slow) var(--ease-out-expo);
+  }
+  .work-header.reveal-visible { border-color: var(--color-border-strong); }
   .work-title { font-family: var(--font-serif); font-size: var(--text-5xl); font-weight: 400; margin: 0 0 var(--space-4); color: var(--color-text); }
-  .work-lead { font-size: var(--text-lg); color: var(--color-text-secondary); margin: 0; }
+  .work-lead { font-size: var(--text-lg); color: var(--color-text-secondary); margin: 0; letter-spacing: 0.02em; }
   .case-list { list-style: none; margin: 0; padding: 0; }
-  .case-item { border-bottom: 1px solid var(--color-border); }
+  .case-item {
+    border-bottom: 1px solid var(--color-border);
+    transition: border-color var(--duration-fast), background-color var(--duration-fast);
+  }
+  .case-item:hover {
+    border-color: var(--color-border-strong);
+    background: rgba(255,255,255,0.02);
+  }
   .case-link { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-6); padding: var(--space-6) 0; transition: color var(--duration-fast); }
   .case-link:hover .case-title { color: var(--color-accent); }
-  .case-title { font-size: var(--text-lg); font-weight: 500; color: var(--color-text); transition: color var(--duration-fast); }
+  .case-title { font-size: var(--text-lg); font-weight: 500; color: var(--color-text); transition: color var(--duration-fast) var(--ease-out-expo); }
   .case-client { font-size: var(--text-sm); color: var(--color-text-muted); }
   .case-date { font-size: var(--text-sm); color: var(--color-text-muted); margin-left: auto; }
 </style>

@@ -1,5 +1,5 @@
 ---
-title: "DNS-Level Ad Blocking — System Design"
+title: "DNS-Level Ad Blocking. System Design"
 description: "How to design a DNS-based ad blocking system: architecture, tradeoffs, and what you give up when you block at the resolver."
 pubDate: 2025-01-22
 ---

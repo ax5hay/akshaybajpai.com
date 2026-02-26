@@ -1,5 +1,5 @@
 ---
-title: "Restaurant Demand Forecasting — From Spreadsheets to Production"
+title: "Restaurant Demand Forecasting. From Spreadsheets to Production"
 description: "Building a forecasting system for restaurant prep and ordering: data pipeline, model choice, and operational integration."
 pubDate: 2025-03-10
 client: "Restaurant chain (anonymized)"
@@ -13,7 +13,7 @@ A restaurant chain was planning prep and ordering using spreadsheets and gut fee
 
 ## Architecture
 
-Historical data (sales, events, day of week, weather if available) is aggregated to daily or meal-period level. Features are built in a batch job; the model (gradient boosting) is trained periodically (e.g. weekly) and used for inference in a daily run. Predictions are written to a store that the ordering/prep UI and reports consume via a simple REST API. No real-time inference—batch is sufficient and keeps the system simple.
+Historical data (sales, events, day of week, weather if available) is aggregated to daily or meal-period level. Features are built in a batch job; the model (gradient boosting) is trained periodically (e.g. weekly) and used for inference in a daily run. Predictions are written to a store that the ordering/prep UI and reports consume via a simple REST API. No real-time inference, batch is sufficient and keeps the system simple.
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 260" role="img" aria-label="Restaurant demand forecasting">

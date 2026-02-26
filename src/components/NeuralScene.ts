@@ -48,13 +48,7 @@ const CLUSTER_CENTERS: [number, number, number][] = [
   [-1.8, -1.8, -0.8],
 ];
 
-const CLUSTER_TITLES = [
-  'AI Infrastructure',
-  'Systems Thinking',
-  'Performance Engineering',
-  'Product & SaaS',
-  'Experimental UI',
-];
+const CLUSTER_TITLES = ['Essays', 'About', 'Work', 'Blog', 'Contact'];
 
 const CLUSTER_URLS = ['/essays', '/about', '/work', '/blog', '/contact'];
 
@@ -436,13 +430,21 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
 
       overlayEl = document.createElement('div');
       overlayEl.className = 'neural-fullscreen-overlay';
-      overlayEl.innerHTML = '<div class="neural-overlay-inner"><button type="button" class="neural-overlay-close" aria-label="Close">×</button><iframe class="neural-overlay-iframe" title="Content"></iframe></div>';
+      overlayEl.innerHTML = '<div class="neural-overlay-inner"><button type="button" class="neural-overlay-back" aria-label="Back to intro">×</button><button type="button" class="neural-overlay-close" aria-label="Close">×</button><iframe class="neural-overlay-iframe" title="Content"></iframe></div>';
+      const backBtn = overlayEl.querySelector('.neural-overlay-back');
       const closeBtn = overlayEl.querySelector('.neural-overlay-close');
       const iframe = overlayEl.querySelector('.neural-overlay-iframe') as HTMLIFrameElement;
-      closeBtn?.addEventListener('click', () => {
+      const closeOverlay = (): void => {
         overlayEl?.classList.remove('active');
         if (iframe) iframe.src = 'about:blank';
+        setHovered(null, null);
+        flyTarget = null;
+        flyStart = null;
+      };
+      backBtn?.addEventListener('click', () => {
+        if (iframe) iframe.src = '/hero-placard';
       });
+      closeBtn?.addEventListener('click', closeOverlay);
       document.body.appendChild(overlayEl);
 
       haloEl = document.createElement('div');
@@ -463,6 +465,8 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
           .neural-fullscreen-overlay.active{display:block;opacity:1;}
           .neural-fullscreen-overlay::before{content:'';position:absolute;inset:0;background:rgba(10,10,12,0.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none;}
           .neural-overlay-inner{position:absolute;inset:0;padding:var(--space-8);box-sizing:border-box;}
+          .neural-overlay-back{position:absolute;top:var(--space-4);right:calc(var(--space-4) + 52px);width:44px;height:44px;border:none;background:rgba(255,255,255,0.08);color:var(--color-text);font-size:28px;line-height:1;cursor:pointer;border-radius:4px;z-index:10;}
+          .neural-overlay-back:hover{background:rgba(255,255,255,0.12);}
           .neural-overlay-close{position:absolute;top:var(--space-4);right:var(--space-4);width:44px;height:44px;border:none;background:rgba(255,255,255,0.08);color:var(--color-text);font-size:28px;line-height:1;cursor:pointer;border-radius:4px;z-index:10;}
           .neural-overlay-close:hover{background:rgba(255,255,255,0.12);}
           .neural-overlay-iframe{width:100%;height:100%;border:none;background:rgba(10,10,12,0.85);}

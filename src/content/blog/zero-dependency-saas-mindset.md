@@ -1,6 +1,6 @@
 ---
 title: "Building SaaS with a Zero-Dependency Mindset"
-description: "Why minimizing dependencies is a strategic advantage in SaaS—and how to do it without reinventing the wheel."
+description: "Why minimizing dependencies is a strategic advantage in SaaS, and how to do it without reinventing the wheel."
 pubDate: 2025-02-01
 ---
 

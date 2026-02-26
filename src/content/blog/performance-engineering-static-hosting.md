@@ -4,7 +4,7 @@ description: "How to hit Lighthouse 95+ and sub-second FCP when you have no serv
 pubDate: 2025-02-10
 ---
 
-Static hosting—GitHub Pages, Netlify, Cloudflare Pages—gives you global edge delivery and no server to maintain. It also means every byte and every request is visible to the user. Performance is not optional; it is the product. Here is how to treat it as engineering.
+Static hosting, GitHub Pages, Netlify, Cloudflare Pages, gives you global edge delivery and no server to maintain. It also means every byte and every request is visible to the user. Performance is not optional; it is the product. Here is how to treat it as engineering.
 
 ## Budgets first
 

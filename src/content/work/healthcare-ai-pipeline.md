@@ -1,5 +1,5 @@
 ---
-title: "Healthcare AI Pipeline — From Research to Clinician Assist"
+title: "Healthcare AI Pipeline. From Research to Clinician Assist"
 description: "Case study: designing an AI pipeline for clinical decision support with auditability, safety, and compliance in mind."
 pubDate: 2025-02-12
 client: "Healthcare (anonymized)"
@@ -9,7 +9,7 @@ metrics: ["Under 500ms p99 inference", "100% audit coverage", "Zero PII in logs"
 
 ## Problem
 
-A healthcare partner needed an AI-assisted workflow for a specific clinical task. Requirements: (1) inference in under 500 ms p99, (2) every prediction traceable to model version and input hash, (3) no PII in logs or telemetry, (4) clinician always in the loop—system suggests, human decides. We had to integrate with existing EHR-adjacent systems and pass security and compliance review.
+A healthcare partner needed an AI-assisted workflow for a specific clinical task. Requirements: (1) inference in under 500 ms p99, (2) every prediction traceable to model version and input hash, (3) no PII in logs or telemetry, (4) clinician always in the loop, system suggests, human decides. We had to integrate with existing EHR-adjacent systems and pass security and compliance review.
 
 ## Architecture
 

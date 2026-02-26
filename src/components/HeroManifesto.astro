@@ -14,7 +14,11 @@
   </div>
   <div class="hero-scroll-prompt" data-hero-line aria-hidden="true">
     <span class="hero-scroll-label">Scroll</span>
-    <span class="hero-scroll-chevron" aria-hidden="true"></span>
+    <span class="hero-scroll-chevron" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="12">
+        <path d="M2 2l10 10 10-10" />
+      </svg>
+    </span>
   </div>
 </section>
 <div class="hero-hints" aria-live="polite" aria-hidden="true">
@@ -107,11 +111,14 @@
     color: var(--color-text-muted);
   }
   .hero-scroll-chevron {
+    color: var(--color-text-muted);
+    display: block;
+    animation: hero-chevron-bounce 2s ease-in-out infinite;
+  }
+  .hero-scroll-chevron svg {
+    display: block;
     width: 20px;
     height: 12px;
-    background: no-repeat center/contain;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 14' fill='none' stroke='%239a9aa8' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M2 2l10 10 10-10'/%3E%3C/svg%3E");
-    animation: hero-chevron-bounce 2s ease-in-out infinite;
   }
   @keyframes hero-chevron-bounce {
     0%, 100% { transform: translateY(0); }
