@@ -6,38 +6,41 @@ import PageLayout from '@layouts/PageLayout.astro';
   title="About — Akshay Bajpai"
   description="From medical AI research to building products people use daily. Architect of systems, builder of intelligence."
 >
-  <article class="about-page">
-    <header class="about-header">
-      <h1 class="about-title">About</h1>
-      <p class="about-lead">Architect of systems. Builder of intelligence.</p>
-    </header>
-    <div class="about-prose">
-      <p>
-        I operate at the intersection of AI infrastructure, systems thinking, and product. My work spans
-        medical AI research, restaurant automation, DNS-level ad blocking, healthcare AI architecture,
-        and zero-dependency SaaS—each system designed with explicit tradeoffs and long-term maintainability
-        in mind.
-      </p>
-      <p>
-        I co-founded Aiximius, Merakiel, and Rude Corp; served as CTO at PYVOT; and hold a Master's with
-        97.5% distinction in Artificial Intelligence & Intelligent Systems from Lviv Polytechnic. I have
-        published research and shipped products that people use daily. I prefer building with minimal
-        dependencies, clear architecture, and performance as a non-negotiable.
-      </p>
-      <p>
-        This site is a thinking laboratory: essays, case studies, and technical writing that reflect how
-        I approach problems. No fluff, no placeholders. If you want to collaborate on AI systems,
-        architecture, or performance-critical products, <a href="/contact">get in touch</a>.
-      </p>
+  <article class="about-page section-surface">
+    <div class="about-inner">
+      <header class="about-header" data-reveal>
+        <h1 class="about-title">About</h1>
+        <p class="about-lead">Architect of systems. Builder of intelligence.</p>
+      </header>
+      <div class="about-prose" data-reveal>
+        <p>
+          I operate at the intersection of AI infrastructure, systems thinking, and product. My work spans
+          research, architecture, and shipping—each system designed with explicit tradeoffs and long-term
+          maintainability in mind.
+        </p>
+        <p>
+          I hold a Master's with distinction in Artificial Intelligence & Intelligent Systems. I have
+          published research and shipped products that people use daily. I prefer building with minimal
+          dependencies, clear architecture, and performance as a non-negotiable.
+        </p>
+        <p>
+          This site is a thinking laboratory: essays, case studies, and technical writing that reflect how
+          I approach problems. No fluff, no placeholders. If you want to collaborate on AI systems,
+          architecture, or performance-critical products, <a href="/contact" class="link-hover">get in touch</a>.
+        </p>
+      </div>
     </div>
   </article>
 </PageLayout>
 
 <style>
   .about-page {
+    padding: var(--space-24) var(--space-8);
+    position: relative;
+  }
+  .about-inner {
     max-width: var(--content-narrow);
     margin: 0 auto;
-    padding: var(--space-24) var(--space-8);
   }
   .about-header {
     margin-bottom: var(--space-16);
@@ -64,8 +67,6 @@ import PageLayout from '@layouts/PageLayout.astro';
   }
   .about-prose a {
     color: var(--color-accent);
-    text-decoration: underline;
-    text-underline-offset: 2px;
   }
   .about-prose a:hover {
     color: var(--color-text);

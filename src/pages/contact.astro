@@ -6,122 +6,59 @@ import PageLayout from '@layouts/PageLayout.astro';
   title="Contact — Akshay Bajpai"
   description="Get in touch for AI systems, architecture, or performance-critical product work."
 >
-  <article class="contact-page">
-    <header class="contact-header">
-      <h1 class="contact-title">Contact</h1>
-      <p class="contact-lead">Let's build something that matters.</p>
-    </header>
-    <div class="contact-prose">
-      <p>
-        For consulting, speaking, or collaboration on AI infrastructure, systems design, or
-        performance engineering—reach out.
-      </p>
-      <nav class="contact-links" aria-label="Contact links">
-        <a href="mailto:hello@akshaybajpai.com">hello@akshaybajpai.com</a>
-        <a href="https://linkedin.com/in/ax5hay" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://github.com/ax5hay" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://twitter.com/ax5hay" target="_blank" rel="noopener noreferrer">Twitter / X</a>
-      </nav>
-      <p class="contact-form-note">
-        For a longer message, use the form below. It sends to the same inbox.
-      </p>
-      <form
-        class="contact-form"
-        action="https://formspree.io/f/xlgeqele"
-        method="POST"
-        aria-label="Contact form"
-      >
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" required autocomplete="email" />
-        <label for="message">Message</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
-        <button type="submit">Send</button>
-      </form>
+  <article class="contact-page section-surface">
+    <div class="contact-inner">
+      <header class="contact-header" data-reveal>
+        <h1 class="contact-title">Contact</h1>
+        <p class="contact-lead">Let's build something that matters.</p>
+      </header>
+      <div class="contact-prose" data-reveal>
+        <p>
+          For consulting, speaking, or collaboration on AI infrastructure, systems design, or
+          performance engineering—reach out.
+        </p>
+        <nav class="contact-links" aria-label="Contact links" data-reveal-stagger>
+          <a href="mailto:hello@akshaybajpai.com" class="link-hover">hello@akshaybajpai.com</a>
+          <a href="https://linkedin.com/in/ax5hay" target="_blank" rel="noopener noreferrer" class="link-hover">LinkedIn</a>
+          <a href="https://github.com/ax5hay" target="_blank" rel="noopener noreferrer" class="link-hover">GitHub</a>
+          <a href="https://twitter.com/ax5hay" target="_blank" rel="noopener noreferrer" class="link-hover">Twitter / X</a>
+        </nav>
+        <p class="contact-form-note" data-reveal>
+          For a longer message, use the form below. It sends to the same inbox.
+        </p>
+        <form
+          class="contact-form"
+          action="https://formspree.io/f/xlgeqele"
+          method="POST"
+          aria-label="Contact form"
+          data-reveal
+        >
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required autocomplete="email" />
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+          <button type="submit">Send</button>
+        </form>
+      </div>
     </div>
   </article>
 </PageLayout>
 
 <style>
-  .contact-page {
-    max-width: var(--content-narrow);
-    margin: 0 auto;
-    padding: var(--space-24) var(--space-8);
-  }
-  .contact-header {
-    margin-bottom: var(--space-16);
-  }
-  .contact-title {
-    font-family: var(--font-serif);
-    font-size: var(--text-5xl);
-    font-weight: 400;
-    margin: 0 0 var(--space-4);
-    color: var(--color-text);
-  }
-  .contact-lead {
-    font-size: var(--text-lg);
-    color: var(--color-text-secondary);
-    margin: 0;
-  }
-  .contact-prose p {
-    margin: 0 0 var(--space-6);
-    color: var(--color-text-secondary);
-    font-size: var(--text-lg);
-  }
-  .contact-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4) var(--space-8);
-    margin-bottom: var(--space-12);
-  }
-  .contact-links a {
-    color: var(--color-accent);
-    font-weight: 500;
-    transition: color var(--duration-fast);
-  }
-  .contact-links a:hover {
-    color: var(--color-text);
-  }
-  .contact-form-note {
-    margin-bottom: var(--space-4);
-  }
-  .contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    max-width: 28rem;
-  }
-  .contact-form label {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-text-secondary);
-  }
-  .contact-form input,
-  .contact-form textarea {
-    padding: var(--space-3);
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    color: var(--color-text);
-    font-family: inherit;
-    font-size: var(--text-base);
-  }
-  .contact-form input:focus,
-  .contact-form textarea:focus {
-    outline: none;
-    border-color: var(--color-accent);
-  }
-  .contact-form button {
-    padding: var(--space-3) var(--space-6);
-    background: var(--color-accent);
-    color: var(--color-text-inverse);
-    border: none;
-    font-weight: 600;
-    font-size: var(--text-sm);
-    letter-spacing: 0.05em;
-    align-self: flex-start;
-    transition: opacity var(--duration-fast);
-  }
-  .contact-form button:hover {
-    opacity: 0.9;
-  }
+  .contact-page { padding: var(--space-24) var(--space-8); }
+  .contact-inner { max-width: var(--content-narrow); margin: 0 auto; }
+  .contact-header { margin-bottom: var(--space-16); }
+  .contact-title { font-family: var(--font-serif); font-size: var(--text-5xl); font-weight: 400; margin: 0 0 var(--space-4); color: var(--color-text); }
+  .contact-lead { font-size: var(--text-lg); color: var(--color-text-secondary); margin: 0; }
+  .contact-prose p { margin: 0 0 var(--space-6); color: var(--color-text-secondary); font-size: var(--text-lg); }
+  .contact-links { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-8); margin-bottom: var(--space-12); }
+  .contact-links a { color: var(--color-accent); font-weight: 500; }
+  .contact-links a:hover { color: var(--color-text); }
+  .contact-form-note { margin-bottom: var(--space-4); }
+  .contact-form { display: flex; flex-direction: column; gap: var(--space-4); max-width: 28rem; }
+  .contact-form label { font-size: var(--text-sm); font-weight: 500; color: var(--color-text-secondary); }
+  .contact-form input, .contact-form textarea { padding: var(--space-3); background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: 4px; color: var(--color-text); font-family: inherit; font-size: var(--text-base); }
+  .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--color-accent); }
+  .contact-form button { padding: var(--space-3) var(--space-6); background: var(--color-accent); color: var(--color-text-inverse); border: none; font-weight: 600; font-size: var(--text-sm); letter-spacing: 0.05em; align-self: flex-start; transition: opacity var(--duration-fast), transform var(--duration-fast); }
+  .contact-form button:hover { opacity: 0.9; transform: translateY(-1px); }
 </style>

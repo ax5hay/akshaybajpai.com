@@ -8,75 +8,38 @@ const essays = (await getCollection('essays')).filter((e) => !e.data.draft).sort
   title="Essays — Akshay Bajpai"
   description="Long-form thinking on AI, systems, and the discipline of building."
 >
-  <div class="essays-page">
-    <header class="essays-header">
-      <h1 class="essays-title">Essays</h1>
-      <p class="essays-lead">Deep thinking on systems, intelligence, and engineering.</p>
-    </header>
-    <ul class="essay-list" aria-label="Essays">
-      {essays.map((essay) => (
-        <li class="essay-item">
-          <a href={`/essays/${essay.slug}`} class="essay-link">
-            <span class="essay-title">{essay.data.title}</span>
-            <time class="essay-date" datetime={essay.data.pubDate.toISOString()}>
-              {essay.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-            </time>
-          </a>
-        </li>
-      ))}
-    </ul>
+  <div class="essays-page section-surface">
+    <div class="essays-inner">
+      <header class="essays-header" data-reveal>
+        <h1 class="essays-title">Essays</h1>
+        <p class="essays-lead">Deep thinking on systems, intelligence, and engineering.</p>
+      </header>
+      <ul class="essay-list" aria-label="Essays" data-reveal-stagger>
+        {essays.map((essay) => (
+          <li class="essay-item">
+            <a href={`/essays/${essay.slug}`} class="essay-link link-hover">
+              <span class="essay-title">{essay.data.title}</span>
+              <time class="essay-date" datetime={essay.data.pubDate.toISOString()}>
+                {essay.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   </div>
 </PageLayout>
 
 <style>
-  .essays-page {
-    max-width: var(--content-width);
-    margin: 0 auto;
-    padding: var(--space-24) var(--space-8);
-  }
-  .essays-header {
-    margin-bottom: var(--space-16);
-  }
-  .essays-title {
-    font-family: var(--font-serif);
-    font-size: var(--text-5xl);
-    font-weight: 400;
-    margin: 0 0 var(--space-4);
-    color: var(--color-text);
-  }
-  .essays-lead {
-    font-size: var(--text-lg);
-    color: var(--color-text-secondary);
-    margin: 0;
-  }
-  .essay-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .essay-item {
-    border-bottom: 1px solid var(--color-border);
-  }
-  .essay-link {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--space-4);
-    padding: var(--space-6) 0;
-    transition: color var(--duration-fast);
-  }
-  .essay-link:hover .essay-title {
-    color: var(--color-accent);
-  }
-  .essay-title {
-    font-size: var(--text-lg);
-    font-weight: 500;
-    color: var(--color-text);
-    transition: color var(--duration-fast);
-  }
-  .essay-date {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    flex-shrink: 0;
-  }
+  .essays-page { padding: var(--space-24) var(--space-8); }
+  .essays-inner { max-width: var(--content-width); margin: 0 auto; }
+  .essays-header { margin-bottom: var(--space-16); }
+  .essays-title { font-family: var(--font-serif); font-size: var(--text-5xl); font-weight: 400; margin: 0 0 var(--space-4); color: var(--color-text); }
+  .essays-lead { font-size: var(--text-lg); color: var(--color-text-secondary); margin: 0; }
+  .essay-list { list-style: none; margin: 0; padding: 0; }
+  .essay-item { border-bottom: 1px solid var(--color-border); }
+  .essay-link { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); padding: var(--space-6) 0; transition: color var(--duration-fast); }
+  .essay-link:hover .essay-title { color: var(--color-accent); }
+  .essay-title { font-size: var(--text-lg); font-weight: 500; color: var(--color-text); transition: color var(--duration-fast); }
+  .essay-date { font-size: var(--text-sm); color: var(--color-text-muted); flex-shrink: 0; }
 </style>

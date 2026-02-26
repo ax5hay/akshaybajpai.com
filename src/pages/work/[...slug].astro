@@ -19,6 +19,7 @@ const { Content } = await caseStudy.render();
   description={caseStudy.data.description}
   pubDate={caseStudy.data.pubDate}
   canonical={`/work/${caseStudy.slug}`}
+  layoutVariant="case-study"
 >
   <Content />
 </ContentLayout>

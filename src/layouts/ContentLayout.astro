@@ -7,9 +7,10 @@ interface Props {
   pubDate: Date;
   canonical?: string;
   ogImage?: string;
+  layoutVariant?: 'article' | 'case-study';
 }
 
-const { title, description, pubDate, canonical, ogImage } = Astro.props;
+const { title, description, pubDate, canonical, ogImage, layoutVariant = 'article' } = Astro.props;
 ---
 
 <PageLayout
@@ -20,31 +21,47 @@ const { title, description, pubDate, canonical, ogImage } = Astro.props;
   type="article"
   publishedTime={pubDate.toISOString()}
 >
-  <article class="content-article">
-    <header class="content-header">
-      <h1 class="content-title">{title}</h1>
-      <time class="content-date" datetime={pubDate.toISOString()}>
-        {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-      </time>
-    </header>
-    <div class="content-body">
-      <slot />
+  <article class="content-article content-article--placard section-surface">
+    <div class="content-inner">
+      <header class="content-header" data-reveal>
+        <h1 class="content-title">{title}</h1>
+        <time class="content-date" datetime={pubDate.toISOString()}>
+          {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </time>
+      </header>
+      <div class="content-body" class:list={{ 'content-body--case-study': layoutVariant === 'case-study' }} data-reveal>
+        <slot />
+      </div>
     </div>
   </article>
 </PageLayout>
 
 <style>
+  /* Museum placard: large margin space, sharp serif headings, modern grotesk body */
+  .content-article--placard {
+    padding: var(--space-32) var(--space-12);
+  }
   .content-article {
-    max-width: var(--content-narrow);
-    margin: 0 auto;
     padding: var(--space-24) var(--space-8);
   }
+  .content-article--placard .content-inner {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 0 var(--space-16);
+  }
+  .content-inner {
+    max-width: var(--content-narrow);
+    margin: 0 auto;
+  }
   .content-header {
-    margin-bottom: var(--space-12);
+    margin-bottom: var(--space-16);
+  }
+  .content-article--placard .content-header {
+    margin-bottom: var(--space-20);
   }
   .content-title {
     font-family: var(--font-serif);
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 5vw, 3.25rem);
     font-weight: 400;
     line-height: var(--leading-tight);
     margin: 0 0 var(--space-4);
@@ -53,35 +70,50 @@ const { title, description, pubDate, canonical, ogImage } = Astro.props;
   .content-date {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+    letter-spacing: 0.04em;
   }
   .content-body {
     font-size: var(--text-lg);
-    line-height: var(--leading-relaxed);
+    line-height: 1.8;
+    font-family: var(--font-sans);
   }
   .content-body :global(p) {
-    margin: 0 0 var(--space-6);
+    margin: 0 0 var(--space-8);
     color: var(--color-text-secondary);
+  }
+  .content-article--placard .content-body :global(p) {
+    margin-bottom: var(--space-10);
   }
   .content-body :global(h2) {
     font-family: var(--font-serif);
-    font-size: var(--text-2xl);
-    margin: var(--space-12) 0 var(--space-4);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    margin: var(--space-16) 0 var(--space-6);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
     color: var(--color-text);
+    scroll-margin-top: 2rem;
+    transition: border-color var(--duration-slow) var(--ease-out-expo), box-shadow var(--duration-slow) var(--ease-out-expo);
+  }
+  .content-body :global(h2[data-reveal].reveal-visible) {
+    border-color: var(--color-border-strong);
+    box-shadow: 0 1px 0 var(--color-accent-soft);
   }
   .content-body :global(h3) {
+    font-family: var(--font-sans);
     font-size: var(--text-xl);
     font-weight: 600;
-    margin: var(--space-8) 0 var(--space-3);
+    margin: var(--space-12) 0 var(--space-3);
     color: var(--color-text);
   }
   .content-body :global(ul),
   .content-body :global(ol) {
-    margin: 0 0 var(--space-6);
+    margin: 0 0 var(--space-8);
     padding-left: var(--space-8);
     color: var(--color-text-secondary);
   }
   .content-body :global(li) {
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
   }
   .content-body :global(a) {
     color: var(--color-accent);
@@ -98,8 +130,15 @@ const { title, description, pubDate, canonical, ogImage } = Astro.props;
     border: 1px solid var(--color-border);
     padding: var(--space-6);
     overflow-x: auto;
-    margin: 0 0 var(--space-6);
+    margin: var(--space-8) 0;
     border-radius: 4px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity var(--duration-slow) var(--ease-out-expo), transform var(--duration-slow) var(--ease-out-expo);
+  }
+  .content-body.reveal-visible :global(pre) {
+    opacity: 1;
+    transform: translateY(0);
   }
   .content-body :global(code) {
     padding: 0.15em 0.4em;
@@ -111,10 +150,66 @@ const { title, description, pubDate, canonical, ogImage } = Astro.props;
     background: none;
   }
   .content-body :global(blockquote) {
-    margin: var(--space-8) 0;
-    padding-left: var(--space-6);
+    margin: var(--space-10) 0;
+    padding: var(--space-4) 0 var(--space-4) var(--space-6);
     border-left: 3px solid var(--color-accent);
     color: var(--color-text-muted);
     font-style: italic;
+  }
+  /* Floating side notes — museum placard */
+  .content-body :global(aside.side-note) {
+    float: right;
+    width: 14rem;
+    margin: 0 0 var(--space-6) var(--space-8);
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    border-left: 1px solid var(--color-border);
+    font-style: normal;
+  }
+  @media (max-width: 768px) {
+    .content-body :global(aside.side-note) {
+      float: none;
+      width: auto;
+      margin-left: 0;
+    }
+  }
+  /* Case study: split view — diagram left, technical breakdown right */
+  .content-body--case-study {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(0, 1.4fr);
+    gap: var(--space-16);
+    align-items: start;
+  }
+  .content-body--case-study > :global(*) {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .content-body--case-study > :global(pre:first-of-type) {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    position: sticky;
+    top: var(--space-8);
+  }
+  .content-body--case-study > :global(pre:first-of-type) {
+    background: var(--color-bg-elevated);
+    padding: var(--space-6);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+  }
+  .content-body--case-study > :global(pre:first-of-type) :global(code) {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  @media (max-width: 900px) {
+    .content-body--case-study {
+      grid-template-columns: 1fr;
+    }
+    .content-body--case-study > :global(*),
+    .content-body--case-study > :global(pre:first-of-type) {
+      grid-column: 1;
+      grid-row: auto;
+      position: static;
+    }
   }
 </style>

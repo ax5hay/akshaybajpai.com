@@ -6,13 +6,13 @@ const year = new Date().getFullYear();
   <div class="footer-inner">
     <p class="footer-tagline">The Architecture of Intelligence</p>
     <nav class="footer-nav" aria-label="Footer">
-      <a href="/about">About</a>
-      <a href="/work">Work</a>
-      <a href="/blog">Blog</a>
-      <a href="/essays">Essays</a>
-      <a href="/contact">Contact</a>
-      <a href="https://linkedin.com/in/ax5hay" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-      <a href="https://github.com/ax5hay" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="/about" class="link-hover">About</a>
+      <a href="/work" class="link-hover">Work</a>
+      <a href="/blog" class="link-hover">Blog</a>
+      <a href="/essays" class="link-hover">Essays</a>
+      <a href="/contact" class="link-hover">Contact</a>
+      <a href="https://linkedin.com/in/ax5hay" target="_blank" rel="noopener noreferrer" class="link-hover">LinkedIn</a>
+      <a href="https://github.com/ax5hay" target="_blank" rel="noopener noreferrer" class="link-hover">GitHub</a>
     </nav>
     <p class="footer-copy">&copy; {year} Akshay Bajpai. All rights reserved.</p>
   </div>
@@ -23,6 +23,7 @@ const year = new Date().getFullYear();
     padding: var(--space-24) var(--space-8);
     border-top: 1px solid var(--color-border);
     margin-top: var(--space-32);
+    background: var(--color-bg-surface);
   }
   .footer-inner {
     max-width: var(--content-width);

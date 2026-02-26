@@ -8,80 +8,40 @@ const cases = (await getCollection('work')).filter((c) => !c.data.draft).sort((a
   title="Work & Case Studies — Akshay Bajpai"
   description="Case studies in AI systems, architecture, and performance. Problem, solution, tradeoffs, metrics."
 >
-  <div class="work-page">
-    <header class="work-header">
-      <h1 class="work-title">Work</h1>
-      <p class="work-lead">Case studies: problem, architecture, tradeoffs, lessons.</p>
-    </header>
-    <ul class="case-list" aria-label="Case studies">
-      {cases.map((c) => (
-        <li class="case-item">
-          <a href={`/work/${c.slug}`} class="case-link">
-            <span class="case-title">{c.data.title}</span>
-            {c.data.client && <span class="case-client">{c.data.client}</span>}
-            <time class="case-date" datetime={c.data.pubDate.toISOString()}>
-              {c.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
-            </time>
-          </a>
-        </li>
-      ))}
-    </ul>
+  <div class="work-page section-surface">
+    <div class="work-inner">
+      <header class="work-header" data-reveal>
+        <h1 class="work-title">Work</h1>
+        <p class="work-lead">Case studies: problem, architecture, tradeoffs, lessons.</p>
+      </header>
+      <ul class="case-list" aria-label="Case studies" data-reveal-stagger>
+        {cases.map((c) => (
+          <li class="case-item">
+            <a href={`/work/${c.slug}`} class="case-link link-hover">
+              <span class="case-title">{c.data.title}</span>
+              {c.data.client && <span class="case-client">{c.data.client}</span>}
+              <time class="case-date" datetime={c.data.pubDate.toISOString()}>
+                {c.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+              </time>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   </div>
 </PageLayout>
 
 <style>
-  .work-page {
-    max-width: var(--content-width);
-    margin: 0 auto;
-    padding: var(--space-24) var(--space-8);
-  }
-  .work-header {
-    margin-bottom: var(--space-16);
-  }
-  .work-title {
-    font-family: var(--font-serif);
-    font-size: var(--text-5xl);
-    font-weight: 400;
-    margin: 0 0 var(--space-4);
-    color: var(--color-text);
-  }
-  .work-lead {
-    font-size: var(--text-lg);
-    color: var(--color-text-secondary);
-    margin: 0;
-  }
-  .case-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .case-item {
-    border-bottom: 1px solid var(--color-border);
-  }
-  .case-link {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-2) var(--space-6);
-    padding: var(--space-6) 0;
-    transition: color var(--duration-fast);
-  }
-  .case-link:hover .case-title {
-    color: var(--color-accent);
-  }
-  .case-title {
-    font-size: var(--text-lg);
-    font-weight: 500;
-    color: var(--color-text);
-    transition: color var(--duration-fast);
-  }
-  .case-client {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-  }
-  .case-date {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    margin-left: auto;
-  }
+  .work-page { padding: var(--space-24) var(--space-8); }
+  .work-inner { max-width: var(--content-width); margin: 0 auto; }
+  .work-header { margin-bottom: var(--space-16); }
+  .work-title { font-family: var(--font-serif); font-size: var(--text-5xl); font-weight: 400; margin: 0 0 var(--space-4); color: var(--color-text); }
+  .work-lead { font-size: var(--text-lg); color: var(--color-text-secondary); margin: 0; }
+  .case-list { list-style: none; margin: 0; padding: 0; }
+  .case-item { border-bottom: 1px solid var(--color-border); }
+  .case-link { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-6); padding: var(--space-6) 0; transition: color var(--duration-fast); }
+  .case-link:hover .case-title { color: var(--color-accent); }
+  .case-title { font-size: var(--text-lg); font-weight: 500; color: var(--color-text); transition: color var(--duration-fast); }
+  .case-client { font-size: var(--text-sm); color: var(--color-text-muted); }
+  .case-date { font-size: var(--text-sm); color: var(--color-text-muted); margin-left: auto; }
 </style>

@@ -89,6 +89,38 @@ const image = ogImage ? new URL(ogImage, site).href : new URL('/og-default.jpg',
     <script type="application/ld+json">{JSON.stringify(websiteSchema)}</script>
   </head>
   <body>
+    <script is:inline>
+      (function () {
+        if (typeof document === 'undefined') return;
+        var path = window.location.pathname || '';
+        if (path === '/' || path === '/index.html' || path === '') {
+          document.body.classList.add('home-hero');
+          function update() {
+            document.body.classList.toggle('scrolled-past-hero', window.scrollY > window.innerHeight * 0.55);
+          }
+          window.addEventListener('scroll', update, { passive: true });
+          update();
+        }
+      })();
+    </script>
     <slot />
+    <script is:inline>
+      (function () {
+        if (typeof document === 'undefined') return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) e.target.classList.add('reveal-visible');
+          });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+        function run() {
+          document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach(function (el) {
+            observer.observe(el);
+          });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+        else run();
+      })();
+    </script>
   </body>
 </html>
