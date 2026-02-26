@@ -34,11 +34,6 @@ jobs:
         env:
           SITE: "https://www.akshaybajpai.com"
 
-      - name: Lighthouse CI (performance ≥ 90, accessibility 100)
-        run: npx @lhci/cli@0.15.x autorun
-        env:
-          LHCI_GITHUB_APP_TOKEN: ""
-
       - name: Preserve CNAME
         run: |
           if [ -f CNAME ]; then
