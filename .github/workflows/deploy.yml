@@ -59,3 +59,29 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Retry delay (1/2)
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+
+      - name: Deploy to GitHub Pages (retry 1)
+        if: steps.deployment.outcome == 'failure'
+        id: deploy_retry1
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Retry delay (2/2)
+        if: steps.deploy_retry1.outcome == 'failure'
+        run: sleep 60
+
+      - name: Deploy to GitHub Pages (retry 2)
+        if: steps.deploy_retry1.outcome == 'failure'
+        id: deploy_retry2
+        uses: actions/deploy-pages@v4
+
+      - name: Fail if all deploys failed
+        if: always() && steps.deployment.outcome == 'failure' && steps.deploy_retry1.outcome == 'failure' && steps.deploy_retry2.outcome == 'failure'
+        run: |
+          echo "::error::Deployment failed after 3 attempts. Check https://www.githubstatus.com and re-run the workflow."
+          exit 1

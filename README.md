@@ -1,11 +1,21 @@
 # The Architecture of Intelligence
 
 [![Deploy to GitHub Pages](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml/badge.svg)](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml)
-[![Node 18+](https://img.shields.io/badge/node-18%2B-brightgreen?logo=node.js)](https://nodejs.org/)
-[![Astro](https://img.shields.io/badge/Astro-4-FF5D01?logo=astro)](https://astro.build/)
+[![Live site](https://img.shields.io/badge/live-akshaybajpai.com-0a0a0c?style=flat)](https://www.akshaybajpai.com)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen?logo=node.js)](https://nodejs.org/)
+[![Astro](https://img.shields.io/badge/Astro-4.x-FF5D01?logo=astro)](https://astro.build/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.170-000000?logo=three.js)](https://threejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-build%20tool-646CFF?logo=vite)](https://vitejs.dev/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-222?logo=github)](https://pages.github.com/)
+[![Static](https://img.shields.io/badge/output-static-5c5c6a)](https://docs.astro.build/en/guides/deploy/github/)
+[![RSS](https://img.shields.io/badge/RSS-included-FFA500)](https://www.akshaybajpai.com/rss.xml)
 [![License](https://img.shields.io/badge/license-All%20rights%20reserved-lightgrey)]()
 
 **Live:** [www.akshaybajpai.com](https://www.akshaybajpai.com)
+
+> **GitHub repo description** (copy for *Settings → About → Description*):  
+> Personal site with an explorable neural map. Astro, Three.js, TypeScript. Scroll-driven 3D constellation; hover & click to open sections. Static, RSS, GitHub Pages.
 
 Personal site and neural map. Not a list of links — a spatial system you move through. The homepage is one scroll-driven scene: you scroll in, the camera flies into a constellation of nodes; you hover and click to open sections. No nav bar on the hero, no “sections” below the fold. Content lives inside the map.
 
@@ -46,20 +56,22 @@ Personal site and neural map. Not a list of links — a spatial system you move 
 **Build & deploy**
 
 - Astro 4, static output. Vite: Three.js and NeuralScene in separate chunks; inline stylesheets auto; HTML compressed.
-- GitHub Actions: `npm ci` → `npm run build` → write CNAME into `dist/` → verify artifact → upload → deploy-pages. Source set to GitHub Actions in repo Settings → Pages. Custom domain via CNAME.
+- GitHub Actions: `npm ci` → `npm run build` → write CNAME into `dist/` → verify artifact → upload → deploy-pages (with up to 3 attempts and 60s delay between retries). Source set to GitHub Actions in repo Settings → Pages. Custom domain via CNAME.
 
 ---
 
-## Stack
+## Stack & versions
 
-| Layer   | Choice |
-|--------|--------|
-| Framework | Astro 4 |
-| Runtime | Node 18+ |
-| 3D / map | Three.js (instanced mesh, LineSegments, raycaster, fog) |
-| Content | Markdown, content collections (blog, essays, work) |
-| Styles | Vanilla CSS, design tokens, no Tailwind/Bootstrap |
-| Hosting | GitHub Pages |
+| Layer     | Tech | Version |
+|-----------|------|--------|
+| Framework | Astro | 4.x |
+| Runtime   | Node | ≥18 (CI: 20) |
+| 3D / map  | Three.js | 0.170 |
+| Language  | TypeScript | 5.6 |
+| Build     | Vite (via Astro) | — |
+| Content   | Markdown, content collections | @astrojs/rss 4.x, @astrojs/sitemap 3.x |
+| Styles    | Vanilla CSS, design tokens | — |
+| Hosting   | GitHub Pages | Actions (deploy-pages@v4, upload-pages-artifact@v4) |
 
 ---
 
