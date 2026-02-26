@@ -31,21 +31,27 @@ const REDUCE_MOTION =
 const CLUSTER_COUNT = 5;
 const NODES_PER_CLUSTER = 22;
 const NODE_COUNT = CLUSTER_COUNT * NODES_PER_CLUSTER;
-const CONNECT_THRESHOLD = 2.2;
-const NUCLEUS_RADIUS = 0.22;
+const CONNECT_THRESHOLD = 2.4;
+// Cross-cluster: only when nodes pass close (stricter distance) — fewer inter-section lines, dynamic as they orbit
+const CONNECT_CROSS_MAX = 1.15;
+const NUCLEUS_RADIUS = 0.2;
 const THOUGHT_RADIUS = 0.06;
-const FOG_NEAR = 6;
-const FOG_FAR = 32;
-const ORBIT_SPEED = 0.04;
-const DRIFT = 0.015;
+const FOG_NEAR = 5;
+const FOG_FAR = 28;
+const ORBIT_SPEED = 0.025;
+const DRIFT = 0.004;
 
-// Cluster centers — spread in 3D (AI Infra, Systems Thinking, Perf Eng, Product & SaaS, Experimental UI)
+// Bounds so the net stays on page
+const BOUNDS = { x: 2.6, y: 2.2, z: 2.2 };
+
+// Five clusters in a balanced ring so no left/right bunching; z staggered for depth
+const CLUSTER_RADIUS = 1.65;
 const CLUSTER_CENTERS: [number, number, number][] = [
-  [-2.8, 0.8, 1.5],
-  [2.2, -0.6, 2],
-  [0, 2.2, -1.8],
-  [2.5, 0.5, 0.5],
-  [-1.8, -1.8, -0.8],
+  [CLUSTER_RADIUS * 0.95, 0, 0.6],           // Essays — right
+  [CLUSTER_RADIUS * 0.59, CLUSTER_RADIUS * 0.81, -0.3],   // About — top-right
+  [-CLUSTER_RADIUS * 0.59, CLUSTER_RADIUS * 0.81, 0.2],   // Work — top-left
+  [-CLUSTER_RADIUS * 0.95, 0, -0.4],        // Blog — left
+  [0, -CLUSTER_RADIUS * 0.95, 0.5],         // Contact — bottom
 ];
 
 const CLUSTER_TITLES = ['Essays', 'About', 'Work', 'Blog', 'Contact'];
@@ -59,6 +65,10 @@ const CLUSTER_RAW_SNIPPETS = [
   'auth, billing, webhooks, docs',
   'scroll-linked camera; instanced mesh',
 ];
+
+// Line colors per cluster (same-cluster edges only); nodes stay white
+const CLUSTER_LINE_COLORS = [0xc9a227, 0xa89b6a, 0xb8a85a, 0x9a9a7a, 0xa89bb8];
+const NEUTRAL_LINE = 0x5c5c6a; // cross-cluster edges
 
 interface NodePosition {
   x: number;
@@ -117,27 +127,36 @@ function initNodes(): NodePosition[] {
   for (let c = 0; c < CLUSTER_COUNT; c++) {
     const [cx, cy, cz] = CLUSTER_CENTERS[c];
     for (let i = 0; i < NODES_PER_CLUSTER; i++) {
-      const angle = (i / NODES_PER_CLUSTER) * Math.PI * 2 + Math.random() * 0.5;
-      const orbitRadius = 0.8 + Math.random() * 1.2;
-      const x = cx + Math.cos(angle) * orbitRadius + (Math.random() - 0.5) * 0.3;
-      const y = cy + Math.sin(angle) * orbitRadius * 0.6 + (Math.random() - 0.5) * 0.3;
-      const z = cz + (Math.random() - 0.5) * 0.6;
+      const angle = (i / NODES_PER_CLUSTER) * Math.PI * 2 + Math.random() * 0.6;
+      const orbitRadius = 0.55 + Math.random() * 0.55;
+      const x = cx + Math.cos(angle) * orbitRadius + (Math.random() - 0.5) * 0.25;
+      const y = cy + Math.sin(angle) * orbitRadius * 0.7 + (Math.random() - 0.5) * 0.25;
+      const z = cz + (Math.random() - 0.5) * 0.5;
       list.push({
         x, y, z,
         cluster: c,
         angle,
         orbitRadius,
-        vx: (Math.random() - 0.5) * 0.008,
-        vy: (Math.random() - 0.5) * 0.008,
-        vz: (Math.random() - 0.5) * 0.008,
+        vx: (Math.random() - 0.5) * DRIFT,
+        vy: (Math.random() - 0.5) * DRIFT,
+        vz: (Math.random() - 0.5) * DRIFT,
       });
     }
   }
   return list;
 }
 
+function hexToRgb(hex: number): [number, number, number] {
+  const r = ((hex >> 16) & 255) / 255;
+  const g = ((hex >> 8) & 255) / 255;
+  const b = (hex & 255) / 255;
+  return [r, g, b];
+}
+
 function buildEdgeGeometry(positions: NodePosition[]): BufferGeometry {
-  const pairs: number[] = [];
+  const positionsArr: number[] = [];
+  const colorsArr: number[] = [];
+  const neutral = hexToRgb(NEUTRAL_LINE);
   for (let i = 0; i < positions.length; i++) {
     for (let j = i + 1; j < positions.length; j++) {
       const a = positions[i];
@@ -146,14 +165,18 @@ function buildEdgeGeometry(positions: NodePosition[]): BufferGeometry {
       const dy = b.y - a.y;
       const dz = b.z - a.z;
       const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-      const sameCluster = a.cluster === b.cluster ? 1.4 : 1;
-      if (d < CONNECT_THRESHOLD * sameCluster) {
-        pairs.push(a.x, a.y, a.z, b.x, b.y, b.z);
+      const sameCluster = a.cluster === b.cluster;
+      const threshold = sameCluster ? CONNECT_THRESHOLD * 1.35 : CONNECT_CROSS_MAX;
+      if (d < threshold) {
+        positionsArr.push(a.x, a.y, a.z, b.x, b.y, b.z);
+        const [r, g, b_] = sameCluster ? hexToRgb(CLUSTER_LINE_COLORS[a.cluster]) : neutral;
+        colorsArr.push(r, g, b_, r, g, b_);
       }
     }
   }
   const geo = new BufferGeometry();
-  geo.setAttribute('position', new Float32BufferAttribute(pairs, 3));
+  geo.setAttribute('position', new Float32BufferAttribute(positionsArr, 3));
+  geo.setAttribute('color', new Float32BufferAttribute(colorsArr, 3));
   return geo;
 }
 
@@ -199,16 +222,18 @@ function setHovered(instanceId: number | null, nucleusCluster: number | null): v
 
 function updatePositions(): void {
   if (REDUCE_MOTION) return;
-  const now = Date.now() * 0.001;
   for (const p of nodePositions) {
     const [cx, cy, cz] = CLUSTER_CENTERS[p.cluster];
     p.angle += ORBIT_SPEED * 0.016;
     const baseX = cx + Math.cos(p.angle) * p.orbitRadius;
-    const baseY = cy + Math.sin(p.angle) * p.orbitRadius * 0.6;
+    const baseY = cy + Math.sin(p.angle) * p.orbitRadius * 0.5;
     const baseZ = cz;
     p.x = baseX + (p.x - baseX) * 0.98 + p.vx;
     p.y = baseY + (p.y - baseY) * 0.98 + p.vy;
     p.z = baseZ + (p.z - baseZ) * 0.98 + p.vz;
+    p.x = Math.max(-BOUNDS.x, Math.min(BOUNDS.x, p.x));
+    p.y = Math.max(-BOUNDS.y, Math.min(BOUNDS.y, p.y));
+    p.z = Math.max(-BOUNDS.z, Math.min(BOUNDS.z, p.z));
   }
 }
 
@@ -257,7 +282,7 @@ function tick(): void {
     }
   } else {
     const t = now * 0.12;
-    const baseZ = Math.max(6, 14 - scrollY * 0.012);
+    const baseZ = Math.max(5.5, 13 - scrollY * 0.024);
     const orbitR = 1.2;
     camera.position.x = Math.sin(t) * orbitR;
     camera.position.z = baseZ + Math.cos(t) * orbitR;
@@ -379,7 +404,7 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
       matrix = new Matrix4();
       quat = new Quaternion();
 
-      // Nucleus per cluster — larger, slightly glowing
+      // Nucleus per cluster — larger, white
       const nucleusGeo = new SphereGeometry(NUCLEUS_RADIUS, 20, 16);
       const nucleusMat = new MeshBasicMaterial({
         color: 0xe8e8ec,
@@ -398,7 +423,7 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
       const thoughtMat = new MeshBasicMaterial({
         color: 0xe8e8ec,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.85,
       });
       thoughtNodes = new InstancedMesh(thoughtGeo, thoughtMat, NODE_COUNT);
       scene.add(thoughtNodes);
@@ -406,7 +431,7 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
 
       const lineGeo = buildEdgeGeometry(nodePositions);
       lineMaterial = new LineBasicMaterial({
-        color: 0xc9a227,
+        vertexColors: true,
         transparent: true,
         opacity: LINE_OPACITY_IDLE,
       });
@@ -430,8 +455,7 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
 
       overlayEl = document.createElement('div');
       overlayEl.className = 'neural-fullscreen-overlay';
-      overlayEl.innerHTML = '<div class="neural-overlay-inner"><button type="button" class="neural-overlay-back" aria-label="Back to intro">×</button><button type="button" class="neural-overlay-close" aria-label="Close">×</button><iframe class="neural-overlay-iframe" title="Content"></iframe></div>';
-      const backBtn = overlayEl.querySelector('.neural-overlay-back');
+      overlayEl.innerHTML = '<div class="neural-overlay-inner"><button type="button" class="neural-overlay-close" aria-label="Back to map">×</button><iframe class="neural-overlay-iframe" title="Content"></iframe></div>';
       const closeBtn = overlayEl.querySelector('.neural-overlay-close');
       const iframe = overlayEl.querySelector('.neural-overlay-iframe') as HTMLIFrameElement;
       const closeOverlay = (): void => {
@@ -441,9 +465,6 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
         flyTarget = null;
         flyStart = null;
       };
-      backBtn?.addEventListener('click', () => {
-        if (iframe) iframe.src = '/hero-placard';
-      });
       closeBtn?.addEventListener('click', closeOverlay);
       document.body.appendChild(overlayEl);
 
@@ -465,8 +486,6 @@ export function initNeuralScene(container: HTMLElement): Promise<() => void> {
           .neural-fullscreen-overlay.active{display:block;opacity:1;}
           .neural-fullscreen-overlay::before{content:'';position:absolute;inset:0;background:rgba(10,10,12,0.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none;}
           .neural-overlay-inner{position:absolute;inset:0;padding:var(--space-8);box-sizing:border-box;}
-          .neural-overlay-back{position:absolute;top:var(--space-4);right:calc(var(--space-4) + 52px);width:44px;height:44px;border:none;background:rgba(255,255,255,0.08);color:var(--color-text);font-size:28px;line-height:1;cursor:pointer;border-radius:4px;z-index:10;}
-          .neural-overlay-back:hover{background:rgba(255,255,255,0.12);}
           .neural-overlay-close{position:absolute;top:var(--space-4);right:var(--space-4);width:44px;height:44px;border:none;background:rgba(255,255,255,0.08);color:var(--color-text);font-size:28px;line-height:1;cursor:pointer;border-radius:4px;z-index:10;}
           .neural-overlay-close:hover{background:rgba(255,255,255,0.12);}
           .neural-overlay-iframe{width:100%;height:100%;border:none;background:rgba(10,10,12,0.85);}

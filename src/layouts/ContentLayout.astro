@@ -7,10 +7,9 @@ interface Props {
   pubDate: Date;
   canonical?: string;
   ogImage?: string;
-  layoutVariant?: 'article' | 'case-study';
 }
 
-const { title, description, pubDate, canonical, ogImage, layoutVariant = 'article' } = Astro.props;
+const { title, description, pubDate, canonical, ogImage } = Astro.props;
 ---
 
 <PageLayout
@@ -29,7 +28,7 @@ const { title, description, pubDate, canonical, ogImage, layoutVariant = 'articl
           {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
         </time>
       </header>
-      <div class="content-body" class:list={{ 'content-body--case-study': layoutVariant === 'case-study' }} data-reveal>
+      <div class="content-body" data-reveal>
         <slot />
       </div>
     </div>
@@ -172,58 +171,6 @@ const { title, description, pubDate, canonical, ogImage, layoutVariant = 'articl
       float: none;
       width: auto;
       margin-left: 0;
-    }
-  }
-  /* Case study: split view — diagram left, technical breakdown right (prose wider) */
-  .content-body--case-study {
-    display: grid;
-    grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.8fr);
-    gap: var(--space-16);
-    align-items: start;
-  }
-  .content-body--case-study > :global(*) {
-    grid-column: 2;
-    min-width: 0;
-  }
-  .content-body--case-study > :global(.case-study-diagram) {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    position: sticky;
-    top: var(--space-8);
-    background: var(--color-bg-elevated);
-    padding: var(--space-6);
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-  }
-  .content-body--case-study > :global(.case-study-diagram) :global(svg) {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  .content-body--case-study > :global(pre:first-of-type) {
-    grid-column: 1;
-    grid-row: 1 / -1;
-    position: sticky;
-    top: var(--space-8);
-    background: var(--color-bg-elevated);
-    padding: var(--space-6);
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-  }
-  .content-body--case-study > :global(pre:first-of-type) :global(code) {
-    font-size: 0.8rem;
-    line-height: 1.5;
-  }
-  @media (max-width: 900px) {
-    .content-body--case-study {
-      grid-template-columns: 1fr;
-    }
-    .content-body--case-study > :global(*),
-    .content-body--case-study > :global(.case-study-diagram),
-    .content-body--case-study > :global(pre:first-of-type) {
-      grid-column: 1;
-      grid-row: auto;
-      position: static;
     }
   }
 </style>
