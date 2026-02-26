@@ -2,7 +2,7 @@
 // No previous hero layout. Centered typography, no gradient orbs, no particle clone.
 ---
 
-<section class="hero" aria-label="Introduction">
+<section class="hero" aria-label="Introduction" data-hero>
   <h1 class="hero-title">
     <span class="hero-name">Akshay Bajpai</span>
     <span class="hero-role">Architect of Systems</span>
@@ -21,6 +21,7 @@
     padding: var(--space-8);
     position: relative;
     z-index: 2;
+    will-change: transform;
   }
   .hero-title {
     display: flex;
@@ -52,4 +53,30 @@
     letter-spacing: 0.1em;
     margin: 0;
   }
+  @media (prefers-reduced-motion: reduce) {
+    .hero { will-change: auto; }
+  }
 </style>
+
+<script>
+  (function () {
+    const hero = document.querySelector('[data-hero]');
+    if (!hero) return;
+    var ticking = false;
+    function update() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY;
+        var vh = window.innerHeight;
+        var t = Math.max(0, 1 - y / (vh * 0.6));
+        hero.style.transform = 'translateY(' + (y * 0.2) + 'px) scale(' + (0.97 + t * 0.03) + ')';
+        hero.style.opacity = String(0.7 + t * 0.3);
+        ticking = false;
+      });
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>

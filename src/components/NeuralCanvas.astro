@@ -43,21 +43,37 @@
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 1.2s var(--ease-out-expo);
+    transition: opacity 1.5s var(--ease-out-expo);
+    pointer-events: none;
   }
   .neural-mount.ready {
     opacity: 1;
   }
+  .neural-mount canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 </style>
 
 <script>
-  // Lazy-load 3D neural scene (Three.js) when idle.
-  const mount = document.getElementById('neural-mount');
-  if (mount && 'requestIdleCallback' in window) {
-    requestIdleCallback(() => {
-      import('@components/NeuralScene.ts').then(({ initNeuralScene }) => {
-        initNeuralScene(mount).then(() => { mount.classList.add('ready'); }).catch(() => {});
-      }).catch(() => {});
-    }, { timeout: 2500 });
-  }
+  (function () {
+    const mount = document.getElementById('neural-mount');
+    if (!mount) return;
+    function loadScene() {
+      import('./NeuralScene.ts').then(function (m) {
+        m.initNeuralScene(mount).then(function () {
+          mount.classList.add('ready');
+        }).catch(function (err) {
+          console.error('[NeuralScene] init failed', err);
+          mount.classList.add('ready');
+        });
+      }).catch(function (err) {
+        console.error('[NeuralScene] load failed', err);
+        mount.classList.add('ready');
+      });
+    }
+    if (document.readyState === 'complete') loadScene();
+    else window.addEventListener('load', loadScene);
+  })();
 </script>
