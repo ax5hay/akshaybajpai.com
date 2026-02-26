@@ -14,8 +14,6 @@
 
 **Live:** [www.akshaybajpai.com](https://www.akshaybajpai.com)
 
-> **GitHub repo description** (copy for *Settings → About → Description*):  
-> Personal site with an explorable neural map. Astro, Three.js, TypeScript. Scroll-driven 3D constellation; hover & click to open sections. Static, RSS, GitHub Pages.
 
 Personal site and neural map. Not a list of links — a spatial system you move through. The homepage is one scroll-driven scene: you scroll in, the camera flies into a constellation of nodes; you hover and click to open sections. No nav bar on the hero, no “sections” below the fold. Content lives inside the map.
 
