@@ -6,8 +6,8 @@ export const GET = async (context) => {
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
     .slice(0, 50);
   return rss({
-    title: 'Akshay Bajpai — Blog',
-    description: 'Technical writing on AI infrastructure, systems design, and performance engineering.',
+    title: 'Akshay Bajpai | AI Architect & Technology Leader — Blog',
+    description: 'Akshay Bajpai — Technical writing on AI infrastructure, systems design, and performance engineering.',
     site: context.site?.href ?? 'https://www.akshaybajpai.com',
     items: posts.map((p) => ({
       title: p.data.title,

@@ -19,18 +19,32 @@ const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Akshay Bajpai',
+  alternateName: ['ax5hay', 'Akshay Bajpai AI'],
   url: site,
-  jobTitle: 'Architect of Systems',
+  image: `${site}/logo.png`,
+  jobTitle: 'AI Architect & Technology Leader',
+  description: 'Akshay Bajpai — AI Architect and Technology Leader. Expert in LLMs, RAG pipelines, and scalable AI systems. Published researcher with 97.5% Master\'s distinction in AI & Intelligent Systems.',
   sameAs: ['https://linkedin.com/in/ax5hay', 'https://github.com/ax5hay', 'https://twitter.com/ax5hay'],
+  knowsAbout: ['Artificial Intelligence', 'Machine Learning', 'Large Language Models', 'RAG Systems', 'Deep Learning', 'Natural Language Processing', 'System Architecture', 'Technology Leadership'],
+  email: 'contact@akshaybajpai.com',
+  address: { '@type': 'PostalAddress', addressLocality: 'New Delhi', addressRegion: 'Delhi', addressCountry: 'India' },
 };
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'Akshay Bajpai',
+  name: 'Akshay Bajpai | AI Architect & Technology Leader',
   url: site,
-  description: 'The Architecture of Intelligence. AI infrastructure, systems thinking, performance engineering.',
+  description: 'Akshay Bajpai — AI Architect and Technology Leader. LLMs, RAG systems, intelligent system design. Professional portfolio and neural archive.',
+  author: { '@type': 'Person', name: 'Akshay Bajpai' },
+  inLanguage: 'en-US',
+  potentialAction: { '@type': 'SearchAction', target: `${site}/#contact`, 'query-input': 'required name=search_term_string' },
 };
-const image = ogImage ? new URL(ogImage, site).href : new URL('/og-default.jpg', site).href;
+const profilePageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: { '@type': 'Person', name: 'Akshay Bajpai', alternateName: 'ax5hay', description: 'AI Architect, Technology Leader, and Published Researcher', image: `${site}/logo.png`, sameAs: ['https://linkedin.com/in/ax5hay', 'https://github.com/ax5hay'] },
+};
+const image = ogImage ? new URL(ogImage, site).href : new URL('/logo.png', site).href;
 ---
 
 <!doctype html>
@@ -41,26 +55,32 @@ const image = ogImage ? new URL(ogImage, site).href : new URL('/og-default.jpg',
     <meta name="theme-color" content="#0a0a0c" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    {noIndex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
+    <meta name="author" content="Akshay Bajpai" />
+    <meta name="keywords" content="Akshay Bajpai, Akshay Bajpai AI, AI Architect, Machine Learning, LLM, RAG systems, Technology Leader, Published Researcher, ax5hay" />
+    {noIndex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
+    <meta name="googlebot" content="index, follow" />
     <link rel="canonical" href={canonicalUrl} />
 
     <!-- Open Graph -->
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="Akshay Bajpai | AI Architect & Technology Leader" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Akshay Bajpai — AI Architect & Technology Leader, LLMs, RAG systems" />
     <meta property="og:locale" content="en_US" />
     {publishedTime && type === 'article' && <meta property="article:published_time" content={publishedTime} />}
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@ax5hay" />
+    <meta name="twitter:creator" content="@ax5hay" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
-    <meta name="twitter:creator" content="@ax5hay" />
 
     <!-- Fonts: Instrument Serif + IBM Plex Sans (editorial, not previous) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -83,10 +103,18 @@ const image = ogImage ? new URL(ogImage, site).href : new URL('/og-default.jpg',
       />
     </noscript>
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <script type="application/ld+json">{JSON.stringify(personSchema)}</script>
-    <script type="application/ld+json">{JSON.stringify(websiteSchema)}</script>
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="shortcut icon" type="image/png" href="/logo.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(profilePageSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Akshay Bajpai', item: site }],
+    })} />
   </head>
   <body>
     <script is:inline>

@@ -12,7 +12,9 @@ const currentPath = Astro.url.pathname;
 ---
 
 <header class="site-header" role="banner">
-  <a href="/" class="logo" aria-label="Home · Akshay Bajpai">AB</a>
+  <a href="/" class="logo" aria-label="Home · Akshay Bajpai">
+    <img src="/logo.png" alt="Akshay Bajpai" width="32" height="32" />
+  </a>
   <nav class="nav" aria-label="Primary">
     <ul class="nav-list">
       {navLinks.map((link) => (
@@ -61,11 +63,15 @@ const currentPath = Astro.url.pathname;
     opacity: 1;
   }
   .logo {
-    font-family: var(--font-serif);
-    font-size: var(--text-xl);
-    font-weight: 400;
-    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
     color: var(--color-text);
+  }
+  .logo img {
+    display: block;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
   }
   .nav-list {
     list-style: none;
