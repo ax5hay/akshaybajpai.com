@@ -18,7 +18,13 @@ export default async function WorkIndexPage() {
         <div className="page-shell-inner" style={{ maxWidth: 'var(--content-width)' }}>
           <header className="page-header" data-reveal>
             <h1 className="page-title">Work</h1>
-            <p className="page-lead">Case studies: problem, architecture, tradeoffs, lessons.</p>
+            <p className="page-lead">
+              Open-source systems and research from{' '}
+              <a href="https://github.com/ax5hay" className="link-hover" style={{ color: 'var(--accent)' }}>
+                @ax5hay
+              </a>
+              — architecture, tradeoffs, and lessons from each build.
+            </p>
           </header>
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }} aria-label="Case studies" data-reveal-stagger>
             {cases.map((c) => (

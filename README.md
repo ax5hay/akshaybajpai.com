@@ -234,7 +234,7 @@ flowchart LR
 |------------|------|-------------|-------|
 | `blog` | `content/blog/` | `title`, `description`, `pubDate`, `draft?` | Included in RSS |
 | `essays` | `content/essays/` | same | Long-form writing |
-| `work` | `content/work/` | + `client?`, `stack?`, `metrics?` | Case studies |
+| `work` | `content/work/` | + `client?`, `stack?`, `metrics?` | Case studies sourced from [github.com/ax5hay](https://github.com/ax5hay) pinned repositories |
 
 Example frontmatter:
 
