@@ -31,23 +31,20 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:
-          SITE: "https://www.akshaybajpai.com"
 
       - name: Preserve CNAME
-        run: |
-          echo "www.akshaybajpai.com" > dist/CNAME
+        run: echo "www.akshaybajpai.com" > out/CNAME
 
       - name: Verify artifact
         run: |
-          ls -la dist/
-          test -f dist/index.html
-          test -f dist/CNAME
+          ls -la out/
+          test -f out/index.html
+          test -f out/CNAME
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: dist
+          path: out
 
   deploy:
     environment:
@@ -83,5 +80,5 @@ jobs:
       - name: Fail if all deploys failed
         if: always() && steps.deployment.outcome == 'failure' && steps.deploy_retry1.outcome == 'failure' && steps.deploy_retry2.outcome == 'failure'
         run: |
-          echo "::error::Deployment failed after 3 attempts. Check https://www.githubstatus.com and re-run the workflow."
+          echo "::error::Deployment failed after 3 attempts."
           exit 1

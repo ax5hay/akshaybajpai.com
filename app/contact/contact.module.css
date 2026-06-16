@@ -1,0 +1,68 @@
+.prose {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-8);
+  line-height: var(--leading-relaxed);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-8);
+  margin-bottom: var(--space-12);
+}
+
+.links a {
+  color: var(--shimmer-cyan);
+  font-weight: 500;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 28rem;
+}
+
+.form label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form input,
+.form textarea {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--text-base);
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.form input:focus,
+.form textarea:focus {
+  outline: none;
+  border-color: var(--shimmer-cyan);
+  box-shadow: 0 0 0 3px var(--shimmer-cyan-soft);
+}
+
+.form button {
+  padding: var(--space-3) var(--space-8);
+  background: linear-gradient(135deg, var(--shimmer-coral), var(--shimmer-violet));
+  color: var(--void);
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  align-self: flex-start;
+  transition: transform var(--duration-fast), opacity var(--duration-fast);
+}
+
+.form button:hover {
+  opacity: 0.92;
+  transform: translateY(-2px);
+}

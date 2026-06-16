@@ -1,0 +1,83 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out-expo);
+}
+
+.overlayOpen {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.panel {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  margin: var(--space-6);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  transform: translateY(16px);
+  transition: transform 0.5s var(--ease-out-expo);
+}
+
+.overlayOpen .panel {
+  transform: translateY(0);
+}
+
+.panelGlow {
+  display: none;
+}
+
+.close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.close:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - var(--space-12));
+  border: none;
+  background: var(--color-bg);
+}
+
+@media (max-width: 768px) {
+  .panel {
+    margin: var(--space-2);
+  }
+}
