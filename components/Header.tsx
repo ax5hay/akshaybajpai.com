@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NAV_LINKS } from '@/lib/constants';
+import { SearchDialog } from '@/components/SearchDialog';
 import styles from './Header.module.css';
 
 export function Header() {
@@ -35,7 +36,7 @@ export function Header() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className={`link-hover ${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
+                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
               >
                 {link.label}
               </Link>
@@ -43,6 +44,7 @@ export function Header() {
           ))}
         </ul>
       </nav>
+      <SearchDialog />
       <button
         type="button"
         className={styles.toggle}

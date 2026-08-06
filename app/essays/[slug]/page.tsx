@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/PageShell';
 import { ArticleLayout } from '@/components/ArticleLayout';
-import { getAllSlugs, getEntry } from '@/lib/content';
+import { getAllSlugs, getEntry, estimateReadingTime, getRelatedPosts } from '@/lib/content';
 import { buildMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
@@ -26,10 +26,21 @@ export default async function EssayPage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const essay = await getEntry('essays', slug);
   if (!essay) notFound();
+  const related = await getRelatedPosts('essays', slug, 3);
 
   return (
     <PageShell>
-      <ArticleLayout title={essay.frontmatter.title} date={essay.frontmatter.pubDate} html={essay.html} />
+      <ArticleLayout
+        section="essays"
+        title={essay.frontmatter.title}
+        date={essay.frontmatter.pubDate}
+        html={essay.html}
+        description={essay.frontmatter.description}
+        readingTime={estimateReadingTime(essay.content)}
+        backHref="/essays/"
+        backLabel="← Essays"
+        related={related}
+      />
     </PageShell>
   );
 }

@@ -19,7 +19,7 @@
   width: 100%;
   transform: scaleX(0);
   transform-origin: left;
-  background: var(--accent);
+  background: var(--section-accent, var(--accent));
   transition: transform 80ms var(--ease-out-expo);
 }
 

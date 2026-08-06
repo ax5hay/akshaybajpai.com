@@ -22,7 +22,7 @@ export function ScrollProgress() {
   }, []);
 
   return (
-    <div className={styles.progress} aria-hidden="true">
+    <div className={`scroll-progress ${styles.progress}`} aria-hidden="true">
       <div className={styles.bar} data-scroll-progress />
     </div>
   );

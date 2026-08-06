@@ -17,14 +17,14 @@ export function RevealObserver() {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (embedded) {
-      document.documentElement.classList.add('embedded');
+      document.body.classList.add('embedded');
     }
 
     if (embedded || reduced) {
       // IntersectionObserver is unreliable inside iframe modals — show content immediately
       revealAll();
       return () => {
-        if (embedded) document.documentElement.classList.remove('embedded');
+        if (embedded) document.body.classList.remove('embedded');
       };
     }
 

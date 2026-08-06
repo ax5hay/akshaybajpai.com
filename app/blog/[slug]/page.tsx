@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/PageShell';
 import { ArticleLayout } from '@/components/ArticleLayout';
-import { getAllSlugs, getEntry } from '@/lib/content';
+import { getAllSlugs, getEntry, estimateReadingTime, getRelatedPosts } from '@/lib/content';
 import { buildMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
@@ -26,10 +26,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const post = await getEntry('blog', slug);
   if (!post) notFound();
+  const related = await getRelatedPosts('blog', slug, 3);
 
   return (
     <PageShell>
-      <ArticleLayout title={post.frontmatter.title} date={post.frontmatter.pubDate} html={post.html} />
+      <ArticleLayout
+        section="blog"
+        title={post.frontmatter.title}
+        date={post.frontmatter.pubDate}
+        html={post.html}
+        description={post.frontmatter.description}
+        readingTime={estimateReadingTime(post.content)}
+        backHref="/blog/"
+        backLabel="← Blog"
+        related={related}
+      />
     </PageShell>
   );
 }

@@ -170,12 +170,39 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 
 .page-main {
+  position: relative;
+  z-index: 1;
   padding-top: var(--header-height);
   min-height: 100vh;
 }
 
+.page-main[data-embedded] {
+  padding-top: 0;
+}
+
 .page-main--hero {
   padding-top: 0;
+}
+
+.page-main:not(.page-main--hero) {
+  animation: pageIn 0.45s var(--ease-out-expo);
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-main:not(.page-main--hero) {
+    animation: none;
+  }
 }
 
 body.home-hero .site-header {
@@ -235,9 +262,21 @@ body.home-hero.scrolled-past-hero .site-header {
   }
 }
 
+/* Neural map iframe — hide chrome before React hydrates (see EmbeddedDetectScript on body) */
+body.embedded .site-header,
+body.embedded .scroll-progress,
+body.embedded .site-footer,
+body.embedded .skip-link {
+  display: none !important;
+}
+
+body.embedded .page-main {
+  padding-top: 0;
+}
+
 /* Neural map iframe overlay — skip scroll reveals (IO often never fires) */
-html.embedded [data-reveal],
-html.embedded [data-reveal-stagger] > * {
+body.embedded [data-reveal],
+body.embedded [data-reveal-stagger] > * {
   opacity: 1;
   transform: none;
   transition: none;
@@ -245,17 +284,40 @@ html.embedded [data-reveal-stagger] > * {
 
 .section-surface {
   position: relative;
-  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 100%);
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 12, 0.72) 0%,
+    rgba(15, 15, 18, 0.88) 100%
+  );
+  border-top: 1px solid transparent;
 }
 
 .section-surface::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 10%;
-  right: 10%;
+  left: 8%;
+  right: 8%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--section-accent-glow, var(--border-glow)),
+    transparent
+  );
+}
+
+.section-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    var(--section-accent-soft, rgba(201, 162, 39, 0.06)),
+    transparent 60%
+  );
 }
 
 .link-hover {
@@ -332,6 +394,59 @@ html.embedded [data-reveal-stagger] > * {
   border-radius: 3px;
 }
 .prose pre code { padding: 0; background: none; }
+
+/* Article prose enhancements */
+.prose-article > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding-right: var(--space-3);
+  padding-top: 0.05em;
+  color: var(--section-accent, var(--accent));
+}
+
+.prose-article blockquote {
+  border-left-color: var(--section-accent, var(--shimmer-violet));
+  background: rgba(255, 255, 255, 0.02);
+  padding: var(--space-4) var(--space-6);
+  border-radius: 0 6px 6px 0;
+}
+
+.prose-article pre {
+  border-color: var(--section-accent-soft, var(--border));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.prose-article h2 {
+  position: relative;
+  border-bottom-color: var(--section-accent-soft, var(--border));
+}
+
+.prose-article h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 3rem;
+  height: 1px;
+  background: var(--section-accent, var(--accent));
+  box-shadow: 0 0 12px var(--section-accent-glow, var(--accent-soft));
+}
+
+.prose-article hr {
+  border: none;
+  height: 1px;
+  margin: var(--space-16) 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--section-accent-soft, var(--border)),
+    transparent
+  );
+}
 
 /* Page shells */
 .page-shell {

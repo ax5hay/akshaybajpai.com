@@ -87,10 +87,40 @@ export async function getAllSlugs(collection: CollectionName): Promise<string[]>
   return entries.map((e) => e.slug);
 }
 
-export function formatDate(dateStr: string, style: 'long' | 'short' = 'long'): string {
-  const date = new Date(dateStr);
-  if (style === 'short') {
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+export { formatDate } from '@/lib/format';
+
+export function estimateReadingTime(text: string): number {
+  const words = text.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+export function parseGithubRepo(client?: string): string | null {
+  if (!client) return null;
+  const match = client.match(/ax5hay\/([\w.-]+)/i);
+  return match ? `https://github.com/ax5hay/${match[1]}` : null;
+}
+
+export async function getRelatedPosts(
+  collection: CollectionName,
+  slug: string,
+  limit = 3
+): Promise<Array<{ slug: string; title: string; href: string; description: string }>> {
+  const entries = await getCollection(collection);
+  return entries
+    .filter((e) => e.slug !== slug)
+    .slice(0, limit)
+    .map((e) => ({
+      slug: e.slug,
+      title: e.frontmatter.title,
+      description: e.frontmatter.description,
+      href: `/${collection}/${e.slug}/`,
+    }));
+}
+
+export function getAllTagsFromWork(entries: ContentEntry<WorkFrontmatter>[]): string[] {
+  const tags = new Set<string>();
+  for (const e of entries) {
+    e.frontmatter.stack?.forEach((t) => tags.add(t));
   }
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  return [...tags].sort();
 }

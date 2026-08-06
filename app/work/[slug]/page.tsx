@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/PageShell';
 import { ArticleLayout } from '@/components/ArticleLayout';
-import { getAllSlugs, getEntry } from '@/lib/content';
+import { getAllSlugs, getEntry, estimateReadingTime, getRelatedPosts, type WorkFrontmatter } from '@/lib/content';
 import { buildMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
@@ -24,12 +24,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function WorkCasePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const study = await getEntry('work', slug);
+  const study = await getEntry<WorkFrontmatter>('work', slug);
   if (!study) notFound();
+
+  const fm = study.frontmatter;
+  const tags = [...(fm.stack ?? []), ...(fm.metrics ?? [])].slice(0, 6);
+  const related = await getRelatedPosts('work', slug, 3);
 
   return (
     <PageShell>
-      <ArticleLayout title={study.frontmatter.title} date={study.frontmatter.pubDate} html={study.html} />
+      <ArticleLayout
+        section="work"
+        title={fm.title}
+        date={fm.pubDate}
+        html={study.html}
+        description={fm.description}
+        readingTime={estimateReadingTime(study.content)}
+        tags={tags}
+        backHref="/work/"
+        backLabel="← Work"
+        related={related}
+      />
     </PageShell>
   );
 }

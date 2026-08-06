@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { PageShell } from '@/components/PageShell';
+import { ContentPage } from '@/components/ContentPage';
+import { PageHero } from '@/components/PageHero';
 import { buildMetadata } from '@/lib/metadata';
+import styles from './not-found.module.css';
 
 export const metadata = buildMetadata({
   title: '404 — Not Found',
@@ -11,31 +14,14 @@ export const metadata = buildMetadata({
 export default function NotFound() {
   return (
     <PageShell hideHeader hideFooter>
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--space-8)',
-        textAlign: 'center',
-      }}>
-        <div>
-          <h1 style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'var(--text-7xl)',
-            fontWeight: 400,
-            color: 'var(--text-muted)',
-            margin: '0 0 var(--space-6)',
-            lineHeight: 1,
-          }}>404</h1>
-          <p style={{ fontSize: 'var(--text-lg)', color: 'var(--text-secondary)', margin: '0 0 var(--space-8)' }}>
-            This path doesn&apos;t exist in the neural map.
-          </p>
-          <Link href="/" style={{ color: 'var(--shimmer-cyan)', fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
-            Return home
+      <ContentPage section="architecture">
+        <div className={styles.wrap}>
+          <PageHero section="architecture" title="404" showOrb={false} showBack={false} centered lead="This path doesn't exist in the neural map." />
+          <Link href="/" className={styles.home}>
+            Return to neural map
           </Link>
         </div>
-      </div>
+      </ContentPage>
     </PageShell>
   );
 }

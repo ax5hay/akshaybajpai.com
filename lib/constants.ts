@@ -20,6 +20,8 @@ export const CLUSTER_CONFIG = [
   { title: 'Contact', href: '/contact/', raw: 'scroll-linked camera; instanced mesh' },
 ] as const;
 
+/** @deprecated Use NEURAL_CLUSTERS from lib/neural-clusters */
+
 export const SOCIAL = {
   linkedin: 'https://linkedin.com/in/ax5hay',
   github: 'https://github.com/ax5hay',

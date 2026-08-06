@@ -1,0 +1,60 @@
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(30, 30, 38, 0.9), var(--void));
+}
+
+.lead {
+  margin: 0 0 var(--space-8);
+  font-size: var(--text-xs);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-4);
+  width: min(100%, 640px);
+}
+
+.card {
+  width: 100%;
+  padding: var(--space-6) var(--space-4);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(15, 15, 18, 0.8);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  transition: border-color var(--duration-fast), transform var(--duration-fast);
+}
+
+.card:hover {
+  border-color: var(--cluster-accent, var(--accent));
+  transform: translateY(-2px);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cluster-accent, var(--accent));
+  box-shadow: 0 0 16px var(--cluster-accent, var(--accent));
+}

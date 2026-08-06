@@ -5,7 +5,7 @@
   "description": "The Architecture of Intelligence — Akshay Bajpai",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/generate-rss.mjs",
+    "build": "next build && node scripts/generate-rss.mjs && node scripts/generate-search-index.mjs",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"

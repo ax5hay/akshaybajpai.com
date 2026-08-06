@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Instrument_Serif, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 import { JsonLd } from '@/components/JsonLd';
+import { SkipLink } from '@/components/SkipLink';
+import { EmbeddedDetectScript } from '@/components/EmbeddedDetectScript';
 import { RevealObserver } from '@/components/RevealObserver';
 import { HomeHeroBodyClass } from '@/components/HomeHeroBodyClass';
 import { buildMetadata } from '@/lib/metadata';
@@ -37,7 +39,11 @@ export const metadata: Metadata = buildMetadata({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${instrumentSerif.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`}>
+    <html
+      lang="en"
+      className={`${instrumentSerif.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="icon" href="/logo.png" />
         <link rel="apple-touch-icon" href="/logo.png" />
@@ -45,7 +51,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#0a0a0c" />
         <JsonLd />
       </head>
-      <body>
+      <body suppressHydrationWarning>
+        <EmbeddedDetectScript />
+        <SkipLink />
         <HomeHeroBodyClass />
         <RevealObserver />
         {children}

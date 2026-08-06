@@ -1,6 +1,13 @@
-import Link from 'next/link';
 import { PageShell } from '@/components/PageShell';
-import { getCollection, formatDate, type WorkFrontmatter } from '@/lib/content';
+import { ContentPage } from '@/components/ContentPage';
+import { PageHero } from '@/components/PageHero';
+import { WorkIndex } from '@/components/WorkIndex';
+import {
+  getCollection,
+  getAllTagsFromWork,
+  parseGithubRepo,
+  type WorkFrontmatter,
+} from '@/lib/content';
 import { buildMetadata } from '@/lib/metadata';
 
 export const metadata = buildMetadata({
@@ -11,38 +18,39 @@ export const metadata = buildMetadata({
 
 export default async function WorkIndexPage() {
   const cases = await getCollection<WorkFrontmatter>('work');
+  const tags = getAllTagsFromWork(cases);
+
+  const items = cases.map((c) => ({
+    slug: c.slug,
+    href: `/work/${c.slug}/`,
+    title: c.frontmatter.title,
+    date: c.frontmatter.pubDate,
+    description: c.frontmatter.description,
+    meta: c.frontmatter.client,
+    githubUrl: parseGithubRepo(c.frontmatter.client) ?? undefined,
+    stackTags: c.frontmatter.stack,
+    metrics: c.frontmatter.metrics,
+  }));
 
   return (
     <PageShell>
-      <div className="page-shell page-shell--wide section-surface">
-        <div className="page-shell-inner" style={{ maxWidth: 'var(--content-width)' }}>
-          <header className="page-header" data-reveal>
-            <h1 className="page-title">Work</h1>
-            <p className="page-lead">
+      <ContentPage section="work" wide>
+        <PageHero
+          section="work"
+          title="Work"
+          eyebrow={`Work · ${cases.length} case ${cases.length === 1 ? 'study' : 'studies'}`}
+          lead={
+            <>
               Open-source systems and research from{' '}
-              <a href="https://github.com/ax5hay" className="link-hover" style={{ color: 'var(--accent)' }}>
+              <a href="https://github.com/ax5hay" className="link-hover">
                 @ax5hay
               </a>
               — architecture, tradeoffs, and lessons from each build.
-            </p>
-          </header>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }} aria-label="Case studies" data-reveal-stagger>
-            {cases.map((c) => (
-              <li key={c.slug} className="list-item">
-                <Link href={`/work/${c.slug}/`} className="list-link link-hover" style={{ flexWrap: 'wrap' }}>
-                  <span className="list-link-title">{c.frontmatter.title}</span>
-                  {c.frontmatter.client && (
-                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>{c.frontmatter.client}</span>
-                  )}
-                  <time className="list-link-meta" dateTime={c.frontmatter.pubDate} style={{ marginLeft: 'auto' }}>
-                    {formatDate(c.frontmatter.pubDate, 'short')}
-                  </time>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+            </>
+          }
+        />
+        <WorkIndex items={items} tags={tags} featuredSlug="neural-map-personal-site" />
+      </ContentPage>
     </PageShell>
   );
 }

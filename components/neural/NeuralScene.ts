@@ -1,7 +1,8 @@
-/**
- * Neural constellation — clean, performant.
- * Instanced nodes + single LineSegments mesh (in-place buffer updates, no per-frame alloc).
- */
+import {
+  NEURAL_CLUSTERS,
+  NEURAL_CLUSTER_COUNT,
+  clusterHref,
+} from '@/lib/neural-clusters';
 
 import {
   Scene,
@@ -32,6 +33,7 @@ export interface NeuralCallbacks {
   onHover?: (cluster: number | null, label: string, x: number, y: number) => void;
   onPhaseChange?: (phase: OverlayPhase) => void;
   onClusterSelect?: (cluster: number, url: string) => void;
+  onStaticMode?: () => void;
 }
 
 export interface NeuralSceneHandle {
@@ -39,12 +41,17 @@ export interface NeuralSceneHandle {
   setRawMode: (raw: boolean) => void;
   setOverlayPhase: (phase: OverlayPhase) => void;
   getOverlayPhase: () => OverlayPhase;
+  flyToCluster: (cluster: number) => void;
 }
 
 const REDUCE_MOTION =
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const CLUSTER_COUNT = 5;
+const CLUSTER_COUNT = NEURAL_CLUSTER_COUNT;
+const CLUSTER_TITLES = NEURAL_CLUSTERS.map((c) => c.title);
+const CLUSTER_URLS = NEURAL_CLUSTERS.map((c) => c.href);
+const CLUSTER_RAW = NEURAL_CLUSTERS.map((c) => c.raw);
+
 const NODES_PER_CLUSTER = 16;
 const NODE_COUNT = CLUSTER_COUNT * NODES_PER_CLUSTER;
 const CONNECT_THRESHOLD = 2.4;
@@ -64,16 +71,6 @@ const CLUSTER_CENTERS: [number, number, number][] = [
   [-CLUSTER_RADIUS * 0.59, CLUSTER_RADIUS * 0.81, 0.2],
   [-CLUSTER_RADIUS * 0.95, 0, -0.4],
   [0, -CLUSTER_RADIUS * 0.95, 0.5],
-];
-
-const CLUSTER_TITLES = ['Essays', 'About', 'Work', 'Blog', 'Contact'];
-const CLUSTER_URLS = ['/essays/', '/about/', '/work/', '/blog/', '/contact/'];
-const CLUSTER_RAW = [
-  'model = load(embedding); index.add(vectors);',
-  'constraints → invariants → feedback loops',
-  'latency_p99 < 50ms; throughput 10k/s',
-  'auth, billing, webhooks, docs',
-  'scroll-linked camera; instanced mesh',
 ];
 
 const CLUSTER_LINE_COLORS = [0xc9a227, 0xa89b6a, 0xb8a85a, 0x9a9a7a, 0xa89bb8];
@@ -324,6 +321,57 @@ function tick(): void {
   rafId = requestAnimationFrame(tick);
 }
 
+function pickClusterFromPointer(clientX: number, clientY: number, touchSlop: number): number | null {
+  if (!containerEl || !camera) return null;
+  const rect = containerEl.getBoundingClientRect();
+  let best: { cluster: number; dist: number } | null = null;
+
+  for (let c = 0; c < CLUSTER_COUNT; c++) {
+    const [cx, cy, cz] = CLUSTER_CENTERS[c];
+    _projVec.set(cx, cy, cz).project(camera);
+    const sx = (_projVec.x * 0.5 + 0.5) * rect.width + rect.left;
+    const sy = (-_projVec.y * 0.5 + 0.5) * rect.height + rect.top;
+    const dist = Math.hypot(clientX - sx, clientY - sy);
+    if (dist <= touchSlop && (!best || dist < best.dist)) best = { cluster: c, dist };
+  }
+
+  return best?.cluster ?? null;
+}
+
+function updatePointer(clientX: number, clientY: number): void {
+  if (overlayPhase !== 'closed' || !containerEl) return;
+  const rect = containerEl.getBoundingClientRect();
+  mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(pickables, false);
+  const first = hits[0] as Intersection | undefined;
+  if (first) {
+    if (first.object === thoughtNodes && first.instanceId != null) {
+      setHover(first.instanceId, null);
+      return;
+    }
+    const mesh = first.object as Mesh;
+    if (mesh.userData?.cluster != null) {
+      setHover(null, mesh.userData.cluster as number);
+      return;
+    }
+  }
+
+  const touchSlop = coarsePointer ? 52 : 0;
+  if (touchSlop > 0) {
+    const near = pickClusterFromPointer(clientX, clientY, touchSlop);
+    if (near !== null) {
+      setHover(null, near);
+      return;
+    }
+  }
+  setHover(null, null);
+}
+
+let coarsePointer = false;
+let pickables: (InstancedMesh | Mesh)[] = [];
+
 function selectCluster(cluster: number): void {
   if (overlayPhase !== 'closed') return;
   overlayPhase = 'flying';
@@ -332,12 +380,29 @@ function selectCluster(cluster: number): void {
   flyStart = camera.position.clone();
   flyTarget = new Vector3(cx + 0.5, cy, cz + 1.2);
   flyStartTime = performance.now() / 1000;
-  callbacks.onClusterSelect?.(cluster, CLUSTER_URLS[cluster]);
+  callbacks.onClusterSelect?.(cluster, clusterHref(cluster));
   setHover(null, null);
 }
 
-let boundMouseMove: ((e: MouseEvent) => void) | null = null;
-let boundClick: (() => void) | null = null;
+function staticHandle(cb: NeuralCallbacks): NeuralSceneHandle {
+  return {
+    dispose: () => {},
+    setRawMode: () => {},
+    setOverlayPhase: (phase) => {
+      overlayPhase = phase;
+    },
+    getOverlayPhase: () => overlayPhase,
+    flyToCluster: (cluster) => {
+      if (cluster < 0 || cluster >= CLUSTER_COUNT) return;
+      overlayPhase = 'open';
+      cb.onPhaseChange?.('open');
+      cb.onClusterSelect?.(cluster, clusterHref(cluster));
+    },
+  };
+}
+
+let boundPointerMove: ((e: PointerEvent) => void) | null = null;
+let boundPointerUp: ((e: PointerEvent) => void) | null = null;
 let boundWheel: ((e: WheelEvent) => void) | null = null;
 let onVisibility: (() => void) | null = null;
 
@@ -345,8 +410,8 @@ function dispose(): void {
   if (rafId) cancelAnimationFrame(rafId);
   window.removeEventListener('scroll', onScroll);
   if (renderer?.domElement) {
-    if (boundMouseMove) renderer.domElement.removeEventListener('mousemove', boundMouseMove);
-    if (boundClick) renderer.domElement.removeEventListener('click', boundClick);
+    if (boundPointerMove) renderer.domElement.removeEventListener('pointermove', boundPointerMove);
+    if (boundPointerUp) renderer.domElement.removeEventListener('pointerup', boundPointerUp);
     if (boundWheel) renderer.domElement.removeEventListener('wheel', boundWheel);
   }
   if (onVisibility) document.removeEventListener('visibilitychange', onVisibility);
@@ -378,10 +443,12 @@ function onResize(container: HTMLElement): void {
 
 export function initNeuralScene(container: HTMLElement, cb: NeuralCallbacks = {}): NeuralSceneHandle {
   callbacks = cb;
+  coarsePointer = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
 
   if (REDUCE_MOTION) {
+    cb.onStaticMode?.();
     cb.onReady?.();
-    return { dispose: () => {}, setRawMode: () => {}, setOverlayPhase: () => {}, getOverlayPhase: () => 'closed' };
+    return staticHandle(cb);
   }
 
   scrollY = window.scrollY ?? 0;
@@ -391,14 +458,21 @@ export function initNeuralScene(container: HTMLElement, cb: NeuralCallbacks = {}
   const width = container.clientWidth;
   const height = container.clientHeight;
 
-  scene = new Scene();
-  scene.background = new Color(0x0a0a0c);
-  scene.fog = new Fog(0x0a0a0c, 5, 28);
+  try {
+    scene = new Scene();
+    scene.background = new Color(0x0a0a0c);
+    scene.fog = new Fog(0x0a0a0c, 5, 28);
 
-  camera = new PerspectiveCamera(50, width / height, 0.1, 100);
-  camera.position.set(0, 0, 14);
+    camera = new PerspectiveCamera(50, width / height, 0.1, 100);
+    camera.position.set(0, 0, 14);
 
-  renderer = new WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    renderer = new WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    if (!renderer.getContext()) throw new Error('WebGL context unavailable');
+  } catch {
+    cb.onStaticMode?.();
+    cb.onReady?.();
+    return staticHandle(cb);
+  }
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1));
   container.appendChild(renderer.domElement);
@@ -440,29 +514,18 @@ export function initNeuralScene(container: HTMLElement, cb: NeuralCallbacks = {}
 
   raycaster = new Raycaster();
   mouse = new Vector2();
-  const pickables = [thoughtNodes, ...nuclei];
+  pickables = [thoughtNodes, ...nuclei];
 
-  boundMouseMove = (e: MouseEvent) => {
-    if (overlayPhase !== 'closed') return;
-    const rect = container.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(pickables, false);
-    const first = hits[0] as Intersection | undefined;
-    if (!first) { setHover(null, null); return; }
-    if (first.object === thoughtNodes && first.instanceId != null) {
-      setHover(first.instanceId, null);
-      return;
-    }
-    const mesh = first.object as Mesh;
-    if (mesh.userData?.cluster != null) setHover(null, mesh.userData.cluster as number);
-    else setHover(null, null);
+  boundPointerMove = (e: PointerEvent) => {
+    updatePointer(e.clientX, e.clientY);
   };
 
-  boundClick = () => {
+  boundPointerUp = (e: PointerEvent) => {
     if (overlayPhase !== 'closed') return;
-    const cluster = hoveredNucleusCluster ?? (hoveredInstanceId !== null ? nodePositions[hoveredInstanceId].cluster : null);
+    updatePointer(e.clientX, e.clientY);
+    const cluster =
+      hoveredNucleusCluster ??
+      (hoveredInstanceId !== null ? nodePositions[hoveredInstanceId].cluster : null);
     if (cluster === null) return;
     selectCluster(cluster);
   };
@@ -491,8 +554,9 @@ export function initNeuralScene(container: HTMLElement, cb: NeuralCallbacks = {}
     }
   };
 
-  renderer.domElement.addEventListener('mousemove', boundMouseMove);
-  renderer.domElement.addEventListener('click', boundClick);
+  renderer.domElement.style.touchAction = 'none';
+  renderer.domElement.addEventListener('pointermove', boundPointerMove);
+  renderer.domElement.addEventListener('pointerup', boundPointerUp);
   renderer.domElement.addEventListener('wheel', boundWheel, { passive: false });
 
   resizeObserver = new ResizeObserver(() => onResize(container));
@@ -520,5 +584,9 @@ export function initNeuralScene(container: HTMLElement, cb: NeuralCallbacks = {}
       }
     },
     getOverlayPhase: () => overlayPhase,
+    flyToCluster: (cluster: number) => {
+      if (cluster < 0 || cluster >= CLUSTER_COUNT) return;
+      selectCluster(cluster);
+    },
   };
 }

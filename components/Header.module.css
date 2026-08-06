@@ -7,6 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-4);
   height: var(--header-height);
   padding: 0 var(--space-8);
   border-bottom: 1px solid transparent;
@@ -16,6 +17,9 @@
 
 .scrolled {
   border-color: var(--border);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
 }
 
 .logo {
@@ -45,6 +49,7 @@
 }
 
 .navLink {
+  position: relative;
   font-size: var(--text-xs);
   font-weight: 500;
   color: var(--text-muted);
@@ -53,9 +58,26 @@
   transition: color var(--duration-fast);
 }
 
+.navLink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--section-accent, var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-normal) var(--ease-out-expo);
+}
+
 .navLink:hover,
 .navLinkActive {
   color: var(--text);
+}
+
+.navLinkActive::after {
+  transform: scaleX(1);
 }
 
 .toggle {

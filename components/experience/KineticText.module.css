@@ -1,9 +1,0 @@
-.root {
-  display: inline-flex;
-  flex-wrap: wrap;
-}
-
-.char {
-  display: inline-block;
-  will-change: transform, opacity;
-}

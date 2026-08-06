@@ -40,8 +40,8 @@ export function HeroManifesto() {
             <span className={styles.role}>Architect of Systems</span>
             <span className={styles.role}>Builder of Intelligence</span>
           </h1>
-          <a href="#explore" className={styles.cta} aria-label="Explore the mind">
-            Explore the mind
+          <a href="#explore" className={styles.cta} aria-label="Explore sections">
+            Explore sections
           </a>
         </div>
         <div className={styles.scrollPrompt} aria-hidden="true">
@@ -53,10 +53,10 @@ export function HeroManifesto() {
       </section>
       <div className={styles.hints} aria-live="polite">
         <p className={`${styles.hint} ${hints.h1 ? styles.hintVisible : ''}`}>
-          Hover nodes to reveal · Click to enter
+          Tap or click nodes · Or choose a section below
         </p>
         <p className={`${styles.hint} ${styles.hintSecondary} ${hints.h2 ? styles.hintVisible : ''}`}>
-          Shift + scroll for raw mode
+          Shift + scroll for raw mode · Browser back closes panels
         </p>
       </div>
     </>
