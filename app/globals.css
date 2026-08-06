@@ -235,6 +235,14 @@ body.home-hero.scrolled-past-hero .site-header {
   }
 }
 
+/* Neural map iframe overlay — skip scroll reveals (IO often never fires) */
+html.embedded [data-reveal],
+html.embedded [data-reveal-stagger] > * {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
 .section-surface {
   position: relative;
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 100%);

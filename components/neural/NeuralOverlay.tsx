@@ -53,6 +53,7 @@ export function NeuralOverlay({ url, phase, onClose }: Props) {
         </button>
         {url && (
           <iframe
+            key={url}
             ref={iframeRef}
             className={styles.frame}
             src={isOpen ? url : 'about:blank'}

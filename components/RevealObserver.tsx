@@ -1,10 +1,32 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+
+function revealAll() {
+  document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => {
+    el.classList.add('reveal-visible');
+  });
+}
 
 export function RevealObserver() {
+  const pathname = usePathname();
+
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const embedded = window.self !== window.top;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (embedded) {
+      document.documentElement.classList.add('embedded');
+    }
+
+    if (embedded || reduced) {
+      // IntersectionObserver is unreliable inside iframe modals — show content immediately
+      revealAll();
+      return () => {
+        if (embedded) document.documentElement.classList.remove('embedded');
+      };
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -20,7 +42,7 @@ export function RevealObserver() {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return null;
 }
