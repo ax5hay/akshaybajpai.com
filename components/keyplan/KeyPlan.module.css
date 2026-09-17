@@ -51,7 +51,9 @@
 }
 
 .leader {
-  stroke: var(--rule);
+  /* --ink-4 rather than --rule: the rule tokens are alpha-blended and vanish
+     against the board in artifact mode. */
+  stroke: var(--ink-4);
   stroke-width: 1.25;
   stroke-dasharray: 5 6;
   transition: stroke var(--d-2), stroke-width var(--d-2);
@@ -82,12 +84,22 @@
   margin: 0;
 }
 
+/* Heavy accent rule over the name, the way a title block is ruled off. It is
+   the one piece of hot colour the plan carries at rest. */
+.headline::before {
+  content: '';
+  width: 64px;
+  height: 3px;
+  margin-bottom: var(--s-1);
+  background: var(--accent);
+}
+
 .headlineName {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 46px;
+  font-size: 54px;
   font-weight: 400;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: var(--ink);
 }
 
@@ -123,6 +135,9 @@
   padding: 16px;
   background: var(--paper-raised);
   border: 1px solid var(--rule-strong);
+  /* At rest, not just on hover: the sheets have to read as paper lying on the
+     board. Raw mode sets this to `none` and stays deliberately flat. */
+  box-shadow: var(--shadow-lift);
   overflow: hidden;
   transition:
     border-color var(--d-2) var(--ease-plate),
@@ -152,8 +167,39 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   color: var(--paper);
-  background: var(--ink);
+  background: var(--disc, var(--ink));
   transition: background-color var(--d-2);
+}
+
+/* Discipline index colours. Artifact mode is the issued print and carries the
+   full index; annotated and raw are single-pen modes and stay monochrome, so
+   --disc is simply never set there and the tags fall back to ink. */
+html[data-mode='artifact'] .plate[data-discipline='A'] {
+  --disc: #a8432f;
+}
+
+html[data-mode='artifact'] .plate[data-discipline='S'] {
+  --disc: #35638f;
+}
+
+html[data-mode='artifact'] .plate[data-discipline='R'] {
+  --disc: #6d7735;
+}
+
+html[data-mode='artifact'] .plate[data-discipline='W'] {
+  --disc: #a3701f;
+}
+
+html[data-mode='artifact'] .plate[data-discipline='B'] {
+  --disc: #2c6d66;
+}
+
+html[data-mode='artifact'] .plate[data-discipline='E'] {
+  --disc: #71456b;
+}
+
+html[data-mode='artifact'] .plate[data-discipline='C'] {
+  --disc: #7d5c3c;
 }
 
 .plate:hover .plateTag,
