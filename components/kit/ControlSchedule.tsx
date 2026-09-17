@@ -9,7 +9,7 @@ import styles from './ControlSchedule.module.css';
 
 /**
  * The drawing conventions, as working controls. Every switch here changes the
- * sheet you are reading rather than demonstrating against a mock — the grid
+ * sheet you are reading rather than demonstrating against a mock. The grid
  * and grain toggles drive real attributes on <html> that globals.css reads.
  */
 export function ControlSchedule() {

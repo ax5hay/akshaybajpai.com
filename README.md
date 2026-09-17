@@ -28,7 +28,7 @@ A switch in the rail re-issues the entire set in three states.
 
 <br/>
 
-![The key plan — G-000](docs/media/key.png)
+![The key plan, G-000](docs/media/key.png)
 
 <sub><b>G-000 · Key plan.</b> The homepage is a pannable, zoomable general arrangement.<br/>
 Every sheet in the set is drawn in place, with leader lines for cross-references.</sub>
@@ -77,7 +77,7 @@ The site is a drawing set, and the metaphor is load-bearing rather than decorati
 
 ### Sheets, not pages
 
-Every route carries a number, a discipline, a scale, and a revision — `A-101 The
+Every route carries a number, a discipline, a scale, and a revision: `A-101 The
 Architect`, `S-201 Structural Principles`, `W-402 AIDA`. The numbers *are* the
 navigation.
 
@@ -100,7 +100,7 @@ navigation. Changing route reads as a new sheet laid on the same board.
 </table>
 
 Cross-references are real links, and the title block always reports the sheet you
-are actually on — including detail sheets, which carry their own number rather
+are actually on, including detail sheets, which carry their own number rather
 than their section's.
 
 ---
@@ -116,7 +116,7 @@ site, and it is a first-class state rather than a debug toggle.
 
 ![Annotated mode](docs/media/annot.png)
 
-**`REV B` — Annotated**
+**`REV B` · Annotated**
 
 Cyanotype. Line work reverses to white and the markup pen turns on: numbered
 margin notes on leader lines, dimensions, and labels for the sheet's own anatomy.
@@ -127,22 +127,22 @@ The dimension line measures itself and prints the real rendered width.
 
 ![Raw mode](docs/media/raw.png)
 
-**`REV C` — Raw**
+**`REV C` · Raw**
 
-Presentation stripped. The sheet's record — frontmatter, discipline, refs, word
-count — followed by the verbatim Markdown it was drawn from.
+Presentation stripped. The sheet's record (frontmatter, discipline, refs, word
+count) followed by the verbatim Markdown it was drawn from.
 
 </td>
 </tr>
 </table>
 
-`REV A — Artifact` is the drawing as issued: warm stock, dense ink, nothing but
+`REV A · Artifact` is the drawing as issued: warm stock, dense ink, nothing but
 the work. It is the default, and it carries no markup at all.
 
 ### Why it is CSS-only
 
 Mode lives in a `data-mode` attribute on `<html>`. Every mode is a palette plus a
-set of `display` rules — there are no mode branches in React.
+set of `display` rules. There are no mode branches in React.
 
 ```mermaid
 flowchart LR
@@ -158,7 +158,7 @@ flowchart LR
 Three consequences worth keeping:
 
 1. **All three modes ship as static markup.** No second render, no hydration
-   flash — the server already emitted every mode's content.
+   flash. The server already emitted every mode's content.
 2. **The mode resolves before first paint**, so the sheet never renders on paper
    and then re-inks to blueprint.
 3. **Switching repaints but never reflows.** The measure is the same width in all
@@ -168,7 +168,7 @@ Three consequences worth keeping:
 > `ModeScript` is a server component and inlines the storage key **literally**.
 > That key therefore lives in `lib/mode.ts`, which deliberately carries no
 > `'use client'` directive. Importing it from `ModeProvider` instead yields a
-> client-reference stub at build time and silently breaks persistence — the
+> client-reference stub at build time and silently breaks persistence. The
 > shipped script ends up reading `localStorage.getItem('function(){throw ...}')`.
 
 ---
@@ -196,7 +196,7 @@ arrangement and `x01…` are its detail sheets.
 
 Detail sheets are numbered at build time by [`lib/sheet-index.ts`](lib/sheet-index.ts),
 which walks each collection in publication order. **Adding a case study renumbers
-the W series automatically** — nothing is hand-maintained.
+the W series automatically**: nothing is hand-maintained.
 
 ---
 
@@ -212,10 +212,10 @@ flowchart TD
   PLANE --> CAM["camera<br/>scale, x, y"]
   CAM --> XFORM["translate3d + scale<br/>transform-origin 0 0"]
   CAM --> LOD{"scale"}
-  LOD -->|"< 0.62"| FAR["far — titles only"]
-  LOD -->|"< 1.1"| MID["mid — contents"]
-  LOD -->|"≥ 1.1"| NEAR["near — full detail"]
-  XFORM --> FLY["click — fly camera to the sheet, then route"]
+  LOD -->|"< 0.62"| FAR["far - titles only"]
+  LOD -->|"< 1.1"| MID["mid - contents"]
+  LOD -->|"≥ 1.1"| NEAR["near - full detail"]
+  XFORM --> FLY["click - fly camera to the sheet, then route"]
 ```
 
 Things to know before editing it:
@@ -242,7 +242,7 @@ current mode shows.
 flowchart TD
   ROUTE["app/*/page.tsx"] --> SHELL["PlateShell"]
   SHELL --> META["SetPlateMeta → title block + rail"]
-  SHELL --> HEAD["header — sheet tag, title, lead, sheet data"]
+  SHELL --> HEAD["header - sheet tag, title, lead, sheet data"]
   SHELL --> BODY["body (children)"]
   SHELL --> REFS["cross-references"]
   SHELL --> RAW["raw record + Markdown source"]
@@ -263,7 +263,7 @@ metric schedule, and adjacent sheets.
 | `kit/Controls` | `Button`, `Switch`, `Stamp` |
 | `kit/MetricSchedule` | Outcomes as a numbered, ruled schedule |
 | `kit/ControlSchedule` | Live specimen panel; its switches write to `<html>` |
-| `sheet/SheetRail` | Top rail — breadcrumb, index, lens, mode switch |
+| `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
 | `sheet/TitleBlock` | Expandable bottom-right title block |
 | `sheet/SheetIndex` | Full-set search, fuzzy-ranked |
 | `sheet/Loupe` | Draggable inspection lens |
@@ -282,7 +282,7 @@ metric schedule, and adjacent sheets.
 | <kbd>←</kbd> <kbd>→</kbd> | Move the comparison divider, or walk the mode switch |
 
 Shortcuts are suppressed while typing in a field. Under `prefers-reduced-motion`
-all motion is removed — including the key plan's camera fly — and every reveal
+all motion is removed (including the key plan's camera fly) and every reveal
 falls back to its final state rather than staying invisible.
 
 ---
@@ -302,12 +302,12 @@ flowchart LR
   ROUTE --> SHEET["numbered sheet"]
 ```
 
-The raw Markdown is also handed to `PlateShell` verbatim — that is what raw mode
+The raw Markdown is also handed to `PlateShell` verbatim, and that is what raw mode
 prints.
 
 | Collection | Path | Frontmatter |
 |:-----------|:-----|:------------|
-| `blog` | `content/blog/` | `title`, `description`, `pubDate`, `draft?` — included in RSS |
+| `blog` | `content/blog/` | `title`, `description`, `pubDate`, `draft?`: included in RSS |
 | `essays` | `content/essays/` | same |
 | `work` | `content/work/` | + `client?`, `stack?`, `metrics?` |
 
@@ -319,7 +319,7 @@ prints.
 1. Add a `.md` file under `content/blog/`, `content/essays/`, or `content/work/`.
 2. Include required frontmatter (`title`, `description`, `pubDate`).
 3. Set `draft: true` to exclude it from production builds.
-4. Run `npm run build` — `generateStaticParams` picks up the slug and the sheet
+4. Run `npm run build`, and `generateStaticParams` picks up the slug and the sheet
    number is assigned automatically.
 
 ```yaml
@@ -344,7 +344,7 @@ them as `"97% accuracy"` rather than as a sentence.
 
 | Layer | Technology |
 |:------|:-----------|
-| Framework | [Next.js 15](https://nextjs.org/) — App Router, SSG, static export |
+| Framework | [Next.js 15](https://nextjs.org/): App Router, SSG, static export |
 | UI | React 19 |
 | Language | TypeScript 5.7 |
 | Styling | CSS Modules + custom properties |
@@ -380,7 +380,7 @@ npx serve out
 
 > [!WARNING]
 > Stop any server holding `out/` before running `npm run build`. The export step
-> clears that directory and the build will fail — sometimes quietly — if it is
+> clears that directory and the build will fail, sometimes quietly, if it is
 > locked.
 
 ---
@@ -407,7 +407,7 @@ components/
 lib/
 ├── plates.ts             # sheet registry and key plan geometry
 ├── sheet-index.ts        # detail sheet numbering and adjacency
-├── mode.ts               # mode vocabulary — no 'use client', see warning above
+├── mode.ts               # mode vocabulary - no 'use client', see warning above
 ├── content.ts            # Markdown pipeline
 └── metadata.ts · format.ts · constants.ts
 
@@ -442,7 +442,7 @@ flowchart LR
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full runbook.
 
 `node_modules/`, `.next/`, `out/`, `*.tsbuildinfo`, and `.env*` are ignored.
-Static assets are served from `public/` only — the repo root is not a web root.
+Static assets are served from `public/` only. The repo root is not a web root.
 
 </details>
 

@@ -88,8 +88,8 @@ export function CorrespondenceForm() {
         {/* Toasts carry the outcome, but status must also reach assistive
             technology and anyone who dismissed the slip. */}
         <p className={styles.status} role="status" aria-live="polite">
-          {status === 'sent' && 'Sent — I will come back to you.'}
-          {status === 'failed' && 'Failed — email hello@akshaybajpai.com instead.'}
+          {status === 'sent' && 'Sent. I will come back to you.'}
+          {status === 'failed' && 'Failed. Email hello@akshaybajpai.com instead.'}
         </p>
       </div>
     </form>

@@ -2,7 +2,7 @@
   "name": "akshaybajpai-com",
   "version": "3.0.0",
   "private": true,
-  "description": "The Architecture of Intelligence — Akshay Bajpai",
+  "description": "The Architecture of Intelligence · Akshay Bajpai",
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/generate-rss.mjs",

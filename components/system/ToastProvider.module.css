@@ -83,7 +83,7 @@
   color: var(--accent);
 }
 
-/* Depletion rule along the bottom edge — the stamp's remaining dwell time. */
+/* Depletion rule along the bottom edge: the stamp's remaining dwell time. */
 .timer {
   position: absolute;
   left: 0;

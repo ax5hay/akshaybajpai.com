@@ -9,9 +9,9 @@ metrics: ["~60% fewer manual touchpoints", "94% precision on diagnostic imaging"
 
 ## Problem
 
-Wealth and health domains both punish “helpful” hallucinations. Finance workflows need **stateful tool routing** across risk APIs, rebalancing logic, and onboarding — with retries, fallbacks, and memory that survives multi-step conversations. Healthcare imaging pipelines need **precision and compliance**: fine-tuned models inside HIPAA/GDPR-aware infrastructure, not notebook accuracy.
+Wealth and health domains both punish “helpful” hallucinations. Finance workflows need **stateful tool routing** across risk APIs, rebalancing logic, and onboarding, with retries, fallbacks, and memory that survives multi-step conversations. Healthcare imaging pipelines need **precision and compliance**: fine-tuned models inside HIPAA/GDPR-aware infrastructure, not notebook accuracy.
 
-## Finance — LangGraph agentic workflows
+## Finance: LangGraph agentic workflows
 
 Built stateful multi-agent orchestration:
 
@@ -19,7 +19,7 @@ Built stateful multi-agent orchestration:
 - Fallback handling, retry logic, and cross-step memory persistence
 - Approximately **60% reduction in manual touchpoints** for supported journeys
 
-## Healthcare — multimodal pipelines
+## Healthcare: multimodal pipelines
 
 - EHR and diagnostic image analysis with fine-tuned open-source LLMs via **QLoRA**
 - **94% precision** on the targeted imaging tasks within compliant AWS boundaries
@@ -27,10 +27,10 @@ Built stateful multi-agent orchestration:
 
 ## Production RAG
 
-Hybrid retrieval, contextual reranking, and domain guardrails sustaining **sub-800ms p95 latency** — the bar where operators treat the system as interactive, not batch.
+Hybrid retrieval, contextual reranking, and domain guardrails sustaining **sub-800ms p95 latency**: the bar where operators treat the system as interactive, not batch.
 
 ## Lessons
 
-1. **Memory and routing are the finance product** — the base model is interchangeable; the graph is not.
-2. **Cost is an architecture input** — QLoRA and batching decisions belong beside latency SLOs.
-3. **Guardrails beat bigger models** — domain constraints on retrieval and generation outperform raw parameter count for compliance-sensitive text.
+1. **Memory and routing are the finance product**: the base model is interchangeable; the graph is not.
+2. **Cost is an architecture input**: QLoRA and batching decisions belong beside latency SLOs.
+3. **Guardrails beat bigger models**: domain constraints on retrieval and generation outperform raw parameter count for compliance-sensitive text.

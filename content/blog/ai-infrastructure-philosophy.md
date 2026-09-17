@@ -4,7 +4,7 @@ description: "Why the best AI systems treat infrastructure as a first-class prod
 pubDate: 2025-01-15
 ---
 
-Infrastructure is not the boring part of AI. It is the part that determines whether your model ever runs in production, whether it degrades gracefully, and whether your team can iterate without setting the building on fire. Forward-deployed work — shared LLM gateways on AWS CDK, Kafka paths under 200ms, governed NL2SQL with human confirmation — is where that philosophy stops being abstract; see the [multi-tenant fertility platform](/work/forward-deployed-multi-tenant-fertility-ai/) and [video intelligence](/work/agentic-video-intelligence-operations/) case studies for concrete tradeoffs.
+Infrastructure is not the boring part of AI. It is the part that determines whether your model ever runs in production, whether it degrades gracefully, and whether your team can iterate without setting the building on fire. Forward-deployed work (shared LLM gateways on AWS CDK, Kafka paths under 200ms, governed NL2SQL with human confirmation) is where that philosophy stops being abstract; see the [multi-tenant fertility platform](/work/forward-deployed-multi-tenant-fertility-ai/) and [video intelligence](/work/agentic-video-intelligence-operations/) case studies for concrete tradeoffs.
 
 ## Infrastructure as product
 

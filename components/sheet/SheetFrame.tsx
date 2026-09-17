@@ -5,7 +5,7 @@ const ZONE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 /**
  * The drawing border: trim marks, ruled edge, and the zone grid printed down
- * the margins of every sheet in the set. Pure decoration — never interactive,
+ * the margins of every sheet in the set. Pure decoration, never interactive,
  * never in the accessibility tree, and rendered once in the root layout so it
  * survives navigation without repainting.
  */

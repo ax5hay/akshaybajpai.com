@@ -14,12 +14,12 @@ export function TitleBlock() {
   const [expanded, setExpanded] = useState(false);
 
   const copyReference = async () => {
-    const reference = `${meta.sheet} — ${meta.title.toUpperCase()} · ${window.location.href}`;
+    const reference = `${meta.sheet} · ${meta.title.toUpperCase()} · ${window.location.href}`;
     try {
       await navigator.clipboard.writeText(reference);
       toast({
         kind: 'Reference copied',
-        message: `${meta.sheet} — ${meta.title}`,
+        message: `${meta.sheet} · ${meta.title}`,
         detail: 'Sheet number and link are on your clipboard',
         tone: 'revision',
       });

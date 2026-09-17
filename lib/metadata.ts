@@ -37,7 +37,7 @@ export function buildMetadata({
       siteName: SITE_NAME,
       title,
       description,
-      images: [{ url: image, width: 1200, height: 630, alt: 'Akshay Bajpai — AI Architect & Technology Leader' }],
+      images: [{ url: image, width: 1200, height: 630, alt: 'Akshay Bajpai · AI Architect & Technology Leader' }],
       locale: 'en_US',
       ...(publishedTime && type === 'article' ? { publishedTime } : {}),
     },
@@ -94,7 +94,7 @@ export function websiteJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     description:
-      'Akshay Bajpai — AI Architect and Technology Leader. LLMs, RAG systems, intelligent system design.',
+      'Akshay Bajpai · AI Architect and Technology Leader. LLMs, RAG systems, intelligent system design.',
     author: { '@type': 'Person', name: 'Akshay Bajpai' },
     inLanguage: 'en-US',
   };

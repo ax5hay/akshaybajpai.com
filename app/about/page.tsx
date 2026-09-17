@@ -10,7 +10,7 @@ const PLATE = getPlateByHref('/about/')!;
 export const metadata = buildMetadata({
   title: 'About · Akshay Bajpai | AI Architect & Technology Leader',
   description:
-    'Forward-deployed AI engineer — multi-tenant platforms, governed agents, clinical and operational intelligence from research to production.',
+    'Forward-deployed AI engineer: multi-tenant platforms, governed agents, clinical and operational intelligence from research to production.',
   path: '/about/',
 });
 
@@ -34,14 +34,14 @@ export default function AboutPage() {
       <div className="prose prose-lead">
         <p>
           I work where product stakes, model behavior, and infrastructure meet. The through-line in
-          my career is taking ambiguous domain problems—multi-tenant fertility platforms,
-          defense-adjacent video intelligence, and clinical NLP—and making them operable.
+          my career is taking ambiguous domain problems (multi-tenant fertility platforms,
+          defense-adjacent video intelligence, and clinical NLP) and making them operable.
         </p>
         <p>
           Technically, I live in the stack you actually run in production: LLMs and SLMs, agentic
           orchestration, hybrid RAG, schema-grounded NL2SQL, FastAPI, React, Kafka, Docker, and AWS
-          CDK. I care about evaluation, cost-aware routing, and the boring parts — JWT auth, audit
-          logs, and Playwright regression — because that is what separates a demo from something a
+          CDK. I care about evaluation, cost-aware routing, and the boring parts: JWT auth, audit
+          logs, and Playwright regression. That is what separates a demo from something a
           C-suite can sign off on.
         </p>
 

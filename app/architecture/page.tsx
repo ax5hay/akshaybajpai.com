@@ -39,7 +39,7 @@ export default function ArchitecturePage() {
             means naming invariants early: the clinician or operator is always the final authority,
             every model output is traceable to a version and data slice, and ambiguous database
             questions never execute without preview, disambiguation, and explicit human
-            confirmation. Those are not compliance checkboxes — they are structural choices that
+            confirmation. Those are not compliance checkboxes. They are structural choices that
             keep NL2SQL, RAG, and agent tool calls from becoming silent liabilities.
           </p>
         </div>
@@ -56,7 +56,7 @@ export default function ArchitecturePage() {
           For conversational and agentic platforms I default to a gateway-first layout: tiered
           routing (exact match → classifier → composed retrieval), hybrid dense-and-sparse search
           with cross-encoder reranking, per-tenant keys and caching, OpenRouter or Bedrock-backed
-          model selection with fallbacks, and microservices bounded by failure domain —
+          model selection with fallbacks, and microservices bounded by failure domain:
           orchestration, retrieval, execution against real rows, guardrails with escalation flags,
           observability on every hop. Monorepos like{' '}
           <Link href="/work/aurixa-conversational-ai-orchestration/">AURIXA</Link> and
@@ -64,7 +64,7 @@ export default function ArchitecturePage() {
           different packaging of the same idea: scale the concern that hurts, not the whole binary.
         </p>
         <p>
-          When throughput dominates — video ingest, restaurant demand sensing, finance onboarding —
+          When throughput dominates (video ingest, restaurant demand sensing, finance onboarding),
           I reach for Kafka (or equivalent) ingestion, asynchronous inference, WebSocket fan-out
           for operators, and sub-200ms ingestion-to-decision budgets where the product promise
           requires it. Air-gapped and on-premise defense deployments add another axis:
@@ -75,7 +75,7 @@ export default function ArchitecturePage() {
           lineage, QLoRA when fine-tunes must be affordable, batching and quantization when p95
           cost matters, Spark when batch feature work belongs off the request path, Terraform and
           CDK when environments must be reproducible. Local Docker parity with production is
-          non-negotiable for the teams I lead — if staging cannot run the same contract as prod,
+          non-negotiable for the teams I lead: if staging cannot run the same contract as prod,
           UAT is theatre.
         </p>
 

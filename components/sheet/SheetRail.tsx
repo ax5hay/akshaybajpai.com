@@ -84,7 +84,7 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
   return (
     <>
       <header className={styles.rail} data-condensed={condensed || undefined}>
-        <Link href="/" className={styles.mark} aria-label="Key plan — G-000">
+        <Link href="/" className={styles.mark} aria-label="Key plan, G-000">
           <span className={styles.monogram} aria-hidden="true">
             AB
           </span>

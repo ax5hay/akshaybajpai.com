@@ -1,6 +1,6 @@
 ---
 title: "Agentic Video Intelligence for 24/7 Operations"
-description: "Real-time CCTV triage with LangGraph and MCP — Kafka ingestion, sub-200ms paths, and defense-grade on-prem deployment."
+description: "Real-time CCTV triage with LangGraph and MCP: Kafka ingestion, sub-200ms paths, and defense-grade on-prem deployment."
 pubDate: 2026-04-01
 client: "Defense-adjacent · video intelligence"
 stack: ["LangGraph", "MCP", "FastAPI", "Kafka", "WebSockets", "React", "Next.js", "Python"]
@@ -30,6 +30,6 @@ Stateful **multi-agent orchestration** with LangGraph and MCP:
 
 ## Lessons
 
-1. **Agents need state, not just prompts** — classification and escalation are graphs, not single-shot completions.
-2. **Latency is a trust metric** — operators abandon dashboards that lag the wall of cameras.
-3. **Design for disconnected environments early** — packaging models and brokers for on-prem avoids a rewrite when classification moves to classified networks.
+1. **Agents need state, not just prompts**: classification and escalation are graphs, not single-shot completions.
+2. **Latency is a trust metric**: operators abandon dashboards that lag the wall of cameras.
+3. **Design for disconnected environments early**: packaging models and brokers for on-prem avoids a rewrite when classification moves to classified networks.

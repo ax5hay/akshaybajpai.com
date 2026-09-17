@@ -42,8 +42,8 @@ export default function ResearchPage() {
           (2017–2021), with honours.
         </p>
         <p>
-          <strong>Peer-reviewed publication.</strong> I am lead author on Chapter 17 — machine
-          learning approaches to medical diagnosis — in{' '}
+          <strong>Peer-reviewed publication.</strong> I am lead author on Chapter 17, machine
+          learning approaches to medical diagnosis, in{' '}
           <em>ML for Medical Diagnosis in Data-Centric Business and Application</em>, 3rd edition
           (Springer, 2024, ISBN 978-3-031-60815-5). The chapter situates diagnostic models inside
           data-centric business constraints: label quality, deployment accountability, and the gap
@@ -51,7 +51,7 @@ export default function ResearchPage() {
         </p>
         <p>
           <strong>Undergraduate research.</strong> At IIT Gandhinagar I authored a comparative study
-          on Alzheimer&apos;s disease diagnosis using machine learning — the methodological
+          on Alzheimer&apos;s disease diagnosis using machine learning, the methodological
           foundation for my later{' '}
           <Link href="/work/alzheimers-ml-thesis-research/">
             Master&apos;s thesis on OASIS biomarkers
@@ -60,8 +60,8 @@ export default function ResearchPage() {
           recall-weighted evaluation.
         </p>
         <p>
-          Production work since then — insurance document intelligence, EHR variable extraction,
-          multimodal diagnostic imaging, programme KPI engines — extends the same principle: rigor
+          Production work since then (insurance document intelligence, EHR variable extraction,
+          multimodal diagnostic imaging, programme KPI engines) extends the same principle: rigor
           in data, honest metrics, and systems that clinicians and operators can override. Deeper
           build narratives live under <Link href="/work/">Work</Link>; opinion and infrastructure
           philosophy under <Link href="/blog/">Blog</Link> and <Link href="/essays/">Essays</Link>.
@@ -69,7 +69,7 @@ export default function ResearchPage() {
         <p>
           Current research interests include governed agentic retrieval, schema-grounded
           text-to-SQL, minimal-dependency edge deployments, and evaluation pipelines that survive
-          executive readouts — the same problems I ship against in forward-deployed engagements.
+          executive readouts, the same problems I ship against in forward-deployed engagements.
         </p>
       </div>
     </PlateShell>

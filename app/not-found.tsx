@@ -10,8 +10,8 @@ export default function NotFound() {
       title="Sheet Not Issued"
       subtitle="This drawing is not part of the current set"
       discipline="X"
-      scale="—"
-      revision="—"
+      scale="NTS"
+      revision="X"
       refs={['G-000', 'W-400', 'E-600']}
       lead={
         <p>
