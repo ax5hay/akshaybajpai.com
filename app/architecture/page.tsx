@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { PlateShell } from '@/components/plate/PlateShell';
 import { ExtractionFigure } from '@/components/plate/ExtractionFigure';
 import { ControlSchedule } from '@/components/kit/ControlSchedule';
+import { Callout } from '@/components/kit/Callout';
+import { DimensionLine } from '@/components/kit/DimensionLine';
 import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
 
@@ -30,18 +32,24 @@ export default function ArchitecturePage() {
         { k: 'default', v: 'gateway-first, tiered routing' },
       ]}
     >
-      <div className="prose prose-lead">
-        <p>
-          Architecture is the set of decisions that outlast implementation. In AI systems that
-          means naming invariants early: the clinician or operator is always the final authority,
-          every model output is traceable to a version and data slice, and ambiguous database
-          questions never execute without preview, disambiguation, and explicit human
-          confirmation. Those are not compliance checkboxes — they are structural choices that
-          keep NL2SQL, RAG, and agent tool calls from becoming silent liabilities.
-        </p>
-      </div>
+      <Callout note="Three invariants are named in this paragraph. Every sheet in the W series is a case of holding at least one of them.">
+        <div className="prose prose-lead">
+          <p>
+            Architecture is the set of decisions that outlast implementation. In AI systems that
+            means naming invariants early: the clinician or operator is always the final authority,
+            every model output is traceable to a version and data slice, and ambiguous database
+            questions never execute without preview, disambiguation, and explicit human
+            confirmation. Those are not compliance checkboxes — they are structural choices that
+            keep NL2SQL, RAG, and agent tool calls from becoming silent liabilities.
+          </p>
+        </div>
+      </Callout>
 
-      <ExtractionFigure />
+      <DimensionLine />
+
+      <Callout note="Both states are always mounted and in register. The divider is a clip boundary, so dragging it never reflows either pane.">
+        <ExtractionFigure />
+      </Callout>
 
       <div className="prose">
         <p>
@@ -78,7 +86,9 @@ export default function ArchitecturePage() {
         </p>
       </div>
 
-      <ControlSchedule />
+      <Callout note="The switches below write to the root element. Every mode and overlay on this set is a CSS state, which is why none of them re-render the page.">
+        <ControlSchedule />
+      </Callout>
 
       <div className="prose">
         <p>

@@ -690,8 +690,10 @@ html[data-mode='artifact'] .prose-lead > p:first-of-type::first-letter {
   min-height: 100svh;
 }
 
-/* Standard content plate: a measure-width column inside the sheet margins. */
+/* Standard content plate: a measure-width column inside the sheet margins.
+   Margin notes number themselves per sheet, so the counter resets here. */
 .plate {
+  counter-reset: callout;
   padding:
     var(--plate-top)
     calc(var(--sheet-margin) + var(--sheet-gutter))
@@ -724,7 +726,7 @@ html[data-mode='artifact'] .prose-lead > p:first-of-type::first-letter {
   position: absolute;
   top: 0;
   right: 100%;
-  margin-right: var(--s-2);
+  margin-right: var(--s-5);
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
   letter-spacing: 0.08em;

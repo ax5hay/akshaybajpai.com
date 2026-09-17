@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { PlateShell } from '@/components/plate/PlateShell';
 import { Chronology } from '@/components/plate/Chronology';
+import { Callout } from '@/components/kit/Callout';
 import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
 
@@ -47,7 +48,9 @@ export default function AboutPage() {
         <h2>Chronology</h2>
       </div>
 
-      <Chronology />
+      <Callout note="Read as a section, not a list: the datum runs vertically and each role is a mark struck off it.">
+        <Chronology />
+      </Callout>
 
       <div className="prose">
         <p>

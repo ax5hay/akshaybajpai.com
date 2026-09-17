@@ -266,4 +266,10 @@ html[data-mode='annotated'] .title {
   .facts {
     flex-direction: column;
   }
+
+  /* Stacked, the 7rem basis would size cell height instead of width and
+     leave each fact in a block of dead space. */
+  .fact {
+    flex: 0 0 auto;
+  }
 }

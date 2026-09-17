@@ -1,0 +1,38 @@
+/* Dimensions are markup, not content: they appear when the pen is on. */
+.dim {
+  display: none;
+  align-items: center;
+  gap: var(--s-2);
+  margin: var(--s-4) 0;
+  color: var(--accent);
+}
+
+html[data-mode='annotated'] .dim {
+  display: flex;
+}
+
+.rule {
+  flex: 1;
+  height: var(--lw-thin);
+  background: var(--accent-line, var(--accent));
+}
+
+/* Extension ticks, struck at the drafting 60 degrees rather than square. */
+.tick {
+  width: var(--lw-med);
+  height: 0.75rem;
+  background: var(--accent-line, var(--accent));
+  transform: skewX(-30deg);
+}
+
+.label {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* Reserves the slot so the line does not jump when the width is measured. */
+  min-width: 4rem;
+  text-align: center;
+}

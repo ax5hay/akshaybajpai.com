@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { PlateShell, type PlateFact } from './PlateShell';
 import { MetricSchedule } from '@/components/kit/MetricSchedule';
+import { Callout } from '@/components/kit/Callout';
 import { formatDate } from '@/lib/format';
 import { parseGithubRepo } from '@/lib/content';
 import type { Discipline } from '@/lib/plates';
@@ -94,7 +95,13 @@ export function ArticlePlate({
         </ul>
       )}
 
-      <MetricSchedule metrics={metrics} />
+      {metrics && metrics.length > 0 ? (
+        <Callout note="Measured in production, not in a benchmark. Each row is the figure the engagement was signed off against.">
+          <MetricSchedule metrics={metrics} />
+        </Callout>
+      ) : (
+        <MetricSchedule metrics={metrics} />
+      )}
 
       <div className="prose prose-lead" dangerouslySetInnerHTML={{ __html: html }} />
 

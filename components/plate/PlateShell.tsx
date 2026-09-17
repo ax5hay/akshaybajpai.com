@@ -78,12 +78,20 @@ export function PlateShell({
           <span className={styles.disciplineName}>{DISCIPLINES[discipline].name}</span>
         </p>
 
-        <h1 className={styles.title}>{title}</h1>
+        {/* In annotated mode the sheet labels its own anatomy in the left
+            margin, the way a drawing keys its parts. */}
+        <h1 className={styles.title} data-annotate="Sheet title">
+          {title}
+        </h1>
         <p className={styles.subtitle}>{subtitle}</p>
 
-        {lead && <div className={styles.lead}>{lead}</div>}
+        {lead && (
+          <div className={styles.lead} data-annotate="Lead">
+            {lead}
+          </div>
+        )}
 
-        <dl className={styles.facts} aria-label="Sheet data">
+        <dl className={styles.facts} aria-label="Sheet data" data-annotate="Sheet data">
           {headFacts.map((f) => (
             <div key={f.k} className={styles.fact}>
               <dt>{f.k}</dt>
@@ -95,10 +103,12 @@ export function PlateShell({
         <div className={styles.headRule} aria-hidden="true" />
       </header>
 
-      <div className={styles.body}>{children}</div>
+      <div className={styles.body} data-annotate="Body">
+        {children}
+      </div>
 
       {refs.length > 0 && (
-        <nav className={styles.refs} aria-label="Cross-references">
+        <nav className={styles.refs} aria-label="Cross-references" data-annotate="Refs">
           <span className={styles.refsLabel}>Refer to</span>
           <ul className={styles.refsList}>
             {refs.map((ref) => {
