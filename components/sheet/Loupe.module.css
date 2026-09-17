@@ -1,5 +1,5 @@
 /* Inspection lens. The optical element is a backdrop inversion, so the page
-   underneath is never re-rendered — only recomposited. */
+   underneath is never re-rendered, only recomposited. */
 
 .loupe {
   position: fixed;
@@ -40,6 +40,54 @@
   border-radius: 50%;
   backdrop-filter: invert(1) hue-rotate(8deg) saturate(1.7) contrast(1.06);
   -webkit-backdrop-filter: invert(1) hue-rotate(8deg) saturate(1.7) contrast(1.06);
+}
+
+/* The technical layer. Drawn across the whole viewport and revealed by the
+   barrel's circular clip, so dragging costs one clip-path write instead of a
+   re-measure. Sits above the optic and below nothing: the barrel rim is left
+   uncovered because the clip radius stops short of the wall. */
+.xray {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-loupe) + 1);
+  pointer-events: none;
+  /* Until the lens paints, reveal nothing. */
+  clip-path: circle(0 at 50% 50%);
+}
+
+.xrayPlate {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The field behind is a dark inversion in all three modes, so the technical
+   layer sets its own light palette instead of following the mode accent. */
+.box {
+  fill: rgba(127, 212, 255, 0.05);
+  stroke: #7fd4ff;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.boxLabel,
+.boxDim {
+  font-family: var(--font-label), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  /* The inverted field behind is dark in every mode, so the type is set light
+     and carries a dark backing to survive a busy sheet. */
+  fill: #ffd479;
+  paint-order: stroke;
+  stroke: rgba(4, 10, 20, 0.85);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.boxDim {
+  fill: #8fe3ff;
+  font-size: 8.5px;
 }
 
 /* ground-glass reticle: crosshair plus graticule ticks */
@@ -95,13 +143,18 @@
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
   letter-spacing: 0.1em;
-  color: var(--ink-3);
+  color: var(--ink-2);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  /* Names whatever is under the crosshair, so it has to stay legible against
+     the sheet rather than the inverted field. */
+  padding: 2px 6px;
+  background: var(--paper);
+  border: var(--lw-hair) solid var(--rule);
 }
 
 /* Safari and Firefox without backdrop-filter get a tinted lens rather than a
-   transparent hole — still legible, just not inverted. */
+   transparent hole, still legible, just not inverted. */
 @supports not ((backdrop-filter: invert(1)) or (-webkit-backdrop-filter: invert(1))) {
   .field {
     background: color-mix(in srgb, var(--paper) 18%, #0b2036 82%);

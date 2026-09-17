@@ -153,7 +153,7 @@
   border-color: var(--ink);
 }
 
-/* Three stacked rules — the glyph for a contents table. */
+/* Three stacked rules: the glyph for a contents table. */
 .indexGlyph {
   display: flex;
   flex-direction: column;

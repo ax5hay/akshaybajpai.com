@@ -116,7 +116,7 @@ export function ExtractionFigure() {
       beforeLabel="As received"
       afterLabel="As extracted"
       figure="Fig. 1"
-      caption="Drag the divider. The same clinical note, before and after the extraction pipeline — the point of the architecture is that the right-hand state is traceable back to the left."
+      caption="Drag the divider. The same clinical note, before and after the extraction pipeline. The point of the architecture is that the right-hand state is traceable back to the left."
     />
   );
 }

@@ -29,7 +29,7 @@ export async function buildSheetIndex(): Promise<IndexEntry[]> {
       subtitle: entry.frontmatter.description,
       href: `/work/${entry.slug}/`,
       discipline: COLLECTION_SERIES.work.discipline,
-      group: 'Works — details',
+      group: 'Works · details',
     })),
     ...essays.map((entry, i) => ({
       sheet: detailSheetNumber('essays', i),
@@ -37,7 +37,7 @@ export async function buildSheetIndex(): Promise<IndexEntry[]> {
       subtitle: entry.frontmatter.description,
       href: `/essays/${entry.slug}/`,
       discipline: COLLECTION_SERIES.essays.discipline,
-      group: 'Essays — details',
+      group: 'Essays · details',
     })),
     ...blog.map((entry, i) => ({
       sheet: detailSheetNumber('blog', i),
@@ -45,7 +45,7 @@ export async function buildSheetIndex(): Promise<IndexEntry[]> {
       subtitle: entry.frontmatter.description,
       href: `/blog/${entry.slug}/`,
       discipline: COLLECTION_SERIES.blog.discipline,
-      group: 'Field notes — details',
+      group: 'Field notes · details',
     })),
   ];
 

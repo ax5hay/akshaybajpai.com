@@ -38,9 +38,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Akshay Bajpai | AI Architect & Technology Leader — LLMs, RAG, ML Systems',
+  title: 'Akshay Bajpai | AI Architect & Technology Leader · LLMs, RAG, ML Systems',
   description:
-    'Akshay Bajpai — forward-deployed AI engineer and architect. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical & insurance document AI. Springer author; MSc AI with distinction.',
+    'Akshay Bajpai, forward-deployed AI engineer and architect. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical & insurance document AI. Springer author; MSc AI with distinction.',
   path: '/',
 });
 

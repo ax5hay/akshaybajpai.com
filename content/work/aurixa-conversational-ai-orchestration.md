@@ -1,6 +1,6 @@
 ---
-title: "AURIXA — Conversational AI Orchestration at Scale"
-description: "Multi-tenant microservices platform for real-time LLM routing, RAG, agent execution, safety guardrails, and voice — built as a production Turborepo monorepo."
+title: "AURIXA: Conversational AI Orchestration at Scale"
+description: "Multi-tenant microservices platform for real-time LLM routing, RAG, agent execution, safety guardrails, and voice, built as a production Turborepo monorepo."
 pubDate: 2026-02-18
 client: "Open source · ax5hay/AURIXA"
 stack: ["TypeScript", "Python", "FastAPI", "Fastify", "Next.js 15", "PostgreSQL", "Redis", "Docker", "Turborepo"]
@@ -9,7 +9,7 @@ metrics: ["8 Python services + API gateway", "Pluggable OpenAI / Claude / Gemini
 
 ## Problem
 
-Most “chat with your data” demos collapse under real constraints: multiple tenants, provider failover, cost-aware routing, tool execution against real databases, safety checks before a response ships, and observability when eight services are in the path. AURIXA exists to answer a single question — *how do you run conversational AI like infrastructure, not like a script?*
+Most “chat with your data” demos collapse under real constraints: multiple tenants, provider failover, cost-aware routing, tool execution against real databases, safety checks before a response ships, and observability when eight services are in the path. AURIXA exists to answer a single question: *how do you run conversational AI like infrastructure, not like a script?*
 
 The platform targets healthcare-adjacent workflows (appointments, insurance checks, prescription refills) but the architecture is domain-agnostic: stateless services, async orchestration, and a gateway that can scale each concern independently.
 
@@ -20,17 +20,17 @@ Every request enters through a **Fastify API Gateway** (rate limits, CORS, WebSo
 ```
 User → Gateway (:3000)
   → Orchestration (:8001)
-      ├─ Intent → LLM Router (:8002)     — semantic + keyword routing, cost-aware model pick
-      ├─ Agent path → Agent Runtime (:8003) + Execution Engine (:8007) — DB-backed tools
-      ├─ RAG path   → RAG Service (:8004) — hybrid BM25 + vector retrieval
-      ├─ Safety     → Guardrails (:8005)  — validation, clinical keyword escalation
-      └─ Voice      → Streaming Voice (:8006) — ASR / audio path when needed
+      ├─ Intent → LLM Router (:8002)     - semantic + keyword routing, cost-aware model pick
+      ├─ Agent path → Agent Runtime (:8003) + Execution Engine (:8007) - DB-backed tools
+      ├─ RAG path   → RAG Service (:8004) - hybrid BM25 + vector retrieval
+      ├─ Safety     → Guardrails (:8005)  - validation, clinical keyword escalation
+      └─ Voice      → Streaming Voice (:8006) - ASR / audio path when needed
   → Observability Core (:8008)
 ```
 
-**Execution Engine** actions are not mocks — they read and write tenant-scoped records: `get_appointments`, `create_appointment`, `check_insurance`, `get_availability`, `request_prescription_refill`. **Safety Guardrails** flag phrases like chest pain or stroke and set `requires_escalation` rather than pretending the model is a clinician.
+**Execution Engine** actions are not mocks; they read and write tenant-scoped records: `get_appointments`, `create_appointment`, `check_insurance`, `get_availability`, `request_prescription_refill`. **Safety Guardrails** flag phrases like chest pain or stroke and set `requires_escalation` rather than pretending the model is a clinician.
 
-Frontends ship in the same monorepo: unified admin dashboard (playground, tenants, service health), patient portal, and hospital portal — all Next.js 15.
+Frontends ship in the same monorepo: unified admin dashboard (playground, tenants, service health), patient portal, and hospital portal, all Next.js 15.
 
 ## Tech stack
 
@@ -38,9 +38,9 @@ Frontends ship in the same monorepo: unified admin dashboard (playground, tenant
 |-------|---------|
 | Monorepo | Turborepo + pnpm workspaces |
 | Gateway | Fastify 5, TypeScript |
-| Services | FastAPI (Python 3.11+) — orchestration, LLM router, RAG, agents, safety, voice, execution, observability |
+| Services | FastAPI (Python 3.11+): orchestration, LLM router, RAG, agents, safety, voice, execution, observability |
 | Data | PostgreSQL 16, Redis 7 |
-| LLM layer | Shared `llm-clients` package — OpenAI, Anthropic, Gemini, local models |
+| LLM layer | Shared `llm-clients` package: OpenAI, Anthropic, Gemini, local models |
 | Infra | Docker Compose locally; K8s + Terraform templates for AWS |
 | UI | Next.js 15 dashboards, shared `ui-kit` |
 
@@ -48,7 +48,7 @@ Response caching (TTL 300s) and telemetry emission on orchestration, routing, an
 
 ## Tradeoffs
 
-- **Microservices vs. velocity:** Eight services plus three frontends is heavy for a solo builder, but it mirrors how production AI platforms actually fail — at routing, safety, and observability boundaries. The split buys independent deploy and clear ownership per concern.
+- **Microservices vs. velocity:** Eight services plus three frontends is heavy for a solo builder, but it mirrors how production AI platforms actually fail: at routing, safety, and observability boundaries. The split buys independent deploy and clear ownership per concern.
 - **Healthcare demo data vs. generic core:** Sample patients and appointments anchor the execution engine, yet the gateway–orchestration–router pattern transfers to any vertical with tool calls and RAG.
 - **Python + TypeScript split:** Gateway and auth stay in Node; ML-heavy paths stay in FastAPI. Two runtimes, one contract: Pydantic schemas and shared auth utilities.
 

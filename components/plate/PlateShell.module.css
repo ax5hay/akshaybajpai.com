@@ -3,21 +3,29 @@
 }
 
 /* ---- Mode switching -----------------------------------------------------
-   Raw mode swaps the drawing for its record. Doing this in CSS keeps all
-   three modes static markup: no client branch, no flash, no second render. */
+   Raw mode does not replace the drawing, it exposes what the drawing was made
+   from: the record and the verbatim source are added, and the content stays
+   readable. Doing this in CSS keeps all three modes static markup: no client
+   branch, no flash, no second render. */
 
 .raw {
   display: none;
 }
 
-html[data-mode='raw'] .head,
-html[data-mode='raw'] .body,
-html[data-mode='raw'] .refs {
-  display: none;
+html[data-mode='raw'] .raw {
+  display: block;
+}
+
+/* The record belongs at the top of a source view, before the rendered output,
+   without reordering the markup for the other two modes. */
+html[data-mode='raw'] .plate {
+  display: flex;
+  flex-direction: column;
 }
 
 html[data-mode='raw'] .raw {
-  display: block;
+  order: -1;
+  margin-bottom: var(--s-12);
 }
 
 /* ---- Header -------------------------------------------------------------- */
@@ -94,7 +102,7 @@ html[data-mode='annotated'] .title {
   text-wrap: pretty;
 }
 
-/* Sheet data table — ruled cells, like the data block on a real drawing. */
+/* Sheet data table: ruled cells, like the data block on a real drawing. */
 .facts {
   display: flex;
   flex-wrap: wrap;

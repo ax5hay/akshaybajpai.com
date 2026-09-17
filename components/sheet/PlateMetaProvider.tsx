@@ -36,7 +36,7 @@ const FALLBACK: PlateMeta = {
   title: 'Unissued',
   discipline: 'X',
   scale: 'NTS',
-  revision: '—',
+  revision: 'X',
 };
 
 const PlateMetaContext = createContext<PlateMetaContextValue | null>(null);

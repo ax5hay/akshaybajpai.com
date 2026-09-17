@@ -6,7 +6,7 @@ import { parseContentDate } from '@/lib/format';
 import { SOCIAL } from '@/lib/constants';
 
 export const metadata = buildMetadata({
-  title: 'Akshay Bajpai — Architect of Systems, Builder of Intelligence',
+  title: 'Akshay Bajpai · Architect of Systems, Builder of Intelligence',
   description:
     'The Architecture of Intelligence, issued as a drawing set. Forward-deployed AI engineering: LLM platforms, governed agents, hybrid RAG, and systems built to be operated.',
   path: '/',
@@ -28,7 +28,7 @@ export default async function Page() {
   const contents: KeyPlanContents = {
     about: [
       { sheet: '2026', title: 'Lead Full-Stack AI Engineer', meta: 'Forward deployment' },
-      { sheet: '2026', title: 'AI Lead — video intelligence', meta: 'Defense-adjacent' },
+      { sheet: '2026', title: 'AI Lead · video intelligence', meta: 'Defense-adjacent' },
       { sheet: '2025', title: 'Senior AI Consultant', meta: 'Finance & health' },
       { sheet: '2025', title: 'Founding Engineer', meta: 'Restaurant SaaS' },
       { sheet: '2023', title: 'Data Scientist II', meta: 'Insurance' },
@@ -38,7 +38,7 @@ export default async function Page() {
     research: [
       { title: 'ML for Medical Diagnosis, Ch. 17', meta: 'Springer 2024' },
       { title: 'Alzheimer\u2019s classification thesis', meta: 'OASIS' },
-      { title: 'MSc AI — 9.8/10, distinction', meta: 'Lviv Poly' },
+      { title: 'MSc AI · 9.8/10, distinction', meta: 'Lviv Poly' },
       { title: 'Governed agentic retrieval', meta: 'Current' },
     ],
 

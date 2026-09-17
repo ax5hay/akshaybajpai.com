@@ -39,7 +39,7 @@ export default async function BlogIndexPage() {
       wide
       lead={
         <p>
-          Shorter pieces written close to the work — what a system taught while it was still
+          Shorter pieces written close to the work: what a system taught while it was still
           being built, before the lesson had time to round itself off.
         </p>
       }

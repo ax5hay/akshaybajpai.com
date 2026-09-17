@@ -1,4 +1,4 @@
-/* G-000 — the general arrangement. A single transformed plane holding every
+/* G-000: the general arrangement. A single transformed plane holding every
    sheet in the set, pannable and zoomable, with level-of-detail so the plan
    reads as a composition when far out and as a contents table when close in. */
 
@@ -65,6 +65,170 @@
   stroke-dasharray: none;
 }
 
+/* ---- Markup layer (annotated mode) ------------------------------------
+   Annotation is drawn over the sheets, so this sits above them. It is off in
+   every other mode, which is why the artifact print stays clean. */
+
+.markup {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+html[data-mode='annotated'] .markup {
+  display: block;
+}
+
+.dimLine,
+.dimTick {
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+
+.dimText,
+.xrefText {
+  fill: var(--accent);
+  font-family: var(--font-label), monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  text-anchor: middle;
+  paint-order: stroke;
+  /* The figures cross sheet faces, so they carry their own backing. */
+  stroke: var(--paper);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.xrefText {
+  font-size: 9.5px;
+  fill: var(--accent-2);
+}
+
+.cloud {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.4;
+  opacity: 0.85;
+}
+
+.revFlag path {
+  fill: var(--accent);
+}
+
+.revFlag text {
+  fill: var(--paper);
+  font-family: var(--font-label), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+/* Placement note each sheet prints about itself when the markup is on. */
+.plateAnnot {
+  display: none;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: var(--lw-hair) dashed var(--accent-line);
+  font-family: var(--font-label), monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+html[data-mode='annotated'] .plateAnnot {
+  display: flex;
+}
+
+/* The technical footer replaces the presentational one rather than stacking
+   below it, so the contents table keeps its height. */
+html[data-mode='annotated'] .plateFoot {
+  display: none;
+}
+
+/* ---- Record layer (raw mode) -----------------------------------------
+   Raw mode does not hide the sheet; it adds what the sheet was drawn from. */
+
+.plateRecord {
+  display: none;
+  flex-direction: column;
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: var(--lw-hair) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: 8.5px;
+  /* The shortest sheets are only 180 units tall, so the record is set tight
+     enough to fit them without clipping. */
+  line-height: 1.45;
+}
+
+html[data-mode='raw'] .plateRecord {
+  display: flex;
+}
+
+.recordRow {
+  display: grid;
+  grid-template-columns: 62px 1fr;
+  gap: 8px;
+}
+
+.recordKey {
+  color: var(--accent);
+}
+
+.recordValue {
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The miniature contents table is the presented view, so raw mode drops it in
+   favour of the record above. Everything else on the sheet stays put. */
+html[data-mode='raw'] .plateBody {
+  display: none;
+}
+
+.provenance {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  margin: var(--s-3) 0 0;
+  font-family: var(--font-label), monospace;
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.provenance span:first-child {
+  color: var(--accent);
+}
+
+html[data-mode='raw'] .provenance {
+  display: flex;
+}
+
+/* The prose note is the presented framing; raw mode states the source instead. */
+html[data-mode='raw'] .headlineNote {
+  display: none;
+}
+
+.legendRow[data-layer] {
+  display: none;
+}
+
+html[data-mode='annotated'] .legendRow[data-layer='markup'],
+html[data-mode='raw'] .legendRow[data-layer='record'] {
+  display: flex;
+}
+
 /* ---- Headline, set into the plan's empty quadrant -------------------- */
 
 /* Position comes from KEY_PLAN_FURNITURE so the plan's composition lives in
@@ -101,6 +265,14 @@
   line-height: 1;
   letter-spacing: -0.025em;
   color: var(--ink);
+}
+
+/* The display face is mono in both engineering modes, which sets much wider
+   than the serif. Pulling it back keeps the name inside its furniture box. */
+html[data-mode='annotated'] .headlineName,
+html[data-mode='raw'] .headlineName {
+  font-size: 38px;
+  letter-spacing: -0.04em;
 }
 
 .headlineRole {
@@ -143,7 +315,28 @@
     border-color var(--d-2) var(--ease-plate),
     background-color var(--d-2) var(--ease-plate),
     box-shadow var(--d-2) var(--ease-plate),
+    opacity var(--d-2) var(--ease-plate),
     transform var(--d-2) var(--ease-plate);
+}
+
+/* The set is issued sheet by sheet: each one lands on the board a beat after
+   the last. `backwards` rather than `forwards` matters, because a forwards
+   fill would pin transform at the end keyframe and the hover lift below would
+   never apply. */
+@keyframes sheet-land {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.plate {
+  animation: sheet-land 560ms var(--ease-plate) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms + 120ms);
 }
 
 .plate:hover,
@@ -153,6 +346,38 @@
   box-shadow: var(--shadow-deep);
   transform: translateY(-2px);
   z-index: 2;
+}
+
+/* Attention is singular: reading one sheet sends the rest of the set back. */
+.plane:has(.plate:hover) .plate:not(:hover) {
+  opacity: 0.45;
+}
+
+/* The furniture inks in around the sheets: title block first, then the notes
+   and legend, then the cross-references once there is something to join. */
+@keyframes plan-ink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.header,
+.notes,
+.legend,
+.leaders {
+  animation: plan-ink 700ms var(--ease-plate) backwards;
+}
+
+.notes,
+.legend {
+  animation-delay: 540ms;
+}
+
+.leaders {
+  animation-delay: 700ms;
 }
 
 /* Sheet number tag, reversed out in the top-left as on a drawing. */
@@ -167,39 +392,8 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   color: var(--paper);
-  background: var(--disc, var(--ink));
+  background: var(--ink);
   transition: background-color var(--d-2);
-}
-
-/* Discipline index colours. Artifact mode is the issued print and carries the
-   full index; annotated and raw are single-pen modes and stay monochrome, so
-   --disc is simply never set there and the tags fall back to ink. */
-html[data-mode='artifact'] .plate[data-discipline='A'] {
-  --disc: #a8432f;
-}
-
-html[data-mode='artifact'] .plate[data-discipline='S'] {
-  --disc: #35638f;
-}
-
-html[data-mode='artifact'] .plate[data-discipline='R'] {
-  --disc: #6d7735;
-}
-
-html[data-mode='artifact'] .plate[data-discipline='W'] {
-  --disc: #a3701f;
-}
-
-html[data-mode='artifact'] .plate[data-discipline='B'] {
-  --disc: #2c6d66;
-}
-
-html[data-mode='artifact'] .plate[data-discipline='E'] {
-  --disc: #71456b;
-}
-
-html[data-mode='artifact'] .plate[data-discipline='C'] {
-  --disc: #7d5c3c;
 }
 
 .plate:hover .plateTag,
@@ -217,7 +411,7 @@ html[data-mode='artifact'] .plate[data-discipline='C'] {
 
 .plateTitle {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 19px;
+  font-size: 22px;
   line-height: 1.05;
   color: var(--ink);
 }
@@ -248,7 +442,7 @@ html[data-mode='artifact'] .plate[data-discipline='C'] {
   grid-template-columns: 1fr auto;
   align-items: baseline;
   gap: 8px;
-  padding: 3px 0;
+  padding: 2px 0;
   border-bottom: 1px solid var(--rule-faint);
 }
 
@@ -466,6 +660,24 @@ html[data-mode='artifact'] .plate[data-discipline='C'] {
 .legendSwatch[data-kind='rev'] {
   height: 8px;
   background: var(--accent);
+}
+
+.legendSwatch[data-kind='dim'] {
+  height: 7px;
+  border-left: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
+  background: linear-gradient(var(--accent), var(--accent)) center / 100% 1px no-repeat;
+}
+
+.legendSwatch[data-kind='cloud'] {
+  height: 8px;
+  background: radial-gradient(circle at 3px 4px, var(--accent) 0 2.6px, transparent 2.8px)
+    0 0 / 6px 8px repeat-x;
+}
+
+.legendSwatch[data-kind='record'] {
+  height: 8px;
+  background: repeating-linear-gradient(var(--accent) 0 1px, transparent 1px 3px);
 }
 
 .legendScale {

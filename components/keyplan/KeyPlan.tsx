@@ -4,11 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
+  DISCIPLINES,
   GENERAL_NOTES,
   KEY_PLAN_FURNITURE,
   KEY_PLAN_HEIGHT,
   KEY_PLAN_WIDTH,
   keyPlanPlates,
+  PLATES,
+  type KeyPlanRect,
   type PlacedPlate,
 } from '@/lib/plates';
 import { useToast } from '@/components/system/ToastProvider';
@@ -44,6 +47,48 @@ const place = (r: { x: number; y: number; w: number; h: number }) => ({
   width: r.w,
   height: r.h,
 });
+
+/** The plan's own drawing grid, matching the ticks printed on the sheet frame. */
+const GRID_COLS = 8;
+const GRID_ROWS = 6;
+
+/** Grid reference for a rectangle's centre, e.g. `B/1`. */
+const gridRef = (r: KeyPlanRect) => {
+  const col = Math.min(GRID_COLS, Math.floor((r.x + r.w / 2) / (KEY_PLAN_WIDTH / GRID_COLS)) + 1);
+  const row = Math.min(GRID_ROWS, Math.floor((r.y + r.h / 2) / (KEY_PLAN_HEIGHT / GRID_ROWS)));
+  return `${String.fromCharCode(65 + row)}/${col}`;
+};
+
+/**
+ * Scalloped outline used to ring a revised area, as on an issued drawing.
+ * Walks the perimeter placing one arc per step so the bulges face outward.
+ */
+const revisionCloud = (r: KeyPlanRect, step = 34, bulge = 11) => {
+  const pts: Array<[number, number]> = [];
+  const edge = (x1: number, y1: number, x2: number, y2: number) => {
+    const len = Math.hypot(x2 - x1, y2 - y1);
+    const n = Math.max(1, Math.round(len / step));
+    for (let i = 0; i < n; i += 1) {
+      pts.push([x1 + ((x2 - x1) * i) / n, y1 + ((y2 - y1) * i) / n]);
+    }
+  };
+  const { x, y, w, h } = r;
+  edge(x, y, x + w, y);
+  edge(x + w, y, x + w, y + h);
+  edge(x + w, y + h, x, y + h);
+  edge(x, y + h, x, y);
+
+  return (
+    pts
+      .map(([px, py], i) => {
+        const [nx, ny] = pts[(i + 1) % pts.length];
+        const a = i === 0 ? `M ${px} ${py}` : '';
+        // Sweep 1 keeps every bulge on the outside of the walk.
+        return `${a} A ${bulge} ${bulge} 0 0 1 ${nx} ${ny}`;
+      })
+      .join(' ') + ' Z'
+  );
+};
 
 export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   const plates = useMemo(() => keyPlanPlates(), []);
@@ -257,6 +302,30 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   }, [plates]);
 
   /**
+   * Chain dimension across the plan: each column band and the gutter between
+   * them, read off the plates so the printed figures always match the real
+   * composition rather than being written down twice.
+   */
+  const chain = useMemo(() => {
+    const xs = [...new Set(plates.map((p) => p.rect.x))].sort((a, b) => a - b);
+    const runs: Array<{ x: number; w: number; gutter?: true }> = [];
+
+    xs.forEach((x, i) => {
+      const w = Math.max(...plates.filter((p) => p.rect.x === x).map((p) => p.rect.w));
+      runs.push({ x, w });
+      const next = xs[i + 1];
+      if (next !== undefined) runs.push({ x: x + w, w: next - (x + w), gutter: true });
+    });
+    return runs;
+  }, [plates]);
+
+  /** The sheet at the highest revision gets the cloud, as on a real issue. */
+  const revised = useMemo(
+    () => plates.reduce((a, b) => (b.revision > a.revision ? b : a)),
+    [plates],
+  );
+
+  /**
    * Leaders are drawn between plate edges, not centres: a line that runs
    * under an opaque sheet is never seen, so each end is pulled back to the
    * boundary and the run lives entirely in the gutters between plates.
@@ -281,7 +350,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   });
 
   return (
-    <section className={styles.stage} aria-label="Key plan — general arrangement">
+    <section className={styles.stage} aria-label="Key plan, general arrangement">
       <div
         className={styles.surface}
         ref={stageRef}
@@ -329,30 +398,130 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             })}
           </svg>
 
+          {/* Markup layer. Annotation is drawn over the drawing, not under it,
+              so this sits above the sheets and is inert to the pointer. CSS
+              alone decides whether it prints. */}
+          <svg
+            className={styles.markup}
+            viewBox={`0 0 ${KEY_PLAN_WIDTH} ${KEY_PLAN_HEIGHT}`}
+            aria-hidden="true"
+          >
+            {/* Chain dimension: column widths and gutters, then the overall. */}
+            <g className={styles.dim}>
+              {chain.map((run) => (
+                <g key={`c${run.x}`}>
+                  <line x1={run.x} y1={402} x2={run.x} y2={418} className={styles.dimTick} />
+                  <line
+                    x1={run.x + 6}
+                    y1={410}
+                    x2={run.x + run.w - 6}
+                    y2={410}
+                    className={styles.dimLine}
+                  />
+                  <text x={run.x + run.w / 2} y={407} className={styles.dimText}>
+                    {run.gutter ? run.w : `${run.w}`}
+                  </text>
+                </g>
+              ))}
+              <line
+                x1={KEY_PLAN_WIDTH}
+                y1={402}
+                x2={KEY_PLAN_WIDTH}
+                y2={418}
+                className={styles.dimTick}
+              />
+
+              {/* Overall height, taken up the first gutter. */}
+              <line x1={440} y1={6} x2={440} y2={KEY_PLAN_HEIGHT - 6} className={styles.dimLine} />
+              <line x1={432} y1={0} x2={448} y2={0} className={styles.dimTick} />
+              <line
+                x1={432}
+                y1={KEY_PLAN_HEIGHT}
+                x2={448}
+                y2={KEY_PLAN_HEIGHT}
+                className={styles.dimTick}
+              />
+              <text
+                x={440}
+                y={KEY_PLAN_HEIGHT / 2}
+                className={styles.dimText}
+                transform={`rotate(-90 440 ${KEY_PLAN_HEIGHT / 2})`}
+              >
+                {KEY_PLAN_HEIGHT}
+              </text>
+            </g>
+
+            {/* Every cross-reference names the pair it joins. */}
+            {leaders.map(({ key, a, b }) => {
+              const pa = edgePoint(a, centre(b));
+              const pb = edgePoint(b, centre(a));
+              return (
+                <text
+                  key={`l${key}`}
+                  x={(pa.x + pb.x) / 2}
+                  y={(pa.y + pb.y) / 2 - 4}
+                  className={styles.xrefText}
+                >
+                  {a.sheet}/{b.sheet}
+                </text>
+              );
+            })}
+
+            {/* Revision cloud and triangle over the most recently issued sheet. */}
+            <path
+              d={revisionCloud({
+                x: revised.rect.x - 7,
+                y: revised.rect.y - 7,
+                w: revised.rect.w + 14,
+                h: revised.rect.h + 14,
+              })}
+              className={styles.cloud}
+            />
+            <g
+              className={styles.revFlag}
+              transform={`translate(${revised.rect.x + revised.rect.w - 4} ${revised.rect.y - 4})`}
+            >
+              <path d="M 0 -15 L 13 8 L -13 8 Z" />
+              <text y={5}>{revised.revision}</text>
+            </g>
+          </svg>
+
           <div className={styles.header} style={place(KEY_PLAN_FURNITURE.headline)}>
             <h1 className={styles.headline}>
               <span className={styles.headlineName}>Akshay Bajpai</span>
               <span className={styles.headlineRole}>Architect of systems · Builder of intelligence</span>
             </h1>
             <p className={styles.headlineNote}>
-              This site is a drawing set. Every section is a numbered sheet on the plan below —
-              open one, or press <kbd>/</kbd> for the index.
+              This site is a drawing set. Every section is a numbered sheet on the plan below.
+              Open one, or press <kbd>/</kbd> for the index.
+            </p>
+
+            {/* Raw: what the plan is generated from. */}
+            <p className={styles.provenance}>
+              <span>lib/plates.ts</span>
+              <span>
+                PLATES: Plate[] = {PLATES.length}, {plates.length} placed on G-000
+              </span>
+              <span>
+                plan {KEY_PLAN_WIDTH} × {KEY_PLAN_HEIGHT} units, {leaders.length} refs resolved
+              </span>
+              <span>KeyPlan.tsx, client, no data fetch</span>
             </p>
           </div>
 
-          {plates.map((plate) => (
+          {plates.map((plate, index) => (
             <Link
               key={plate.sheet}
               href={plate.href}
               className={styles.plate}
               data-discipline={plate.discipline}
-              style={place(plate.rect)}
+              style={{ ...place(plate.rect), '--i': index } as React.CSSProperties}
               data-wide={plate.rect.w >= 600 || undefined}
               onClick={(e) => onPlateClick(e, plate)}
               onMouseEnter={() => setHovered(plate.sheet)}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => onPlateFocus(plate)}
-              aria-label={`${plate.sheet} — ${plate.title}. ${plate.subtitle}`}
+              aria-label={`${plate.sheet}. ${plate.title}. ${plate.subtitle}`}
             >
               <span className={styles.plateTag}>{plate.sheet}</span>
 
@@ -373,6 +542,37 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                     {item.sheet && <span className={styles.itemSheet}>{item.sheet}</span>}
                     <span className={styles.itemTitle}>{item.title}</span>
                     {item.meta && <span className={styles.itemMeta}>{item.meta}</span>}
+                  </span>
+                ))}
+              </span>
+
+              {/* Annotated: the sheet states its own placement on the plan. */}
+              <span className={styles.plateAnnot}>
+                <span>Grid {gridRef(plate.rect)}</span>
+                <span>
+                  {plate.rect.w} × {plate.rect.h}
+                </span>
+                <span>{DISCIPLINES[plate.discipline].name}</span>
+              </span>
+
+              {/* Raw: the record this sheet was drawn from, verbatim. */}
+              <span className={styles.plateRecord}>
+                {(
+                  [
+                    ['route', plate.href],
+                    ['source', `app${plate.href}page.tsx`],
+                    ['id', plate.id],
+                    ['discipline', `${plate.discipline} · ${DISCIPLINES[plate.discipline].name}`],
+                    ['rect', `x ${plate.rect.x}  y ${plate.rect.y}  w ${plate.rect.w}  h ${plate.rect.h}`],
+                    // scale and revision are already printed in the sheet
+                    // footer, so the record does not repeat them.
+                    ['refs', plate.refs.join(' ') || 'none'],
+                    ['entries', String((contents[plate.id] ?? []).length)],
+                  ] as const
+                ).map(([k, v]) => (
+                  <span key={k} className={styles.recordRow}>
+                    <span className={styles.recordKey}>{k}</span>
+                    <span className={styles.recordValue}>{v}</span>
                   </span>
                 ))}
               </span>
@@ -414,6 +614,18 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             <span className={styles.legendRow}>
               <span className={styles.legendSwatch} data-kind="rev" />
               Current revision
+            </span>
+            <span className={styles.legendRow} data-layer="markup">
+              <span className={styles.legendSwatch} data-kind="dim" />
+              Dimension, plan units
+            </span>
+            <span className={styles.legendRow} data-layer="markup">
+              <span className={styles.legendSwatch} data-kind="cloud" />
+              Revision cloud
+            </span>
+            <span className={styles.legendRow} data-layer="record">
+              <span className={styles.legendSwatch} data-kind="record" />
+              Sheet record, as authored
             </span>
             <span className={styles.legendScale}>
               <span className={styles.scaleBar} />

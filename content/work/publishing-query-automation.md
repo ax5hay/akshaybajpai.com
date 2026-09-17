@@ -1,5 +1,5 @@
 ---
-title: "Publishing AI Automation — Multi-Channel Support at Scale"
+title: "Publishing AI Automation: Multi-Channel Support at Scale"
 description: "Multi-channel author query automation with intent classification, hybrid RAG, unified identity across WhatsApp and email, and confidence-gated human escalation."
 pubDate: 2025-09-17
 client: "Publishing · client engagement"
@@ -9,7 +9,7 @@ metrics: ["5 communication channels", "Hybrid semantic + keyword RAG", "Entity e
 
 ## Problem
 
-A publishing house fields the same questions across **WhatsApp, Instagram, email, web, and SMS** — order status, manuscript guidelines, ISBN lookups, royalty queries. Agents context-switch between channels; answers drift from the knowledge base; low-confidence guesses erode author trust.
+A publishing house fields the same questions across **WhatsApp, Instagram, email, web, and SMS**: order status, manuscript guidelines, ISBN lookups, royalty queries. Agents context-switch between channels; answers drift from the knowledge base; low-confidence guesses erode author trust.
 
 The goal was not a chatbot widget. It was an **automation platform**: classify intent, retrieve the right policy paragraph, score confidence, escalate to humans when unsure, and keep one identity graph so “the same author” is recognized whether they DM or email.
 
@@ -30,27 +30,27 @@ Inbound (webhook / API)
 
 | Component | Implementation |
 |-----------|----------------|
-| API | Express + TypeScript — queries, webhooks, health |
-| Core | `queryProcessor.ts` — pipeline orchestration |
-| Knowledge | `ragSystem.ts` — hybrid search over knowledge base documents |
-| Database | Supabase (PostgreSQL) — profiles, conversations, audit |
-| AI | OpenAI GPT-4 — intent classification, response drafting |
-| Cache | Redis — session and hot retrieval paths |
+| API | Express + TypeScript: queries, webhooks, health |
+| Core | `queryProcessor.ts`: pipeline orchestration |
+| Knowledge | `ragSystem.ts`: hybrid search over knowledge base documents |
+| Database | Supabase (PostgreSQL): profiles, conversations, audit |
+| AI | OpenAI GPT-4: intent classification, response drafting |
+| Cache | Redis: session and hot retrieval paths |
 | Ops | Docker Compose; optional Prometheus/Grafana hooks |
 
 Structured logging with **request correlation IDs** ties a webhook receipt to its RAG retrieval and final response for support debugging.
 
 ## Tradeoffs
 
-- **Custom code vs. no-code:** Full control over confidence thresholds, Supabase schema, and channel formatters — at the cost of owning the integration layer instead of a SaaS bot builder.
+- **Custom code vs. no-code:** Full control over confidence thresholds, Supabase schema, and channel formatters, at the cost of owning the integration layer instead of a SaaS bot builder.
 - **GPT-4 for intent + generation:** Higher quality for messy author language; mitigated by retrieval-first answers and escalation on low scores.
 - **Supabase as backend:** Fast iteration for a single-tenant publisher deployment; not multi-tenant SaaS out of the box without further isolation work.
 
 ## Metrics & capabilities
 
-- **Channels:** WhatsApp, Instagram, Email, Web, SMS — unified identity layer across all five.
+- **Channels:** WhatsApp, Instagram, Email, Web, SMS, with a unified identity layer across all five.
 - **Entities:** Extraction for ISBNs, emails, book titles from free-text queries.
-- **RAG:** Hybrid search — semantic embeddings plus keyword fallback for exact policy clauses.
+- **RAG:** Hybrid search using semantic embeddings plus keyword fallback for exact policy clauses.
 - **Reliability:** Health checks, graceful degradation, human escalation path for low-confidence classifications.
 
 ## Lessons

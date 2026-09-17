@@ -61,7 +61,7 @@
   right: 0;
 }
 
-/* Corner trim marks — two short rules meeting at the cut line. */
+/* Corner trim marks: two short rules meeting at the cut line. */
 .trim {
   position: absolute;
   width: calc(var(--sheet-margin) * 0.55);
