@@ -26,6 +26,35 @@
   cursor: grabbing;
 }
 
+/* The board is lit from the middle. Without this the plan is an evenly lit
+   rectangle and the eye has nowhere to land; with it the composition has a
+   centre and the sheets at the edge sit back into the surface. */
+.surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 82% 80% at 50% 44%,
+    transparent 0%,
+    transparent 62%,
+    rgba(38, 28, 12, 0.07) 84%,
+    rgba(38, 28, 12, 0.17) 100%
+  );
+}
+
+/* The dark modes are already deep at the edges; doubling the falloff there
+   just muddies the line work. */
+html[data-mode='annotated'] .surface::after,
+html[data-mode='raw'] .surface::after {
+  background: radial-gradient(
+    ellipse 80% 76% at 50% 44%,
+    transparent 58%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+}
+
 .plane {
   position: absolute;
   top: 0;
@@ -65,6 +94,43 @@
   stroke-dasharray: none;
 }
 
+/* Cross-reference bubble: split circle, sheet over sheet. */
+.xref circle {
+  fill: var(--paper);
+  stroke: var(--ink-3);
+  stroke-width: 1.1;
+  transition: fill var(--d-2), stroke var(--d-2);
+}
+
+.xref line {
+  stroke: var(--ink-3);
+  stroke-width: 1.1;
+  transition: stroke var(--d-2);
+}
+
+.xref text {
+  fill: var(--ink-2);
+  font-family: var(--font-label), monospace;
+  font-size: 8px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-anchor: middle;
+  transition: fill var(--d-2);
+}
+
+.xref[data-lit] circle {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.xref[data-lit] line {
+  stroke: var(--paper-raised);
+}
+
+.xref[data-lit] text {
+  fill: var(--paper-raised);
+}
+
 /* ---- Markup layer (annotated mode) ------------------------------------
    Annotation is drawn over the sheets, so this sits above them. It is off in
    every other mode, which is why the artifact print stays clean. */
@@ -90,8 +156,7 @@ html[data-mode='annotated'] .markup {
   stroke-width: 1;
 }
 
-.dimText,
-.xrefText {
+.dimText {
   fill: var(--accent);
   font-family: var(--font-label), monospace;
   font-size: 11px;
@@ -103,11 +168,6 @@ html[data-mode='annotated'] .markup {
   stroke: var(--paper);
   stroke-width: 4;
   stroke-linejoin: round;
-}
-
-.xrefText {
-  font-size: 9.5px;
-  fill: var(--accent-2);
 }
 
 .cloud {
@@ -159,14 +219,14 @@ html[data-mode='annotated'] .plateFoot {
 .plateRecord {
   display: none;
   flex-direction: column;
-  margin-top: 6px;
-  padding-top: 5px;
+  margin-top: 4px;
+  padding-top: 4px;
   border-top: var(--lw-hair) solid var(--rule);
   font-family: var(--font-label), monospace;
   font-size: 8.5px;
   /* The shortest sheets are only 180 units tall, so the record is set tight
      enough to fit them without clipping. */
-  line-height: 1.45;
+  line-height: 1.32;
 }
 
 html[data-mode='raw'] .plateRecord {
@@ -252,18 +312,21 @@ html[data-mode='raw'] .legendRow[data-layer='record'] {
    the one piece of hot colour the plan carries at rest. */
 .headline::before {
   content: '';
-  width: 64px;
-  height: 3px;
-  margin-bottom: var(--s-1);
+  width: 108px;
+  height: 4px;
+  margin-bottom: var(--s-2);
   background: var(--accent);
 }
 
+/* The one piece of type on the plan allowed to be large. Everything else is
+   drafted at 8 to 11px, so the jump in scale is what makes the composition
+   read as a title block rather than as seven equal cards. */
 .headlineName {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 54px;
+  font-size: 62px;
   font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.025em;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
   color: var(--ink);
 }
 
@@ -271,8 +334,8 @@ html[data-mode='raw'] .legendRow[data-layer='record'] {
    than the serif. Pulling it back keeps the name inside its furniture box. */
 html[data-mode='annotated'] .headlineName,
 html[data-mode='raw'] .headlineName {
-  font-size: 38px;
-  letter-spacing: -0.04em;
+  font-size: 42px;
+  letter-spacing: -0.045em;
 }
 
 .headlineRole {
@@ -305,8 +368,14 @@ html[data-mode='raw'] .headlineName {
   display: flex;
   flex-direction: column;
   padding: 16px;
-  background: var(--paper-raised);
-  border: 1px solid var(--rule-strong);
+  /* Stock, not a fill. The wash off the top edge is the light falling across
+     a sheet lying on the board, and it is the difference between paper and a
+     white rectangle. */
+  background: linear-gradient(177deg, var(--sheet-sheen) 0%, transparent 45%),
+    var(--paper-raised);
+  /* Heaviest weight in the drawing. A sheet boundary is the one line that has
+     to survive being printed, so it is drawn in ink rather than in a tint. */
+  border: var(--lw-thin) solid var(--rule-ink);
   /* At rest, not just on hover: the sheets have to read as paper lying on the
      board. Raw mode sets this to `none` and stays deliberately flat. */
   box-shadow: var(--shadow-lift);
@@ -344,13 +413,23 @@ html[data-mode='raw'] .headlineName {
   border-color: var(--accent);
   background: var(--paper-raised);
   box-shadow: var(--shadow-deep);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.012);
   z-index: 2;
 }
 
-/* Attention is singular: reading one sheet sends the rest of the set back. */
-.plane:has(.plate:hover) .plate:not(:hover) {
-  opacity: 0.45;
+/* Attention is singular, but not blind: the sheets a hovered sheet is
+   cross-referenced to stay up and take the accent, and only the unrelated
+   ones recede. Hovering anything therefore draws its own subgraph. */
+.plate[data-dim] {
+  opacity: 0.32;
+}
+
+.plate[data-linked] {
+  border-color: var(--accent-line);
+}
+
+.plate[data-linked] .plateTag {
+  background: var(--accent);
 }
 
 /* The furniture inks in around the sheets: title block first, then the notes
@@ -367,12 +446,14 @@ html[data-mode='raw'] .headlineName {
 .header,
 .notes,
 .legend,
+.instruments,
 .leaders {
   animation: plan-ink 700ms var(--ease-plate) backwards;
 }
 
 .notes,
-.legend {
+.legend,
+.instruments {
   animation-delay: 540ms;
 }
 
@@ -380,18 +461,20 @@ html[data-mode='raw'] .headlineName {
   animation-delay: 700ms;
 }
 
-/* Sheet number tag, reversed out in the top-left as on a drawing. */
+/* Sheet number tag, reversed out in the top-left as on a drawing. These are
+   the darkest masses in the plan, so they carry the composition when the
+   sheets themselves are near white. */
 .plateTag {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 4px 8px;
+  padding: 5px 10px;
   font-family: var(--font-label), monospace;
   font-variant-numeric: tabular-nums;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--paper);
+  letter-spacing: 0.12em;
+  color: var(--paper-raised);
   background: var(--ink);
   transition: background-color var(--d-2);
 }
@@ -401,12 +484,18 @@ html[data-mode='raw'] .headlineName {
   background: var(--accent);
 }
 
+/* Title strip. Ruling it off gives each sheet the same internal structure a
+   real one has, and turns a loose stack of text into a drawn object. */
 .plateHead {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding-left: 52px;
+  padding-left: 58px;
+  padding-bottom: 5px;
   min-height: 26px;
+  /* The title strip is never the thing that gives way when a sheet is tight. */
+  flex-shrink: 0;
+  border-bottom: var(--lw-thin) solid var(--rule-strong);
 }
 
 .plateTitle {
@@ -421,14 +510,14 @@ html[data-mode='raw'] .headlineName {
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-4);
+  color: var(--ink-3);
 }
 
 .plateBody {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  margin-top: 12px;
+  margin-top: 7px;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -443,7 +532,9 @@ html[data-mode='raw'] .headlineName {
   align-items: baseline;
   gap: 8px;
   padding: 2px 0;
-  border-bottom: 1px solid var(--rule-faint);
+  /* Ruled, not merely spaced. A drawn table is what separates a contents
+     schedule from a list of grey text sitting on a white rectangle. */
+  border-bottom: var(--lw-hair) solid var(--rule);
 }
 
 .plateBody[data-numbered] .item {
@@ -477,7 +568,7 @@ html[data-mode='raw'] .headlineName {
   text-transform: uppercase;
   color: var(--ink-4);
   white-space: nowrap;
-  max-width: 13ch;
+  max-width: 19ch;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -559,27 +650,37 @@ html[data-mode='raw'] .headlineName {
   transition: opacity var(--d-2) var(--ease-plate);
 }
 
-/* ---- General notes ----------------------------------------------------- */
+/* ---- Plan furniture: notes, instruments, legend -------------------------
+   These are printed on the board rather than on a sheet, so they take the
+   deeper stock. Board, furniture and sheet then read as three distinct
+   planes, which is where the plan gets its depth in artifact mode. */
 
-.notes {
+.notes,
+.instruments,
+.legend {
   position: absolute;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  border: 1px solid var(--rule);
-  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  border: var(--lw-thin) solid var(--rule-strong);
+  background: var(--paper-deep);
 }
 
-.notesTitle {
-  padding-bottom: 8px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid var(--rule-strong);
+/* Reversed header bar, as on a drawing schedule. Three of them, spaced across
+   the bottom of the plan, are the dark anchors the composition hangs on. */
+.furnitureTitle {
+  display: block;
+  padding: 5px 10px;
+  background: var(--ink);
+  color: var(--paper-raised);
   font-family: var(--font-label), monospace;
   font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-2);
+}
+
+.notes {
+  padding-bottom: 14px;
 }
 
 .notesList {
@@ -587,7 +688,7 @@ html[data-mode='raw'] .headlineName {
   flex-direction: column;
   gap: 8px;
   margin: 0;
-  padding: 0;
+  padding: 12px 16px 0;
   list-style: none;
 }
 
@@ -607,16 +708,158 @@ html[data-mode='raw'] .headlineName {
   color: var(--accent);
 }
 
-/* ---- Legend ------------------------------------------------------------ */
+/* ---- Instrument tray ---------------------------------------------------
+   The lens, the index and the drawing modes are the parts of this set that
+   reward a click, so they are drawn on the plan with their names and their
+   keys rather than left as glyphs in the rail for someone to find. */
 
-.legend {
+.instruments {
+  padding-bottom: 10px;
+  /* The one block on the plan that is not a drawing, so it keeps the bright
+     stock of a sheet and reads as something placed on the board. */
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-lift);
+}
+
+/* First visit only, and it stops the moment anything is operated. Three
+   beats is enough to move an eye; more would be a nag. Drawn on a pseudo
+   element so it composes with the tray's own fade rather than replacing it. */
+@keyframes tray-invite {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  45% {
+    opacity: 0.6;
+    transform: scale(1.04);
+  }
+}
+
+.instruments[data-inviting]::after {
+  content: '';
   position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  border: var(--lw-med) solid var(--accent);
+  /* Invisible at rest so reduced motion, which collapses the animation to
+     nothing, leaves no ring stranded around the tray. */
+  opacity: 0;
+  animation: tray-invite 2000ms var(--ease-plate) 1600ms 3 backwards;
+}
+
+.instrument {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 12px 7px 10px;
+  text-align: left;
+  border-bottom: var(--lw-hair) solid var(--rule-faint);
+  color: var(--ink);
+  transition:
+    background-color var(--d-1) var(--ease-plate),
+    color var(--d-1) var(--ease-plate);
+}
+
+.instrument:hover,
+.instrument:focus-visible {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.instrument[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--paper-raised);
+}
+
+.instrGlyph {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.instrument[aria-pressed='true'] .instrGlyph {
+  color: inherit;
+}
+
+.instrText {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 14px;
-  border: 1px solid var(--rule);
-  background: color-mix(in srgb, var(--paper) 60%, transparent);
+  gap: 1px;
+  min-width: 0;
+}
+
+.instrName {
+  font-family: var(--font-label), monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: inherit;
+}
+
+.instrNote {
+  font-size: 9.5px;
+  line-height: 1.35;
+  color: var(--ink-3);
+}
+
+.instrument:hover .instrNote,
+.instrument:focus-visible .instrNote,
+.instrument[aria-pressed='true'] .instrNote {
+  color: inherit;
+}
+
+/* Printed key, drawn as a physical cap so it reads as pressable. */
+.instrKey {
+  min-width: 17px;
+  padding: 1px 0;
+  font-family: var(--font-label), monospace;
+  font-size: 9px;
+  text-align: center;
+  color: var(--paper-raised);
+  background: var(--ink);
+  border-bottom: 2px solid var(--rule-ink);
+}
+
+.instrument:hover .instrKey,
+.instrument:focus-visible .instrKey {
+  background: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.instrument[aria-pressed='true'] .instrKey {
+  color: var(--accent);
+  background: var(--paper-raised);
+  border-bottom-color: var(--paper-raised);
+}
+
+.instrFoot {
+  margin-top: 8px;
+  padding: 0 12px;
+  font-family: var(--font-label), monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* Hovering a sheet sends the rest of the set back, but never the tray: the
+   invitation stays legible whatever else the reader is doing. */
+.plane:has(.plate:hover) .instruments {
+  opacity: 1;
+}
+
+/* ---- Legend ------------------------------------------------------------ */
+
+/* Sized to the fullest case: annotated prints two extra rows, so every other
+   mode simply has more air rather than the block having to grow. */
+.legend {
+  gap: 3px;
+  padding-bottom: 10px;
   font-family: var(--font-label), monospace;
   font-size: 9px;
   letter-spacing: 0.08em;
@@ -624,15 +867,12 @@ html[data-mode='raw'] .headlineName {
   color: var(--ink-3);
 }
 
-.legendTitle {
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--ink-2);
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--rule);
+.legend .furnitureTitle {
+  margin-bottom: 8px;
 }
 
 .legendRow {
+  padding: 0 14px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -640,7 +880,7 @@ html[data-mode='raw'] .headlineName {
 
 .legendSwatch {
   width: 22px;
-  height: 8px;
+  height: 7px;
   flex-shrink: 0;
 }
 
@@ -680,13 +920,40 @@ html[data-mode='raw'] .headlineName {
   background: repeating-linear-gradient(var(--accent) 0 1px, transparent 1px 3px);
 }
 
+.revTitle {
+  margin-top: 4px;
+  padding: 5px 14px 0;
+  border-top: var(--lw-hair) solid var(--rule);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--ink-2);
+}
+
+.revRow {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.revLetter {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.revSheets {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
 .legendScale {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px solid var(--rule);
+  /* Sits on the base of the block rather than floating under the last row. */
+  margin-top: auto;
+  padding: 6px 14px 0;
+  border-top: var(--lw-hair) solid var(--rule);
 }
 
 /* Alternating tick bar, as printed beside a plan scale. */
@@ -745,18 +1012,6 @@ html[data-mode='raw'] .headlineName {
   background: var(--accent-soft);
 }
 
-.hint {
-  position: absolute;
-  right: var(--sheet-margin);
-  bottom: calc(var(--sheet-margin) + var(--titleblock-h) + var(--s-3));
-  font-family: var(--font-label), monospace;
-  font-size: var(--t-micro);
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--ink-4);
-  pointer-events: none;
-}
-
 /* ---- Narrow sheets: the plan becomes a stacked index ------------------- */
 
 @media (max-width: 59.999rem) {
@@ -784,7 +1039,6 @@ html[data-mode='raw'] .headlineName {
 
   .leaders,
   .legend,
-  .hint,
   .controls {
     display: none;
   }
@@ -792,19 +1046,51 @@ html[data-mode='raw'] .headlineName {
   /* Furniture carries inline geometry from KEY_PLAN_FURNITURE, which has to
      be overridden to let these blocks join the stacked flow. */
   .header,
-  .notes {
+  .notes,
+  .instruments {
     position: static !important;
     width: auto !important;
     height: auto !important;
   }
 
   .header {
-    margin-bottom: var(--s-6);
+    margin-bottom: var(--s-5);
+  }
+
+  /* The tray leads on a narrow sheet. It is the only thing between the name
+     and a list of links, and it is the part worth touching. Relative rather
+     than static so the invitation ring still frames the tray. */
+  .instruments {
+    /* Relative rather than static so the invitation ring still frames the
+       tray, which means the plan coordinates have to be cleared by hand or
+       they would offset it off the side of the screen. */
+    position: relative !important;
+    inset: auto !important;
+    order: -1;
+    margin-bottom: var(--s-4);
+  }
+
+  .instrument {
+    padding: var(--s-3) var(--s-3);
+  }
+
+  .instrName,
+  .instrNote {
+    font-size: var(--t-mini);
+  }
+
+  .instrKey {
+    min-width: 1.25rem;
+    font-size: var(--t-micro);
+  }
+
+  /* Nothing pans or zooms on a stacked sheet, so the tray does not claim it. */
+  .instrFoot {
+    display: none;
   }
 
   .notes {
     order: 1;
-    padding: var(--s-4);
   }
 
   .headlineName {

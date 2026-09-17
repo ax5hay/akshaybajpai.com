@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useInstruments } from '@/components/system/InstrumentProvider';
 import { ModeSelector } from '@/components/system/ModeSelector';
-import { useToast } from '@/components/system/ToastProvider';
 import { usePlateMeta } from './PlateMetaProvider';
 import { SheetIndex, type IndexEntry } from './SheetIndex';
 import styles from './SheetRail.module.css';
@@ -13,65 +13,19 @@ import styles from './SheetRail.module.css';
 // The lens is only ever needed on demand, so it stays out of the entry bundle.
 const Loupe = dynamic(() => import('./Loupe').then((m) => m.Loupe), { ssr: false });
 
-function isTyping(target: EventTarget | null): boolean {
-  const el = target as HTMLElement | null;
-  return Boolean(el?.closest('input, textarea, select, [contenteditable="true"]'));
-}
-
 export function SheetRail({ entries }: { entries: IndexEntry[] }) {
   const { meta } = usePlateMeta();
   const pathname = usePathname();
-  const { toast } = useToast();
+  const { lensOn, toggleLens, indexOpen, openIndex, closeIndex } = useInstruments();
 
-  const [indexOpen, setIndexOpen] = useState(false);
-  const [lensOn, setLensOn] = useState(false);
   const [condensed, setCondensed] = useState(false);
 
   const isKeyPlan = pathname === '/' || pathname === '';
-  const closeIndex = useCallback(() => setIndexOpen(false), []);
 
   // Route changes stow transient chrome.
   useEffect(() => {
-    setIndexOpen(false);
-  }, [pathname]);
-
-  const toggleLens = useCallback(() => {
-    setLensOn((on) => {
-      if (!on) {
-        toast({
-          kind: 'Lens deployed',
-          message: 'Drag the barrel across the sheet to read the negative.',
-          detail: 'Scroll to resize · Esc or double-click to stow',
-          tone: 'revision',
-        });
-      }
-      return !on;
-    });
-  }, [toast]);
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        setIndexOpen((v) => !v);
-        return;
-      }
-      if (event.metaKey || event.ctrlKey || event.altKey || isTyping(event.target)) return;
-
-      if (event.key === '/') {
-        event.preventDefault();
-        setIndexOpen(true);
-        return;
-      }
-      if (event.key.toLowerCase() === 'l') {
-        event.preventDefault();
-        toggleLens();
-      }
-    };
-
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [toggleLens]);
+    closeIndex();
+  }, [pathname, closeIndex]);
 
   // The rail thins once the reader is into the sheet, giving the drawing room.
   useEffect(() => {
@@ -112,7 +66,7 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
           <button
             type="button"
             className={styles.control}
-            onClick={() => setIndexOpen(true)}
+            onClick={openIndex}
             aria-haspopup="dialog"
           >
             <span className={styles.indexGlyph} aria-hidden="true">
@@ -149,7 +103,7 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
         currentSheet={meta.sheet}
       />
 
-      {lensOn && <Loupe onDismiss={() => setLensOn(false)} />}
+      {lensOn && <Loupe onDismiss={toggleLens} />}
     </>
   );
 }

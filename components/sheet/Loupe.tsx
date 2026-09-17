@@ -9,39 +9,39 @@ const MAX = 460;
 /** Barrel wall, in px. The x-ray is clipped inside it so the rim stays clean. */
 const WALL = 9;
 /** Enough to cover a dense sheet without drawing boxes nobody will look at. */
-const PROBE_LIMIT = 220;
+const PROBE_LIMIT = 420;
+/** Below this, a box has no room to print its own name legibly. */
+const LABEL_MIN_W = 58;
+const LABEL_MIN_H = 20;
 
-/** Everything worth naming when the lens passes over it. */
+/**
+ * Everything worth naming when the lens passes over it.
+ *
+ * `[class*="__"]` is the load-bearing one: every styled element in this site
+ * is a CSS module, and module class names always carry a `__` hash separator.
+ * Naming the modules individually meant the lens found the sheets but almost
+ * nothing inside them, which is the opposite of an x-ray.
+ */
 const PROBE_SELECTOR = [
+  '[class*="__"]',
   '[data-raw]',
   '[data-annotate]',
   '[data-bound]',
-  'main h1',
-  'main h2',
-  'main h3',
-  'main h4',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
   'main p',
   'main li',
-  'main dl',
   'main dt',
   'main dd',
-  'main figure',
-  'main figcaption',
-  'main table',
   'main th',
   'main td',
   'main pre',
   'main code',
-  'main strong',
   'main blockquote',
   'main img',
-  'main a',
-  'main button',
-  'main input',
-  'main textarea',
-  '[class*="_plate__"]',
-  '[class*="_notes__"]',
-  '[class*="_legend__"]',
+  'kbd',
 ].join(',');
 
 interface Probe {
@@ -103,10 +103,13 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
     document.querySelectorAll(PROBE_SELECTOR).forEach((el) => {
       if (seen.has(el) || found.length >= PROBE_LIMIT) return;
       seen.add(el);
+      // The lens is not part of the drawing and must not inspect itself.
+      if (el.closest(`.${styles.loupe}, .${styles.xray}`)) return;
 
       const r = el.getBoundingClientRect();
-      if (r.width < 24 || r.height < 9) return;
+      if (r.width < 16 || r.height < 7) return;
       if (r.bottom < 0 || r.top > window.innerHeight) return;
+      if (r.right < 0 || r.left > window.innerWidth) return;
 
       found.push({ x: r.x, y: r.y, w: r.width, h: r.height, label: describe(el) });
     });
@@ -126,17 +129,36 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
       xrayRef.current.style.clipPath = `circle(${half - WALL}px at ${x + half}px ${y + half}px)`;
     }
     if (readoutRef.current) {
-      // Smallest box containing the crosshair is the most specific thing there.
+      // Everything containing the crosshair, largest first, is the containment
+      // chain at that point. Reading it out is what makes the lens an
+      // inspector rather than a magnifier.
       const cx = x + half;
       const cy = y + half;
-      let best: Probe | null = null;
-      for (const p of probeList.current) {
-        if (cx < p.x || cx > p.x + p.w || cy < p.y || cy > p.y + p.h) continue;
-        if (!best || p.w * p.h < best.w * best.h) best = p;
+      const stack = probeList.current
+        .filter((p) => cx >= p.x && cx <= p.x + p.w && cy >= p.y && cy <= p.y + p.h)
+        .sort((a, b) => b.w * b.h - a.w * a.h);
+
+      const innermost = stack[stack.length - 1];
+      if (!innermost) {
+        readoutRef.current.textContent = `⌀ ${Math.round(size)}`;
+        return;
       }
-      readoutRef.current.textContent = best
-        ? `${best.label}  ${Math.round(best.w)} × ${Math.round(best.h)}`
-        : `⌀ ${Math.round(size)}`;
+
+      // A chain inside one component repeats its name at every level, which
+      // is three quarters of the readout saying nothing. Only the first
+      // mention keeps the component.
+      let owner = '';
+      const chain = stack.slice(-3).map((p) => {
+        const [component, part] = p.label.split('.');
+        if (!part) return p.label;
+        if (component === owner) return `.${part}`;
+        owner = component;
+        return p.label;
+      });
+
+      readoutRef.current.textContent = `${chain.join(' › ')}   ${Math.round(
+        innermost.w
+      )} × ${Math.round(innermost.h)}`;
     }
   }, [size]);
 
@@ -248,13 +270,18 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
             <g key={`${p.label}-${i}`}>
               <rect x={p.x} y={p.y} width={p.w} height={p.h} className={styles.box} />
               {/* Set inside the box: a label above it would be clipped away
-                  exactly when the lens is over that edge. */}
-              <text x={p.x + 5} y={p.y + 12} className={styles.boxLabel}>
-                {p.label}
-              </text>
-              <text x={p.x + 5} y={p.y + p.h - 5} className={styles.boxDim}>
-                {Math.round(p.w)} × {Math.round(p.h)}
-              </text>
+                  exactly when the lens is over that edge. Boxes too small to
+                  hold their own name are left to the readout. */}
+              {p.w >= LABEL_MIN_W && p.h >= LABEL_MIN_H && (
+                <>
+                  <text x={p.x + 4} y={p.y + 11} className={styles.boxLabel}>
+                    {p.label}
+                  </text>
+                  <text x={p.x + 4} y={p.y + p.h - 4} className={styles.boxDim}>
+                    {Math.round(p.w)} × {Math.round(p.h)}
+                  </text>
+                </>
+              )}
             </g>
           ))}
         </svg>

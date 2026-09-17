@@ -5,7 +5,8 @@
 **A personal site issued as a drawing set.**
 
 Every route is a numbered sheet. The homepage is the key plan those sheets sit on.<br/>
-A switch in the rail re-issues the entire set in three states.
+It is an instrument, not a brochure: re-issue the whole set in three states,<br/>
+or put an x-ray lens over any part of it and read what it is made of.
 
 <br/>
 
@@ -30,8 +31,9 @@ A switch in the rail re-issues the entire set in three states.
 
 ![The key plan, G-000](docs/media/key.png)
 
-<sub><b>G-000 · Key plan.</b> The homepage is a pannable, zoomable general arrangement.<br/>
-Every sheet in the set is drawn in place, with leader lines for cross-references.</sub>
+<sub><b>G-000 · Key plan.</b> The homepage is a pannable, zoomable general arrangement. Every sheet is<br/>
+drawn in place, joined by leaders with split-circle cross-reference bubbles. Hovering a sheet lights<br/>
+the ones it references and sends the rest back, so the plan reads out its own wiring.</sub>
 
 </div>
 
@@ -56,8 +58,9 @@ products stapled together. This version commits to **one metaphor, end to end**.
 | Sheet | Section | What it covers |
 |:------|:--------|:---------------|
 | [`G-001`](#the-idea) | **The idea** | Why a drawing set, and what that buys |
-| [`G-002`](#drawing-modes) | **Drawing modes** | The three states and why they are CSS-only |
-| [`G-003`](#sheet-registry) | **Sheet registry** | Numbering, disciplines, routes |
+| [`G-002`](#the-instruments) | **The instruments** | The lens, the index, the mode switch |
+| [`G-003`](#drawing-modes) | **Drawing modes** | The three states and why they are CSS-only |
+| [`G-004`](#sheet-registry) | **Sheet registry** | Numbering, disciplines, routes |
 | [`S-001`](#key-plan) | **Key plan** | Camera, level of detail, leader geometry |
 | [`S-002`](#how-a-plate-is-composed) | **Plate composition** | `PlateShell` and the component kit |
 | [`S-003`](#interaction-model) | **Interaction** | Keyboard, motion, accessibility |
@@ -105,10 +108,80 @@ than their section's.
 
 ---
 
+## The instruments
+
+A set that can be operated is worth nothing if nobody works out that it can be.
+So the tools are **printed on the first sheet you land on**, named, with their
+keys, as a block of plan furniture beside the general notes. Nothing here has to
+be discovered by clicking around and getting lucky.
+
+<table>
+<tr>
+<td width="46%" valign="top">
+
+![The instrument tray on the key plan](docs/media/tray.png)
+
+</td>
+<td width="54%" valign="top">
+
+**Drawn, not hidden.** The tray is a real part of the drawing, in the same
+reversed-header style as the legend and the general notes. Each row is a button
+that does the thing it describes, and each prints the keyboard shortcut for it.
+
+On a first visit the tray pulses three times and a toast says what the set can
+do. Both are `localStorage`-gated and never appear again, and both stop the
+moment anything is operated.
+
+On narrow screens the tray moves to the very top, above the name.
+
+</td>
+</tr>
+</table>
+
+### The inspection lens
+
+![The lens over S-201](docs/media/lens.png)
+
+<sub><b>The lens is an x-ray, not a magnifier.</b> It outlines, names, and measures every element it
+covers, and the readout under the barrel prints the containment chain at the crosshair.</sub>
+
+Optically it is a `backdrop-filter: invert()`, so the page underneath is
+recomposited rather than re-rendered. The technical layer is drawn once across
+the whole viewport and revealed through a moving `clip-path` circle, which makes
+a drag cost one style write instead of a re-measure of the page.
+
+- **Drag** the barrel, or nudge it with the arrow keys.
+- **Scroll** over it to change the diameter.
+- <kbd>Esc</kbd> or double-click to stow it.
+
+> [!WARNING]
+> The barrel shadow must be `box-shadow`, never `filter: drop-shadow()`. Any
+> `filter` on an ancestor makes it a **backdrop root**, which leaves the optic
+> with nothing behind it to invert and turns the lens into an empty circle.
+
+### The rest
+
+| Instrument | Key | What it does |
+|:-----------|:----|:-------------|
+| Inspection lens | <kbd>L</kbd> | Outlines, names, and measures whatever it covers |
+| Sheet index | <kbd>/</kbd> | Fuzzy-ranked search across the whole set |
+| Drawing mode | <kbd>D</kbd> | Cycles artifact, annotated, raw |
+| Comparison sliders | <kbd>←</kbd> <kbd>→</kbd> | Native range input, so keyboard and screen readers work unmodified |
+| Key plan camera | drag, scroll | Pan and zoom, with level of detail tied to scale |
+
+State for the lens and the index lives in `InstrumentProvider`, above the rail,
+precisely so that any surface can offer them. The key plan is the surface that
+takes it up.
+
+---
+
 ## Drawing modes
 
 The switch in the rail re-issues the set. This is the *dev-aligned* view of the
 site, and it is a first-class state rather than a debug toggle.
+
+**The three modes differ in what they say, not only in what colour they say it
+in.** Each one adds or removes real content.
 
 <table>
 <tr>
@@ -118,9 +191,12 @@ site, and it is a first-class state rather than a debug toggle.
 
 **`REV B` · Annotated**
 
-Cyanotype. Line work reverses to white and the markup pen turns on: numbered
-margin notes on leader lines, dimensions, and labels for the sheet's own anatomy.
-The dimension line measures itself and prints the real rendered width.
+Cyanotype, and the markup pen turns on. The key plan grows a chain dimension
+across the composition, a revision cloud and triangle over the most recently
+issued sheet, and a placement note on every sheet giving its grid reference,
+its size in plan units, and its discipline. On a content sheet you get numbered
+margin callouts on leader lines and dimension lines that measure themselves and
+print the real rendered width.
 
 </td>
 <td width="50%" valign="top">
@@ -129,15 +205,20 @@ The dimension line measures itself and prints the real rendered width.
 
 **`REV C` · Raw**
 
-Presentation stripped. The sheet's record (frontmatter, discipline, refs, word
-count) followed by the verbatim Markdown it was drawn from.
+Presentation stripped. Each sheet on the plan replaces its contents table with
+the record it was drawn from: route, source file, id, discipline, rect, refs,
+entry count. The title block states the plan's own provenance. On a content
+sheet the prose stays, every structural element is outlined and labelled with
+its part name, and the verbatim Markdown is printed at the top.
 
 </td>
 </tr>
 </table>
 
-`REV A · Artifact` is the drawing as issued: warm stock, dense ink, nothing but
-the work. It is the default, and it carries no markup at all.
+`REV A · Artifact` is the drawing as issued, and it is the default. Warm stock,
+a board a full tone deeper than the sheets pinned to it, ink-weight sheet
+boundaries, ruled contents tables, and reversed header bars on the furniture. No
+markup at all, because an issued print does not carry any.
 
 ### Why it is CSS-only
 
@@ -158,7 +239,9 @@ flowchart LR
 Three consequences worth keeping:
 
 1. **All three modes ship as static markup.** No second render, no hydration
-   flash. The server already emitted every mode's content.
+   flash. The server already emitted every mode's content, including the
+   records and the markup layer, which is why they can differ in substance and
+   still cost nothing to switch between.
 2. **The mode resolves before first paint**, so the sheet never renders on paper
    and then re-inks to blueprint.
 3. **Switching repaints but never reflows.** The measure is the same width in all
@@ -227,8 +310,24 @@ Things to know before editing it:
 - **Leaders run between plate *edges*, not centres.** A centre-to-centre line
   would pass under an opaque sheet and never be seen, so each end is pulled back
   to the boundary and the run lives in the gutters.
+- **Cross-reference bubbles walk the leader until they find room.** The split
+  circle naming each pair is drawn under the sheets, so it steps along the line
+  from the midpoint outward and takes the first spot no plate covers. A leader
+  with no clear spot simply goes unlabelled, as it would on paper.
+- **Hovering reads out the subgraph.** The hovered sheet, everything it
+  references, and everything that references it all stay lit and take the
+  accent; the rest fall back to 32% opacity.
+- **The furniture is data, not decoration.** The revision schedule in the legend
+  is derived from the sheets themselves, so it cannot drift out of date.
 - **Narrow screens get a stacked index.** Pan and zoom need a pointer and room
-  for the plan; below `60rem` the same registry renders as a list.
+  for the plan; below `60rem` the same registry renders as a list, led by the
+  instrument tray.
+
+The composition is tuned for artifact mode specifically, because that is the
+only mode that has to earn its contrast rather than getting it free from a dark
+field: the board sits a full tone under the sheets, sheet boundaries are drawn
+in ink rather than in a tint, each sheet carries a ruled title strip, and the
+three furniture blocks share a bottom datum so their reversed headers line up.
 
 ---
 
@@ -266,7 +365,8 @@ metric schedule, and adjacent sheets.
 | `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
 | `sheet/TitleBlock` | Expandable bottom-right title block |
 | `sheet/SheetIndex` | Full-set search, fuzzy-ranked |
-| `sheet/Loupe` | Draggable inspection lens |
+| `sheet/Loupe` | Draggable x-ray inspection lens |
+| `system/InstrumentProvider` | Owns the lens and index so any surface can offer them |
 | `system/ToastProvider` | Rubber-stamp toasts |
 
 ---
@@ -279,11 +379,16 @@ metric schedule, and adjacent sheets.
 | <kbd>D</kbd> | Cycle drawing mode |
 | <kbd>L</kbd> | Toggle the inspection loupe |
 | <kbd>Esc</kbd> | Close the index, or stow the loupe |
-| <kbd>←</kbd> <kbd>→</kbd> | Move the comparison divider, or walk the mode switch |
+| <kbd>←</kbd> <kbd>→</kbd> | Move the comparison divider, nudge the lens, or walk the mode switch |
 
-Shortcuts are suppressed while typing in a field. Under `prefers-reduced-motion`
-all motion is removed (including the key plan's camera fly) and every reveal
-falls back to its final state rather than staying invisible.
+Shortcuts are suppressed while typing in a field, and every one of them is also
+printed as a button on the key plan's instrument tray, so the site is fully
+operable without knowing a single key.
+
+Under `prefers-reduced-motion` all motion is removed, including the key plan's
+camera fly and the tray's first-visit pulse. Staggered entrances reset their
+`animation-delay` as well as their duration, because a `backwards` fill would
+otherwise hold each element at its start keyframe for the length of the delay.
 
 ---
 

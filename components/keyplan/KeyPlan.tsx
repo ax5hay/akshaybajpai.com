@@ -14,7 +14,10 @@ import {
   type KeyPlanRect,
   type PlacedPlate,
 } from '@/lib/plates';
+import { useInstruments } from '@/components/system/InstrumentProvider';
+import { useMode } from '@/components/system/ModeProvider';
 import { useToast } from '@/components/system/ToastProvider';
+import { MODE_INFO, MODES } from '@/lib/mode';
 import styles from './KeyPlan.module.css';
 
 export interface PlateItem {
@@ -31,6 +34,8 @@ const MAX_SCALE = 2.6;
 const FLY_MS = 340;
 /** Travel, in px, that separates a click on a sheet from a pan of the plan. */
 const DRAG_SLOP = 4;
+/** Radius of a cross-reference bubble, in plan units. */
+const XREF_R = 17;
 
 interface Camera {
   scale: number;
@@ -94,6 +99,9 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   const plates = useMemo(() => keyPlanPlates(), []);
   const router = useRouter();
   const { toast } = useToast();
+  const { toggleLens, openIndex, lensOn, inviting } = useInstruments();
+  const { mode, cycleMode } = useMode();
+  const nextMode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
 
   const stageRef = useRef<HTMLDivElement>(null);
   const [camera, setCamera] = useState<Camera>({ scale: 1, x: 0, y: 0 });
@@ -319,11 +327,38 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     return runs;
   }, [plates]);
 
+  /**
+   * Sheets joined to the one under the cursor, in either direction. Hovering
+   * anything on the plan reads its cross-references out loud: the pair stays
+   * lit and everything unrelated falls back, so the set shows how it is wired
+   * without the reader having to open a thing.
+   */
+  const lit = useMemo(() => {
+    if (!hovered) return null;
+    const live = new Set<string>([hovered]);
+    for (const plate of plates) {
+      if (plate.sheet === hovered) plate.refs.forEach((r) => live.add(r));
+      else if (plate.refs.includes(hovered)) live.add(plate.sheet);
+    }
+    return live;
+  }, [hovered, plates]);
+
   /** The sheet at the highest revision gets the cloud, as on a real issue. */
   const revised = useMemo(
     () => plates.reduce((a, b) => (b.revision > a.revision ? b : a)),
     [plates],
   );
+
+  /** Which sheets stand at which revision, newest issue first. */
+  const revisions = useMemo(() => {
+    const byRev = new Map<string, string[]>();
+    for (const plate of plates) {
+      const list = byRev.get(plate.revision) ?? [];
+      list.push(plate.sheet);
+      byRev.set(plate.revision, list);
+    }
+    return [...byRev.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  }, [plates]);
 
   /**
    * Leaders are drawn between plate edges, not centres: a line that runs
@@ -348,6 +383,29 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     x: p.rect.x + p.rect.w / 2,
     y: p.rect.y + p.rect.h / 2,
   });
+
+  /**
+   * Bubbles are drawn under the sheets, so one placed over a plate would be
+   * half eaten by it. Walk out from the midpoint of the leader and take the
+   * first clear spot; a leader with no clear spot goes unlabelled, exactly as
+   * it would on paper.
+   */
+  const bubbleOn = (pa: { x: number; y: number }, pb: { x: number; y: number }) => {
+    const clear = (m: { x: number; y: number }) =>
+      !plates.some(
+        (p) =>
+          m.x > p.rect.x - XREF_R &&
+          m.x < p.rect.x + p.rect.w + XREF_R &&
+          m.y > p.rect.y - XREF_R &&
+          m.y < p.rect.y + p.rect.h + XREF_R
+      );
+
+    for (const t of [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74]) {
+      const m = { x: pa.x + (pb.x - pa.x) * t, y: pa.y + (pb.y - pa.y) * t };
+      if (clear(m)) return m;
+    }
+    return null;
+  };
 
   return (
     <section className={styles.stage} aria-label="Key plan, general arrangement">
@@ -383,7 +441,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             {leaders.map(({ key, a, b }) => {
               const pa = edgePoint(a, centre(b));
               const pb = edgePoint(b, centre(a));
-              const lit = hovered === a.sheet || hovered === b.sheet;
+              const on = hovered === a.sheet || hovered === b.sheet;
               return (
                 <line
                   key={key}
@@ -392,8 +450,31 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                   x2={pb.x}
                   y2={pb.y}
                   className={styles.leader}
-                  data-lit={lit || undefined}
+                  data-lit={on || undefined}
                 />
+              );
+            })}
+
+            {/* Cross-reference bubbles, the split circle a drawing uses to
+                name the two sheets a leader joins. They are what keeps the
+                gutters worth looking at when no markup layer is on. */}
+            {leaders.map(({ key, a, b }) => {
+              const pa = edgePoint(a, centre(b));
+              const pb = edgePoint(b, centre(a));
+              const m = bubbleOn(pa, pb);
+              if (!m) return null;
+              const on = hovered === a.sheet || hovered === b.sheet;
+              return (
+                <g key={`b${key}`} className={styles.xref} data-lit={on || undefined}>
+                  <circle cx={m.x} cy={m.y} r={XREF_R} />
+                  <line x1={m.x - XREF_R} y1={m.y} x2={m.x + XREF_R} y2={m.y} />
+                  <text x={m.x} y={m.y - 3.5}>
+                    {a.sheet}
+                  </text>
+                  <text x={m.x} y={m.y + 10}>
+                    {b.sheet}
+                  </text>
+                </g>
               );
             })}
           </svg>
@@ -451,21 +532,8 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               </text>
             </g>
 
-            {/* Every cross-reference names the pair it joins. */}
-            {leaders.map(({ key, a, b }) => {
-              const pa = edgePoint(a, centre(b));
-              const pb = edgePoint(b, centre(a));
-              return (
-                <text
-                  key={`l${key}`}
-                  x={(pa.x + pb.x) / 2}
-                  y={(pa.y + pb.y) / 2 - 4}
-                  className={styles.xrefText}
-                >
-                  {a.sheet}/{b.sheet}
-                </text>
-              );
-            })}
+            {/* Cross-references are named by the bubbles on the leader layer
+                in every mode, so the markup layer does not repeat them. */}
 
             {/* Revision cloud and triangle over the most recently issued sheet. */}
             <path
@@ -517,6 +585,8 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               data-discipline={plate.discipline}
               style={{ ...place(plate.rect), '--i': index } as React.CSSProperties}
               data-wide={plate.rect.w >= 600 || undefined}
+              data-linked={(lit && plate.sheet !== hovered && lit.has(plate.sheet)) || undefined}
+              data-dim={(lit && !lit.has(plate.sheet)) || undefined}
               onClick={(e) => onPlateClick(e, plate)}
               onMouseEnter={() => setHovered(plate.sheet)}
               onMouseLeave={() => setHovered(null)}
@@ -588,7 +658,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
           ))}
 
           <div className={styles.notes} style={place(KEY_PLAN_FURNITURE.notes)}>
-            <span className={styles.notesTitle}>General Notes</span>
+            <span className={styles.furnitureTitle}>General Notes</span>
             <ol className={styles.notesList}>
               {GENERAL_NOTES.map((note, i) => (
                 <li key={i} className={styles.note}>
@@ -601,8 +671,73 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             </ol>
           </div>
 
+          {/* Instrument tray. The set can be operated, and this is where it
+              says so: named tools with their keys, on the plan itself, so no
+              one has to discover them by chance. */}
+          <div
+            className={styles.instruments}
+            style={place(KEY_PLAN_FURNITURE.instruments)}
+            data-inviting={inviting || undefined}
+          >
+            <span className={styles.furnitureTitle}>Instruments</span>
+
+            <button
+              type="button"
+              className={styles.instrument}
+              onClick={toggleLens}
+              aria-pressed={lensOn}
+            >
+              <svg className={styles.instrGlyph} viewBox="0 0 16 16" aria-hidden="true">
+                <circle cx="6.5" cy="6.5" r="4.6" fill="none" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M10 10l4.4 4.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" />
+                <path d="M4.2 6.5h4.6M6.5 4.2v4.6" stroke="currentColor" strokeWidth="0.8" />
+              </svg>
+              <span className={styles.instrText}>
+                <span className={styles.instrName}>Inspection lens</span>
+                <span className={styles.instrNote}>
+                  {lensOn ? 'Deployed. Drag it over the sheet.' : 'X-ray anything it covers'}
+                </span>
+              </span>
+              <kbd className={styles.instrKey}>L</kbd>
+            </button>
+
+            <button type="button" className={styles.instrument} onClick={openIndex}>
+              <svg className={styles.instrGlyph} viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M1.5 3.5h13M1.5 8h13M1.5 12.5h13"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                />
+              </svg>
+              <span className={styles.instrText}>
+                <span className={styles.instrName}>Sheet index</span>
+                <span className={styles.instrNote}>Jump to any sheet in the set</span>
+              </span>
+              <kbd className={styles.instrKey}>/</kbd>
+            </button>
+
+            <button type="button" className={styles.instrument} onClick={cycleMode}>
+              <svg className={styles.instrGlyph} viewBox="0 0 16 16" aria-hidden="true">
+                <circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M8 1.8a6.2 6.2 0 0 0 0 12.4z" fill="currentColor" />
+              </svg>
+              <span className={styles.instrText}>
+                <span className={styles.instrName}>Drawing mode</span>
+                <span className={styles.instrNote}>
+                  Rev {MODE_INFO[mode].rev}, {MODE_INFO[mode].label.toLowerCase()}. Next is{' '}
+                  {MODE_INFO[nextMode].label.toLowerCase()}.
+                </span>
+              </span>
+              <kbd className={styles.instrKey}>D</kbd>
+            </button>
+
+            <span className={styles.instrFoot}>
+              Drag to pan · Scroll to zoom · Click any sheet to open it
+            </span>
+          </div>
+
           <div className={styles.legend} style={place(KEY_PLAN_FURNITURE.legend)} aria-hidden="true">
-            <span className={styles.legendTitle}>Legend</span>
+            <span className={styles.furnitureTitle}>Legend</span>
             <span className={styles.legendRow}>
               <span className={styles.legendSwatch} data-kind="sheet" />
               Sheet boundary
@@ -627,6 +762,16 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               <span className={styles.legendSwatch} data-kind="record" />
               Sheet record, as authored
             </span>
+            {/* Revision schedule, read off the sheets rather than written
+                down twice. Dense small type is what a drawing is made of. */}
+            <span className={styles.revTitle}>Revision schedule</span>
+            {revisions.map(([rev, sheets]) => (
+              <span key={rev} className={styles.revRow}>
+                <span className={styles.revLetter}>{rev}</span>
+                <span className={styles.revSheets}>{sheets.join('  ')}</span>
+              </span>
+            ))}
+
             <span className={styles.legendScale}>
               <span className={styles.scaleBar} />
               <span>Plan 1:50 at fit</span>
@@ -671,9 +816,6 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
         </button>
       </div>
 
-      <p className={styles.hint} aria-hidden="true">
-        Drag to pan · Scroll to zoom
-      </p>
     </section>
   );
 }
