@@ -6,6 +6,7 @@ import { SkipLink } from '@/components/SkipLink';
 import { EmbeddedDetectScript } from '@/components/EmbeddedDetectScript';
 import { RevealObserver } from '@/components/RevealObserver';
 import { HomeHeroBodyClass } from '@/components/HomeHeroBodyClass';
+import { AnonymizationNotice } from '@/components/AnonymizationNotice';
 import { buildMetadata } from '@/lib/metadata';
 
 const instrumentSerif = Instrument_Serif({
@@ -33,7 +34,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = buildMetadata({
   title: 'Akshay Bajpai | AI Architect & Technology Leader — LLMs, RAG, ML Systems',
   description:
-    'Akshay Bajpai — AI Architect & Technology Leader. Expert in LLMs, RAG pipelines, scalable AI systems. Published researcher, 97.5% Master\'s distinction.',
+    'Akshay Bajpai — forward-deployed AI engineer and architect. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical & insurance document AI. Springer author; MSc AI with distinction.',
   path: '/',
 });
 
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SkipLink />
         <HomeHeroBodyClass />
         <RevealObserver />
+        <AnonymizationNotice />
         {children}
       </body>
     </html>

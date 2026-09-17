@@ -19,8 +19,8 @@ export default function ContactPage() {
         <PageHero section="contact" title="Contact" lead="Let's build something that matters." />
         <div data-reveal>
           <p className={styles.prose}>
-            For consulting, speaking, or collaboration on AI infrastructure, systems design, or
-            performance engineering, reach out.
+            For forward-deployed AI work, architecture reviews, speaking, or collaboration on systems design and
+            performance engineering, use the form below or connect on LinkedIn and GitHub.
           </p>
           <nav className={styles.links} aria-label="Contact links" data-reveal-stagger>
             <a href={`mailto:${SOCIAL.email}`} className="link-hover">{SOCIAL.email}</a>

@@ -4,7 +4,7 @@ description: "How to design AI systems in healthcare: compliance, safety, and th
 pubDate: 2025-03-01
 ---
 
-Healthcare AI is not “AI plus healthcare.” It is a domain where errors can harm patients, data is highly regulated, and the end user is often a clinician who must trust and override the system. Architecture has to reflect that from day one.
+Healthcare AI is not “AI plus healthcare.” It is a domain where errors can harm patients, data is highly regulated, and the end user is often a clinician who must trust and override the system. Architecture has to reflect that from day one — whether you are extracting structured variables from EHRs at thousands of documents per day ([clinical NLP](/work/clinical-nlp-ehr-extraction/)), running multimodal pipelines under HIPAA-aware AWS ([finance & health agents](/work/agentic-finance-healthcare-ai/)), or grounding programme KPIs so LLM narratives never invent counts ([AIDA](/work/aida-health-programme-intelligence/)).
 
 ## Safety and accountability
 

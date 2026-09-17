@@ -60,9 +60,18 @@ export function personJsonLd() {
     alternateName: ['ax5hay', 'Akshay Bajpai AI'],
     url: SITE_URL,
     image: `${SITE_URL}/logo.png`,
-    jobTitle: 'AI Architect & Technology Leader',
+    jobTitle: 'Senior Full Stack AI Engineer · Forward Deployment',
     description:
-      "Akshay Bajpai — AI Architect and Technology Leader. Expert in LLMs, RAG pipelines, and scalable AI systems.",
+      'Forward-deployed AI engineer: multi-tenant LLM platforms, governed NL2SQL, agentic orchestration (LangGraph, MCP), hybrid RAG, clinical and operational document intelligence, AWS CDK and MLOps.',
+    knowsAbout: [
+      'Large language models',
+      'Retrieval-augmented generation',
+      'Agentic AI',
+      'MLOps',
+      'FastAPI',
+      'React',
+      'AWS',
+    ],
     sameAs: [
       'https://linkedin.com/in/ax5hay',
       'https://github.com/ax5hay',

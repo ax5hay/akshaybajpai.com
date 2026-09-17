@@ -4,7 +4,7 @@ description: "Where AI actually helps in restaurant operations, order prediction
 pubDate: 2025-02-25
 ---
 
-Restaurants run on thin margins and chaotic inputs: weather, events, no-shows, and daily specials. AI can help in narrow, well-defined areas. It can also waste time and money if applied where the problem is process, not prediction. This post is about the former.
+While founding engineering on a restaurant SaaS pilot (200+ sites), the wins came from the back of the house — not chatbots at the register. Restaurants run on thin margins and chaotic inputs: weather, events, no-shows, and daily specials. AI can help in narrow, well-defined areas. It can also waste time and money if applied where the problem is process, not prediction. This post is about the former; the [restaurant forecasting case study](/work/restaurant-saas-demand-forecasting/) covers what we shipped.
 
 ## Where AI helps
 

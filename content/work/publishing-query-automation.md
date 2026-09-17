@@ -1,8 +1,8 @@
 ---
-title: "BookLeaf AI Automation — Publishing Support at Scale"
+title: "Publishing AI Automation — Multi-Channel Support at Scale"
 description: "Multi-channel author query automation with intent classification, hybrid RAG, unified identity across WhatsApp and email, and confidence-gated human escalation."
 pubDate: 2025-09-17
-client: "BookLeaf Publishing"
+client: "Publishing · client engagement"
 stack: ["Node.js", "TypeScript", "Express", "Supabase", "OpenAI GPT-4", "Redis", "Docker"]
 metrics: ["5 communication channels", "Hybrid semantic + keyword RAG", "Entity extraction for ISBNs and titles"]
 ---

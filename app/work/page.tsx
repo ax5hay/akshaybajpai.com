@@ -41,15 +41,15 @@ export default async function WorkIndexPage() {
           eyebrow={`Work · ${cases.length} case ${cases.length === 1 ? 'study' : 'studies'}`}
           lead={
             <>
-              Open-source systems and research from{' '}
+              Forward-deployed client systems, open-source platforms, and research builds from{' '}
               <a href="https://github.com/ax5hay" className="link-hover">
                 @ax5hay
               </a>
-              — architecture, tradeoffs, and lessons from each build.
+              — architecture, tradeoffs, and lessons from production delivery.
             </>
           }
         />
-        <WorkIndex items={items} tags={tags} featuredSlug="neural-map-personal-site" />
+        <WorkIndex items={items} tags={tags} featuredSlug="forward-deployed-multi-tenant-fertility-ai" />
       </ContentPage>
     </PageShell>
   );
