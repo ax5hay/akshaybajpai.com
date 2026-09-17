@@ -151,7 +151,7 @@ export const PLATES: Plate[] = [
     scale: 'NTS',
     revision: 'B',
     refs: ['A-101', 'W-400'],
-    rect: { x: 1240, y: 420, w: 460, h: 180 },
+    rect: { x: 1240, y: 420, w: 460, h: 200 },
   },
 ];
 
@@ -198,9 +198,18 @@ export const KEY_PLAN_HEIGHT = 900;
 
 /** Non-navigable furniture drawn alongside the plates. */
 export const KEY_PLAN_FURNITURE = {
-  headline: { x: 0, y: 0, w: 420, h: 130 },
-  notes: { x: 460, y: 665, w: 740, h: 225 },
-  legend: { x: 1240, y: 620, w: 460, h: 270 },
+  headline: { x: 0, y: 0, w: 430, h: 145 },
+  notes: { x: 460, y: 665, w: 450, h: 225 },
+  /**
+   * The instrument tray. It shares the bottom band with the notes so that the
+   * lens, the index and the drawing modes are printed on the first sheet a
+   * reader ever sees, rather than waiting to be found in the rail.
+   */
+  instruments: { x: 930, y: 665, w: 270, h: 225 },
+  /* Shares the datum with the notes and the tray: three header bars on one
+     line is what makes the bottom of the plan read as drawn rather than as
+     three boxes that happened to land near each other. */
+  legend: { x: 1240, y: 665, w: 460, h: 225 },
 } as const;
 
 /**

@@ -6,6 +6,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { SkipLink } from '@/components/SkipLink';
 import { RevealObserver } from '@/components/RevealObserver';
 import { ModeScript } from '@/components/system/ModeScript';
+import { InstrumentProvider } from '@/components/system/InstrumentProvider';
 import { ModeProvider } from '@/components/system/ModeProvider';
 import { ToastProvider } from '@/components/system/ToastProvider';
 import { PlateMetaProvider } from '@/components/sheet/PlateMetaProvider';
@@ -64,16 +65,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body suppressHydrationWarning>
         <ToastProvider>
           <ModeProvider>
-            <PlateMetaProvider>
-              <SkipLink />
-              <RevealObserver />
-              <SheetFrame />
-              <SheetRail entries={sheetIndex} />
-              <main id="main-content" className="plate-main">
-                {children}
-              </main>
-              <TitleBlock />
-            </PlateMetaProvider>
+            <InstrumentProvider>
+              <PlateMetaProvider>
+                <SkipLink />
+                <RevealObserver />
+                <SheetFrame />
+                <SheetRail entries={sheetIndex} />
+                <main id="main-content" className="plate-main">
+                  {children}
+                </main>
+                <TitleBlock />
+              </PlateMetaProvider>
+            </InstrumentProvider>
           </ModeProvider>
         </ToastProvider>
       </body>

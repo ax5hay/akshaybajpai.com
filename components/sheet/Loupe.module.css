@@ -64,9 +64,12 @@
 
 /* The field behind is a dark inversion in all three modes, so the technical
    layer sets its own light palette instead of following the mode accent. */
+/* Outline only. Boxes nest several deep under the barrel, and even a faint
+   fill stacks into a solid wash that hides the sheet the lens is meant to be
+   revealing. */
 .box {
-  fill: rgba(127, 212, 255, 0.05);
-  stroke: #7fd4ff;
+  fill: none;
+  stroke: rgba(127, 212, 255, 0.72);
   stroke-width: 1;
   stroke-dasharray: 4 3;
 }
@@ -145,6 +148,9 @@
   letter-spacing: 0.1em;
   color: var(--ink-2);
   white-space: nowrap;
+  max-width: min(30rem, 88vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-variant-numeric: tabular-nums;
   /* Names whatever is under the crosshair, so it has to stay legible against
      the sheet rather than the inverted field. */

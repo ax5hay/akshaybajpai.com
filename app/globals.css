@@ -95,25 +95,28 @@
 html[data-mode='artifact'] {
   color-scheme: light;
 
-  /* The board is a tone deeper than the sheets pinned to it. That gap is what
-     gives this mode its figure and ground; the dark modes get theirs free. */
-  --paper: #e7dfce;
-  --paper-deep: #dbd1bc;
-  --paper-raised: #fbf8f1;
-  --paper-sunk: #d5cab4;
+  /* Figure and ground. The dark modes get theirs free: white line on a deep
+     field is contrast without effort. Paper has to earn it, so the board is
+     pushed down to kraft and the sheets stay near white. That spread is the
+     whole reason this mode reads as objects on a surface rather than as a
+     flat cream rectangle, and it is what every other token here protects. */
+  --paper: #ded2b8;
+  --paper-deep: #cec0a0;
+  --paper-raised: #fcfaf4;
+  --paper-sunk: #c7b895;
 
-  --ink: #17171a;
-  --ink-2: #55514a;
-  --ink-3: #8a8377;
-  --ink-4: #a89f8d;
+  --ink: #141417;
+  --ink-2: #413c34;
+  --ink-3: #6f675a;
+  --ink-4: #948a75;
 
-  --rule-faint: rgba(23, 23, 26, 0.09);
-  --rule: rgba(23, 23, 26, 0.22);
-  --rule-strong: rgba(23, 23, 26, 0.55);
-  --rule-ink: rgba(23, 23, 26, 0.85);
+  --rule-faint: rgba(20, 20, 23, 0.12);
+  --rule: rgba(20, 20, 23, 0.28);
+  --rule-strong: rgba(20, 20, 23, 0.62);
+  --rule-ink: rgba(20, 20, 23, 0.9);
 
-  --grid-minor: rgba(23, 23, 26, 0.055);
-  --grid-major: rgba(23, 23, 26, 0.1);
+  --grid-minor: rgba(20, 20, 23, 0.06);
+  --grid-major: rgba(20, 20, 23, 0.115);
   --grid-size: 24px;
 
   /* Vermilion: revision marks, callout leaders, the one hot colour on paper */
@@ -123,11 +126,19 @@ html[data-mode='artifact'] {
   --accent-2: #2f5d8c;
   --accent-2-soft: rgba(47, 93, 140, 0.13);
 
-  --shadow-lift: 0 1px 1px rgba(58, 45, 26, 0.07), 0 10px 26px -14px rgba(58, 45, 26, 0.3);
-  --shadow-deep: 0 2px 4px rgba(58, 45, 26, 0.1), 0 28px 64px -24px rgba(58, 45, 26, 0.45);
+  /* Paper has thickness. A tight contact shadow reads as the edge of the
+     stock, the long one as the gap between sheet and board. */
+  --shadow-lift: 0 1px 0 rgba(46, 35, 18, 0.13), 0 2px 3px rgba(46, 35, 18, 0.1),
+    0 14px 30px -16px rgba(46, 35, 18, 0.42);
+  --shadow-deep: 0 2px 0 rgba(46, 35, 18, 0.16), 0 6px 10px rgba(46, 35, 18, 0.14),
+    0 34px 70px -24px rgba(46, 35, 18, 0.55);
 
   --grain-opacity: 0.4;
   --grain-blend: multiply;
+
+  /* Light falling across the top of a sheet. Paper catches it; a backlit
+     screen pretending to be a blueprint barely should. */
+  --sheet-sheen: rgba(255, 255, 255, 0.85);
 
   --font-display: var(--font-serif);
   --font-body: var(--font-sans);
@@ -172,6 +183,8 @@ html[data-mode='annotated'] {
   --grain-opacity: 0.16;
   --grain-blend: overlay;
 
+  --sheet-sheen: rgba(157, 207, 255, 0.07);
+
   --font-display: var(--font-mono);
   --font-body: var(--font-sans);
   --font-label: var(--font-mono);
@@ -213,6 +226,9 @@ html[data-mode='raw'] {
 
   --grain-opacity: 0.05;
   --grain-blend: overlay;
+
+  /* Raw mode is deliberately unlit. Nothing here pretends to be an object. */
+  --sheet-sheen: transparent;
 
   --font-display: var(--font-mono);
   --font-body: var(--font-mono);
