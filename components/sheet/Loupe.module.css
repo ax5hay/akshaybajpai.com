@@ -12,7 +12,11 @@
   cursor: grab;
   touch-action: none;
   will-change: transform;
-  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55));
+  /* Must not be `filter: drop-shadow()`. Any filter on an ancestor makes it a
+     backdrop root, which leaves .field with nothing behind it to invert and
+     turns the lens into an empty circle. box-shadow follows border-radius and
+     forms no backdrop root. */
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
 .loupe[data-dragging] {

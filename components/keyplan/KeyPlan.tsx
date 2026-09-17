@@ -26,6 +26,8 @@ export type KeyPlanContents = Record<string, PlateItem[]>;
 const MIN_SCALE = 0.35;
 const MAX_SCALE = 2.6;
 const FLY_MS = 340;
+/** Travel, in px, that separates a click on a sheet from a pan of the plan. */
+const DRAG_SLOP = 4;
 
 interface Camera {
   scale: number;
@@ -56,7 +58,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
 
   // Drag bookkeeping lives in a ref so pointermove never triggers a render
   // it does not need; only the camera state does.
-  const drag = useRef({ active: false, moved: 0, px: 0, py: 0, ox: 0, oy: 0 });
+  const drag = useRef({ active: false, moved: 0, px: 0, py: 0, ox: 0, oy: 0, captured: false });
   const flyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /** Camera that frames the whole plan inside the stage. */
@@ -140,9 +142,12 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       py: event.clientY,
       ox: camera.x,
       oy: camera.y,
+      captured: false,
     };
     setAnimating(false);
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    // Capture is deliberately NOT taken here. Capturing on pointerdown makes
+    // the browser retarget the subsequent click to the capturing element, so
+    // every sheet on the plan would stop being clickable.
   };
 
   const onPointerMove = (event: React.PointerEvent) => {
@@ -151,13 +156,24 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     const dx = event.clientX - d.px;
     const dy = event.clientY - d.py;
     d.moved = Math.max(d.moved, Math.abs(dx) + Math.abs(dy));
+
+    // Once this is unambiguously a pan, take the pointer so the drag survives
+    // leaving the surface. By now the gesture can no longer become a click.
+    if (!d.captured && d.moved > DRAG_SLOP) {
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+      d.captured = true;
+    }
+
     setCamera((cam) => ({ ...cam, x: d.ox + dx, y: d.oy + dy }));
   };
 
   const endDrag = (event: React.PointerEvent) => {
     if (!drag.current.active) return;
     drag.current.active = false;
-    (event.currentTarget as HTMLElement).releasePointerCapture?.(event.pointerId);
+    if (drag.current.captured) {
+      (event.currentTarget as HTMLElement).releasePointerCapture?.(event.pointerId);
+      drag.current.captured = false;
+    }
   };
 
   /** Move the camera to frame one plate, then hand off to the router. */
@@ -185,7 +201,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     plate: PlacedPlate
   ) => {
     // A drag that ends over a plate is a pan, not a click.
-    if (drag.current.moved > 4) {
+    if (drag.current.moved > DRAG_SLOP) {
       event.preventDefault();
       drag.current.moved = 0;
       return;
