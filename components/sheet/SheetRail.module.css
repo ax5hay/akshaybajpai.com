@@ -1,0 +1,210 @@
+.rail {
+  position: fixed;
+  top: var(--sheet-margin);
+  left: var(--sheet-margin);
+  right: var(--sheet-margin);
+  z-index: var(--z-rail);
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  height: var(--rail-h, 3.25rem);
+  padding: 0 var(--s-3);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border-bottom: var(--lw-thin) solid var(--rule);
+  transition: height var(--d-2) var(--ease-mech), border-color var(--d-2);
+}
+
+.rail[data-condensed] {
+  --rail-h: 2.75rem;
+  border-bottom-color: var(--rule-strong);
+}
+
+/* ---- Project mark ---- */
+
+.mark {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.monogram {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: var(--ink);
+  transition: background-color var(--d-2) var(--ease-mech);
+}
+
+.mark:hover .monogram {
+  background: var(--accent);
+}
+
+.markText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.project {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.set {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+.rail[data-condensed] .set {
+  display: none;
+}
+
+/* ---- Position readout ---- */
+
+.locus {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-inline: auto;
+  padding: var(--s-1) var(--s-3);
+  border: var(--lw-hair) solid var(--rule);
+  background: var(--paper-sunk);
+}
+
+.crumb {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+  transition: color var(--d-1);
+}
+
+.crumb[data-root]:hover {
+  color: var(--accent);
+}
+
+.crumb[aria-current] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Leader dash between sheet references. */
+.crumbSep {
+  width: var(--s-4);
+  height: var(--lw-thin);
+  background: var(--rule-strong);
+}
+
+/* ---- Controls ---- */
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-left: auto;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: color var(--d-1), border-color var(--d-1), background-color var(--d-1);
+}
+
+.control:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* A deployed lens keeps its button latched, like a pressed panel switch. */
+.control[aria-pressed='true'] {
+  color: var(--paper);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+/* Three stacked rules — the glyph for a contents table. */
+.indexGlyph {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5px;
+  width: 11px;
+}
+
+.indexGlyph span {
+  height: var(--lw-thin);
+  background: currentColor;
+}
+
+.indexGlyph span:nth-child(2) {
+  width: 70%;
+}
+
+.indexGlyph span:nth-child(3) {
+  width: 85%;
+}
+
+.kbd {
+  display: grid;
+  place-items: center;
+  min-width: 1.05rem;
+  height: 1.05rem;
+  font: inherit;
+  font-size: var(--t-micro);
+  color: var(--ink-4);
+  background: var(--paper);
+  border: var(--lw-hair) solid var(--rule);
+}
+
+@media (max-width: 64rem) {
+  .locus {
+    display: none;
+  }
+}
+
+@media (max-width: 64rem) {
+  .markText,
+  .controlLabel,
+  .kbd {
+    display: none;
+  }
+
+  .rail {
+    gap: var(--s-2);
+    justify-content: space-between;
+  }
+
+  .controls {
+    gap: var(--s-2);
+  }
+}

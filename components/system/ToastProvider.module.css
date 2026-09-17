@@ -1,0 +1,138 @@
+.stack {
+  position: fixed;
+  bottom: calc(var(--titleblock-h) + var(--sheet-margin) + var(--s-3));
+  right: var(--sheet-margin);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--s-2);
+  pointer-events: none;
+  max-width: min(22rem, calc(100vw - var(--sheet-margin) * 2));
+}
+
+/* A notice is a rubber stamp on the sheet: hard edges, no radius, tight mono. */
+.toast {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'kind dismiss'
+    'message message'
+    'detail detail';
+  gap: var(--s-1) var(--s-2);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-strong);
+  box-shadow: var(--shadow-deep);
+  pointer-events: auto;
+  animation: stampIn var(--d-3) var(--ease-snap) both;
+}
+
+.toast[data-tone='issue'] {
+  border-color: var(--accent);
+}
+
+.toast[data-tone='revision'] {
+  border-color: var(--accent-2);
+}
+
+.kind {
+  grid-area: kind;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.toast[data-tone='revision'] .kind {
+  color: var(--accent-2);
+}
+
+.message {
+  grid-area: message;
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.detail {
+  grid-area: detail;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.dismiss {
+  grid-area: dismiss;
+  width: 1rem;
+  height: 1rem;
+  display: grid;
+  place-items: center;
+  font-size: var(--t-sm);
+  line-height: 1;
+  color: var(--ink-3);
+  transition: color var(--d-1);
+}
+
+.dismiss:hover {
+  color: var(--accent);
+}
+
+/* Depletion rule along the bottom edge — the stamp's remaining dwell time. */
+.timer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: var(--lw-thick);
+  width: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+  animation: deplete linear both;
+}
+
+.toast[data-tone='revision'] .timer {
+  background: var(--accent-2);
+}
+
+@keyframes stampIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes deplete {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+
+  .timer {
+    display: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .stack {
+    left: var(--sheet-margin);
+    right: var(--sheet-margin);
+    max-width: none;
+  }
+}

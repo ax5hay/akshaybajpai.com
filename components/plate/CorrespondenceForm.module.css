@@ -1,0 +1,97 @@
+.form {
+  margin-top: var(--s-10);
+  border: var(--lw-med) solid var(--rule-strong);
+  background: var(--paper-raised);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-2) var(--s-3);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+}
+
+.headNo {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border-bottom: var(--lw-thin) solid var(--rule);
+}
+
+.field label {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: var(--s-3);
+  background: var(--paper);
+  border: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-mono), monospace;
+  font-size: var(--t-sm);
+  color: var(--ink);
+  resize: vertical;
+  transition: border-color var(--d-1), background-color var(--d-1);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--ink-4);
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--paper-raised);
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: var(--lw-med) solid var(--accent);
+  outline-offset: 2px;
+}
+
+.field input:disabled,
+.field textarea:disabled {
+  color: var(--ink-4);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-4);
+}
+
+.status {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+
+.status:empty {
+  display: none;
+}

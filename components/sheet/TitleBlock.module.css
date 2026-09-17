@@ -1,0 +1,161 @@
+/* Bottom-right title block, as on every sheet in a real set. Collapsed it
+   prints the number and title; expanded it gives the full issue record. */
+
+.block {
+  position: fixed;
+  right: var(--sheet-margin);
+  bottom: var(--sheet-margin);
+  z-index: var(--z-titleblock);
+  width: min(21rem, calc(100vw - var(--sheet-margin) * 2));
+  background: var(--paper-raised);
+  border: var(--lw-med) solid var(--rule-strong);
+  box-shadow: var(--shadow-deep);
+}
+
+.toggle {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  height: var(--titleblock-h);
+  padding: 0 var(--s-3);
+  text-align: left;
+}
+
+.sheetNo {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding-right: var(--s-3);
+  border-right: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.title {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  width: 7px;
+  height: 7px;
+  border-right: var(--lw-med) solid var(--ink-3);
+  border-bottom: var(--lw-med) solid var(--ink-3);
+  transform: rotate(-135deg);
+  transition: transform var(--d-2) var(--ease-mech);
+}
+
+.block[data-expanded] .chevron {
+  transform: rotate(45deg);
+}
+
+.detail {
+  padding: var(--s-3);
+  border-top: var(--lw-thin) solid var(--rule);
+  animation: unfold var(--d-2) var(--ease-plate);
+}
+
+/* Field cells are ruled like the boxes of a printed title block: the gap is
+   the rule, showing through from the container background. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--lw-thin);
+  margin: 0;
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.field {
+  padding: var(--s-2);
+  background: var(--paper-raised);
+}
+
+.field dt {
+  margin-bottom: 2px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.field dd {
+  margin: 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin-top: var(--s-3);
+  font-size: var(--t-xs);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+
+.copy {
+  width: 100%;
+  margin-top: var(--s-3);
+  padding: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--paper);
+  border: var(--lw-thin) solid var(--rule);
+  transition: color var(--d-1), border-color var(--d-1), background-color var(--d-1);
+}
+
+.copy:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+@keyframes unfold {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The title block would cover half a phone screen, so it collapses to a bar. */
+@media (max-width: 40rem) {
+  .block {
+    left: var(--sheet-margin);
+    width: auto;
+  }
+
+  .title {
+    display: none;
+  }
+
+  .block[data-expanded] .title {
+    display: block;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

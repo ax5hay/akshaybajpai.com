@@ -1,528 +1,823 @@
-/* Editorial dark — clean, restrained */
+/* =============================================================================
+   THE PLATE — a drawing set rendered as a website.
+   
+   Three modes, selected on <html data-mode>:
+     artifact   warm paper and ink; the drawing as issued
+     annotated  cyanotype; the same drawing with engineering markup exposed
+     raw        the drawing stripped to its source
+   
+   Every mode is a full palette swap, not an inversion. Component CSS reads
+   only the tokens below, so nothing needs mode-specific rules.
+   ========================================================================== */
 
 :root {
-  --void: #0a0a0c;
-  --void-deep: #060608;
-  --bg: #0a0a0c;
-  --bg-elevated: #0f0f12;
-  --bg-surface: #141418;
-  --bg-glass: rgba(15, 15, 18, 0.85);
+  /* ---- Drafting line weights (ISO 128 series, mapped to device pixels) ---- */
+  --lw-hair: 0.5px;
+  --lw-thin: 1px;
+  --lw-med: 1.5px;
+  --lw-thick: 2px;
+  --lw-heavy: 3px;
 
-  --border: rgba(255, 255, 255, 0.06);
-  --border-glow: rgba(201, 162, 39, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.1);
+  /* ---- Typographic scale (major third off a 16px base) ---- */
+  --t-micro: 0.625rem;
+  --t-mini: 0.6875rem;
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-base: 0.9375rem;
+  --t-md: 1.0625rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.5rem;
+  --t-2xl: 2rem;
+  --t-3xl: 2.75rem;
+  --t-4xl: 3.75rem;
+  --t-5xl: 5rem;
+  --t-6xl: 7rem;
 
-  --color-text: #e8e8ec;
-  --color-text-secondary: #9a9aa8;
-  --color-text-muted: #5c5c6a;
-  --color-bg: #0a0a0c;
+  --lh-tight: 1.08;
+  --lh-snug: 1.3;
+  --lh-normal: 1.6;
+  --lh-loose: 1.75;
 
-  --text: var(--color-text);
-  --text-secondary: var(--color-text-secondary);
-  --text-muted: var(--color-text-muted);
+  /* Tracking for the uppercase drafting labels that carry the whole language */
+  --track-label: 0.16em;
+  --track-label-wide: 0.28em;
 
-  --accent: #c9a227;
-  --accent-soft: rgba(201, 162, 39, 0.22);
-  --accent-glow: rgba(160, 210, 180, 0.12);
+  /* ---- Space (4px base, named so annotated mode can dimension them) ---- */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-10: 2.5rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
+  --s-20: 5rem;
+  --s-24: 6rem;
+  --s-32: 8rem;
 
-  --shimmer-cyan: #9a9aa8;
-  --shimmer-cyan-soft: rgba(154, 154, 168, 0.15);
-  --shimmer-coral: var(--accent);
-  --shimmer-coral-soft: var(--accent-soft);
-  --shimmer-amber: var(--accent);
-  --shimmer-amber-soft: var(--accent-soft);
-  --shimmer-violet: #6b5b8a;
-  --shimmer-violet-soft: rgba(107, 91, 138, 0.15);
+  /* ---- Sheet geometry ---- */
+  --sheet-margin: clamp(0.75rem, 2.2vw, 2.25rem);
+  --sheet-gutter: clamp(1rem, 4vw, 4rem);
+  --measure: 38rem;
+  --measure-wide: 72rem;
+  --rail-h: 3.25rem;
+  --titleblock-h: 3.25rem;
+  /* Clear space the fixed rail and title block claim from every plate. */
+  --plate-top: calc(var(--sheet-margin) + var(--rail-h) + var(--s-8));
+  --plate-bottom: calc(var(--sheet-margin) + var(--titleblock-h) + var(--s-10));
 
-  --gradient-void:
-    radial-gradient(ellipse 100% 70% at 50% -15%, rgba(74, 90, 106, 0.15), transparent 55%),
-    radial-gradient(ellipse 60% 50% at 90% 70%, rgba(120, 80, 140, 0.06), transparent 50%);
+  /* ---- Motion ---- */
+  --ease-plate: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mech: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-snap: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --d-1: 120ms;
+  --d-2: 240ms;
+  --d-3: 420ms;
+  --d-4: 700ms;
+  --d-5: 1100ms;
 
-  /* Typography — families set by next/font on <html> */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
-  --text-4xl: 2.75rem;
-  --text-5xl: 3.75rem;
-  --text-6xl: 5rem;
-  --text-7xl: 7rem;
-
-  --leading-tight: 1.12;
-  --leading-snug: 1.35;
-  --leading-normal: 1.65;
-  --leading-relaxed: 1.8;
-
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --duration-fast: 200ms;
-  --duration-normal: 400ms;
-  --duration-slow: 700ms;
-  --duration-slower: 1100ms;
-
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
-  --space-32: 8rem;
-
-  --content-width: 76rem;
-  --content-narrow: 44rem;
-  --header-height: 4.5rem;
+  --z-sheet: 1;
+  --z-rail: 40;
+  --z-titleblock: 45;
+  --z-overlay: 70;
+  --z-toast: 90;
+  --z-grain: 100;
+  /* The lens sits above the grain so its optic is not veiled by paper fibre. */
+  --z-loupe: 150;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --duration-fast: 0ms;
-    --duration-normal: 0ms;
-    --duration-slow: 0ms;
-    --duration-slower: 0ms;
-  }
+/* -----------------------------------------------------------------------------
+   MODE: ARTIFACT — the issued drawing. Warm stock, dense ink, printed feel.
+   -------------------------------------------------------------------------- */
+:root,
+html[data-mode='artifact'] {
+  color-scheme: light;
+
+  --paper: #ece6d9;
+  --paper-deep: #e1d9c8;
+  --paper-raised: #f5f1e8;
+  --paper-sunk: #d9d0bd;
+
+  --ink: #17171a;
+  --ink-2: #55514a;
+  --ink-3: #8a8377;
+  --ink-4: #b6ae9f;
+
+  --rule-faint: rgba(23, 23, 26, 0.08);
+  --rule: rgba(23, 23, 26, 0.18);
+  --rule-strong: rgba(23, 23, 26, 0.42);
+  --rule-ink: rgba(23, 23, 26, 0.85);
+
+  --grid-minor: rgba(23, 23, 26, 0.045);
+  --grid-major: rgba(23, 23, 26, 0.08);
+  --grid-size: 24px;
+
+  /* Vermilion: revision marks, callout leaders, the one hot colour on paper */
+  --accent: #9e3b2e;
+  --accent-soft: rgba(158, 59, 46, 0.14);
+  --accent-line: rgba(158, 59, 46, 0.55);
+  --accent-2: #2f5d8c;
+  --accent-2-soft: rgba(47, 93, 140, 0.13);
+
+  --shadow-lift: 0 1px 2px rgba(40, 32, 20, 0.07), 0 8px 24px -12px rgba(40, 32, 20, 0.22);
+  --shadow-deep: 0 2px 4px rgba(40, 32, 20, 0.08), 0 24px 60px -24px rgba(40, 32, 20, 0.35);
+
+  --grain-opacity: 0.4;
+  --grain-blend: multiply;
+
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
+  --font-label: var(--font-mono);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+/* -----------------------------------------------------------------------------
+   MODE: ANNOTATED — cyanotype. Line work reverses to white, markup turns on.
+   -------------------------------------------------------------------------- */
+html[data-mode='annotated'] {
+  color-scheme: dark;
+
+  --paper: #082139;
+  --paper-deep: #05182a;
+  --paper-raised: #0c2b49;
+  --paper-sunk: #041322;
+
+  --ink: #e6f1fc;
+  --ink-2: #9dbdd9;
+  --ink-3: #6389ab;
+  --ink-4: #456780;
+
+  --rule-faint: rgba(157, 207, 255, 0.12);
+  --rule: rgba(157, 207, 255, 0.28);
+  --rule-strong: rgba(198, 227, 255, 0.62);
+  --rule-ink: rgba(230, 241, 252, 0.92);
+
+  --grid-minor: rgba(140, 195, 255, 0.09);
+  --grid-major: rgba(140, 195, 255, 0.16);
+  --grid-size: 24px;
+
+  /* Amber: the markup pen. Everything the annotation layer adds is amber. */
+  --accent: #ffc75a;
+  --accent-soft: rgba(255, 199, 90, 0.16);
+  --accent-line: rgba(255, 199, 90, 0.7);
+  --accent-2: #6fe3a0;
+  --accent-2-soft: rgba(111, 227, 160, 0.16);
+
+  --shadow-lift: 0 1px 2px rgba(0, 10, 20, 0.5), 0 8px 28px -14px rgba(0, 0, 0, 0.7);
+  --shadow-deep: 0 2px 6px rgba(0, 10, 20, 0.55), 0 28px 70px -28px rgba(0, 0, 0, 0.85);
+
+  --grain-opacity: 0.16;
+  --grain-blend: overlay;
+
+  --font-display: var(--font-mono);
+  --font-body: var(--font-sans);
+  --font-label: var(--font-mono);
+}
+
+/* -----------------------------------------------------------------------------
+   MODE: RAW — presentation stripped. Source, frontmatter, and structure only.
+   -------------------------------------------------------------------------- */
+html[data-mode='raw'] {
+  color-scheme: dark;
+
+  --paper: #08080a;
+  --paper-deep: #050506;
+  --paper-raised: #111116;
+  --paper-sunk: #000;
+
+  --ink: #d6d6d0;
+  --ink-2: #8d8d86;
+  --ink-3: #5d5d58;
+  --ink-4: #3c3c39;
+
+  --rule-faint: rgba(255, 255, 255, 0.06);
+  --rule: rgba(255, 255, 255, 0.14);
+  --rule-strong: rgba(255, 255, 255, 0.34);
+  --rule-ink: rgba(214, 214, 208, 0.9);
+
+  --grid-minor: rgba(255, 255, 255, 0.022);
+  --grid-major: rgba(255, 255, 255, 0.04);
+  --grid-size: 16px;
+
+  --accent: #8fe388;
+  --accent-soft: rgba(143, 227, 136, 0.12);
+  --accent-line: rgba(143, 227, 136, 0.5);
+  --accent-2: #e8b14c;
+  --accent-2-soft: rgba(232, 177, 76, 0.12);
+
+  --shadow-lift: none;
+  --shadow-deep: none;
+
+  --grain-opacity: 0.05;
+  --grain-blend: overlay;
+
+  --font-display: var(--font-mono);
+  --font-body: var(--font-mono);
+  --font-label: var(--font-mono);
+}
+
+/* =============================================================================
+   RESET
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 html {
   font-size: 100%;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-}
-
-.exp-atmosphere {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.55;
-}
-
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-html.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-body.expedition-mode {
-  overflow-x: hidden;
-}
-
-body.home-world {
-  overflow-x: hidden;
-}
-
-body.home-world::before {
-  opacity: 0.02;
+  background: var(--paper-deep);
+  /* Mode changes are a physical event: the whole sheet re-inks at once. */
+  transition: background-color var(--d-3) var(--ease-mech);
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  background: var(--void);
-  background-image: var(--gradient-void);
-  background-attachment: fixed;
-  color: var(--text);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--t-base);
+  line-height: var(--lh-normal);
   overflow-x: hidden;
+  transition: background-color var(--d-3) var(--ease-mech), color var(--d-3) var(--ease-mech);
 }
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+ul,
+ol {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+/* =============================================================================
+   PAPER SURFACE — grain and grid live on body pseudo-elements so they cost
+   nothing at runtime and never trigger layout.
+   ========================================================================== */
 
 body::before {
   content: '';
   position: fixed;
   inset: 0;
+  z-index: var(--z-grain);
   pointer-events: none;
-  z-index: 9998;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: var(--grain-blend);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23f)' opacity='0.5'/%3E%3C/svg%3E");
+  transition: opacity var(--d-3) var(--ease-mech);
 }
 
-img, svg, video { max-width: 100%; height: auto; display: block; }
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; border: none; background: none; }
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-minor) var(--lw-hair), transparent var(--lw-hair)),
+    linear-gradient(90deg, var(--grid-minor) var(--lw-hair), transparent var(--lw-hair)),
+    linear-gradient(var(--grid-major) var(--lw-hair), transparent var(--lw-hair)),
+    linear-gradient(90deg, var(--grid-major) var(--lw-hair), transparent var(--lw-hair));
+  background-size:
+    var(--grid-size) var(--grid-size),
+    var(--grid-size) var(--grid-size),
+    calc(var(--grid-size) * 5) calc(var(--grid-size) * 5),
+    calc(var(--grid-size) * 5) calc(var(--grid-size) * 5);
+  transition: background-image var(--d-3) var(--ease-mech);
+}
+
+/* The graph grid is the blueprint's whole identity; on paper it is a whisper. */
+html[data-mode='annotated'] body::after {
+  background-position: center center;
+}
+
+/* Surface layers the reader can switch off from the control schedule. */
+html[data-grid='off'] body::after,
+html[data-grain='off'] body::before {
+  opacity: 0;
+}
+
+/* =============================================================================
+   TYPOGRAPHY PRIMITIVES
+   ========================================================================== */
+
+/** Uppercase mono label — the connective tissue of the entire drawing set. */
+.label {
+  font-family: var(--font-label), ui-monospace, monospace;
+  font-size: var(--t-mini);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1;
+}
+
+.label-wide {
+  letter-spacing: var(--track-label-wide);
+}
+
+.label-ink {
+  color: var(--ink-2);
+}
+
+.label-accent {
+  color: var(--accent);
+}
+
+/** Sheet number, as printed. Tabular so columns of them align. */
+.sheet-no {
+  font-family: var(--font-label), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.display {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.015em;
+}
+
+html[data-mode='annotated'] .display,
+html[data-mode='raw'] .display {
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  font-size: 0.82em;
+}
+
+/* =============================================================================
+   FOCUS + SELECTION — a drafting marquee, not a browser ring.
+   ========================================================================== */
+
+:focus {
+  outline: none;
+}
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: var(--lw-med) solid var(--accent);
   outline-offset: 3px;
+  border-radius: 1px;
 }
 
 ::selection {
   background: var(--accent-soft);
-  color: var(--text);
+  color: var(--ink);
 }
 
-.page-main {
-  position: relative;
-  z-index: 1;
-  padding-top: var(--header-height);
-  min-height: 100vh;
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.page-main[data-embedded] {
-  padding-top: 0;
+::-webkit-scrollbar-track {
+  background: var(--paper-deep);
 }
 
-.page-main--hero {
-  padding-top: 0;
+::-webkit-scrollbar-thumb {
+  background: var(--ink-4);
+  border: 3px solid var(--paper-deep);
+  border-radius: 6px;
 }
 
-.page-main:not(.page-main--hero) {
-  animation: pageIn 0.45s var(--ease-out-expo);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
 }
 
-@keyframes pageIn {
+/* =============================================================================
+   SHEET CHANGE — the incoming plate settles onto the board.
+   ========================================================================== */
+
+/* Deliberately short and small: the per-block reveal below carries the
+   drawing-in: this only has to cover the swap so it never reads as a cut. */
+@keyframes plate-settle {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translate3d(0, 10px, 0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .page-main:not(.page-main--hero) {
-    animation: none;
-  }
+.plate-enter {
+  animation: plate-settle 260ms var(--ease-plate) both;
 }
 
-body.home-hero .site-header {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-8px);
-  transition: opacity var(--duration-normal) var(--ease-out-expo),
-    transform var(--duration-normal) var(--ease-out-expo);
-}
-
-body.home-hero.scrolled-past-hero .site-header {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
-}
+/* =============================================================================
+   REVEAL — plates draw themselves in, the way ink lands on paper.
+   ========================================================================== */
 
 [data-reveal] {
   opacity: 0;
-  transform: translateY(32px);
-  transition: opacity var(--duration-slow) var(--ease-out-expo),
-    transform var(--duration-slow) var(--ease-out-expo);
+  transform: translateY(14px);
+  transition:
+    opacity var(--d-4) var(--ease-plate),
+    transform var(--d-4) var(--ease-plate);
 }
 
-[data-reveal].reveal-visible {
+[data-reveal].is-revealed {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 [data-reveal-stagger] > * {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity var(--duration-normal) var(--ease-out-expo),
-    transform var(--duration-normal) var(--ease-out-expo);
+  transform: translateY(12px);
+  transition:
+    opacity var(--d-3) var(--ease-plate),
+    transform var(--d-3) var(--ease-plate);
 }
 
-[data-reveal-stagger].reveal-visible > *:nth-child(1) { transition-delay: 0ms; }
-[data-reveal-stagger].reveal-visible > *:nth-child(2) { transition-delay: 80ms; }
-[data-reveal-stagger].reveal-visible > *:nth-child(3) { transition-delay: 160ms; }
-[data-reveal-stagger].reveal-visible > *:nth-child(4) { transition-delay: 240ms; }
-[data-reveal-stagger].reveal-visible > *:nth-child(5) { transition-delay: 320ms; }
-[data-reveal-stagger].reveal-visible > *:nth-child(6) { transition-delay: 400ms; }
-[data-reveal-stagger].reveal-visible > *:nth-child(n+7) { transition-delay: 480ms; }
-
-[data-reveal-stagger].reveal-visible > * {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal], [data-reveal-stagger] > * {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-
-/* Neural map iframe — hide chrome before React hydrates (see EmbeddedDetectScript on body) */
-body.embedded .site-header,
-body.embedded .scroll-progress,
-body.embedded .site-footer,
-body.embedded .skip-link {
-  display: none !important;
-}
-
-body.embedded .page-main {
-  padding-top: 0;
-}
-
-/* Neural map iframe overlay — skip scroll reveals (IO often never fires) */
-body.embedded [data-reveal],
-body.embedded [data-reveal-stagger] > * {
+[data-reveal-stagger].is-revealed > * {
   opacity: 1;
   transform: none;
-  transition: none;
 }
 
-.section-surface {
-  position: relative;
-  z-index: 1;
-  background: linear-gradient(
-    180deg,
-    rgba(10, 10, 12, 0.72) 0%,
-    rgba(15, 15, 18, 0.88) 100%
-  );
-  border-top: 1px solid transparent;
-}
+[data-reveal-stagger].is-revealed > *:nth-child(1) { transition-delay: 0ms; }
+[data-reveal-stagger].is-revealed > *:nth-child(2) { transition-delay: 55ms; }
+[data-reveal-stagger].is-revealed > *:nth-child(3) { transition-delay: 110ms; }
+[data-reveal-stagger].is-revealed > *:nth-child(4) { transition-delay: 165ms; }
+[data-reveal-stagger].is-revealed > *:nth-child(5) { transition-delay: 220ms; }
+[data-reveal-stagger].is-revealed > *:nth-child(6) { transition-delay: 275ms; }
+[data-reveal-stagger].is-revealed > *:nth-child(7) { transition-delay: 330ms; }
+[data-reveal-stagger].is-revealed > *:nth-child(n + 8) { transition-delay: 380ms; }
 
-.section-surface::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 8%;
-  right: 8%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--section-accent-glow, var(--border-glow)),
-    transparent
-  );
-}
+/* =============================================================================
+   PROSE — set as a printed page, not a web article.
+   ========================================================================== */
 
-.section-surface::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 80% 50% at 50% -10%,
-    var(--section-accent-soft, rgba(201, 162, 39, 0.06)),
-    transparent 60%
-  );
-}
-
-.link-hover {
-  position: relative;
-  transition: color var(--duration-fast);
-}
-
-.link-hover::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-  width: 0;
-  height: 1px;
-  background: linear-gradient(90deg, var(--accent), #8a7a4a);
-  transition: width var(--duration-normal) var(--ease-out-expo);
-}
-
-.link-hover:hover::after,
-.link-hover:focus-visible::after {
-  width: 100%;
-}
-
-/* Prose */
 .prose {
-  font-size: var(--text-lg);
-  line-height: var(--leading-relaxed);
-  color: var(--text-secondary);
+  font-size: var(--t-md);
+  line-height: var(--lh-loose);
+  color: var(--ink-2);
+}
+
+.prose > * + * {
+  margin-top: var(--s-6);
+}
+
+.prose p {
+  text-wrap: pretty;
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.prose em {
+  font-style: italic;
 }
 
 .prose h2 {
-  font-family: var(--font-serif);
-  font-size: var(--text-3xl);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-xl);
   font-weight: 400;
-  color: var(--text);
-  margin: var(--space-16) 0 var(--space-6);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+  line-height: var(--lh-snug);
+  margin-top: var(--s-16);
+  padding-top: var(--s-4);
+  border-top: var(--lw-thin) solid var(--rule);
+  position: relative;
+}
+
+/* Section marker, as on a drawing: a short heavy tick over the rule. */
+.prose h2::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--lw-thin) * -1);
+  left: 0;
+  width: 2.5rem;
+  height: var(--lw-thick);
+  background: var(--accent);
 }
 
 .prose h3 {
-  font-size: var(--text-xl);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-sm);
   font-weight: 600;
-  color: var(--text);
-  margin: var(--space-12) 0 var(--space-4);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-top: var(--s-10);
 }
 
-.prose p { margin: 0 0 var(--space-8); }
-.prose ul, .prose ol { margin: 0 0 var(--space-8); padding-left: var(--space-8); }
-.prose li { margin-bottom: var(--space-3); }
-.prose a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
-.prose a:hover { color: var(--text); }
-.prose blockquote {
-  margin: var(--space-10) 0;
-  padding: var(--space-4) 0 var(--space-4) var(--space-6);
-  border-left: 2px solid var(--shimmer-violet);
-  color: var(--text-muted);
-  font-style: italic;
-}
-.prose pre {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  padding: var(--space-6);
-  overflow-x: auto;
-  border-radius: 6px;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-}
-.prose code {
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-  padding: 0.15em 0.4em;
-  background: var(--bg-surface);
-  border-radius: 3px;
-}
-.prose pre code { padding: 0; background: none; }
-
-/* Article prose enhancements */
-.prose-article > p:first-of-type::first-letter {
-  float: left;
-  font-family: var(--font-serif);
-  font-size: 3.4em;
-  line-height: 0.82;
-  padding-right: var(--space-3);
-  padding-top: 0.05em;
-  color: var(--section-accent, var(--accent));
+.prose ul,
+.prose ol {
+  padding-left: var(--s-6);
 }
 
-.prose-article blockquote {
-  border-left-color: var(--section-accent, var(--shimmer-violet));
-  background: rgba(255, 255, 255, 0.02);
-  padding: var(--space-4) var(--space-6);
-  border-radius: 0 6px 6px 0;
-}
-
-.prose-article pre {
-  border-color: var(--section-accent-soft, var(--border));
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-    0 8px 32px rgba(0, 0, 0, 0.25);
-}
-
-.prose-article h2 {
+.prose ul li,
+.prose ol li {
   position: relative;
-  border-bottom-color: var(--section-accent-soft, var(--border));
+  margin-bottom: var(--s-3);
 }
 
-.prose-article h2::after {
+.prose ul li::before {
   content: '';
   position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 3rem;
-  height: 1px;
-  background: var(--section-accent, var(--accent));
-  box-shadow: 0 0 12px var(--section-accent-glow, var(--accent-soft));
+  left: calc(var(--s-6) * -1);
+  top: 0.72em;
+  width: var(--s-3);
+  height: var(--lw-thin);
+  background: var(--accent-line);
 }
 
-.prose-article hr {
-  border: none;
-  height: 1px;
-  margin: var(--space-16) 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--section-accent-soft, var(--border)),
-    transparent
-  );
+.prose ol {
+  counter-reset: item;
 }
 
-/* Page shells */
-.page-shell {
-  padding: var(--space-32) var(--space-8);
+.prose ol li {
+  counter-increment: item;
 }
 
-.page-shell-inner {
-  max-width: var(--content-narrow);
-  margin: 0 auto;
-}
-
-.page-shell--wide .page-shell-inner {
-  max-width: var(--content-width);
-}
-
-.page-title {
-  font-family: var(--font-serif);
-  font-size: clamp(2.5rem, 6vw, var(--text-5xl));
-  font-weight: 400;
-  margin: 0 0 var(--space-4);
-  line-height: var(--leading-tight);
-  background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.page-lead {
-  font-size: var(--text-lg);
-  color: var(--text-secondary);
-  margin: 0;
-  letter-spacing: 0.02em;
-}
-
-.page-header {
-  margin-bottom: var(--space-20);
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid var(--border);
-  transition: border-color var(--duration-slow) var(--ease-out-expo);
-}
-
-.page-header.reveal-visible {
-  border-color: var(--border-strong);
-}
-
-.list-item {
-  border-bottom: 1px solid var(--border);
-  transition: background var(--duration-fast), border-color var(--duration-fast);
-}
-
-.list-item:hover {
-  border-color: var(--border-glow);
-  background: rgba(45, 212, 191, 0.02);
-}
-
-.list-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-4);
-  padding: var(--space-6) 0;
-}
-
-.list-link-title {
-  font-size: var(--text-lg);
-  font-weight: 500;
-  color: var(--text);
-  transition: color var(--duration-fast);
-}
-
-.list-item:hover .list-link-title {
+.prose ol li::before {
+  content: counter(item, decimal-leading-zero);
+  position: absolute;
+  left: calc(var(--s-6) * -1 - 0.4rem);
+  top: 0.15em;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
   color: var(--accent);
 }
 
-.list-link-meta {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  flex-shrink: 0;
+.prose a {
+  color: var(--ink);
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent-line), var(--accent-line));
+  background-size: 100% var(--lw-thin);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size var(--d-2) var(--ease-plate), color var(--d-1);
+  padding-bottom: 1px;
+}
+
+.prose a:hover {
+  color: var(--accent);
+  background-size: 100% var(--lw-thick);
+}
+
+.prose blockquote {
+  border-left: var(--lw-thick) solid var(--accent);
+  padding: var(--s-1) 0 var(--s-1) var(--s-6);
+  color: var(--ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-lg);
+  line-height: var(--lh-snug);
+}
+
+.prose pre {
+  background: var(--paper-sunk);
+  border: var(--lw-thin) solid var(--rule);
+  padding: var(--s-5);
+  overflow-x: auto;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--t-xs);
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+.prose code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.875em;
+  padding: 0.1em 0.35em;
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+.prose hr {
+  border: none;
+  height: var(--lw-thin);
+  background: var(--rule);
+  margin: var(--s-12) 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+}
+
+.prose th {
+  text-align: left;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: var(--s-2) var(--s-3);
+  border-bottom: var(--lw-med) solid var(--rule-strong);
+}
+
+.prose td {
+  padding: var(--s-3);
+  border-bottom: var(--lw-thin) solid var(--rule-faint);
+  vertical-align: top;
+}
+
+/* Drop cap: only on paper. Blueprint and raw are technical documents. */
+html[data-mode='artifact'] .prose-lead > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 3.6em;
+  line-height: 0.78;
+  padding: 0.06em var(--s-3) 0 0;
+  color: var(--accent);
+}
+
+/* =============================================================================
+   PLATE LAYOUT — the drawing area inside the fixed frame.
+   ========================================================================== */
+
+.plate-main {
+  position: relative;
+  z-index: var(--z-sheet);
+  min-height: 100svh;
+}
+
+/* Standard content plate: a measure-width column inside the sheet margins. */
+.plate {
+  padding:
+    var(--plate-top)
+    calc(var(--sheet-margin) + var(--sheet-gutter))
+    var(--plate-bottom);
+  max-width: calc(var(--measure) + (var(--sheet-margin) + var(--sheet-gutter)) * 2);
+  margin-inline: auto;
+}
+
+.plate-wide {
+  max-width: calc(var(--measure-wide) + (var(--sheet-margin) + var(--sheet-gutter)) * 2);
+}
+
+/* Full-bleed plate for drawings that own the whole sheet, e.g. the key plan. */
+.plate-bleed {
+  padding: 0;
+  max-width: none;
+}
+
+/* =============================================================================
+   ANNOTATION LAYER — visible only in annotated mode. Component CSS marks
+   elements with data-annotate; these rules turn the markup pen on.
+   ========================================================================== */
+
+[data-annotate] {
+  position: relative;
+}
+
+[data-annotate]::after {
+  content: attr(data-annotate);
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--d-2) var(--ease-plate);
+}
+
+html[data-mode='annotated'] [data-annotate]::after,
+html[data-mode='raw'] [data-annotate]::after {
+  opacity: 0.85;
+}
+
+/* Component boundary outlines — the "show me the boxes" view. */
+html[data-mode='annotated'] [data-bound] {
+  outline: var(--lw-hair) dashed var(--accent-line);
+  outline-offset: 2px;
+}
+
+@media (max-width: 60rem) {
+  /* No room for margin annotations on narrow sheets. */
+  [data-annotate]::after {
+    display: none;
+  }
+}
+
+/* =============================================================================
+   UTILITIES
+   ========================================================================== */
+
+.u-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.u-measure {
+  max-width: var(--measure);
+}
+
+.u-tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hatching, for "not in contract" regions and disabled states. */
+.u-hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    var(--rule-faint) 4px,
+    var(--rule-faint) 5px
+  );
+}
+
+/* =============================================================================
+   REDUCED MOTION — keep every state change, remove every journey.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal],
+  [data-reveal-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media print {
+  body::before,
+  body::after {
+    display: none;
+  }
 }

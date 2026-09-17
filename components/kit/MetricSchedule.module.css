@@ -1,0 +1,97 @@
+.schedule {
+  margin: var(--s-10) 0;
+  border: var(--lw-med) solid var(--rule-strong);
+  background: var(--paper-raised);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-2) var(--s-3);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.headTitle {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+}
+
+.headCount {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, auto) 1fr;
+  align-items: baseline;
+  gap: var(--s-3) var(--s-4);
+  padding: var(--s-3);
+  border-bottom: var(--lw-thin) solid var(--rule-faint);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.no {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  color: var(--ink-4);
+}
+
+/* The measured figure is the point of the row, so it is set as display type. */
+.value {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-xl);
+  line-height: 1;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+html[data-mode='annotated'] .value,
+html[data-mode='raw'] .value {
+  font-size: var(--t-lg);
+}
+
+.label {
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* Rows with no pulled figure let their text run the full width. */
+.label[data-full] {
+  grid-column: 2 / -1;
+}
+
+@media (max-width: 34rem) {
+  .row {
+    grid-template-columns: 2rem 1fr;
+  }
+
+  .value {
+    grid-column: 2;
+  }
+
+  .label {
+    grid-column: 2;
+  }
+}

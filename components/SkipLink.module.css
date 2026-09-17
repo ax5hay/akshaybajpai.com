@@ -1,19 +1,22 @@
 .skip {
   position: fixed;
-  top: var(--space-4);
-  left: var(--space-4);
-  z-index: 10000;
-  padding: var(--space-3) var(--space-5);
-  background: var(--bg-elevated);
-  border: 1px solid var(--accent);
-  border-radius: 4px;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text);
-  transform: translateY(-200%);
-  transition: transform var(--duration-fast);
+  top: var(--sheet-margin);
+  left: var(--sheet-margin);
+  z-index: 200;
+  padding: var(--s-3) var(--s-5);
+  background: var(--paper-raised);
+  border: var(--lw-med) solid var(--accent);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  transform: translateY(-250%);
+  transition: transform var(--d-2) var(--ease-snap);
 }
 
-.skip:focus {
+.skip:focus-visible {
   transform: translateY(0);
+  outline-offset: 2px;
 }

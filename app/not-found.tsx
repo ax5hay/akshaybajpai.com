@@ -1,27 +1,36 @@
 import Link from 'next/link';
-import { PageShell } from '@/components/PageShell';
-import { ContentPage } from '@/components/ContentPage';
-import { PageHero } from '@/components/PageHero';
-import { buildMetadata } from '@/lib/metadata';
+import { PlateShell } from '@/components/plate/PlateShell';
+import { Stamp } from '@/components/kit/Controls';
 import styles from './not-found.module.css';
-
-export const metadata = buildMetadata({
-  title: '404 — Not Found',
-  description: "The page you're looking for doesn't exist.",
-  noIndex: true,
-});
 
 export default function NotFound() {
   return (
-    <PageShell hideHeader hideFooter>
-      <ContentPage section="architecture">
-        <div className={styles.wrap}>
-          <PageHero section="architecture" title="404" showOrb={false} showBack={false} centered lead="This path doesn't exist in the neural map." />
-          <Link href="/" className={styles.home}>
-            Return to neural map
-          </Link>
-        </div>
-      </ContentPage>
-    </PageShell>
+    <PlateShell
+      sheet="X-999"
+      title="Sheet Not Issued"
+      subtitle="This drawing is not part of the current set"
+      discipline="X"
+      scale="—"
+      revision="—"
+      refs={['G-000', 'W-400', 'E-600']}
+      lead={
+        <p>
+          The reference you followed points at a sheet that was never issued, or was withdrawn in
+          a later revision. The drawing index will have what you were looking for.
+        </p>
+      }
+      record={[{ k: 'status', v: 'withdrawn / never issued' }]}
+    >
+      <div className={styles.void}>
+        <Stamp tone="void">Not in contract</Stamp>
+      </div>
+
+      <div className="prose">
+        <p>
+          Press <kbd className={styles.kbd}>/</kbd> to open the index, or return to the{' '}
+          <Link href="/">key plan</Link> and read the set from the general arrangement.
+        </p>
+      </div>
+    </PlateShell>
   );
 }

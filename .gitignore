@@ -4,6 +4,7 @@ INTEGRATION-SUMMARY.md
 node_modules
 dist
 out
+*.tsbuildinfo
 .astro
 .next
 *.local

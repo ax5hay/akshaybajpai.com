@@ -1,40 +1,50 @@
-import { PageShell } from '@/components/PageShell';
-import { ContentPage } from '@/components/ContentPage';
-import { PageHero } from '@/components/PageHero';
-import { ContentList } from '@/components/ContentList';
-import { getCollection } from '@/lib/content';
+import { PlateShell } from '@/components/plate/PlateShell';
+import { SheetSchedule, type ScheduleRow } from '@/components/plate/SheetSchedule';
+import { getCollection, estimateReadingTime } from '@/lib/content';
+import { detailSheetNumber, getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
+
+const PLATE = getPlateByHref('/blog/')!;
 
 export const metadata = buildMetadata({
   title: 'Blog · Akshay Bajpai | AI Architect & Technology Leader',
-  description: 'Technical writing on AI infrastructure, systems design, and performance engineering.',
+  description:
+    'Technical writing on AI infrastructure, healthcare AI architecture, performance engineering, and building software with a zero-dependency mindset.',
   path: '/blog/',
 });
 
 export default async function BlogIndexPage() {
-  const posts = await getCollection('blog');
+  const entries = await getCollection('blog');
+
+  const rows: ScheduleRow[] = entries.map((entry, i) => ({
+    sheet: detailSheetNumber('blog', i),
+    title: entry.frontmatter.title,
+    description: entry.frontmatter.description,
+    href: `/blog/${entry.slug}/`,
+    date: entry.frontmatter.pubDate,
+    readingTime: estimateReadingTime(entry.content),
+  }));
 
   return (
-    <PageShell>
-      <ContentPage section="blog" wide>
-        <PageHero
-          section="blog"
-          title="Blog"
-          eyebrow={`Blog · ${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`}
-          lead="Technical writing on systems, infrastructure, and engineering discipline."
-        />
-        <ContentList
-          section="blog"
-          ariaLabel="Blog posts"
-          items={posts.map((post) => ({
-            slug: post.slug,
-            href: `/blog/${post.slug}/`,
-            title: post.frontmatter.title,
-            date: post.frontmatter.pubDate,
-            description: post.frontmatter.description,
-          }))}
-        />
-      </ContentPage>
-    </PageShell>
+    <PlateShell
+      sheet={PLATE.sheet}
+      title={PLATE.title}
+      subtitle={PLATE.subtitle}
+      discipline={PLATE.discipline}
+      scale={PLATE.scale}
+      revision={PLATE.revision}
+      refs={PLATE.refs}
+      facts={[{ k: 'Sheets', v: String(rows.length) }]}
+      record={[{ k: 'series', v: 'B-5xx' }, { k: 'count', v: String(rows.length) }]}
+      wide
+      lead={
+        <p>
+          Shorter pieces written close to the work — what a system taught while it was still
+          being built, before the lesson had time to round itself off.
+        </p>
+      }
+    >
+      <SheetSchedule rows={rows} unit="notes" />
+    </PlateShell>
   );
 }

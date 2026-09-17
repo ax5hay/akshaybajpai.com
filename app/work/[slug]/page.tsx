@@ -1,7 +1,12 @@
 import { notFound } from 'next/navigation';
-import { PageShell } from '@/components/PageShell';
-import { ArticleLayout } from '@/components/ArticleLayout';
-import { getAllSlugs, getEntry, estimateReadingTime, getRelatedPosts, type WorkFrontmatter } from '@/lib/content';
+import { ArticlePlate } from '@/components/plate/ArticlePlate';
+import {
+  getAllSlugs,
+  getEntry,
+  estimateReadingTime,
+  type WorkFrontmatter,
+} from '@/lib/content';
+import { adjacentSheets, detailSheetFor } from '@/lib/sheet-index';
 import { buildMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
@@ -13,6 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const study = await getEntry('work', slug);
   if (!study) return {};
+
   return buildMetadata({
     title: `${study.frontmatter.title} · Akshay Bajpai`,
     description: study.frontmatter.description,
@@ -22,29 +28,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   });
 }
 
-export default async function WorkCasePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function WorkDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const study = await getEntry<WorkFrontmatter>('work', slug);
   if (!study) notFound();
 
   const fm = study.frontmatter;
-  const tags = [...(fm.stack ?? []), ...(fm.metrics ?? [])].slice(0, 6);
-  const related = await getRelatedPosts('work', slug, 3);
+  const [sheet, adjacent] = await Promise.all([
+    detailSheetFor('work', slug),
+    adjacentSheets('work', slug, 3),
+  ]);
 
   return (
-    <PageShell>
-      <ArticleLayout
-        section="work"
-        title={fm.title}
-        date={fm.pubDate}
-        html={study.html}
-        description={fm.description}
-        readingTime={estimateReadingTime(study.content)}
-        tags={tags}
-        backHref="/work/"
-        backLabel="← Work"
-        related={related}
-      />
-    </PageShell>
+    <ArticlePlate
+      sheet={sheet}
+      title={fm.title}
+      description={fm.description}
+      discipline="W"
+      date={fm.pubDate}
+      html={study.html}
+      source={study.content}
+      readingTime={estimateReadingTime(study.content)}
+      seriesHref="/work/"
+      seriesLabel="Works"
+      client={fm.client}
+      stack={fm.stack}
+      metrics={fm.metrics}
+      adjacent={adjacent}
+    />
   );
 }

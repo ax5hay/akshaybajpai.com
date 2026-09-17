@@ -1,0 +1,107 @@
+.frame {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  /* Contain paint so the fixed frame never joins the scrolling layer. */
+  contain: strict;
+}
+
+.border {
+  position: absolute;
+  inset: var(--sheet-margin);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.ruler {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+}
+
+.zone {
+  line-height: 1;
+}
+
+.rulerTop,
+.rulerBottom {
+  left: var(--sheet-margin);
+  right: var(--sheet-margin);
+  height: var(--sheet-margin);
+  flex-direction: row;
+}
+
+.rulerTop {
+  top: 0;
+}
+
+.rulerBottom {
+  bottom: 0;
+}
+
+.rulerLeft,
+.rulerRight {
+  top: var(--sheet-margin);
+  bottom: var(--sheet-margin);
+  width: var(--sheet-margin);
+  flex-direction: column;
+}
+
+.rulerLeft {
+  left: 0;
+}
+
+.rulerRight {
+  right: 0;
+}
+
+/* Corner trim marks — two short rules meeting at the cut line. */
+.trim {
+  position: absolute;
+  width: calc(var(--sheet-margin) * 0.55);
+  height: calc(var(--sheet-margin) * 0.55);
+  border-color: var(--rule-strong);
+  border-style: solid;
+  border-width: 0;
+}
+
+.trimTL {
+  top: var(--sheet-margin);
+  left: var(--sheet-margin);
+  border-top-width: var(--lw-med);
+  border-left-width: var(--lw-med);
+}
+
+.trimTR {
+  top: var(--sheet-margin);
+  right: var(--sheet-margin);
+  border-top-width: var(--lw-med);
+  border-right-width: var(--lw-med);
+}
+
+.trimBL {
+  bottom: var(--sheet-margin);
+  left: var(--sheet-margin);
+  border-bottom-width: var(--lw-med);
+  border-left-width: var(--lw-med);
+}
+
+.trimBR {
+  bottom: var(--sheet-margin);
+  right: var(--sheet-margin);
+  border-bottom-width: var(--lw-med);
+  border-right-width: var(--lw-med);
+}
+
+/* Margins are too tight on phones to print zone references legibly. */
+@media (max-width: 52rem) {
+  .ruler {
+    display: none;
+  }
+}

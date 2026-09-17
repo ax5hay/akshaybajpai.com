@@ -1,0 +1,115 @@
+/* A survey of the career, drawn as a levels diagram: a datum line down the
+   left with each engagement dimensioned off it. */
+
+.chronology {
+  position: relative;
+  margin: var(--s-12) 0;
+  padding-left: var(--s-10);
+}
+
+/* The datum. */
+.chronology::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--s-2);
+  bottom: var(--s-2);
+  width: var(--lw-thin);
+  background: var(--rule-strong);
+}
+
+.entry {
+  position: relative;
+  padding-bottom: var(--s-8);
+}
+
+.entry:last-child {
+  padding-bottom: 0;
+}
+
+/* Level mark: a filled square on the datum, as used for a spot level. */
+.mark {
+  position: absolute;
+  left: calc(var(--s-10) * -1);
+  top: 0.45em;
+  width: 9px;
+  height: 9px;
+  margin-left: -4px;
+  background: var(--paper);
+  border: var(--lw-med) solid var(--ink);
+  transition: background-color var(--d-2), border-color var(--d-2), transform var(--d-2);
+}
+
+.entry:hover .mark {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: rotate(45deg);
+}
+
+/* Tie line from the datum to the entry. */
+.tie {
+  position: absolute;
+  left: calc(var(--s-10) * -1);
+  top: calc(0.45em + 4px);
+  width: var(--s-8);
+  height: var(--lw-hair);
+  background: var(--rule);
+}
+
+.year {
+  display: block;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.role {
+  margin-top: var(--s-2);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-lg);
+  font-weight: 400;
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+
+html[data-mode='annotated'] .role,
+html[data-mode='raw'] .role {
+  font-size: var(--t-md);
+  text-transform: uppercase;
+}
+
+.context {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.description {
+  margin-top: var(--s-3);
+  font-size: var(--t-sm);
+  line-height: var(--lh-normal);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+@media (max-width: 34rem) {
+  .chronology {
+    padding-left: var(--s-6);
+  }
+
+  .mark {
+    left: calc(var(--s-6) * -1);
+  }
+
+  .tie {
+    display: none;
+  }
+}

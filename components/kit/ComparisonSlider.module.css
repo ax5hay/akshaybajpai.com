@@ -1,0 +1,160 @@
+.figure {
+  margin: var(--s-12) 0;
+}
+
+.frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 18rem;
+  border: var(--lw-med) solid var(--rule-strong);
+  background: var(--paper-raised);
+  touch-action: pan-y;
+  cursor: ew-resize;
+  user-select: none;
+}
+
+.layer {
+  position: relative;
+  padding: var(--s-6);
+}
+
+/* The after layer is stacked over the before layer and revealed by clip, so
+   the two are always in perfect register and neither ever reflows. */
+.layer[data-after] {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 0 var(--split));
+  background: var(--paper-sunk);
+  overflow: auto;
+}
+
+.frame[data-dragging] .layer[data-after] {
+  transition: none;
+}
+
+.label {
+  position: absolute;
+  top: 0;
+  padding: 3px var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.label[data-side='before'] {
+  left: 0;
+  color: var(--paper);
+  background: var(--ink-3);
+}
+
+.label[data-side='after'] {
+  right: 0;
+  color: var(--paper);
+  background: var(--accent);
+}
+
+/* ---- Divider --------------------------------------------------------- */
+
+.divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--split);
+  width: var(--lw-thick);
+  margin-left: calc(var(--lw-thick) / -2);
+  background: var(--accent);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--paper-raised);
+  border: var(--lw-thick) solid var(--accent);
+  box-shadow: var(--shadow-lift);
+}
+
+.gripArrow {
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+
+.gripArrow[data-dir='left'] {
+  border-right: 5px solid var(--accent);
+}
+
+.gripArrow[data-dir='right'] {
+  border-left: 5px solid var(--accent);
+}
+
+.figureNo {
+  position: absolute;
+  right: var(--s-2);
+  bottom: var(--s-2);
+  z-index: 3;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+  pointer-events: none;
+}
+
+/* The native range is the real control: invisible, full-bleed, and on top so
+   it owns focus and keyboard behaviour. */
+.range {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+}
+
+.range:focus-visible ~ .divider,
+.frame:has(.range:focus-visible) .grip {
+  outline: var(--lw-med) solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---- Caption --------------------------------------------------------- */
+
+.caption {
+  display: flex;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  font-size: var(--t-xs);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+
+.captionNo {
+  flex-shrink: 0;
+  font-family: var(--font-label), monospace;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}

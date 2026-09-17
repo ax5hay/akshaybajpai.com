@@ -1,0 +1,99 @@
+.back {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-8);
+}
+
+.backLink,
+.repo {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  transition: color var(--d-1);
+}
+
+.backLink:hover,
+.repo:hover {
+  color: var(--accent);
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-bottom: var(--s-8);
+}
+
+.stackItem {
+  padding: 3px var(--s-2);
+  border: var(--lw-hair) solid var(--rule);
+  background: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---- Adjacent sheets --------------------------------------------------- */
+
+.adjacent {
+  margin-top: var(--s-16);
+  padding-top: var(--s-5);
+  border-top: var(--lw-med) solid var(--rule-strong);
+}
+
+.adjacentLabel {
+  display: block;
+  margin-bottom: var(--s-4);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.adjacentList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--lw-thin);
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.adjacentLink {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  height: 100%;
+  padding: var(--s-4);
+  background: var(--paper);
+  transition: background-color var(--d-2);
+}
+
+.adjacentLink:hover {
+  background: var(--accent-soft);
+}
+
+.adjacentSheet {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.adjacentTitle {
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+  text-wrap: pretty;
+}

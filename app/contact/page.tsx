@@ -1,10 +1,11 @@
-import { PageShell } from '@/components/PageShell';
-import { ContentPage } from '@/components/ContentPage';
-import { PageHero } from '@/components/PageHero';
-import { ContactForm } from '@/components/ContactForm';
+import { PlateShell } from '@/components/plate/PlateShell';
+import { CorrespondenceForm } from '@/components/plate/CorrespondenceForm';
+import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
 import { SOCIAL } from '@/lib/constants';
 import styles from './contact.module.css';
+
+const PLATE = getPlateByHref('/contact/')!;
 
 export const metadata = buildMetadata({
   title: 'Contact · Akshay Bajpai | AI Architect & Technology Leader',
@@ -12,25 +13,52 @@ export const metadata = buildMetadata({
   path: '/contact/',
 });
 
+const CHANNELS = [
+  { label: 'Email', value: SOCIAL.email, href: `mailto:${SOCIAL.email}` },
+  { label: 'LinkedIn', value: 'linkedin.com/in/ax5hay', href: SOCIAL.linkedin },
+  { label: 'GitHub', value: 'github.com/ax5hay', href: SOCIAL.github },
+  { label: 'Twitter / X', value: '@ax5hay', href: SOCIAL.twitter },
+];
+
 export default function ContactPage() {
   return (
-    <PageShell>
-      <ContentPage section="contact">
-        <PageHero section="contact" title="Contact" lead="Let's build something that matters." />
-        <div data-reveal>
-          <p className={styles.prose}>
-            For forward-deployed AI work, architecture reviews, speaking, or collaboration on systems design and
-            performance engineering, use the form below or connect on LinkedIn and GitHub.
-          </p>
-          <nav className={styles.links} aria-label="Contact links" data-reveal-stagger>
-            <a href={`mailto:${SOCIAL.email}`} className="link-hover">{SOCIAL.email}</a>
-            <a href={SOCIAL.linkedin} target="_blank" rel="noopener noreferrer" className="link-hover">LinkedIn</a>
-            <a href={SOCIAL.github} target="_blank" rel="noopener noreferrer" className="link-hover">GitHub</a>
-            <a href={SOCIAL.twitter} target="_blank" rel="noopener noreferrer" className="link-hover">Twitter / X</a>
-          </nav>
-          <ContactForm />
-        </div>
-      </ContentPage>
-    </PageShell>
+    <PlateShell
+      sheet={PLATE.sheet}
+      title={PLATE.title}
+      subtitle={PLATE.subtitle}
+      discipline={PLATE.discipline}
+      scale={PLATE.scale}
+      revision={PLATE.revision}
+      refs={PLATE.refs}
+      lead={<p>Let&apos;s build something that matters.</p>}
+      record={CHANNELS.map((c) => ({ k: c.label.toLowerCase(), v: c.value }))}
+    >
+      <div className="prose prose-lead">
+        <p>
+          For forward-deployed AI work, architecture reviews, speaking, or collaboration on
+          systems design and performance engineering, use the form below or connect on LinkedIn
+          and GitHub.
+        </p>
+      </div>
+
+      <dl className={styles.channels}>
+        {CHANNELS.map((channel) => (
+          <div key={channel.label} className={styles.channel}>
+            <dt>{channel.label}</dt>
+            <dd>
+              <a
+                href={channel.href}
+                target={channel.href.startsWith('mailto:') ? undefined : '_blank'}
+                rel="noopener noreferrer"
+              >
+                {channel.value}
+              </a>
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <CorrespondenceForm />
+    </PlateShell>
   );
 }

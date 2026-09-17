@@ -1,23 +1,26 @@
-.wrap {
-  text-align: center;
-  min-height: calc(100vh - var(--space-32));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+/* Hatching is the drawing convention for an area outside the works. */
+.void {
+  display: grid;
+  place-items: center;
+  min-height: 16rem;
+  margin: var(--s-8) 0 var(--s-12);
+  border: var(--lw-thin) solid var(--rule);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 9px,
+    var(--rule-faint) 9px 10px
+  );
 }
 
-.home {
-  display: inline-block;
-  margin-top: var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--section-accent, var(--accent));
-  transition: color var(--duration-fast);
-}
-
-.home:hover {
-  color: var(--text);
+.kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 4px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-strong);
 }

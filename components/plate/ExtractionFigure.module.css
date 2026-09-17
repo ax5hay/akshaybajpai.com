@@ -1,0 +1,109 @@
+/* The two states either side of the extraction slider on S-201. */
+
+.pane {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--t-xs);
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.paneHead {
+  display: block;
+  margin-bottom: var(--s-3);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.pane[data-state='after'] .paneHead {
+  color: var(--accent);
+}
+
+.trace {
+  display: block;
+  margin-top: var(--s-3);
+  color: var(--ink-4);
+}
+
+.trace[data-state='after'] {
+  color: var(--accent-2);
+}
+
+/* Both states must span the full pane width: the slider clips rather than
+   reflows, so content that hugs one edge leaves the other half looking blank. */
+.afterGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 13rem);
+  gap: var(--s-6);
+  align-items: start;
+}
+
+.schedule {
+  margin: 0;
+  border-top: var(--lw-thin) solid var(--rule);
+}
+
+.schedule > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: 3px 0;
+  border-bottom: var(--lw-hair) solid var(--rule-faint);
+}
+
+.schedule dt,
+.schedule dd {
+  margin: 0;
+  font-size: var(--t-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule dt {
+  color: var(--ink-3);
+}
+
+.schedule dd {
+  color: var(--accent);
+}
+
+.scheduleHead dt,
+.scheduleHead dd {
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+@media (max-width: 40rem) {
+  .afterGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-4);
+  }
+}
+
+.json {
+  margin: 0;
+  font: inherit;
+  white-space: pre;
+  color: var(--ink-2);
+}
+
+/* Token colours are drawn from the palette so they re-ink with the mode
+   rather than staying a fixed editor theme. */
+.key {
+  color: var(--accent-2);
+}
+
+.string {
+  color: var(--ink);
+}
+
+.number {
+  color: var(--accent);
+}
+
+.punct {
+  color: var(--ink-4);
+}
