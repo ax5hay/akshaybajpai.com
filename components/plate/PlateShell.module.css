@@ -1,0 +1,275 @@
+.plate {
+  position: relative;
+}
+
+/* ---- Mode switching -----------------------------------------------------
+   Raw mode swaps the drawing for its record. Doing this in CSS keeps all
+   three modes static markup: no client branch, no flash, no second render. */
+
+.raw {
+  display: none;
+}
+
+html[data-mode='raw'] .head,
+html[data-mode='raw'] .body,
+html[data-mode='raw'] .refs {
+  display: none;
+}
+
+html[data-mode='raw'] .raw {
+  display: block;
+}
+
+/* ---- Header -------------------------------------------------------------- */
+
+.head {
+  margin-bottom: var(--s-12);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.sheetTag {
+  padding: 4px var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.hairline {
+  width: var(--s-8);
+  height: var(--lw-thin);
+  background: var(--rule-strong);
+}
+
+.disciplineName {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.5rem, 7vw, var(--t-4xl));
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+html[data-mode='annotated'] .title {
+  font-size: clamp(1.9rem, 5vw, 2.75rem);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin-top: var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  text-wrap: balance;
+}
+
+.lead {
+  margin-top: var(--s-6);
+  max-width: var(--measure);
+  font-size: var(--t-lg);
+  line-height: var(--lh-snug);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* Sheet data table — ruled cells, like the data block on a real drawing. */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lw-thin);
+  margin-top: var(--s-8);
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.fact {
+  flex: 1 1 7rem;
+  padding: var(--s-2) var(--s-3);
+  background: var(--paper);
+}
+
+.fact dt {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 2px;
+}
+
+.fact dd {
+  margin: 0;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  color: var(--ink);
+}
+
+.headRule {
+  height: var(--lw-heavy);
+  margin-top: var(--s-8);
+  background: var(--ink);
+}
+
+/* ---- Cross-references ----------------------------------------------------- */
+
+.refs {
+  margin-top: var(--s-16);
+  padding-top: var(--s-5);
+  border-top: var(--lw-thin) solid var(--rule);
+}
+
+.refsLabel {
+  display: block;
+  margin-bottom: var(--s-4);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.refsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+
+.ref {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: var(--lw-thin) solid var(--rule);
+  background: var(--paper-raised);
+  transition: border-color var(--d-2), transform var(--d-2) var(--ease-plate);
+}
+
+.ref:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.refSheet {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.refTitle {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* ---- Raw record ------------------------------------------------------------ */
+
+.rawHead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-2) var(--s-3);
+  margin-bottom: var(--lw-thin);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.rawHead:not(:first-child) {
+  margin-top: var(--s-10);
+}
+
+.rawTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lw-hair);
+  margin: 0;
+  background: var(--rule-faint);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.rawRow {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: var(--s-4);
+  padding: var(--s-2) var(--s-3);
+  background: var(--paper);
+  font-family: var(--font-mono), monospace;
+  font-size: var(--t-xs);
+}
+
+.rawRow dt {
+  color: var(--accent);
+}
+
+.rawRow dd {
+  margin: 0;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.rawSource {
+  margin: 0;
+  padding: var(--s-4);
+  border: var(--lw-thin) solid var(--rule);
+  background: var(--paper-raised);
+  overflow-x: auto;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--t-xs);
+  line-height: 1.7;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  /* Long articles would otherwise make the record unscannable. */
+  max-height: 44rem;
+  overflow-y: auto;
+}
+
+@media (max-width: 44rem) {
+  .rawRow {
+    grid-template-columns: 1fr;
+    gap: var(--s-1);
+  }
+
+  .facts {
+    flex-direction: column;
+  }
+
+  /* Stacked, the 7rem basis would size cell height instead of width and
+     leave each fact in a block of dead space. */
+  .fact {
+    flex: 0 0 auto;
+  }
+}

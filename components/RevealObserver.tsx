@@ -3,44 +3,35 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
-function revealAll() {
-  document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => {
-    el.classList.add('reveal-visible');
-  });
-}
+const SELECTOR = '[data-reveal], [data-reveal-stagger]';
 
+/**
+ * Draws plate content in as it enters the viewport. Elements are unobserved
+ * once revealed so a long sheet never keeps hundreds of live targets.
+ */
 export function RevealObserver() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const embedded = window.self !== window.top;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const targets = Array.from(document.querySelectorAll(SELECTOR));
 
-    if (embedded) {
-      document.body.classList.add('embedded');
-    }
-
-    if (embedded || reduced) {
-      // IntersectionObserver is unreliable inside iframe modals — show content immediately
-      revealAll();
-      return () => {
-        if (embedded) document.body.classList.remove('embedded');
-      };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      targets.forEach((el) => el.classList.add('is-revealed'));
+      return;
     }
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add('reveal-visible');
-        });
+      (entries, obs) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('is-revealed');
+          obs.unobserve(entry.target);
+        }
       },
-      { rootMargin: '0px 0px -6% 0px', threshold: 0 }
+      { rootMargin: '0px 0px -8% 0px', threshold: 0 }
     );
 
-    document.querySelectorAll('[data-reveal], [data-reveal-stagger]').forEach((el) => {
-      observer.observe(el);
-    });
-
+    targets.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [pathname]);
 

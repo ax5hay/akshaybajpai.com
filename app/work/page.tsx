@@ -1,56 +1,52 @@
-import { PageShell } from '@/components/PageShell';
-import { ContentPage } from '@/components/ContentPage';
-import { PageHero } from '@/components/PageHero';
-import { WorkIndex } from '@/components/WorkIndex';
-import {
-  getCollection,
-  getAllTagsFromWork,
-  parseGithubRepo,
-  type WorkFrontmatter,
-} from '@/lib/content';
+import { PlateShell } from '@/components/plate/PlateShell';
+import { SheetSchedule, type ScheduleRow } from '@/components/plate/SheetSchedule';
+import { getCollection, estimateReadingTime, type WorkFrontmatter } from '@/lib/content';
+import { detailSheetNumber, getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
+
+const PLATE = getPlateByHref('/work/')!;
 
 export const metadata = buildMetadata({
   title: 'Work · Akshay Bajpai | AI Architect & Technology Leader',
-  description: 'Case studies in AI systems, architecture, and performance.',
+  description:
+    'Case studies in forward-deployed AI: agentic platforms, clinical and insurance document intelligence, demand forecasting, and multi-tenant LLM systems.',
   path: '/work/',
 });
 
 export default async function WorkIndexPage() {
-  const cases = await getCollection<WorkFrontmatter>('work');
-  const tags = getAllTagsFromWork(cases);
+  const entries = await getCollection<WorkFrontmatter>('work');
 
-  const items = cases.map((c) => ({
-    slug: c.slug,
-    href: `/work/${c.slug}/`,
-    title: c.frontmatter.title,
-    date: c.frontmatter.pubDate,
-    description: c.frontmatter.description,
-    meta: c.frontmatter.client,
-    githubUrl: parseGithubRepo(c.frontmatter.client) ?? undefined,
-    stackTags: c.frontmatter.stack,
-    metrics: c.frontmatter.metrics,
+  const rows: ScheduleRow[] = entries.map((entry, i) => ({
+    sheet: detailSheetNumber('work', i),
+    title: entry.frontmatter.title,
+    description: entry.frontmatter.description,
+    href: `/work/${entry.slug}/`,
+    date: entry.frontmatter.pubDate,
+    tags: entry.frontmatter.stack,
+    readingTime: estimateReadingTime(entry.content),
   }));
 
   return (
-    <PageShell>
-      <ContentPage section="work" wide>
-        <PageHero
-          section="work"
-          title="Work"
-          eyebrow={`Work · ${cases.length} case ${cases.length === 1 ? 'study' : 'studies'}`}
-          lead={
-            <>
-              Forward-deployed client systems, open-source platforms, and research builds from{' '}
-              <a href="https://github.com/ax5hay" className="link-hover">
-                @ax5hay
-              </a>
-              — architecture, tradeoffs, and lessons from production delivery.
-            </>
-          }
-        />
-        <WorkIndex items={items} tags={tags} featuredSlug="forward-deployed-multi-tenant-fertility-ai" />
-      </ContentPage>
-    </PageShell>
+    <PlateShell
+      sheet={PLATE.sheet}
+      title={PLATE.title}
+      subtitle={PLATE.subtitle}
+      discipline={PLATE.discipline}
+      scale={PLATE.scale}
+      revision={PLATE.revision}
+      refs={PLATE.refs}
+      facts={[{ k: 'Sheets', v: String(rows.length) }]}
+      record={[{ k: 'series', v: 'W-4xx' }, { k: 'count', v: String(rows.length) }]}
+      wide
+      lead={
+        <p>
+          Engagements where the model was the easy part. Each sheet records what was built, the
+          constraints it was built under, and the numbers it was measured by. Organisation names
+          are generalised; the engineering is not.
+        </p>
+      }
+    >
+      <SheetSchedule rows={rows} unit="case studies" />
+    </PlateShell>
   );
 }

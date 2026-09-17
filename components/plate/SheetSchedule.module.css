@@ -1,0 +1,179 @@
+.schedule {
+  margin-top: var(--s-4);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 5rem 1fr 7rem;
+  gap: var(--s-4);
+  padding: var(--s-2) 0;
+  border-bottom: var(--lw-med) solid var(--rule-strong);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.columns span:last-child {
+  text-align: right;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  border-bottom: var(--lw-thin) solid var(--rule-faint);
+}
+
+.link {
+  position: relative;
+  display: grid;
+  grid-template-columns: 5rem 1fr 7rem;
+  gap: var(--s-4);
+  padding: var(--s-5) 0;
+  transition: background-color var(--d-2) var(--ease-plate);
+}
+
+.link:hover {
+  background: var(--accent-soft);
+}
+
+/* A leader rule runs out from the left edge on hover, like a pen tracking
+   across the schedule. */
+.leader {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--lw-thick);
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform var(--d-2) var(--ease-plate);
+}
+
+.link:hover .leader,
+.link:focus-visible .leader {
+  transform: scaleY(1);
+}
+
+.sheet {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  padding-left: var(--s-3);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-lg);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+  text-wrap: balance;
+  transition: color var(--d-1);
+}
+
+html[data-mode='annotated'] .title,
+html[data-mode='raw'] .title {
+  font-size: var(--t-md);
+  text-transform: uppercase;
+}
+
+.link:hover .title {
+  color: var(--accent);
+}
+
+.description {
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-1);
+}
+
+.tag {
+  padding: 2px var(--s-2);
+  border: var(--lw-hair) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--s-1);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+.readingTime {
+  color: var(--ink-4);
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: var(--lw-med) solid var(--rule-strong);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.empty {
+  padding: var(--s-12) 0;
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+}
+
+@media (max-width: 48rem) {
+  .columns {
+    display: none;
+  }
+
+  .link {
+    grid-template-columns: 1fr;
+    gap: var(--s-2);
+    padding-left: var(--s-3);
+  }
+
+  .sheet {
+    padding-left: 0;
+  }
+
+  .meta {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--s-3);
+  }
+}

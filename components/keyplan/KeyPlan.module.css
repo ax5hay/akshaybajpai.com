@@ -1,0 +1,589 @@
+/* G-000 — the general arrangement. A single transformed plane holding every
+   sheet in the set, pannable and zoomable, with level-of-detail so the plan
+   reads as a composition when far out and as a contents table when close in. */
+
+.stage {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.surface {
+  position: absolute;
+  top: var(--plate-top);
+  bottom: var(--plate-bottom);
+  left: calc(var(--sheet-margin) + var(--s-2));
+  right: calc(var(--sheet-margin) + var(--s-2));
+  overflow: hidden;
+  touch-action: none;
+}
+
+.surface[data-interactive] {
+  cursor: grab;
+}
+
+.surface[data-interactive]:active {
+  cursor: grabbing;
+}
+
+.plane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  transition-property: transform;
+  transition-timing-function: var(--ease-plate);
+  will-change: transform;
+}
+
+/* ---- Cross-reference leaders ---------------------------------------- */
+
+/* Leaders run in the gutters between sheets, so they sit under the plates:
+   the line stops at each boundary and never needs to cross a sheet face. */
+.leaders {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.leader {
+  stroke: var(--rule);
+  stroke-width: 1.25;
+  stroke-dasharray: 5 6;
+  transition: stroke var(--d-2), stroke-width var(--d-2);
+}
+
+.leader[data-lit] {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+/* ---- Headline, set into the plan's empty quadrant -------------------- */
+
+/* Position comes from KEY_PLAN_FURNITURE so the plan's composition lives in
+   one place rather than being split between the registry and this file. */
+.header {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.headline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin: 0;
+}
+
+.headlineName {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 46px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.headlineRole {
+  font-family: var(--font-label), monospace;
+  font-size: 10px;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.headlineNote {
+  margin-top: var(--s-3);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+.headlineNote kbd {
+  font-family: var(--font-label), monospace;
+  padding: 0 3px;
+  border: 1px solid var(--rule);
+  background: var(--paper-raised);
+}
+
+/* ---- Sheets ----------------------------------------------------------- */
+
+.plate {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  overflow: hidden;
+  transition:
+    border-color var(--d-2) var(--ease-plate),
+    background-color var(--d-2) var(--ease-plate),
+    box-shadow var(--d-2) var(--ease-plate),
+    transform var(--d-2) var(--ease-plate);
+}
+
+.plate:hover,
+.plate:focus-visible {
+  border-color: var(--accent);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-deep);
+  transform: translateY(-2px);
+  z-index: 2;
+}
+
+/* Sheet number tag, reversed out in the top-left as on a drawing. */
+.plateTag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4px 8px;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--paper);
+  background: var(--ink);
+  transition: background-color var(--d-2);
+}
+
+.plate:hover .plateTag,
+.plate:focus-visible .plateTag {
+  background: var(--accent);
+}
+
+.plateHead {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 52px;
+  min-height: 26px;
+}
+
+.plateTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 19px;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.plateSubtitle {
+  font-family: var(--font-label), monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.plateBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Each row of the miniature contents: a sheet number, a title, a fact.
+   Unnumbered plates drop the gutter entirely rather than reserving dead
+   width that would truncate their titles. */
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--rule-faint);
+}
+
+.plateBody[data-numbered] .item {
+  grid-template-columns: 42px 1fr auto;
+}
+
+.itemSheet {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.itemTitle {
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Narrow plates have no width to spare, so the fact column is drawn only on
+   the wide ones. */
+.itemMeta {
+  display: none;
+  font-family: var(--font-label), monospace;
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+  max-width: 13ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plate[data-wide] .itemMeta {
+  display: block;
+}
+
+.plateFoot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 7px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.plateOpen {
+  margin-left: auto;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--d-2) var(--ease-plate), transform var(--d-2) var(--ease-plate);
+}
+
+.plate:hover .plateOpen,
+.plate:focus-visible .plateOpen {
+  opacity: 1;
+  transform: none;
+}
+
+/* Clipped corner: the drawing convention for a partial view. */
+.corner {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 14px;
+  height: 14px;
+  background: var(--paper);
+  border-left: 1px solid var(--rule-strong);
+  border-top: 1px solid var(--rule-strong);
+  transition: border-color var(--d-2);
+}
+
+.plate:hover .corner,
+.plate:focus-visible .corner {
+  border-color: var(--accent);
+}
+
+/* ---- Level of detail --------------------------------------------------
+   Zoomed out the plan is a composition of labelled blocks; zoomed in it
+   becomes a readable contents table. Rows fade rather than reflow so the
+   transition never costs a layout pass. */
+
+.plane[data-lod='far'] .plateBody,
+.plane[data-lod='far'] .plateFoot,
+.plane[data-lod='far'] .headlineNote {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plane[data-lod='far'] .plateTitle {
+  font-size: 23px;
+}
+
+.plane[data-lod='far'] .notes {
+  opacity: 0;
+}
+
+.plateBody,
+.plateFoot,
+.headlineNote,
+.notes {
+  transition: opacity var(--d-2) var(--ease-plate);
+}
+
+/* ---- General notes ----------------------------------------------------- */
+
+.notes {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+
+.notesTitle {
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--rule-strong);
+  font-family: var(--font-label), monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.notesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.note {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 8px;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.noteNo {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 9px;
+  color: var(--accent);
+}
+
+/* ---- Legend ------------------------------------------------------------ */
+
+.legend {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--paper) 60%, transparent);
+  font-family: var(--font-label), monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.legendTitle {
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--ink-2);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.legendRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendSwatch {
+  width: 22px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.legendSwatch[data-kind='sheet'] {
+  border: 1px solid var(--rule-strong);
+}
+
+.legendSwatch[data-kind='leader'] {
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--rule-strong) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.legendSwatch[data-kind='rev'] {
+  height: 8px;
+  background: var(--accent);
+}
+
+.legendScale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Alternating tick bar, as printed beside a plan scale. */
+.scaleBar {
+  width: 64px;
+  height: 6px;
+  background:
+    repeating-linear-gradient(90deg, var(--ink-3) 0 8px, transparent 8px 16px);
+  border: 1px solid var(--ink-4);
+}
+
+/* ---- Controls ---------------------------------------------------------- */
+
+.controls {
+  position: absolute;
+  left: calc(var(--sheet-margin) + var(--s-3));
+  bottom: calc(var(--sheet-margin) + var(--s-3));
+  z-index: 3;
+  display: flex;
+  align-items: stretch;
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule);
+  box-shadow: var(--shadow-lift);
+}
+
+.control,
+.controlFit,
+.controlHelp {
+  display: grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  color: var(--ink-2);
+  border-right: var(--lw-hair) solid var(--rule);
+  transition: color var(--d-1), background-color var(--d-1);
+}
+
+.controlHelp {
+  border-right: none;
+}
+
+.controlFit {
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.control:hover,
+.controlFit:hover,
+.controlHelp:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.hint {
+  position: absolute;
+  right: var(--sheet-margin);
+  bottom: calc(var(--sheet-margin) + var(--titleblock-h) + var(--s-3));
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+  pointer-events: none;
+}
+
+/* ---- Narrow sheets: the plan becomes a stacked index ------------------- */
+
+@media (max-width: 59.999rem) {
+  .stage {
+    height: auto;
+    overflow: visible;
+  }
+
+  .surface {
+    position: static;
+    overflow: visible;
+    touch-action: auto;
+    padding: var(--plate-top) var(--sheet-gutter) var(--plate-bottom);
+  }
+
+  .plane {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  .leaders,
+  .legend,
+  .hint,
+  .controls {
+    display: none;
+  }
+
+  /* Furniture carries inline geometry from KEY_PLAN_FURNITURE, which has to
+     be overridden to let these blocks join the stacked flow. */
+  .header,
+  .notes {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .header {
+    margin-bottom: var(--s-6);
+  }
+
+  .notes {
+    order: 1;
+    padding: var(--s-4);
+  }
+
+  .headlineName {
+    font-size: clamp(2.25rem, 11vw, 3.25rem);
+  }
+
+  .headlineRole,
+  .headlineNote {
+    font-size: var(--t-xs);
+  }
+
+  /* Stays a containing block so the sheet tag and corner mark stay inside
+     their own plate, but the plan coordinates must be neutralised or they
+     would offset each card out of the stack. */
+  .plate {
+    position: relative !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0;
+    padding: var(--s-4);
+  }
+
+  .plateBody {
+    max-height: 9rem;
+  }
+
+  .plateTitle {
+    font-size: var(--t-lg);
+  }
+
+  .itemTitle {
+    font-size: var(--t-xs);
+  }
+
+  .plateOpen {
+    opacity: 1;
+    transform: none;
+  }
+}

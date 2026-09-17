@@ -1,0 +1,226 @@
+/* ================================================================= Button */
+
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-3) var(--s-5);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  border: var(--lw-thin) solid var(--rule-strong);
+  color: var(--ink);
+  background: var(--paper-raised);
+  transition:
+    color var(--d-2) var(--ease-plate),
+    background-color var(--d-2) var(--ease-plate),
+    border-color var(--d-2) var(--ease-plate),
+    transform var(--d-1) var(--ease-plate);
+}
+
+.button[data-full] {
+  width: 100%;
+}
+
+.button[data-variant='solid'] {
+  color: var(--paper);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.button[data-variant='ghost'] {
+  border-color: transparent;
+  background: none;
+  color: var(--ink-2);
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.button[data-variant='solid']:hover:not(:disabled) {
+  color: var(--paper);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Presses in, like a key on a panel, rather than lifting like a web button. */
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  color: var(--ink-4);
+  border-color: var(--rule);
+  cursor: not-allowed;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 4px,
+    var(--rule-faint) 4px 5px
+  );
+}
+
+.buttonLabel {
+  position: relative;
+  z-index: 1;
+}
+
+/* A drafting tick that runs out along the bottom edge on hover. */
+.buttonRule {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: var(--lw-thick);
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--d-2) var(--ease-plate);
+}
+
+.button:hover:not(:disabled) .buttonRule {
+  transform: scaleX(1);
+}
+
+/* ================================================================= Switch */
+
+.switchRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-3) 0;
+  border-bottom: var(--lw-thin) solid var(--rule-faint);
+}
+
+.switchLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.switchName {
+  font-size: var(--t-sm);
+  color: var(--ink);
+}
+
+.switchHint {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  color: var(--ink-4);
+}
+
+/* The input stays in the layer above the painted track so it keeps native
+   semantics and hit area while the track does the drawing. */
+.switchInput {
+  position: absolute;
+  right: 0;
+  width: 4.5rem;
+  height: 1.6rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.switchTrack {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 4.5rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+  background: var(--paper-sunk);
+  border: var(--lw-thin) solid var(--rule-strong);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.switchThumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: var(--ink);
+  transition: transform var(--d-2) var(--ease-mech), background-color var(--d-2);
+}
+
+.switchInput:checked ~ .switchTrack .switchThumb {
+  transform: translateX(100%);
+  background: var(--accent);
+}
+
+.switchOn,
+.switchOff {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color var(--d-2);
+}
+
+.switchOn {
+  order: 2;
+  color: var(--ink-4);
+}
+
+.switchOff {
+  order: 1;
+  color: var(--paper);
+}
+
+.switchInput:checked ~ .switchTrack .switchOn {
+  color: var(--paper);
+}
+
+.switchInput:checked ~ .switchTrack .switchOff {
+  color: var(--ink-4);
+}
+
+.switchInput:focus-visible ~ .switchTrack {
+  outline: var(--lw-med) solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ================================================================== Stamp */
+
+.stamp {
+  display: inline-block;
+  transform: rotate(-4deg);
+  /* Ink sits unevenly on paper; the stamp should not look printed. */
+  opacity: 0.86;
+}
+
+.stampInner {
+  display: inline-block;
+  padding: var(--s-2) var(--s-4);
+  border: var(--lw-heavy) solid currentColor;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.stamp[data-tone='draft'] .stampInner {
+  color: var(--ink-3);
+}
+
+.stamp[data-tone='void'] .stampInner {
+  color: var(--ink-4);
+  text-decoration: line-through;
+}

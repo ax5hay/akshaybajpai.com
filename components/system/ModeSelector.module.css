@@ -1,0 +1,138 @@
+/* A three-detent selector switch, drawn as equipment bolted to the sheet
+   rather than a web toggle. */
+
+.housing {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule);
+  box-shadow: var(--shadow-lift);
+}
+
+.caption {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.track {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  background: var(--paper-sunk);
+  border: var(--lw-hair) solid var(--rule);
+  /* Inset so the thumb reads as travelling inside a machined slot. */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+/* Positioned by detent index, so a fourth mode would need no new CSS. */
+.thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: calc(100% / 3);
+  background: var(--ink);
+  transform: translateX(calc(var(--position, 0) * 100%));
+  transition: transform var(--d-2) var(--ease-mech);
+  will-change: transform;
+}
+
+.track[data-position='0'] { --position: 0; }
+.track[data-position='1'] { --position: 1; }
+.track[data-position='2'] { --position: 2; }
+
+.detent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--s-2) var(--s-4) calc(var(--s-2) - 1px);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+  transition: color var(--d-2) var(--ease-mech);
+}
+
+.detent:hover {
+  color: var(--ink);
+}
+
+.detent[aria-checked='true'] {
+  color: var(--paper);
+}
+
+/* Index mark above each position, as on a real panel. */
+.tick {
+  width: var(--lw-thin);
+  height: 4px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.detent[aria-checked='true'] .tick {
+  opacity: 1;
+  height: 5px;
+  background: var(--accent);
+}
+
+.name {
+  line-height: 1;
+}
+
+.rev {
+  display: none;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  display: grid;
+  place-items: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 3px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  color: var(--ink-3);
+  background: var(--paper);
+  border: var(--lw-hair) solid var(--rule);
+}
+
+@media (max-width: 64rem) {
+  .caption,
+  .hint {
+    display: none;
+  }
+
+  .detent {
+    padding-inline: var(--s-3);
+  }
+}
+
+/* On the narrowest sheets the switch keeps its throw but drops to revisions. */
+@media (max-width: 30rem) {
+  .name {
+    display: none;
+  }
+
+  .rev {
+    display: block;
+  }
+
+  .detent {
+    padding-inline: var(--s-4);
+  }
+}

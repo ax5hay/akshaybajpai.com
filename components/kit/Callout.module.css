@@ -1,0 +1,76 @@
+.host {
+  position: relative;
+}
+
+/* The note and its leader are laid out in both modes but only inked in
+   annotated mode, so switching costs a repaint and never a reflow. */
+.leader,
+.note {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--d-2) var(--ease-plate);
+}
+
+.leader {
+  position: absolute;
+  top: 0.65em;
+  left: 100%;
+  width: var(--s-8);
+  height: var(--lw-thin);
+  margin-left: var(--s-3);
+  background: var(--accent-line, var(--accent));
+}
+
+.note {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s-2);
+  width: 12rem;
+  margin-left: calc(var(--s-8) + var(--s-6));
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  line-height: 1.5;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
+.no::before {
+  content: counter(callout, decimal-leading-zero);
+  counter-increment: callout;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+html[data-mode='annotated'] .leader {
+  opacity: 1;
+}
+
+html[data-mode='annotated'] .note {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* No margin to write in on a narrow sheet: the notes fall inline under the
+   block they key, still numbered, still only in annotated mode. */
+@media (max-width: 78rem) {
+  .leader {
+    display: none;
+  }
+
+  .note {
+    position: static;
+    display: none;
+    width: auto;
+    margin: var(--s-3) 0 0;
+    padding-left: var(--s-3);
+    border-left: var(--lw-med) solid var(--accent-line, var(--accent));
+  }
+
+  html[data-mode='annotated'] .note {
+    display: grid;
+  }
+}
