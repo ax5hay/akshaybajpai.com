@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ArticlePlate } from '@/components/plate/ArticlePlate';
 import { getAllSlugs, getEntry, estimateReadingTime } from '@/lib/content';
-import { adjacentSheets, detailSheetFor } from '@/lib/sheet-index';
+import { adjacentSheets, crossReferences, detailSheetFor } from '@/lib/sheet-index';
 import { buildMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
@@ -28,9 +28,10 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   const post = await getEntry('blog', slug);
   if (!post) notFound();
 
-  const [sheet, adjacent] = await Promise.all([
+  const [sheet, adjacent, xrefs] = await Promise.all([
     detailSheetFor('blog', slug),
     adjacentSheets('blog', slug, 3),
+    crossReferences(`/blog/${slug}/`),
   ]);
 
   return (
@@ -47,6 +48,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
       seriesHref="/blog/"
       seriesLabel="Field Notes"
       adjacent={adjacent}
+      xrefs={xrefs}
     />
   );
 }

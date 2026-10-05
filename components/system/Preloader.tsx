@@ -135,6 +135,8 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
   const [done, setDone] = useState(false);
   /** The set is in the cache: the way in can be offered. */
   const [loaded, setLoaded] = useState(false);
+  /** Sheets this visit will actually fetch: fewer on a frugal connection. */
+  const [issuing, setIssuing] = useState(sheets.length);
   /** Seconds until the cover lifts by itself, and whether that is on hold. */
   const [left, setLeft] = useState(0);
   const [run, setRun] = useState(0);
@@ -156,8 +158,13 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
     const started = performance.now();
     const here = pathname.endsWith('/') ? pathname : `${pathname}/`;
     const connection = (navigator as Navigator & { connection?: Connection }).connection;
+    // A phone is the device most likely to be on a metered or patchy link,
+    // and Safari does not report the connection at all, so a narrow screen
+    // is treated the same as one that asks to save data.
     const frugal =
-      Boolean(connection?.saveData) || /(^|-)2g|3g/.test(connection?.effectiveType ?? '');
+      Boolean(connection?.saveData) ||
+      /(^|-)2g|3g/.test(connection?.effectiveType ?? '') ||
+      window.matchMedia('(max-width: 40rem)').matches;
 
     // The section sheets always; the detail sheets too unless that would be
     // spending someone's data allowance on pages they have not asked for.
@@ -182,10 +189,10 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       el.style.setProperty('--issued', String(issued));
       el.style.setProperty('--p', String(Math.min(1, stepsDone / steps)));
       el.style.setProperty('--task', JSON.stringify(task));
-      el.querySelectorAll(`.${styles.countTotal}`).forEach((n) => {
-        n.textContent = String(total);
-      });
     };
+    // In state, not written to the DOM: the next render would put the full
+    // count straight back.
+    setIssuing(total);
     show('Setting type');
 
     let released = false;
@@ -323,7 +330,12 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
         if (issued === 1) show('Instruments ready');
         settle();
       });
-    wanted.forEach((s) => router.prefetch(s.href));
+    // Not until the page's own styles, scripts and typefaces are in: thirty
+    // prefetches started alongside them compete for the same connection and
+    // hold up the first paint they were meant to follow.
+    const issue = () => wanted.forEach((s) => router.prefetch(s.href));
+    if (document.readyState === 'complete') issue();
+    else window.addEventListener('load', issue, { once: true });
     settle();
 
     // A network that never answers must not keep the door shut. Whatever is
@@ -351,6 +363,7 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       timers.forEach(clearTimeout);
       timers = [];
       window.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('load', issue);
     };
     // Runs once: the cover belongs to the load, not to later navigations.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -373,13 +386,13 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       {/* The three prints say the same thing three times over; assistive
           technology is given the button and nothing else to wade through. */}
       <div className={`${styles.layer} ${styles.raw}`} aria-hidden="true">
-        <Print total={sheets.length} />
+        <Print total={issuing} />
       </div>
       <div className={`${styles.layer} ${styles.annot}`} aria-hidden="true">
-        <Print total={sheets.length} />
+        <Print total={issuing} />
       </div>
       <div className={`${styles.layer} ${styles.paper}`} aria-hidden="true">
-        <Print total={sheets.length} />
+        <Print total={issuing} />
       </div>
 
       <span className={`${styles.seam} ${styles.seamOuter}`} aria-hidden="true" />

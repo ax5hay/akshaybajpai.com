@@ -156,6 +156,41 @@ html[data-mode='raw'] .title {
   color: var(--ink-3);
 }
 
+/* The article's section profile at thumbnail size: the same strip the sheet
+   itself opens with, so the index shows the shape of what is behind it. */
+.profile {
+  display: flex;
+  width: 100%;
+  height: 0.5rem;
+  margin-top: var(--s-2);
+  border: var(--lw-thin) solid var(--ink-3);
+}
+
+.profile span {
+  flex-basis: 0;
+  border-left: var(--lw-thin) solid var(--ink-3);
+  transition: background-color var(--d-2) var(--ease-plate);
+}
+
+.profile span:first-child {
+  border-left: none;
+}
+
+/* On hover the strip is inked in, left to right, as if being read. */
+.link:hover .profile span,
+.link:focus-visible .profile span {
+  background: var(--accent);
+  transition-delay: calc(var(--n, 0) * 45ms);
+}
+
+.profile span:nth-child(2) { --n: 1; }
+.profile span:nth-child(3) { --n: 2; }
+.profile span:nth-child(4) { --n: 3; }
+.profile span:nth-child(5) { --n: 4; }
+.profile span:nth-child(6) { --n: 5; }
+.profile span:nth-child(7) { --n: 6; }
+.profile span:nth-child(n + 8) { --n: 7; }
+
 /* ---- Stack key: the filter ----------------------------------------------- */
 
 .key {
@@ -289,6 +324,11 @@ html[data-mode='raw'] .metric {
     flex-wrap: wrap;
   }
 
+  .profile {
+    flex-basis: 100%;
+    margin-top: 0;
+  }
+
   .columns {
     display: none;
   }
@@ -307,5 +347,91 @@ html[data-mode='raw'] .metric {
     flex-direction: row;
     align-items: baseline;
     gap: var(--s-3);
+  }
+}
+
+/* =============================================================================
+   TOUCH. There is no hover to ink a row's profile in, so it is inked by the
+   row's own passage up the screen: a view timeline, which costs no script.
+   ========================================================================== */
+
+@media (hover: none) {
+  .profile {
+    position: relative;
+  }
+
+  @supports (animation-timeline: view()) {
+    .profile::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      mix-blend-mode: multiply;
+      transform-origin: left center;
+      animation: profile-read linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 55%;
+    }
+
+    html[data-mode='annotated'] .profile::after,
+    html[data-mode='raw'] .profile::after {
+      mix-blend-mode: normal;
+      opacity: 0.55;
+    }
+  }
+
+  /* A pressed row answers at once; the hover tint would otherwise stick to
+     the last row touched. */
+  .link:hover {
+    background: none;
+  }
+
+  .link:active {
+    background: var(--accent-soft);
+  }
+}
+
+@keyframes profile-read {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* The stack key is one line that swipes, with the next tag showing at the
+   edge to say so; wrapped, it pushed the first case study off the screen. */
+@media (max-width: 48rem) {
+  .keyTags {
+    flex-wrap: nowrap;
+    margin-inline: calc(var(--sheet-pad, 0px) * -1);
+    padding: 2px var(--sheet-pad, 0px);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+  }
+
+  .keyTags::-webkit-scrollbar {
+    display: none;
+  }
+
+  .keyTag {
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+
+  .keyTag:last-child {
+    margin-right: 2.5rem;
+  }
+
+  .keyLabel::after {
+    content: ' · swipe';
+    font-weight: 400;
   }
 }

@@ -49,8 +49,12 @@ export function SheetProfile({
     let tops: number[] = [];
     let end = 0;
     let frame = 0;
+    let pin = 0;
+    const narrow = window.matchMedia('(max-width: 40rem)');
 
     const measure = () => {
+      pin = root ? parseFloat(getComputedStyle(root).top) || 0 : 0;
+      if (!narrow.matches) root?.removeAttribute('data-stuck');
       tops = sections.map((s) => {
         const el = document.getElementById(s.id);
         return el ? el.getBoundingClientRect().top + window.scrollY : Infinity;
@@ -79,6 +83,11 @@ export function SheetProfile({
         done += sections[at].words * within;
       }
       root?.style.setProperty('--at', String(done / total));
+      // On a phone the strip stays under the rail; once it is riding there
+      // it is drawn slimmer (see the stylesheet).
+      if (root && narrow.matches) {
+        root.toggleAttribute('data-stuck', root.getBoundingClientRect().top <= pin + 1);
+      }
     };
 
     const onScroll = () => {

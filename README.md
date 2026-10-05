@@ -489,6 +489,20 @@ same registry is drawn as something else.
 | **The dock** | Below `40rem` the instruments leave the rail for a bar at the foot, where a thumb is: sheet number and title block, index, lens, and the `A · B · C` mode switch |
 | **Reading line** | Along the top of the dock a dimension line fills as the sheet is read, driven by a CSS scroll timeline |
 
+Inside the sheets, the phone gets its own handling too:
+
+- **The section strip follows the reader.** With no margin to key sections in,
+  the strip sticks under the rail for the length of an article, slimmer once it
+  is riding there, with the current section named beneath it.
+- **Index profiles ink themselves** as each row passes up the screen, on a CSS
+  view timeline, since there is no hover to do it.
+- **The stack key is one swipeable line**, not five wrapped rows.
+- **Form fields are 16px**, the size below which iOS zooms the page on focus.
+- **Wide tables scroll inside themselves**, not the page.
+- **Preloading stays out of the way.** The cover starts prefetching only after
+  the page's own assets have loaded, and on a narrow screen fetches the seven
+  section sheets, not all thirty-one.
+
 Scrolling the pile holds 60 fps (median frame 16.7 ms, worst 21.8 ms, headless Chromium at
 390 × 844). Nothing on a phone uses `backdrop-filter`.
 
@@ -506,6 +520,21 @@ How a reader learns the set can be operated
 ([`Hints.tsx`](components/system/Hints.tsx)). One note at a time, keyed like a note on a
 drawing, saying one thing the reader can do **where they are, on the device they are
 holding**.
+
+What a note says depends on the sheet. The things only that sheet can do are
+said first, then the things every sheet can:
+
+| Sheet | Said first |
+|:------|:-----------|
+| Key plan | How to move around it (pan, zoom, arrows; or the pile and the small plan on a phone) |
+| An article | The section strip, and that numbered headings copy a reference |
+| A case study | That Fig. 1 is operable, then the two above |
+| The Architect | That the elevation is operable |
+| Works | That the stack key filters |
+| Structural Principles | The slider, the schematic and the live switches |
+
+Wording follows the device: *tap* and *swipe* on a phone, *click*, *hover* and
+keys on a desktop.
 
 | Rule | |
 |:-----|:--|
@@ -541,6 +570,10 @@ The frame is the same on every route. What is drawn inside it is not.
 | **`R-301` Research** | A ruled **schedule of record** for degrees, the publication and the studies |
 | **`S-201` Structural Principles** | A second operable schematic, of the gateway-first routing tiers the page describes |
 | **`W-400` Works** | A **stack key** above the schedule. Choosing a tag strikes the other sheets back without removing them, so the schedule keeps its length and numbering. Each row carries its lead figure |
+| **Index sheets** (`W-400`, `B-500`, `E-600`) | Every row carries its article's **section profile at thumbnail size**, inked in left to right on hover |
+| **Articles that cite each other** | **Cross-references in the text**: the sheets this one links to and the sheets that link here, each named by a split-circle bubble. Read off the Markdown links at build time; a sheet with none shows none |
+| **`C-700` Correspondence** | The form is a **transmittal**: dated, with tick-box subjects, a live word count, and a stamp when it has gone. Each channel has a copy control |
+| **`X-999` Sheet Not Issued** | Prints the reference that was followed, struck through, and offers the **nearest issued sheets** by shared words in the address |
 | **Every sheet** | A reading line along the foot of the rail, driven by a CSS scroll timeline |
 
 The section widths, counts and reading times come from the Markdown at build time
@@ -627,6 +660,8 @@ flowchart LR
 | `plate/CareerElevation` | The career as an operable elevation |
 | `plate/RecordSchedule` | Ruled schedule of degrees, publications and studies |
 | `kit/CountUp` | A measured figure that counts up to itself |
+| `kit/CopyValue` | Copy control for a printed value |
+| `plate/NearestSheets` | Suggestions on the unissued sheet |
 | `sheet/SheetFrame` | Drawing border, zone rulers, trim |
 | `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
 | `sheet/TitleBlock` | Bottom-right title block, grid reference, copy and print |

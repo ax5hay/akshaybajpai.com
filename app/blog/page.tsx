@@ -23,6 +23,7 @@ export default async function BlogIndexPage() {
     href: `/blog/${entry.slug}/`,
     date: entry.frontmatter.pubDate,
     readingTime: estimateReadingTime(entry.content),
+    profile: entry.sections.map((section) => section.words),
   }));
 
   return (

@@ -16,6 +16,8 @@ export interface ScheduleRow {
   readingTime?: number;
   /** The one measured figure worth setting large against this row. */
   metric?: string;
+  /** Word count of each section, in order: the article's profile, in small. */
+  profile?: number[];
 }
 
 /** Tags worth offering as a filter: those on more than one sheet. */
@@ -110,6 +112,16 @@ export function SheetSchedule({
                 <time dateTime={row.date}>{formatDate(row.date, 'short')}</time>
                 {row.readingTime != null && (
                   <span className={styles.readingTime}>{row.readingTime} min</span>
+                )}
+                {row.profile && row.profile.length > 1 && (
+                  <span className={styles.profile} aria-hidden="true">
+                    {row.profile.map((words, i) => (
+                      <span key={i} style={{ flexGrow: Math.max(words, 1) }} />
+                    ))}
+                  </span>
+                )}
+                {row.profile && row.profile.length > 1 && (
+                  <span className={styles.profileNote}>{row.profile.length} sections</span>
                 )}
               </span>
 

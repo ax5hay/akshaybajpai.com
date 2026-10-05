@@ -33,6 +33,8 @@ interface Props {
   stack?: string[];
   metrics?: string[];
   adjacent?: AdjacentSheet[];
+  /** Sheets this one's text links to, and sheets whose text links here. */
+  xrefs?: { out: AdjacentSheet[]; in: AdjacentSheet[] };
   /**
    * An operable figure for this sheet. Where the article already carries a
    * diagram typed out as a code block, the figure is drawn in its place;
@@ -58,6 +60,7 @@ export function ArticlePlate({
   stack,
   metrics,
   adjacent = [],
+  xrefs,
   figure,
 }: Props) {
   const issued = formatDate(date, 'short');
@@ -145,6 +148,39 @@ export function ArticlePlate({
         );
       })()}
       </ProseTools>
+
+      {xrefs && xrefs.out.length + xrefs.in.length > 0 && (
+        <nav className={styles.xrefs} aria-label="Cross-references in the text">
+          {(
+            [
+              ['This sheet refers to', xrefs.out],
+              ['Referred to from', xrefs.in],
+            ] as const
+          ).map(
+            ([label, list]) =>
+              list.length > 0 && (
+                <div key={label} className={styles.xrefGroup}>
+                  <span className={styles.adjacentLabel}>{label}</span>
+                  <ul className={styles.xrefList}>
+                    {list.map((item) => (
+                      <li key={item.href}>
+                        <Link href={item.href} className={styles.xref}>
+                          {/* The split circle a drawing uses to name a
+                              reference: this sheet over that one. */}
+                          <span className={styles.xrefBubble} aria-hidden="true">
+                            <span>{sheet}</span>
+                            <span>{item.sheet}</span>
+                          </span>
+                          <span className={styles.xrefTitle}>{item.title}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+          )}
+        </nav>
+      )}
 
       {adjacent.length > 0 && (
         <nav className={styles.adjacent} aria-label="Adjacent sheets">

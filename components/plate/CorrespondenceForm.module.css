@@ -95,3 +95,180 @@
 .status:empty {
   display: none;
 }
+
+/* ---- Transmittal: subject, count, stamp --------------------------------- */
+
+.form {
+  position: relative;
+}
+
+.legend {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.field > label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+
+.count {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+
+.subjects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--lw-thin);
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+/* A tick box on a printed slip: struck through when chosen. */
+.subject {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 2.75rem;
+  padding: 0 var(--s-3);
+  background: var(--paper);
+  /* Set as running text, not as a field label. */
+  font-family: var(--font-body), system-ui, sans-serif !important;
+  font-size: var(--t-sm) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--ink-2) !important;
+  cursor: pointer;
+  transition:
+    background-color var(--d-1),
+    color var(--d-1);
+}
+
+.subject input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.tick {
+  position: relative;
+  flex-shrink: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: var(--lw-med) solid var(--ink-2);
+}
+
+.tick::before,
+.tick::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150%;
+  height: var(--lw-med);
+  background: var(--accent);
+  translate: -50% -50%;
+  rotate: 45deg;
+  scale: 0 1;
+  transition: scale var(--d-2) var(--ease-plate);
+}
+
+.tick::after {
+  rotate: -45deg;
+  transition-delay: 60ms;
+}
+
+.subject:hover {
+  color: var(--ink);
+  background: var(--paper-raised);
+}
+
+.subject[data-on] {
+  color: var(--ink) !important;
+  font-weight: 500 !important;
+  background: var(--paper-raised);
+}
+
+.subject[data-on] .tick {
+  border-color: var(--accent);
+}
+
+.subject[data-on] .tick::before,
+.subject[data-on] .tick::after {
+  scale: 1 1;
+}
+
+.subject:focus-within {
+  outline: var(--lw-med) solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Struck when it has gone. */
+.stamp {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: auto;
+  padding: 0.45rem 0.8rem 0.4rem;
+  border: 2.5px solid var(--accent);
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  rotate: -5deg;
+  animation: transmitted 420ms var(--ease-snap) both;
+}
+
+.stamp span:last-child {
+  font-size: 0.75em;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes transmitted {
+  from {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+/* iOS zooms the page into any field set smaller than 16px and does not zoom
+   back out. On a phone the fields are set at exactly that. */
+@media (max-width: 40rem) {
+  .field input,
+  .field textarea {
+    font-size: 1rem;
+    padding: var(--s-3) var(--s-3);
+  }
+
+  .subjects {
+    grid-template-columns: 1fr;
+  }
+
+  .subject {
+    min-height: 3rem;
+    font-size: var(--t-base) !important;
+  }
+
+  .actions > :first-child {
+    flex: 1 1 100%;
+  }
+
+  .actions button {
+    width: 100%;
+    min-height: 3rem;
+  }
+}

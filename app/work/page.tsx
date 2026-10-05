@@ -24,6 +24,7 @@ export default async function WorkIndexPage() {
     date: entry.frontmatter.pubDate,
     tags: entry.frontmatter.stack,
     readingTime: estimateReadingTime(entry.content),
+    profile: entry.sections.map((section) => section.words),
     metric: entry.frontmatter.metrics?.[0],
   }));
 

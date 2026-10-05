@@ -24,118 +24,171 @@ interface Note {
 
 const K = ({ children }: { children: ReactNode }) => <kbd className={styles.key}>{children}</kbd>;
 
-type Where = 'plan' | 'study' | 'sheet';
+type Where = 'plan' | 'study' | 'article' | 'about' | 'works' | 'architecture' | 'sheet';
 
+/**
+ * What there is to say on one kind of sheet, most particular first. A page
+ * shows the first three it has not shown before, so the things only this
+ * sheet can do are said ahead of the things every sheet can.
+ */
 function notesFor(where: Where, phone: boolean, docked: boolean): Note[] {
-  if (phone) {
-    const dock: Note = {
-      id: 'phone-dock',
-      text: (
-        <>
-          The bar at the foot is the instrument dock: the index, the lens, and{' '}
-          <b>A · B · C</b> to re-issue the whole set in another mode.
-        </>
-      ),
-    };
-    if (where === 'plan')
-      return [
+  const tap = phone ? 'Tap' : 'Click';
+
+  // ---- Particular to the sheet -------------------------------------------
+  const profile: Note = {
+    id: phone ? 'phone-profile' : 'profile',
+    text: phone ? (
+      <>
+        The strip under the title is a <b>section through this sheet</b>. It follows you down the
+        page; tap a segment to jump to that section.
+      </>
+    ) : (
+      <>
+        The strip under the title is a <b>section through this sheet</b>, one segment per section.
+        Click a segment to jump; the margin key on the left does the same.
+      </>
+    ),
+  };
+  const cite: Note = {
+    id: phone ? 'phone-cite' : 'cite',
+    text: <>{tap} any numbered heading to copy a reference to that section: sheet, number and link.</>,
+  };
+  const schematic: Note = {
+    id: phone ? 'phone-schematic' : 'schematic',
+    text: phone ? (
+      <>
+        <b>Fig. 1</b> on this sheet is operable. Choose a scenario, then swipe the drawing to follow
+        its path.
+      </>
+    ) : (
+      <>
+        <b>Fig. 1</b> on this sheet is operable. Choose a scenario and its path is traced through
+        the system.
+      </>
+    ),
+  };
+
+  const particular: Record<Where, Note[]> = {
+    plan: phone
+      ? [
+          {
+            id: 'phone-pile',
+            text: <>Scroll. The seven sheets are a pile: each one slides up and rests on the last.</>,
+          },
+          {
+            id: 'phone-mini',
+            text: <>Tap any sheet on the small key plan and the pile turns to it.</>,
+          },
+        ]
+      : [
+          {
+            id: 'plan-camera',
+            text: (
+              <>
+                Drag to pan, scroll to zoom, or walk the plan with <K>←</K> <K>→</K> <K>↑</K>{' '}
+                <K>↓</K>. Click a sheet and it grows into its page.
+              </>
+            ),
+          },
+        ],
+    study: [schematic, profile, cite],
+    article: [profile, cite],
+    about: [
+      {
+        id: phone ? 'phone-elevation' : 'elevation',
+        text: phone ? (
+          <>
+            The <b>elevation</b> under Chronology is operable. Tap a volume, or use Earlier and
+            Later, to read each role.
+          </>
+        ) : (
+          <>
+            The <b>elevation</b> under Chronology is operable. Hover or click a volume, or step
+            through with <K>←</K> <K>→</K>, to read each role.
+          </>
+        ),
+      },
+    ],
+    works: [
+      {
+        id: phone ? 'phone-stack' : 'stack',
+        text: phone ? (
+          <>
+            The <b>stack key</b> filters the schedule. Swipe it, tap a tag, and the other sheets
+            fall back; tap it again to clear.
+          </>
+        ) : (
+          <>
+            The <b>stack key</b> above the schedule filters it. Click a tag and the other sheets
+            fall back; click it again to clear.
+          </>
+        ),
+      },
+    ],
+    architecture: [
+      {
+        id: phone ? 'phone-figures' : 'figures',
+        text: (
+          <>
+            Three things on this sheet are operable: drag the divider on <b>Fig. 1</b>, choose a
+            request on <b>Fig. 2</b>, and the switches further down change this very page.
+          </>
+        ),
+      },
+    ],
+    sheet: [],
+  };
+
+  // ---- True of every sheet --------------------------------------------------
+  const general: Note[] = phone
+    ? docked
+      ? [
+          {
+            id: 'phone-dock',
+            text: (
+              <>
+                The bar at the foot is the instrument dock: the index, the lens, and{' '}
+                <b>A · B · C</b> to re-issue the whole set in another mode.
+              </>
+            ),
+          },
+          {
+            id: 'phone-titleblock',
+            text: (
+              <>Tap the sheet number in the dock for its title block, and to issue it as a PDF.</>
+            ),
+          },
+        ]
+      : []
+    : [
         {
-          id: 'phone-pile',
-          text: <>Scroll. The seven sheets are a pile: each one slides up and rests on the last.</>,
+          id: 'modes',
+          text: (
+            <>
+              Press <K>D</K> to re-issue the whole set: as issued, with the markup pen on, or
+              stripped to its source.
+            </>
+          ),
         },
         {
-          id: 'phone-mini',
-          text: <>Tap any sheet on the small key plan and the pile turns to it.</>,
+          id: 'lens',
+          text: (
+            <>
+              Press <K>L</K> for the lens. Drag it over anything to look through to the blueprint.
+            </>
+          ),
         },
-        ...(docked ? [dock] : []),
+        {
+          id: 'index',
+          text: (
+            <>
+              Press <K>/</K> to find any of the sheets by number, title or subject.
+            </>
+          ),
+        },
       ];
-    const notes = docked ? [dock] : [];
-    if (where === 'study')
-      notes.push({
-        id: 'phone-schematic',
-        text: (
-          <>
-            <b>Fig. 1</b> on this sheet is operable. Choose a scenario, then swipe the drawing to
-            follow its path.
-          </>
-        ),
-      });
-    if (docked)
-      notes.push({
-        id: 'phone-titleblock',
-        text: <>Tap the sheet number in the dock for its title block, and to issue it as a PDF.</>,
-      });
-    return notes;
-  }
 
-  if (where === 'plan')
-    return [
-      {
-        id: 'plan-camera',
-        text: (
-          <>
-            Drag to pan, scroll to zoom, or walk the plan with <K>←</K> <K>→</K> <K>↑</K> <K>↓</K>.
-            Click a sheet and it grows into its page.
-          </>
-        ),
-      },
-      {
-        id: 'modes',
-        text: (
-          <>
-            Press <K>D</K> to re-issue the whole set: as issued, with the markup pen on, or stripped
-            to its source.
-          </>
-        ),
-      },
-      {
-        id: 'lens',
-        text: (
-          <>
-            Press <K>L</K> for the lens. Drag it over anything to look through to the blueprint.
-          </>
-        ),
-      },
-    ];
-
-  const notes: Note[] = [];
-  if (where === 'study')
-    notes.push({
-      id: 'schematic',
-      text: (
-        <>
-          <b>Fig. 1</b> on this sheet is operable. Choose a scenario and its path is traced through
-          the system.
-        </>
-      ),
-    });
-  notes.push(
-    {
-      id: 'lens',
-      text: (
-        <>
-          Press <K>L</K> for the lens. Drag it over anything to look through to the blueprint.
-        </>
-      ),
-    },
-    {
-      id: 'index',
-      text: (
-        <>
-          Press <K>/</K> to find any of the sheets by number, title or subject.
-        </>
-      ),
-    },
-    {
-      id: 'modes',
-      text: (
-        <>
-          Press <K>D</K> to re-issue the whole set in another drawing mode.
-        </>
-      ),
-    }
-  );
-  return notes;
+  return [...particular[where], ...general];
 }
 
 const SEEN_KEY = 'plate.notes';
@@ -177,7 +230,19 @@ export function Hints() {
 
     const parts = pathname.split('/').filter(Boolean);
     const where: Where =
-      parts.length === 0 ? 'plan' : parts[0] === 'work' && parts.length > 1 ? 'study' : 'sheet';
+      parts.length === 0
+        ? 'plan'
+        : parts.length > 1
+          ? parts[0] === 'work'
+            ? 'study'
+            : 'article'
+          : parts[0] === 'about'
+            ? 'about'
+            : parts[0] === 'work'
+              ? 'works'
+              : parts[0] === 'architecture'
+                ? 'architecture'
+                : 'sheet';
     // `phone`: the stacked plan and no keyboard to speak of. `docked`: narrow
     // enough that the instruments have moved to the bar at the foot.
     const phone = window.matchMedia('(max-width: 59.999rem), (hover: none)').matches;

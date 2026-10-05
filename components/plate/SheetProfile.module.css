@@ -262,9 +262,60 @@
   background: var(--accent);
 }
 
+/* On a phone there is no margin to key the sections in, so the strip itself
+   follows the reader: it sticks under the rail for the length of the article,
+   with its heading tucked up behind the rail and only the strip and the name
+   of the current section left showing. */
 @media (max-width: 40rem) {
+  .profile {
+    --head-h: 2rem;
+    position: sticky;
+    top: calc(var(--sheet-margin) + var(--rail-h) - var(--head-h));
+    z-index: 5;
+    margin-inline: calc(var(--sheet-pad, 0px) * -1);
+    padding: 0 var(--sheet-pad, 0px) var(--s-3);
+    background: var(--paper-raised);
+  }
+
   .head {
+    height: calc(var(--head-h) - var(--s-2));
+    align-items: flex-end;
     letter-spacing: 0.08em;
+  }
+
+  .profile[data-stuck] {
+    padding-top: var(--s-2);
+    padding-bottom: var(--s-2);
+    border-bottom: var(--lw-thin) solid var(--rule-strong);
+    box-shadow: 0 10px 18px -14px rgba(46, 35, 18, 0.55);
+  }
+
+  /* Tucked behind the rail, and not left peeking out from under it. */
+  .profile[data-stuck] .head {
+    visibility: hidden;
+  }
+
+  .headTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile[data-stuck] .strip {
+    height: 1.75rem;
+  }
+
+  .profile[data-stuck] .segNo {
+    display: none;
+  }
+
+  .profile[data-stuck] .readout {
+    margin-top: var(--s-2);
+  }
+
+  .profile[data-stuck] .cursor {
+    top: -4px;
+    bottom: -4px;
   }
 
   .readoutMeta {

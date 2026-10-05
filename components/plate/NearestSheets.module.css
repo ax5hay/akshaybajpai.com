@@ -1,0 +1,89 @@
+.near {
+  margin: 0 0 var(--s-10);
+  border: var(--lw-med) solid var(--rule-strong);
+  background: var(--paper-raised);
+}
+
+.asked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-4);
+  padding: var(--s-3);
+  background: var(--ink);
+  color: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.asked code {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: anywhere;
+  opacity: 0.8;
+  /* Struck through: the reference that did not resolve. */
+  text-decoration: line-through;
+  text-decoration-color: var(--accent);
+}
+
+.label {
+  padding: var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 5rem 1fr auto;
+  align-items: baseline;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-3);
+  border-top: var(--lw-thin) solid var(--rule-faint);
+  transition: background-color var(--d-2) var(--ease-plate);
+}
+
+.row:hover,
+.row:focus-visible {
+  background: var(--accent-soft);
+}
+
+.sheet {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-lg);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+
+:global(html[data-mode='annotated']) .title,
+:global(html[data-mode='raw']) .title {
+  font-size: var(--t-base);
+  text-transform: uppercase;
+}
+
+.arrow {
+  font-family: var(--font-label), monospace;
+  color: var(--accent);
+  transition: translate var(--d-2) var(--ease-plate);
+}
+
+.row:hover .arrow {
+  translate: 0.3rem 0;
+}
