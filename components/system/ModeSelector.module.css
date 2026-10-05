@@ -136,3 +136,29 @@
     padding-inline: var(--s-4);
   }
 }
+
+/* In the phone dock the switch is one more cell of the bar: no housing of its
+   own, and each detent a full-height target. */
+@media (max-width: 40rem) {
+  .housing {
+    padding: 0;
+    background: none;
+    border: none;
+    border-left: var(--lw-thin) solid var(--rule);
+    box-shadow: none;
+  }
+
+  .track {
+    height: 100%;
+    border: none;
+    box-shadow: none;
+    background: var(--paper-sunk);
+  }
+
+  .detent {
+    justify-content: center;
+    min-width: 2.5rem;
+    padding: 0;
+    font-size: var(--t-xs);
+  }
+}

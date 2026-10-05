@@ -341,14 +341,23 @@ html[data-mode='raw'] .figure {
     gap: var(--s-1);
   }
 
+  /* Two to a row: five facts stacked one above the other pushed the first
+     line of the article off the first screen. */
   .facts {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 
-  /* Stacked, the 7rem basis would size cell height instead of width and
-     leave each fact in a block of dead space. */
-  .fact {
-    flex: 0 0 auto;
+  .fact:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .title {
+    font-size: clamp(2.1rem, 10.5vw, 3rem);
+  }
+
+  .lead {
+    font-size: var(--t-md);
   }
 }
 

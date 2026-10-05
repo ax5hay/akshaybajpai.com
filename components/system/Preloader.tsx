@@ -28,9 +28,11 @@ import styles from './Preloader.module.css';
  * loops for as long as the fetching takes and plays through once regardless.
  *
  * HOW IT ENDS. The moment the set is actually loaded, a button offers the way
- * in, and Enter, Space or Escape do the same. Nobody is made to sit through
- * a show to reach a page that is already there. Left alone, the cover
- * finishes its tour, is stamped, and lifts on its own.
+ * in, and Enter does the same. Nobody is made to sit through a show to reach
+ * a page that is already there. Beside the button a counter runs down to the
+ * moment the cover will lift by itself. Any other key, or a tap anywhere off
+ * the button, holds it there: the count stops, the tour carries on, and the
+ * reader stays as long as they like. The same again resumes it.
  *
  * WHAT HOLDS IT UP. Nothing, for long: loading is given up on after twelve
  * seconds and the way in is offered anyway, a metered or slow connection only
@@ -49,6 +51,8 @@ const INTRO_MS = 3600;
 const TOUR_MS = 6000;
 /** Left alone, the cover leaves when the tour has played through once. */
 const MIN_MS = INTRO_MS + TOUR_MS + 300;
+/** The count never starts lower than this, and resumes from this after a hold. */
+const COUNT_MIN_S = 6;
 /** Stop waiting on the network by now, and offer the way in regardless. */
 const LOAD_CEILING_MS = 12000;
 /** Seams out, then lift. Mirrors the `[data-ready]` animations. */
@@ -131,7 +135,12 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
   const [done, setDone] = useState(false);
   /** The set is in the cache: the way in can be offered. */
   const [loaded, setLoaded] = useState(false);
+  /** Seconds until the cover lifts by itself, and whether that is on hold. */
+  const [left, setLeft] = useState(0);
+  const [run, setRun] = useState(0);
+  const [held, setHeld] = useState(false);
   const enter = useRef<() => void>(() => {});
+  const toggleHold = useRef<() => void>(() => {});
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -213,6 +222,30 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
     };
 
     let offered = false;
+    let canEnter = false;
+    let holding = false;
+    let deadline = 0;
+    let counter: ReturnType<typeof setInterval> | undefined;
+
+    /** Run the count down from `seconds`, and lift the cover when it ends. */
+    const count = (seconds: number) => {
+      deadline = performance.now() + seconds * 1000;
+      el.style.setProperty('--count', `${seconds}s`);
+      setLeft(seconds);
+      // Restarts the ring's own animation from full.
+      setRun((n) => n + 1);
+      if (counter) clearInterval(counter);
+      counter = setInterval(() => {
+        if (holding || released) return;
+        const remaining = Math.ceil((deadline - performance.now()) / 1000);
+        setLeft(Math.max(0, remaining));
+        if (remaining <= 0) {
+          clearInterval(counter);
+          release();
+        }
+      }, 200);
+    };
+
     /** Everything has landed (or been given up on): offer the way in. */
     const offer = () => {
       if (offered) return;
@@ -222,13 +255,20 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       const untilDrawn = Math.max(0, OFFER_FROM_MS - (performance.now() - started));
       timers.push(
         setTimeout(() => {
+          canEnter = true;
           setLoaded(true);
           enter.current = () => release(true);
+          toggleHold.current = () => {
+            if (released) return;
+            holding = !holding;
+            setHeld(holding);
+            if (!holding) count(COUNT_MIN_S);
+          };
+          // Long enough for the tour to play through once.
+          const toTour = Math.ceil((MIN_MS - (performance.now() - started)) / 1000);
+          count(Math.max(COUNT_MIN_S, toTour));
         }, untilDrawn)
       );
-      // And leave unprompted once the tour has played through.
-      const untilToured = Math.max(0, MIN_MS - (performance.now() - started));
-      timers.push(setTimeout(() => release(), untilToured));
     };
 
     // On what has actually landed, not on what the paced count has got
@@ -290,12 +330,16 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
     // still outstanding carries on fetching behind the page.
     const ceiling = setTimeout(offer, LOAD_CEILING_MS);
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Escape') return;
-      if (!offered) return;
+      if (!canEnter || released) return;
+      // Keys that are not the reader saying anything to the cover.
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (['Tab', 'Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(event.key)) return;
       // Left to the button when it has focus, or it would fire twice.
-      if (event.target instanceof HTMLButtonElement) return;
+      if (event.target instanceof HTMLButtonElement && (event.key === 'Enter' || event.key === ' '))
+        return;
       event.preventDefault();
-      enter.current();
+      if (event.key === 'Enter') enter.current();
+      else toggleHold.current();
     };
     window.addEventListener('keydown', onKey, true);
 
@@ -303,6 +347,7 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       watcher?.disconnect();
       clearTimeout(ceiling);
       if (ticker) clearInterval(ticker);
+      if (counter) clearInterval(counter);
       timers.forEach(clearTimeout);
       timers = [];
       window.removeEventListener('keydown', onKey, true);
@@ -314,7 +359,17 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
   if (done) return null;
 
   return (
-    <div ref={ref} className={styles.pre} data-loaded={loaded || undefined}>
+    <div
+      ref={ref}
+      className={styles.pre}
+      data-loaded={loaded || undefined}
+      data-held={held || undefined}
+      onPointerDown={(event) => {
+        // A press on the way in is a press on the way in.
+        if ((event.target as Element).closest('button')) return;
+        toggleHold.current();
+      }}
+    >
       {/* The three prints say the same thing three times over; assistive
           technology is given the button and nothing else to wade through. */}
       <div className={`${styles.layer} ${styles.raw}`} aria-hidden="true">
@@ -348,21 +403,59 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
 
       {/* The way in. Inert until the set has actually loaded, so it never
           promises a page that is not there yet. */}
-      <button
-        type="button"
-        className={styles.enter}
-        disabled={!loaded}
-        onClick={() => enter.current()}
-      >
-        {loaded ? (
-          <>
-            <span>Skip intro · Enter the set</span>
-            <kbd aria-hidden="true">Enter ↵</kbd>
-          </>
-        ) : (
-          <span>Loading the set…</span>
-        )}
-      </button>
+      <div className={styles.way}>
+        <div className={styles.wayRow}>
+          {/* The count: a bubble with a ring that runs out, as the seconds do. */}
+          <span className={styles.ring} aria-hidden="true">
+            <svg viewBox="0 0 40 40" key={run}>
+              <circle cx="20" cy="20" r="16" className={styles.ringTrack} />
+              {loaded && <circle cx="20" cy="20" r="16" pathLength={1} className={styles.ringRun} />}
+            </svg>
+            <span className={styles.ringNo}>
+              {!loaded ? (
+                '··'
+              ) : held ? (
+                <span className={styles.pause} />
+              ) : (
+                String(left).padStart(2, '0')
+              )}
+            </span>
+          </span>
+
+          <button
+            type="button"
+            className={styles.enter}
+            disabled={!loaded}
+            onClick={() => enter.current()}
+          >
+            {loaded ? (
+              <>
+                <span>Skip intro · Enter the set</span>
+                <kbd aria-hidden="true">Enter ↵</kbd>
+              </>
+            ) : (
+              <span>Loading the set…</span>
+            )}
+          </button>
+        </div>
+
+        <p className={styles.wayHint} role="status">
+          {!loaded ? (
+            <>The way in opens the moment the set has loaded.</>
+          ) : held ? (
+            <>
+              <b>Holding here.</b> Enter when you are ready, or{' '}
+              <span className={styles.byKey}>press any key</span>
+              <span className={styles.byTouch}>tap anywhere</span> to resume.
+            </>
+          ) : (
+            <>
+              Entering in <b>{left}</b>. <span className={styles.byKey}>Press any key</span>
+              <span className={styles.byTouch}>Tap anywhere</span> to hold this screen.
+            </>
+          )}
+        </p>
+      </div>
     </div>
   );
 }

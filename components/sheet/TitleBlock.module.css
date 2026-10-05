@@ -202,3 +202,70 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* =============================================================================
+   PHONE DOCK. The bar at the foot of the screen: the sheet number on the
+   left, opening the title block upward; the instruments on the right, placed
+   there by SheetRail. Along its top edge a dimension line fills as the sheet
+   is read.
+   ========================================================================== */
+
+@media (max-width: 40rem) {
+  .block {
+    box-shadow:
+      0 -1px 0 var(--rule-faint),
+      var(--shadow-deep);
+  }
+
+  .toggle {
+    grid-template-columns: auto auto 1fr;
+    padding: 0 var(--s-3);
+  }
+
+  .sheetNo {
+    font-size: var(--t-base);
+  }
+
+  .gridRef {
+    display: none;
+  }
+
+  /* At rest the toggle is only as wide as the sheet number and its chevron,
+     so it is never lying underneath the docked controls. */
+  .block:not([data-expanded]) .toggle {
+    width: auto;
+    padding-right: var(--s-5);
+  }
+
+  .copy {
+    padding: var(--s-3);
+    font-size: var(--t-mini);
+  }
+
+  /* Driven by the page's own scroll position, so it costs no script and no
+     layout: the compositor moves it. Browsers without scroll timelines
+     simply do not draw it. */
+  @supports (animation-timeline: scroll()) {
+    .block::before {
+      content: '';
+      position: absolute;
+      left: -1.5px;
+      right: -1.5px;
+      top: -3px;
+      height: 3px;
+      background: var(--accent);
+      transform-origin: left center;
+      animation: read-through linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes read-through {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

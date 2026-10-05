@@ -1,0 +1,232 @@
+/* A margin note. Set like a keyed note on a drawing: a numbered bubble on a
+   short leader, the note beside it, and a rule along its foot that runs out
+   as its dwell does. One element, transform and opacity only. */
+
+.note {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--sheet-margin) + var(--s-5));
+  z-index: var(--z-toast);
+  translate: -50% 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'bubble kicker'
+    'bubble text'
+    'bubble actions';
+  column-gap: var(--s-4);
+  row-gap: var(--s-1);
+  width: min(30rem, calc(100vw - var(--sheet-margin) * 2 - var(--s-4)));
+  padding: var(--s-3) var(--s-4) var(--s-4) var(--s-3);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-deep);
+  /* Written in from the left, the way the pen would. */
+  animation: note-in 520ms var(--ease-plate) both;
+}
+
+.note[data-leaving] {
+  animation: note-out 240ms var(--ease-mech) both;
+}
+
+@keyframes note-in {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    translate: -50% 0.5rem;
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(-2rem -2rem -2rem -2rem);
+    translate: -50% 0;
+  }
+}
+
+@keyframes note-out {
+  to {
+    opacity: 0;
+    translate: -50% 0.4rem;
+  }
+}
+
+/* The key: a split-circle bubble, as the cross-references on the plan use. */
+.bubble {
+  grid-area: bubble;
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-top: 2px;
+  border: var(--lw-med) solid var(--accent);
+  border-radius: 50%;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--accent);
+  animation: note-key 420ms var(--ease-snap) 180ms both;
+}
+
+@keyframes note-key {
+  from {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+
+.kicker {
+  grid-area: kicker;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.text {
+  grid-area: text;
+  margin: 0;
+  font-size: var(--t-base);
+  line-height: 1.5;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.text b {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5em;
+  padding: 0 0.35em;
+  font-family: var(--font-label), monospace;
+  font-size: 0.82em;
+  line-height: 1.45;
+  color: var(--paper-raised);
+  background: var(--ink);
+  border-bottom: 2px solid var(--rule-ink);
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  gap: var(--s-4);
+  margin-top: var(--s-2);
+}
+
+.ok,
+.off {
+  padding: var(--s-1) 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  transition: color var(--d-1);
+}
+
+.ok {
+  color: var(--accent);
+}
+
+.off {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.ok:hover,
+.off:hover {
+  color: var(--ink);
+}
+
+/* The dwell. Reading the note (a pointer over it, a finger on it, focus
+   inside it) stops the rule, and so stops the note leaving. */
+.dwell {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: var(--lw-thick);
+  background: var(--accent);
+  transform-origin: left center;
+  animation: note-dwell 8500ms linear 600ms both;
+}
+
+.note:hover .dwell,
+.note:active .dwell,
+.note:focus-within .dwell {
+  animation-play-state: paused;
+}
+
+@keyframes note-dwell {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* On a phone a note sits just above the dock: within reach of a thumb, and
+   clear of the title at the head of the sheet. Notices move to the head to
+   make room (see ToastProvider.module.css). */
+@media (max-width: 40rem) {
+  .note {
+    bottom: calc(var(--sheet-margin) + var(--titleblock-h) + var(--s-3));
+    width: calc(100vw - var(--sheet-margin) * 2 - var(--s-3));
+    column-gap: var(--s-3);
+    padding: var(--s-2) var(--s-3) var(--s-3);
+  }
+
+  .text {
+    font-size: var(--t-sm);
+    line-height: 1.45;
+  }
+
+  .actions {
+    margin-top: 0;
+  }
+
+  .bubble {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .ok,
+  .off {
+    padding: var(--s-2) 0;
+    font-size: var(--t-mini);
+  }
+}
+
+/* The global reduced-motion rule would end the dwell in a hundredth of a
+   millisecond and take the note with it. Here the note simply stays until it
+   is dismissed. */
+@media (prefers-reduced-motion: reduce) {
+  .note,
+  .bubble {
+    animation: none;
+  }
+
+  .dwell {
+    display: none;
+  }
+}
+
+@media print {
+  .note {
+    display: none;
+  }
+}
+
+/* A note steps aside for anything the reader has opened over the sheet. */
+:global(body:has(aside[data-expanded])) .note,
+:global(body:has([role='dialog'])) .note,
+:global(html[data-lens]) .note {
+  display: none;
+}

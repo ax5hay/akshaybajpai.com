@@ -59,10 +59,13 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
     }
     if (announced.current) return;
     announced.current = true;
+    const touch = window.matchMedia('(hover: none)').matches;
     toast({
       kind: 'Lens deployed',
       message: 'Drag the barrel over the sheet. It names and measures whatever it covers.',
-      detail: 'Scroll to resize · Esc or double-click to stow',
+      detail: touch
+        ? 'Double-tap the lens, or the dock button, to stow'
+        : 'Scroll to resize · Esc or double-click to stow',
       tone: 'revision',
       group: 'lens',
     });
@@ -115,25 +118,16 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
     // issued, then give the reader a moment with the plan first.
     const root = document.documentElement;
     const covered = () => 'cover' in root.dataset && !('issued' in root.dataset);
-    let timer: ReturnType<typeof setTimeout> | undefined;
     const watch = new MutationObserver(() => {
       if (covered()) return;
       watch.disconnect();
       begin();
     });
 
+    // The tray pulses to say it is there. What each instrument does is told
+    // by the margin notes (Hints.tsx), one at a time, where it applies.
     const begin = () => {
       setInviting(true);
-      timer = setTimeout(announce, 2200);
-    };
-    const announce = () => {
-      toast({
-        kind: 'This set is instrumented',
-        message: 'Open the lens to x-ray any sheet, or switch the drawing mode to see the markup.',
-        detail: 'L lens · / index · D mode',
-        tone: 'note',
-        duration: 9000,
-      });
       try {
         localStorage.setItem(INVITED_KEY, '1');
       } catch {
@@ -144,11 +138,8 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
     if (covered()) watch.observe(root, { attributes: true });
     else begin();
 
-    return () => {
-      watch.disconnect();
-      if (timer) clearTimeout(timer);
-    };
-  }, [toast]);
+    return () => watch.disconnect();
+  }, []);
 
   const value = useMemo<Instruments>(
     () => ({ lensOn, toggleLens, indexOpen, openIndex, closeIndex, inviting }),

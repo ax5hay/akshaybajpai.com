@@ -53,6 +53,9 @@ export function ModeSelector() {
             }}
             type="button"
             role="radio"
+            // The name is hidden on narrow sheets, where only the revision
+            // letter fits, so the radio is named here and not by its text.
+            aria-label={MODE_INFO[m].label}
             aria-checked={mode === m}
             tabIndex={mode === m ? 0 : -1}
             className={styles.detent}

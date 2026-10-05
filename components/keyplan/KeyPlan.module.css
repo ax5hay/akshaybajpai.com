@@ -452,6 +452,12 @@ html[data-mode='raw'] .plateTitle {
   display: none;
 }
 
+/* The miniature plan belongs to the narrow sheet; the wide one has the real
+   thing. */
+.mini {
+  display: none;
+}
+
 .headlineNote kbd {
   font-family: var(--font-label), monospace;
   padding: 0 3px;
@@ -1413,12 +1419,30 @@ html[data-mode='raw'] .stamp {
   background: var(--accent-soft);
 }
 
-/* ---- Narrow sheets: the plan becomes a stacked index ------------------- */
+/* =============================================================================
+   NARROW SHEETS. Not the wide plan made small: a drawing of its own.
+
+   The first screen is a title sheet: north point, the name at the full width
+   of the stock, an issue stamp, and the plan itself at thumbnail size. Below
+   it the seven sheets are a pile on the board. Each is `position: sticky`
+   with a slightly lower pin than the one before, so as the reader scrolls,
+   every sheet slides up and comes to rest on the last, its edge left showing.
+   No script moves anything; the browser's own scroll does all of it.
+   ========================================================================== */
 
 @media (max-width: 59.999rem) {
   .stage {
     height: auto;
     overflow: visible;
+    /* Nothing may reach past the side of the screen, even mid-animation: on a
+       phone one overhanging element widens the whole layout, and everything
+       fixed to the screen (the dock, the cover) is then laid out too wide.
+       `clip`, not `hidden`, so the sticky pile still has the page to stick to. */
+    overflow-x: clip;
+    /* Where the first sheet of the pile pins: just under the rail. */
+    --pin: calc(var(--sheet-margin) + var(--rail-h) + var(--s-3));
+    /* How much of each sheet shows above the one resting on it. */
+    --step: 0.55rem;
   }
 
   .stage::after {
@@ -1430,14 +1454,14 @@ html[data-mode='raw'] .stamp {
     overflow: visible;
     touch-action: auto;
     container-type: normal;
-    padding: var(--plate-top) var(--sheet-gutter) var(--plate-bottom);
+    padding: var(--pin) var(--sheet-gutter) var(--plate-bottom);
   }
 
   .plane {
     position: static;
     display: flex;
     flex-direction: column;
-    gap: var(--s-4);
+    gap: var(--s-5);
     width: auto !important;
     height: auto !important;
     transform: none !important;
@@ -1446,44 +1470,93 @@ html[data-mode='raw'] .stamp {
     --inv-soft: 1;
   }
 
+  /* The dock at the foot of the screen carries the instruments on a narrow
+     sheet, so the tray, the legend and the camera controls are not printed. */
   .leaders,
+  .markup,
   .legend,
+  .instruments,
   .controls {
-    display: none;
+    display: none !important;
   }
 
-  /* Furniture carries inline geometry from KEY_PLAN_FURNITURE, which has to
-     be overridden to let these blocks join the stacked flow. */
-  .titleStrip,
-  .notes,
-  .instruments {
-    position: static !important;
+  /* ---- Title sheet ------------------------------------------------------- */
+
+  .titleStrip {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
     width: auto !important;
     height: auto !important;
-  }
-
-  /* On a narrow sheet the strip is just the title: the north point, stamp
-     and ruled cells belong to the board, and there is no board here. */
-  .titleStrip {
     order: -2;
     padding: 0;
     border-left: none;
-    margin-bottom: var(--s-2);
   }
 
-  .north,
-  .stamp,
-  .revs,
-  .titleCells {
-    display: none;
+  /* On a phone the title sheet is the first screen, whole. A tablet is tall
+     enough that holding it to a screen's height only opens a gap in it. */
+  @media (max-width: 40rem) {
+    .titleStrip {
+      min-height: calc(
+        100svh - var(--pin) - var(--sheet-margin) - var(--titleblock-h) - var(--s-6)
+      );
+    }
+  }
+
+  .north {
+    padding-bottom: var(--s-3);
+  }
+
+  .northPoint {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .northText {
+    font-size: var(--t-micro);
   }
 
   .header {
-    padding: 0;
+    padding: var(--s-6) 0 0;
   }
 
   .headline {
-    gap: var(--s-2);
+    gap: var(--s-3);
+  }
+
+  .headline::before {
+    width: 5.5rem;
+    height: 5px;
+    margin-bottom: var(--s-1);
+  }
+
+  /* The name takes the whole width of the stock. It is the one thing on the
+     sheet allowed to, and on a phone that is most of the first screen. */
+  .headlineName,
+  html[data-mode='annotated'] .headlineName,
+  html[data-mode='raw'] .headlineName {
+    font-size: clamp(4.25rem, 24.5vw, 8.5rem);
+    line-height: 0.84;
+    letter-spacing: -0.04em;
+  }
+
+  html[data-mode='annotated'] .headlineName,
+  html[data-mode='raw'] .headlineName {
+    font-size: clamp(2.75rem, 15vw, 5.5rem);
+    line-height: 0.96;
+  }
+
+  .headlineRole {
+    font-size: var(--t-micro);
+    letter-spacing: 0.16em;
+    white-space: normal;
+  }
+
+  .headlineNote {
+    margin-top: var(--s-3);
+    max-width: 30ch;
+    font-size: var(--t-sm);
+    line-height: 1.5;
   }
 
   .hintKeys {
@@ -1494,95 +1567,266 @@ html[data-mode='raw'] .stamp {
     display: inline;
   }
 
-  .headlineRole {
-    white-space: normal;
+  .provenance {
+    font-size: var(--t-micro);
+  }
+
+  /* Struck beside the second line of the name, in the space the surname
+     leaves. Placed from the top of the strip in the same units the name is
+     sized in, so it stays in that space as the width changes. */
+  .stamp {
+    position: absolute;
+    top: calc(7.2rem + min(21.5vw, 7.5rem));
+    right: 0.35rem;
+    margin: 0;
+    padding: 0.5rem 0.7rem 0.45rem;
+    font-size: 0.5625rem;
+    rotate: -6deg;
+    /* Struck inward: the wide plan's stamp arrives oversized, and here that
+       would hang it over the edge of the screen for a moment. */
+    animation-name: stamp-press;
+  }
+
+  @keyframes stamp-press {
+    from {
+      opacity: 0;
+      scale: 0.82;
+    }
+  }
+
+  html[data-mode='annotated'] .stamp {
+    top: calc(7.2rem + min(15vw, 5.5rem));
+  }
+
+  .revs {
+    display: none;
+  }
+
+  /* ---- The plan, at thumbnail size --------------------------------------- */
+
+  .mini {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    margin-top: auto;
+    padding-top: var(--s-8);
+  }
+
+  .miniLabel,
+  .miniCue {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-label), monospace;
+    font-size: var(--t-micro);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .miniLabel span:first-child {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .miniPlan {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .miniFurniture {
+    fill: none;
+    stroke: var(--ink-4);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .miniSheet {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .miniSheet rect {
+    fill: var(--paper-raised);
+    stroke: var(--ink);
+    stroke-width: 1.25;
+    vector-effect: non-scaling-stroke;
+    transition:
+      fill var(--d-2) var(--ease-plate),
+      stroke var(--d-2) var(--ease-plate);
+  }
+
+  .miniSheet text {
+    font-family: var(--font-label), monospace;
+    font-size: 62px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-anchor: middle;
+    fill: var(--ink-2);
+    pointer-events: none;
+    transition: fill var(--d-2) var(--ease-plate);
+  }
+
+  .miniSheet:active rect,
+  .miniSheet[data-on] rect {
+    fill: var(--accent);
+    stroke: var(--accent);
+  }
+
+  .miniSheet:active text,
+  .miniSheet[data-on] text {
+    fill: var(--paper-raised);
+  }
+
+  /* A drafting arrow that nods toward the pile, twice, then holds still. */
+  .miniArrow {
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-right: 0.2rem;
+    border-right: var(--lw-med) solid var(--accent);
+    border-bottom: var(--lw-med) solid var(--accent);
+    rotate: 45deg;
+    animation: mini-nod 1600ms var(--ease-plate) calc(var(--boot) + 2400ms) 2;
+  }
+
+  @keyframes mini-nod {
+    50% {
+      translate: 0 0.35rem;
+    }
+  }
+
+  .titleCells {
+    margin-top: var(--s-4);
+  }
+
+  .titleCells dt {
+    font-size: 0.5625rem;
+  }
+
+  .titleCells dd {
+    font-size: var(--t-xs);
+  }
+
+  .titleCells .titleSheet {
+    display: none;
+  }
+
+  /* ---- The pile ---------------------------------------------------------- */
+
+  .plate,
+  .notes {
+    position: sticky !important;
+    top: calc(var(--pin) + var(--i, 7) * var(--step)) !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .plate {
+    min-height: 0;
+    padding: var(--s-4);
+    /* Lit from above, so each sheet casts onto the one it has come to rest
+       on, and the pile reads as having thickness. */
+    box-shadow:
+      0 -1px 0 rgba(46, 35, 18, 0.1),
+      0 -10px 22px -12px rgba(46, 35, 18, 0.5),
+      var(--shadow-lift);
+  }
+
+  /* A finger has no hover. Without this the last sheet touched stays lifted
+     and tinted, and every other one stays dimmed. */
+  .plate:hover,
+  .plate:focus-visible {
+    transform: none;
+    z-index: 1;
+    box-shadow:
+      0 -1px 0 rgba(46, 35, 18, 0.1),
+      0 -10px 22px -12px rgba(46, 35, 18, 0.5),
+      var(--shadow-lift);
+  }
+
+  .plate:active {
+    border-color: var(--accent);
+  }
+
+  .plate[data-dim] {
+    border-color: var(--rule-ink);
+  }
+
+  .plate[data-dim]::before {
+    background: linear-gradient(177deg, var(--sheet-sheen) 0%, transparent 45%),
+      var(--paper-raised);
+  }
+
+  .plate[data-dim] > * {
+    opacity: 1;
+  }
+
+  .plateTag {
+    padding: 6px 12px;
+    font-size: var(--t-xs);
+  }
+
+  .plateHead {
+    padding-left: 4.9rem;
+    padding-bottom: var(--s-3);
+    min-height: 2.6rem;
+  }
+
+  .plateTitle {
+    font-size: var(--t-xl);
   }
 
   .plateSubtitle {
     font-size: var(--t-micro);
   }
 
-  /* The tray follows the name on a narrow sheet: who this is comes first, and
-     the tools sit between that and the list of sheets. */
-  .instruments {
-    /* Relative rather than static so the invitation ring still frames the
-       tray, which means the plan coordinates have to be cleared by hand or
-       they would offset it off the side of the screen. */
-    position: relative !important;
-    inset: auto !important;
-    order: -1;
-    margin-bottom: var(--s-4);
-  }
-
-  .instrument {
-    padding: var(--s-3) var(--s-3);
-  }
-
-  .instrName,
-  .instrNote {
-    font-size: var(--t-mini);
-  }
-
-  .instrKey {
-    min-width: 1.25rem;
-    font-size: var(--t-micro);
-  }
-
-  /* Nothing pans or zooms on a stacked sheet, so the tray does not claim it. */
-  .instrFoot {
-    display: none;
-  }
-
-  .notes {
-    order: 1;
-  }
-
-  .headlineName,
-  html[data-mode='annotated'] .headlineName,
-  html[data-mode='raw'] .headlineName {
-    font-size: clamp(2.25rem, 11vw, 3.25rem);
-    line-height: 0.95;
-  }
-
-  .headlineRole,
-  .headlineNote {
-    font-size: var(--t-xs);
-  }
-
-  /* Stays a containing block so the sheet tag and corner mark stay inside
-     their own plate, but the plan coordinates must be neutralised or they
-     would offset each card out of the stack. */
-  .plate {
-    position: relative !important;
-    inset: auto !important;
-    width: auto !important;
-    height: auto !important;
-    min-height: 0;
-    padding: var(--s-4);
-  }
-
   .plateBody,
   .plateBody[data-layout='side'] {
     flex-direction: column;
     gap: var(--s-3);
+    margin-top: var(--s-3);
   }
 
+  /* The figure leads. On the wide plan it is a thumbnail beside a schedule;
+     here it is the sheet, and the schedule is its key. */
   .plateBody[data-layout='band'] .plateFig,
   .plateBody[data-layout='side'] .plateFig {
     flex: 0 0 auto;
     flex-direction: column;
     align-items: stretch;
     gap: var(--s-2);
-    padding: 0;
+    padding: var(--s-3) 0 0;
     border: none;
-    --fw: 1;
+    --fw: 1.05;
+    --fig-delay: 120ms;
   }
 
   .plate[data-id] .plateBody .plateFig svg {
     width: 100%;
     height: auto;
-    max-height: 11rem;
+    max-height: 11.5rem;
     aspect-ratio: auto;
+  }
+
+  /* Plotted as the sheet arrives, not seven at once while six are off-screen.
+     Gated on script so a reader without it still gets the drawings. */
+  :global(html[data-js]) .plate:not([data-seen]) .plateFig * {
+    animation-play-state: paused;
+  }
+
+  .plateFig text,
+  .plane[data-lod] .plateFig text {
+    display: inline;
+  }
+
+  .plate[data-id='blog'] .figCap {
+    display: flex;
   }
 
   .figCap {
@@ -1590,20 +1834,90 @@ html[data-mode='raw'] .stamp {
   }
 
   .rows {
-    max-height: 8.5rem;
+    flex: 0 0 auto;
+    max-height: 7.6rem;
   }
 
-  .plateTitle {
-    font-size: var(--t-lg);
+  .item {
+    padding: 4px 0;
+  }
+
+  .rows[data-numbered] .item {
+    grid-template-columns: 3.4rem 1fr;
+  }
+
+  .itemSheet {
+    font-size: var(--t-micro);
   }
 
   .itemTitle {
-    font-size: var(--t-xs);
+    font-size: var(--t-sm);
+  }
+
+  .itemMeta {
+    display: none !important;
+  }
+
+  .plateAnnot,
+  .plateRecord,
+  .recordRow {
+    font-size: var(--t-micro);
+  }
+
+  .recordRow {
+    grid-template-columns: 5.5rem 1fr;
+  }
+
+  .plateFoot {
+    display: flex !important;
+    margin-top: var(--s-3);
+    padding-top: var(--s-3);
+    font-size: var(--t-micro);
+  }
+
+  html[data-mode='annotated'] .plateFoot {
+    display: none !important;
   }
 
   .plateOpen {
     opacity: 1;
     transform: none;
+    font-weight: 600;
+  }
+
+  /* The general notes are the last sheet on the pile. */
+  .notes {
+    order: 1;
+    z-index: 1;
+    padding-bottom: var(--s-4);
+    background: var(--paper-deep);
+    box-shadow: 0 -10px 22px -12px rgba(46, 35, 18, 0.5);
+  }
+
+  .furnitureTitle {
+    padding: 7px 12px;
+    font-size: var(--t-micro);
+  }
+
+  .note {
+    grid-template-columns: 1.6rem 1fr;
+    font-size: var(--t-sm);
+  }
+
+  .noteNo {
+    font-size: var(--t-micro);
+  }
+}
+
+/* A short phone has less room under the rail, and a sheet taller than the
+   space it pins into could never be read to its foot. */
+@media (max-width: 59.999rem) and (max-height: 44rem) {
+  .plate[data-id] .plateBody .plateFig svg {
+    max-height: 8.5rem;
+  }
+
+  .rows {
+    max-height: 5.2rem;
   }
 }
 
