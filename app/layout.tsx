@@ -66,7 +66,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <JsonLd />
       </head>
       <body suppressHydrationWarning>
-        <Preloader total={sheetIndex.length} />
+        <Preloader
+          sheets={sheetIndex.map(({ sheet, title, href }) => ({ sheet, title, href }))}
+        />
         <ToastProvider>
           <ModeProvider>
             <InstrumentProvider>

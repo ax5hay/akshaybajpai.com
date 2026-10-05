@@ -73,21 +73,33 @@ products stapled together. This version commits to **one metaphor, end to end**.
 
 ## The cover sheet
 
-A first load opens on a cover: one composition, printed three times, once per
-drawing mode, with the three prints stacked in exact register. Same type, same
-size, same position, different ink: solid on paper, line work on cyanotype,
-scanlines on source. Two slanted seams cut between them, so the name reads
-straight across all three, then the seams run out in favour of the mode you are
-in and the cover lifts off the board.
+A first load opens on a cover, and the cover does the loading.
 
-- **It is CSS, including its own removal**, so it cannot strand a reader whose
-  script never arrives. The seams are two registered custom properties
-  (`--s1`, `--s2`); every clip is computed from the pair, which is why the
-  prints and the hairlines on their edges cannot drift apart.
-- **It plays once per visit.** `ModeScript` sets `data-preloaded` before paint
-  on later loads. Any key or press skips it. Reduced motion never sees it.
-- **The set waits for it.** Entrance animations are offset by `--boot`, so the
-  plan is plotted as the cover comes off and not behind it.
+**What it shows.** One composition, printed three times, once per drawing mode,
+with the three prints stacked in exact register: same type, same size, same
+position, different ink. Solid on paper, line work on cyanotype, scanlines on
+source. The source print comes first; the cyanotype is exposed across it; the
+paper is laid across that; then two slanted seams draw back and all three stand
+side by side with the name running straight through them.
+
+**What it does.** While that plays it issues the set: waits for the typefaces,
+fetches the inspection lens, and prefetches every other sheet into the router's
+cache. The counter, the meter and the line naming the sheet in hand are that
+work, not a timer (a prefetch has no promise, so each payload is watched for as
+a resource entry). When it is done the cover is stamped, the seams run out in
+favour of the mode you are in, and it lifts. Every sheet then opens instantly.
+
+- **It cannot hold the page.** It leaves after ten seconds whatever the network
+  is doing, any key or press skips it, and a metered or slow connection only
+  fetches the seven section sheets.
+- **It plays once per visit**, and never under reduced motion. `ModeScript`
+  decides before paint.
+- **The set waits for it without guessing.** `html[data-cover]` pauses the
+  set's entrance animations at their first frame until the cover reports
+  `data-issued`, so the plan is plotted as the cover comes off however long
+  the fetching took. An inline timer releases them regardless.
+- **Without script** the stylesheet runs the same three acts on a fixed clock
+  and removes the cover itself.
 
 ---
 

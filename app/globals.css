@@ -87,10 +87,11 @@
   /* The lens sits above the grain so its optic is not veiled by paper fibre. */
   --z-loupe: 150;
 
-  /* How long the cover sheet holds the board on a first load. Every entrance
-     animation waits this long, so the set is plotted as the cover comes off
-     and not behind it. Zero once the cover has played. */
-  --boot: 2850ms;
+  /* Without script the cover sheet runs on a fixed clock, and every entrance
+     animation waits this long so the set is plotted as the cover comes off
+     and not behind it. With script the wait is not timed at all: see
+     html[data-cover] below. */
+  --boot: 6100ms;
 
   /* The lens inverts whatever it covers. Markup revealed inside it is drawn
      in the colours that come out of that inversion as amber on deep blue. */
@@ -478,8 +479,17 @@ html[data-mode='raw'] .display {
   }
 }
 
-html[data-preloaded] {
+html[data-js] {
   --boot: 0ms;
+}
+
+/* While the cover sheet is up, the set's entrance is held at its first frame
+   rather than delayed by a guess, because the cover stays for as long as the
+   preloading takes. `data-issued` is set as the cover starts to lift. */
+html[data-cover]:not([data-issued]) main *,
+html[data-cover]:not([data-issued]) main *::before,
+html[data-cover]:not([data-issued]) main *::after {
+  animation-play-state: paused !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

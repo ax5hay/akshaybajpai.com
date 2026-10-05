@@ -1,26 +1,50 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './Preloader.module.css';
 
 /**
- * The cover sheet. Shown once per visit, before the set is laid out.
+ * The cover sheet. Shown once per visit, and it earns the time it takes.
  *
- * It is one composition printed three times, once per drawing mode, and the
- * three prints are stacked in exact register: same type, same size, same
- * position, different ink. Two slanted seams cut between them, so the name
- * reads straight across paper, cyanotype and source without a break. The
- * seams then run out in favour of whichever mode the reader is in, and the
- * cover lifts off the board.
+ * WHAT IT SHOWS. One composition printed three times, once per drawing mode,
+ * stacked in exact register: same type, same size, same position, different
+ * ink. The source print comes first, the cyanotype is exposed across it, the
+ * paper is laid across that, and then the two seams draw back so all three
+ * stand side by side with the name running straight through them.
  *
- * The whole sequence is CSS, including its own removal, so it cannot strand a
- * reader whose script never arrives. Script only adds two things: skipping it
- * on a key or a press, and not showing it again this session (ModeScript sets
- * `data-preloaded` before paint on later loads).
+ * WHAT IT DOES. While that plays it issues the set: waits for the typefaces,
+ * fetches the inspection lens, and prefetches every other sheet into the
+ * router's cache. The counter and the meter are that work, not a timer. When
+ * it is done the cover is stamped, the seams run out in favour of the mode
+ * the reader is in, and it lifts; from then on every sheet opens instantly.
+ *
+ * WHAT HOLDS IT UP. Nothing, for long: a ceiling releases it whatever the
+ * network is doing, any key or press skips it, a metered or slow connection
+ * only fetches the seven section sheets, and without script the stylesheet
+ * runs the whole sequence, and removes it, on a fixed clock.
  */
 
-/** Must outlast the `pre-lift` animation in the stylesheet. */
-const RUN_MS = 3400;
+export interface CoverSheet {
+  sheet: string;
+  title: string;
+  href: string;
+}
+
+/** Long enough after the triptych forms to be read as one. */
+const MIN_MS = 5600;
+/** Leave by now however the fetching is going. */
+const MAX_MS = 10000;
+/** Seams out, then lift. Mirrors the `[data-ready]` animations. */
+const LIFT_AT_MS = 1500;
+const GONE_AT_MS = 2200;
+/** The same, when the reader has asked to get on with it. */
+const HURRY_LIFT_AT_MS = 320;
+const HURRY_GONE_AT_MS = 800;
+/** The count starts once the progress block has inked in. */
+const COUNT_FROM_MS = 1300;
+
+type Connection = { saveData?: boolean; effectiveType?: string };
 
 function Print({ total }: { total: number }) {
   return (
@@ -44,6 +68,12 @@ function Print({ total }: { total: number }) {
         {/* Source only: the element the name is. */}
         <span className={styles.open}>&lt;h1&gt;</span>
         <span className={styles.close}>&lt;/h1&gt;</span>
+
+        {/* Struck when the set is issued. */}
+        <span className={styles.stamp}>
+          <span>Issued</span>
+          <span>Cleared for full thrust</span>
+        </span>
       </span>
 
       <span className={styles.dim}>
@@ -58,47 +88,171 @@ function Print({ total }: { total: number }) {
         Drawn for a wide screen. Open it on desktop for the full set, at full thrust.
       </p>
 
-      <span className={styles.count} style={{ '--total': total } as React.CSSProperties}>
-        Issuing set <span className={styles.countNo} /> of {total} sheets
+      <span className={styles.progress}>
+        <span className={styles.count}>
+          Issuing set <span className={styles.countNo} /> of{' '}
+          <span className={styles.countTotal}>{total}</span> sheets
+        </span>
+        <span className={styles.meter} />
+        <span className={styles.task} />
       </span>
     </div>
   );
 }
 
-export function Preloader({ total }: { total: number }) {
+export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
   const [done, setDone] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const root = document.documentElement;
-    if ('preloaded' in root.dataset) {
+    const el = ref.current;
+    if ('preloaded' in root.dataset || !el) {
       setDone(true);
       return;
     }
 
-    const finish = () => {
-      // Also zeroes --boot, which is what was holding the plan's own plot
-      // back until the cover was off it.
-      root.dataset.preloaded = '';
-      setDone(true);
+    const started = performance.now();
+    const here = pathname.endsWith('/') ? pathname : `${pathname}/`;
+    const connection = (navigator as Navigator & { connection?: Connection }).connection;
+    const frugal =
+      Boolean(connection?.saveData) || /(^|-)2g|3g/.test(connection?.effectiveType ?? '');
+
+    // The section sheets always; the detail sheets too unless that would be
+    // spending someone's data allowance on pages they have not asked for.
+    const wanted = sheets.filter(
+      (s) => s.href !== here && (!frugal || s.href.split('/').filter(Boolean).length <= 1)
+    );
+    const pending = new Map(wanted.map((s) => [s.href, s]));
+    // The sheet being read is already issued.
+    const total = wanted.length + 1;
+    let issued = 1;
+    let fontsReady = false;
+    let lensReady = false;
+    // Sheets that have landed but not yet been counted on the cover. On a
+    // fast connection the whole set arrives before the cover has finished
+    // being drawn, so the count is paced: it never shows a sheet that has not
+    // landed, it just does not show them all in one frame.
+    const landedQueue: CoverSheet[] = [];
+
+    const show = (task: string) => {
+      const steps = total + 2;
+      const stepsDone = issued + (fontsReady ? 1 : 0) + (lensReady ? 1 : 0);
+      el.style.setProperty('--issued', String(issued));
+      el.style.setProperty('--p', String(Math.min(1, stepsDone / steps)));
+      el.style.setProperty('--task', JSON.stringify(task));
+      el.querySelectorAll(`.${styles.countTotal}`).forEach((n) => {
+        n.textContent = String(total);
+      });
+    };
+    show('Setting type');
+
+    let released = false;
+    let timers: Array<ReturnType<typeof setTimeout>> = [];
+
+    const release = (hurry = false) => {
+      if (released) return;
+      released = true;
+      if (hurry) el.setAttribute('data-hurry', '');
+      else show('Set issued');
+      // The seams are mid-breath; the run-out has to start from where they
+      // actually are, so their live values are handed to its keyframes.
+      const live = getComputedStyle(el);
+      el.style.setProperty('--r1', live.getPropertyValue('--s1'));
+      el.style.setProperty('--r2', live.getPropertyValue('--s2'));
+      el.setAttribute('data-ready', '');
+      timers.push(
+        setTimeout(
+          () => {
+            // Lets the plan start plotting as the cover comes off it.
+            root.dataset.issued = '';
+          },
+          hurry ? HURRY_LIFT_AT_MS : LIFT_AT_MS
+        ),
+        setTimeout(
+          () => {
+            root.dataset.preloaded = '';
+            setDone(true);
+          },
+          hurry ? HURRY_GONE_AT_MS : GONE_AT_MS
+        )
+      );
     };
 
-    let leaving: ReturnType<typeof setTimeout> | undefined;
-    const skip = () => {
-      if (leaving) return;
-      ref.current?.setAttribute('data-skip', '');
-      leaving = setTimeout(finish, 260);
+    const settle = () => {
+      if (pending.size || landedQueue.length || !fontsReady || !lensReady) return;
+      const wait = Math.max(0, MIN_MS - (performance.now() - started));
+      timers.push(setTimeout(() => release(), wait));
     };
 
-    const timer = setTimeout(finish, RUN_MS);
+    // One sheet per beat, with the beat set so a full set counts up across
+    // the time the triptych is forming.
+    const beat = Math.max(55, Math.min(140, (MIN_MS - COUNT_FROM_MS - 900) / total));
+    let ticker: ReturnType<typeof setInterval> | undefined;
+    timers.push(
+      setTimeout(() => {
+        ticker = setInterval(() => {
+          const sheet = landedQueue.shift();
+          if (!sheet) return;
+          issued += 1;
+          show(`${sheet.sheet} · ${sheet.title}`);
+          settle();
+        }, beat);
+      }, COUNT_FROM_MS)
+    );
+
+    // A prefetch has no promise to wait on, so the fetch itself is watched:
+    // each sheet's payload shows up as a resource entry when it lands.
+    const landed = (url: string) => {
+      const path = new URL(url, window.location.href).pathname;
+      if (!path.endsWith('index.txt')) return;
+      const href = path.slice(0, -'index.txt'.length);
+      const sheet = pending.get(href);
+      if (!sheet) return;
+      pending.delete(href);
+      landedQueue.push(sheet);
+    };
+    const watcher =
+      'PerformanceObserver' in window
+        ? new PerformanceObserver((list) => list.getEntries().forEach((e) => landed(e.name)))
+        : null;
+    watcher?.observe({ type: 'resource', buffered: false });
+
+    document.fonts.ready.then(() => {
+      fontsReady = true;
+      if (issued === 1) show('Type set');
+      settle();
+    });
+    import('@/components/sheet/Loupe')
+      .catch(() => {})
+      .then(() => {
+        lensReady = true;
+        if (issued === 1) show('Instruments ready');
+        settle();
+      });
+    wanted.forEach((s) => router.prefetch(s.href));
+    settle();
+
+    // The prefetching carries on behind the page either way; skipping only
+    // stops the reader having to watch it.
+    const skip = () => release(true);
+    const ceiling = setTimeout(() => release(), MAX_MS);
     window.addEventListener('keydown', skip);
     window.addEventListener('pointerdown', skip);
+
     return () => {
-      clearTimeout(timer);
-      if (leaving) clearTimeout(leaving);
+      watcher?.disconnect();
+      clearTimeout(ceiling);
+      if (ticker) clearInterval(ticker);
+      timers.forEach(clearTimeout);
+      timers = [];
       window.removeEventListener('keydown', skip);
       window.removeEventListener('pointerdown', skip);
     };
+    // Runs once: the cover belongs to the load, not to later navigations.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (done) return null;
@@ -106,13 +260,13 @@ export function Preloader({ total }: { total: number }) {
   return (
     <div ref={ref} className={styles.pre} aria-hidden="true">
       <div className={`${styles.layer} ${styles.raw}`}>
-        <Print total={total} />
+        <Print total={sheets.length} />
       </div>
       <div className={`${styles.layer} ${styles.annot}`}>
-        <Print total={total} />
+        <Print total={sheets.length} />
       </div>
       <div className={`${styles.layer} ${styles.paper}`}>
-        <Print total={total} />
+        <Print total={sheets.length} />
       </div>
 
       <span className={`${styles.seam} ${styles.seamOuter}`} />
