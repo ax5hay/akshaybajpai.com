@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { PlateShell } from '@/components/plate/PlateShell';
-import { Chronology } from '@/components/plate/Chronology';
+import { CareerElevation } from '@/components/plate/CareerElevation';
 import { Callout } from '@/components/kit/Callout';
 import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
@@ -24,7 +24,6 @@ export default function AboutPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
-      figure={PLATE.id}
       lead={<p>Architect of systems. Builder of intelligence.</p>}
       record={[
         { k: 'name', v: 'Akshay Bajpai' },
@@ -49,8 +48,8 @@ export default function AboutPage() {
         <h2>Chronology</h2>
       </div>
 
-      <Callout note="Read as a section, not a list: the datum runs vertically and each role is a mark struck off it.">
-        <Chronology />
+      <Callout note="Read as an elevation, not a list: the datum runs along the years and each role is a volume standing on it.">
+        <CareerElevation />
       </Callout>
 
       <div className="prose">

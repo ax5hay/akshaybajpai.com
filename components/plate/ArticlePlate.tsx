@@ -3,7 +3,9 @@ import { PlateShell, type PlateFact } from './PlateShell';
 import { MetricSchedule } from '@/components/kit/MetricSchedule';
 import { Callout } from '@/components/kit/Callout';
 import { formatDate } from '@/lib/format';
-import { parseGithubRepo } from '@/lib/content';
+import { parseGithubRepo, type ContentSection } from '@/lib/content';
+import { SheetProfile } from './SheetProfile';
+import { ProseTools } from './ProseTools';
 import type { Discipline } from '@/lib/plates';
 import styles from './ArticlePlate.module.css';
 
@@ -21,6 +23,8 @@ interface Props {
   /** ISO publication date. */
   date: string;
   html: string;
+  /** The article's `##` sections, for its profile and margin key. */
+  sections?: ContentSection[];
   source: string;
   readingTime: number;
   seriesHref: string;
@@ -45,6 +49,7 @@ export function ArticlePlate({
   discipline,
   date,
   html,
+  sections = [],
   source,
   readingTime,
   seriesHref,
@@ -110,6 +115,9 @@ export function ArticlePlate({
         <MetricSchedule metrics={metrics} />
       )}
 
+      <SheetProfile sections={sections} readingTime={readingTime} />
+
+      <ProseTools sheet={sheet}>
       {(() => {
         // An unlabelled code block in a case study is a diagram in ASCII. The
         // verbatim source keeps it; the sheet draws it.
@@ -136,16 +144,23 @@ export function ArticlePlate({
           </>
         );
       })()}
+      </ProseTools>
 
       {adjacent.length > 0 && (
         <nav className={styles.adjacent} aria-label="Adjacent sheets">
-          <span className={styles.adjacentLabel}>Adjacent sheets</span>
+          <span className={styles.adjacentLabel}>Continue through the set</span>
           <ul className={styles.adjacentList}>
-            {adjacent.map((item) => (
-              <li key={item.href}>
+            {adjacent.map((item, i) => (
+              <li key={item.href} data-next={i === 0 || undefined}>
                 <Link href={item.href} className={styles.adjacentLink}>
-                  <span className={styles.adjacentSheet}>{item.sheet}</span>
+                  <span className={styles.adjacentSheet}>
+                    {i === 0 && <span className={styles.adjacentNext}>Next sheet</span>}
+                    {item.sheet}
+                  </span>
                   <span className={styles.adjacentTitle}>{item.title}</span>
+                  <span className={styles.adjacentArrow} aria-hidden="true">
+                    →
+                  </span>
                 </Link>
               </li>
             ))}

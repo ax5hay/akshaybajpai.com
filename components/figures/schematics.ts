@@ -77,6 +77,84 @@ const F = { x: 380, y: 110 };
 const G = { x: 220, y: 180 };
 
 export const SCHEMATICS: Record<string, SchematicSpec> = {
+  /* ------------------------------------- S-201: the gateway-first layout --- */
+  'gateway-first-routing': {
+    pick: 'Request to route',
+    caption:
+      'The gateway-first layout from the paragraph above. Choose a request; each routing tier is tried in turn and the first that can serve it does.',
+    input: { x: 24, y: 45, label: 'REQUEST' },
+    base: 'OBSERVABILITY ON EVERY HOP',
+    nodes: {
+      gateway: { ...A, name: 'Gateway', sub: 'per-tenant keys · caching' },
+      exact: { ...B, name: 'Tier 1 · exact match' },
+      classify: { ...C, name: 'Tier 2 · classifier' },
+      compose: { ...F, name: 'Tier 3 · composed', sub: 'retrieval' },
+      search: { ...E, name: 'Hybrid search', sub: 'dense + sparse · reranked' },
+      model: { ...D, name: 'Model selection', sub: 'with fallbacks' },
+      guard: { ...G, name: 'Guardrails', sub: 'escalation flags' },
+    },
+    edges: {
+      in: IN,
+      gatewayExact: R1_AB,
+      exactClassify: R1_BC,
+      classifyCompose: C_DOWN_F,
+      composeSearch: 'M380 125H350',
+      searchModel: 'M220 125H190',
+      exactGuard: 'M235 60V98H205V195H220',
+      classifyModel: 'M400 60V88H125V110',
+      modelGuard: 'M125 140V195H220',
+      out: G_EXIT,
+    },
+    scenarios: [
+      {
+        label: 'Served at tier one',
+        says: 'A request the first tier can answer by exact match.',
+        nodes: ['gateway', 'exact', 'guard'],
+        edges: ['in', 'gatewayExact', 'exactGuard', 'out'],
+        exit: 'RESPONSE',
+        flags: ['tiers tried: 1 of 3'],
+        note: 'The cheapest tier is asked first. Most of the routing is deciding how little work a request needs.',
+      },
+      {
+        label: 'Served at tier two',
+        says: 'No exact match; the classifier can place it.',
+        nodes: ['gateway', 'exact', 'classify', 'model', 'guard'],
+        edges: ['in', 'gatewayExact', 'exactClassify', 'classifyModel', 'modelGuard', 'out'],
+        exit: 'RESPONSE',
+        flags: ['tiers tried: 2 of 3'],
+        note: 'Falling through a tier is not a failure. It is the design: each tier only takes what it can serve.',
+      },
+      {
+        label: 'Needs the corpus',
+        says: 'A request that has to be answered from retrieved material.',
+        nodes: ['gateway', 'exact', 'classify', 'compose', 'search', 'model', 'guard'],
+        edges: [
+          'in',
+          'gatewayExact',
+          'exactClassify',
+          'classifyCompose',
+          'composeSearch',
+          'searchModel',
+          'modelGuard',
+          'out',
+        ],
+        exit: 'RESPONSE',
+        flags: ['tiers tried: 3 of 3', 'retrieval: dense and sparse, reranked'],
+        note: 'Only now is the expensive path taken: hybrid search with cross-encoder reranking, then a model chosen with fallbacks.',
+      },
+      {
+        label: 'Flagged on the way out',
+        says: 'Any of the above, where the answer trips a guardrail.',
+        nodes: ['gateway', 'exact', 'classify', 'model', 'guard'],
+        edges: ['in', 'gatewayExact', 'exactClassify', 'classifyModel', 'modelGuard', 'out'],
+        exit: 'ESCALATED',
+        hot: true,
+        flags: ['tiers tried: 2 of 3', 'escalation flag: set'],
+        note: 'Guardrails sit after generation, whichever tier served the request, and they escalate instead of letting it pass.',
+      },
+    ],
+  },
+
   /* ------------------------------------------------------------ AURIXA --- */
   'aurixa-conversational-ai-orchestration': {
     pick: 'Request to trace',

@@ -12,7 +12,7 @@ import styles from './Schematic.module.css';
  * in that data is taken from the case study it sits in, so the figure can be
  * checked against the prose beside it.
  */
-export function Schematic({ spec }: { spec: SchematicSpec }) {
+export function Schematic({ spec, figure = 'Fig. 1' }: { spec: SchematicSpec; figure?: string }) {
   const [active, setActive] = useState(0);
   const scenario = spec.scenarios[active];
   const input = spec.input ?? { x: 24, y: 45, label: 'USER' };
@@ -120,7 +120,7 @@ export function Schematic({ spec }: { spec: SchematicSpec }) {
       </div>
 
       <figcaption className={styles.caption}>
-        <span className={styles.captionNo}>Fig. 1</span>
+        <span className={styles.captionNo}>{figure}</span>
         {spec.caption}
       </figcaption>
     </figure>

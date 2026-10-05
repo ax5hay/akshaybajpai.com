@@ -1,0 +1,284 @@
+/* A section cut along the length of the article: one segment per section, as
+   wide as its words. */
+
+.profile {
+  --at: 0;
+  margin: 0 0 var(--s-10);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-bottom: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.headTitle {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.headMeta {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.strip {
+  position: relative;
+  display: flex;
+  height: 2.75rem;
+  border: var(--lw-med) solid var(--rule-ink);
+  background: var(--paper-raised);
+}
+
+.cell {
+  display: flex;
+  flex-basis: 0;
+  min-width: 1.75rem;
+  border-left: var(--lw-thin) solid var(--rule-ink);
+}
+
+.cell:first-child {
+  border-left: none;
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0 4px 6px;
+  color: var(--ink-3);
+  transition:
+    background-color var(--d-2) var(--ease-plate),
+    color var(--d-2) var(--ease-plate);
+}
+
+.segNo {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* Read: hatched, the way a section shows material that has been cut. */
+.segment[data-state='done'] {
+  color: var(--ink-2);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 4px,
+    var(--rule) 4px 5px
+  );
+}
+
+/* Being read: poched solid. */
+.segment[data-state='on'] {
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.segment:hover,
+.segment:focus-visible {
+  color: var(--paper-raised);
+  background: var(--accent);
+  background-image: none;
+}
+
+/* The reader, exactly. A level mark riding the strip. */
+.cursor {
+  position: absolute;
+  top: -7px;
+  bottom: -7px;
+  left: calc(var(--at) * 100%);
+  width: var(--lw-thick);
+  margin-left: -1px;
+  background: var(--accent);
+  pointer-events: none;
+}
+
+.cursor::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  translate: -50% -50%;
+  rotate: 45deg;
+  background: var(--accent);
+}
+
+.readout {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.readoutNo {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.readoutTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.readoutMeta {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Margin key --------------------------------------------------------------
+   Only where the board has room beside the sheet. It hangs in the left margin
+   and sticks under the rail for the length of the article. */
+
+.rail {
+  display: none;
+}
+
+@media (min-width: 88rem) {
+  .rail {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: calc(100% + var(--sheet-pad, 0px) + var(--s-8));
+    width: 12.5rem;
+    pointer-events: none;
+  }
+
+  .outline {
+    position: sticky;
+    top: calc(var(--sheet-margin) + var(--rail-h) + var(--s-10));
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    border-right: var(--lw-thin) solid var(--rule);
+  }
+
+  /* The engineering modes write part names in this margin. On anything but a
+     very wide board there is not room for both, and the strip above already
+     does the job. */
+  :global(html[data-mode='annotated']) .rail,
+  :global(html[data-mode='raw']) .rail {
+    display: none;
+  }
+}
+
+.outlineHead {
+  padding: 0 var(--s-4) var(--s-3) 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--ink-3);
+}
+
+.outlineItem {
+  position: relative;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: baseline;
+  gap: var(--s-3);
+  width: 100%;
+  padding: 5px var(--s-4) 5px 0;
+  text-align: right;
+  color: var(--ink-3);
+  transition: color var(--d-1);
+}
+
+/* Tick on the margin rule, struck through it for the section being read. */
+.outlineItem::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 6px;
+  height: var(--lw-thin);
+  background: var(--rule-strong);
+  transition:
+    width var(--d-2) var(--ease-plate),
+    background-color var(--d-2),
+    right var(--d-2) var(--ease-plate);
+}
+
+.outlineNo {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.outlineTitle {
+  font-size: var(--t-sm);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.outlineItem:hover {
+  color: var(--accent);
+}
+
+.outlineItem[data-state='done'] {
+  color: var(--ink-4);
+}
+
+.outlineItem[data-state='on'] {
+  color: var(--ink);
+}
+
+.outlineItem[data-state='on'] .outlineNo {
+  color: var(--accent);
+}
+
+.outlineItem[data-state='on']::after {
+  right: -9px;
+  width: 18px;
+  height: var(--lw-thick);
+  background: var(--accent);
+}
+
+@media (max-width: 40rem) {
+  .head {
+    letter-spacing: 0.08em;
+  }
+
+  .readoutMeta {
+    display: none;
+  }
+
+  /* A thumb needs more than a 44-unit strip to land on one section of seven. */
+  .strip {
+    height: 3.25rem;
+  }
+}
+
+@media print {
+  .profile {
+    display: none;
+  }
+}

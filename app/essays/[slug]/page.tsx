@@ -41,6 +41,7 @@ export default async function EssayDetailPage({ params }: { params: Promise<{ sl
       discipline="E"
       date={essay.frontmatter.pubDate}
       html={essay.html}
+      sections={essay.sections}
       source={essay.content}
       readingTime={estimateReadingTime(essay.content)}
       seriesHref="/essays/"

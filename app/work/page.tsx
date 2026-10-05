@@ -24,6 +24,7 @@ export default async function WorkIndexPage() {
     date: entry.frontmatter.pubDate,
     tags: entry.frontmatter.stack,
     readingTime: estimateReadingTime(entry.content),
+    metric: entry.frontmatter.metrics?.[0],
   }));
 
   return (
@@ -47,7 +48,7 @@ export default async function WorkIndexPage() {
         </p>
       }
     >
-      <SheetSchedule rows={rows} unit="case studies" />
+      <SheetSchedule rows={rows} unit="case studies" filterable />
     </PlateShell>
   );
 }

@@ -27,6 +27,36 @@
   border-bottom-color: var(--rule-strong);
 }
 
+/* Reading line: how far down the sheet the reader is, drawn along the foot of
+   the rail. A CSS scroll timeline moves it, so it costs no script and no
+   layout; a browser without scroll timelines does not draw it. The phone has
+   its own on the dock. */
+@supports (animation-timeline: scroll()) {
+  @media (min-width: 40.001rem) {
+    .rail::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: calc(var(--lw-thin) * -1 - 1px);
+      height: 2px;
+      background: var(--accent);
+      transform-origin: left center;
+      animation: rail-read linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes rail-read {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* ---- Project mark ---- */
 
 .mark {

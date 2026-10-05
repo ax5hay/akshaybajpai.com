@@ -49,6 +49,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
       discipline="W"
       date={fm.pubDate}
       html={study.html}
+      sections={study.sections}
       source={study.content}
       readingTime={estimateReadingTime(study.content)}
       seriesHref="/work/"

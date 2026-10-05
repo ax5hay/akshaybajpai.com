@@ -61,6 +61,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 | [`A-105`](#a-105--moving-between-sheets) | **Moving between sheets** | View transitions, keyboard, reduced motion |
 | [`A-106`](#a-106--on-a-phone) | **On a phone** | The title sheet, the pile, the dock |
 | [`A-107`](#a-107--margin-notes) | **Margin notes** | How a reader learns the set can be operated |
+| [`A-108`](#a-108--inside-a-sheet) | **Inside a sheet** | Section profile, citable headings, operable figures on every page |
 | [`S-201`](#s-201--how-it-is-built) | **How it is built** | Architecture, sheet registry, component kit |
 | [`S-202`](#s-202--content-pipeline) | **Content pipeline** | Markdown in, numbered sheets out |
 | [`W-401`](#w-401--run-it-locally) | **Run it locally** | Quick start and scripts |
@@ -525,6 +526,30 @@ dwell with it, with no timer to keep in step.
 
 ---
 
+## A-108 · Inside a sheet
+
+The frame is the same on every route. What is drawn inside it is not.
+
+| On | What the reader gets |
+|:---|:---------------------|
+| **Every article** | A **section through the sheet**: a strip cut along the article's length, one segment per `##` section, each as wide as its word count. The segment being read is poched, the ones behind are hatched, and a cursor rides the strip at the reader's exact position. A segment jumps to its section |
+| | On a wide board the same sections are **keyed down the margin** beside the sheet and stay there as it scrolls |
+| | **Numbered, citable headings.** Each `##` is numbered in the sheet's margin; pressing one copies `W-405 / 03 · Tech stack · link` |
+| | Measured figures in the schedule of outcomes **count up** to themselves when they come into view |
+| | The **next sheet** set large at the foot, with the two after it beneath |
+| **`A-101` The Architect** | The career as an **operable elevation**: each role a volume on the datum, selectable by pointer, focus or arrow keys, with the role read out beneath |
+| **`R-301` Research** | A ruled **schedule of record** for degrees, the publication and the studies |
+| **`S-201` Structural Principles** | A second operable schematic, of the gateway-first routing tiers the page describes |
+| **`W-400` Works** | A **stack key** above the schedule. Choosing a tag strikes the other sheets back without removing them, so the schedule keeps its length and numbering. Each row carries its lead figure |
+| **Every sheet** | A reading line along the foot of the rail, driven by a CSS scroll timeline |
+
+The section widths, counts and reading times come from the Markdown at build time
+(`readSections` in [`lib/content.ts`](lib/content.ts)), so the profile is a true drawing of
+the article. Everything here degrades to static content: the server renders the real
+figures and all six career roles, and script only adds the motion and the selection.
+
+---
+
 ## S-201 · How it is built
 
 ```mermaid
@@ -596,7 +621,12 @@ flowchart LR
 | `figures/Schematic` | Operable schematic; drawings are data in `figures/schematics.ts` |
 | `plate/PlateShell` | Wrapper for every content sheet |
 | `plate/ArticlePlate` | Detail sheet: back link, stack, metrics, schematic, adjacent sheets |
-| `plate/SheetSchedule` | Ruled, numbered index table fronting each collection |
+| `plate/SheetSchedule` | Ruled, numbered index table fronting each collection; filterable by stack |
+| `plate/SheetProfile` | Section strip and margin key for an article |
+| `plate/ProseTools` | Makes an article's numbered headings citable |
+| `plate/CareerElevation` | The career as an operable elevation |
+| `plate/RecordSchedule` | Ruled schedule of degrees, publications and studies |
+| `kit/CountUp` | A measured figure that counts up to itself |
 | `sheet/SheetFrame` | Drawing border, zone rulers, trim |
 | `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
 | `sheet/TitleBlock` | Bottom-right title block, grid reference, copy and print |
