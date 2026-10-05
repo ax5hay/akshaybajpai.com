@@ -12,6 +12,9 @@ const ZONE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
 export function SheetFrame() {
   return (
     <div className={styles.frame} aria-hidden="true">
+      {/* Trim: nothing is drawn outside the border, so a sheet scrolling past
+          is cut off at it instead of running out under the zone numbers. */}
+      <div className={styles.trimMask} />
       <div className={styles.border} />
 
       <div className={`${styles.ruler} ${styles.rulerTop}`}>

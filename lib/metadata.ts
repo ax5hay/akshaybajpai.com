@@ -19,7 +19,7 @@ export function buildMetadata({
   noIndex = false,
 }: PageMeta): Metadata {
   const url = `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
-  const image = `${SITE_URL}/logo.png`;
+  const image = `${SITE_URL}/og.jpg`;
 
   return {
     title,

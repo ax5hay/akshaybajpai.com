@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DISCIPLINES } from '@/lib/plates';
 import { useToast } from '@/components/system/ToastProvider';
 import { usePlateMeta, TOTAL_SHEETS } from './PlateMetaProvider';
@@ -12,6 +12,14 @@ export function TitleBlock() {
   const { meta } = usePlateMeta();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setCompact(window.scrollY > 64);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const copyReference = async () => {
     const reference = `${meta.sheet} · ${meta.title.toUpperCase()} · ${window.location.href}`;
@@ -34,7 +42,12 @@ export function TitleBlock() {
   };
 
   return (
-    <aside className={styles.block} data-expanded={expanded || undefined} aria-label="Title block">
+    <aside
+      className={styles.block}
+      data-expanded={expanded || undefined}
+      data-compact={compact || undefined}
+      aria-label="Title block"
+    >
       <button
         type="button"
         className={styles.toggle}

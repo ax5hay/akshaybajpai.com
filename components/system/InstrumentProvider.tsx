@@ -64,6 +64,7 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
       message: 'Drag the barrel over the sheet. It names and measures whatever it covers.',
       detail: 'Scroll to resize · Esc or double-click to stow',
       tone: 'revision',
+      group: 'lens',
     });
   }, [lensOn, toast]);
 

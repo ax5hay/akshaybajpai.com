@@ -130,11 +130,18 @@
     rgba(255, 255, 255, 0.11) 0deg 1.4deg,
     transparent 1.4deg 2.8deg
   );
-  mask-image: radial-gradient(circle, transparent 0 calc(50% - 8px), #000 calc(50% - 8px) 50%);
+  /* closest-side, so 100% is the rim. Left at the default the gradient is
+     sized to the corner and the knurling spreads a third of the way into
+     the glass. */
+  mask-image: radial-gradient(
+    circle closest-side,
+    transparent 0 calc(100% - 8px),
+    #000 calc(100% - 8px)
+  );
   -webkit-mask-image: radial-gradient(
-    circle,
-    transparent 0 calc(50% - 8px),
-    #000 calc(50% - 8px) 50%
+    circle closest-side,
+    transparent 0 calc(100% - 8px),
+    #000 calc(100% - 8px)
   );
 }
 

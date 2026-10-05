@@ -48,7 +48,7 @@ html[data-mode='raw'] .raw {
   font-size: var(--t-micro);
   font-weight: 600;
   letter-spacing: 0.12em;
-  color: var(--paper);
+  color: var(--paper-raised);
   background: var(--ink);
 }
 
@@ -115,7 +115,7 @@ html[data-mode='annotated'] .title {
 .fact {
   flex: 1 1 7rem;
   padding: var(--s-2) var(--s-3);
-  background: var(--paper);
+  background: var(--paper-raised);
 }
 
 .fact dt {
@@ -233,7 +233,7 @@ html[data-mode='annotated'] .title {
   grid-template-columns: 9rem 1fr;
   gap: var(--s-4);
   padding: var(--s-2) var(--s-3);
-  background: var(--paper);
+  background: var(--paper-raised);
   font-family: var(--font-mono), monospace;
   font-size: var(--t-xs);
 }
@@ -252,7 +252,7 @@ html[data-mode='annotated'] .title {
   margin: 0;
   padding: var(--s-4);
   border: var(--lw-thin) solid var(--rule);
-  background: var(--paper-raised);
+  background: var(--paper-sunk);
   overflow-x: auto;
   font-family: var(--font-mono), monospace;
   font-size: var(--t-xs);
@@ -266,6 +266,12 @@ html[data-mode='annotated'] .title {
 }
 
 @media (max-width: 44rem) {
+  /* An article's subtitle is a full sentence; at label tracking it runs to
+     six lines on a phone. */
+  .subtitle {
+    letter-spacing: 0.08em;
+  }
+
   .rawRow {
     grid-template-columns: 1fr;
     gap: var(--s-1);

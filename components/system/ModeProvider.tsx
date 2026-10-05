@@ -20,6 +20,17 @@ interface ModeContextValue {
 
 const ModeContext = createContext<ModeContextValue | null>(null);
 
+/** Browser chrome follows the board, so the tab bar re-inks with the sheet. */
+const THEME_COLOR: Record<Mode, string> = {
+  artifact: '#ded2b8',
+  annotated: '#082139',
+  raw: '#08080a',
+};
+
+function paintThemeColor(mode: Mode) {
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[mode]);
+}
+
 export function ModeProvider({ children }: { children: ReactNode }) {
   // ModeScript already wrote the real mode to <html> before paint, so read it
   // back rather than defaulting and causing a visible correction on hydrate.
@@ -28,7 +39,10 @@ export function ModeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const current = document.documentElement.dataset.mode;
-    if (isMode(current)) setModeState(current);
+    if (isMode(current)) {
+      setModeState(current);
+      paintThemeColor(current);
+    }
   }, []);
 
   const setMode = useCallback(
@@ -38,6 +52,7 @@ export function ModeProvider({ children }: { children: ReactNode }) {
       if (document.documentElement.dataset.mode === next) return;
 
       document.documentElement.dataset.mode = next;
+      paintThemeColor(next);
       try {
         localStorage.setItem(MODE_STORAGE_KEY, next);
       } catch {
@@ -49,7 +64,8 @@ export function ModeProvider({ children }: { children: ReactNode }) {
         kind: `Re-issued · Rev ${MODE_INFO[next].rev}`,
         message: MODE_INFO[next].label,
         detail: MODE_INFO[next].blurb,
-        tone: next === 'artifact' ? 'note' : next === 'annotated' ? 'issue' : 'revision',
+        tone: 'issue',
+        group: 'mode',
       });
     },
     [toast]

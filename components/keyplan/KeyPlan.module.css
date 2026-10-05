@@ -10,16 +10,24 @@
 
 .surface {
   position: absolute;
-  top: var(--plate-top);
-  bottom: var(--plate-bottom);
+  /* The plan is height-bound on a laptop, so it takes every row the rail and
+     the title block do not need rather than the roomier clearance a content
+     sheet gets. */
+  top: calc(var(--sheet-margin) + var(--rail-h) + var(--s-3));
+  bottom: calc(var(--sheet-margin) + var(--titleblock-h) + var(--s-3));
   left: calc(var(--sheet-margin) + var(--s-2));
   right: calc(var(--sheet-margin) + var(--s-2));
   overflow: hidden;
   touch-action: none;
+  /* Lets the plane fit itself in CSS, below, before the camera exists. */
+  container-type: size;
 }
 
 .surface[data-interactive] {
   cursor: grab;
+  /* A pan is a drag across text; without this it selects what it crosses. */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .surface[data-interactive]:active {
@@ -28,12 +36,14 @@
 
 /* The board is lit from the middle. Without this the plan is an evenly lit
    rectangle and the eye has nowhere to land; with it the composition has a
-   centre and the sheets at the edge sit back into the surface. */
-.surface::after {
+   centre and the sheets at the edge sit back into the surface. It is cast
+   over the whole stage, not the pannable surface, so the falloff runs out to
+   the drawing border instead of stopping at a visible rectangle. */
+.stage::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: 2;
   pointer-events: none;
   background: radial-gradient(
     ellipse 82% 80% at 50% 44%,
@@ -46,8 +56,8 @@
 
 /* The dark modes are already deep at the edges; doubling the falloff there
    just muddies the line work. */
-html[data-mode='annotated'] .surface::after,
-html[data-mode='raw'] .surface::after {
+html[data-mode='annotated'] .stage::after,
+html[data-mode='raw'] .stage::after {
   background: radial-gradient(
     ellipse 80% 76% at 50% 44%,
     transparent 58%,
@@ -59,6 +69,18 @@ html[data-mode='raw'] .surface::after {
   position: absolute;
   top: 0;
   left: 0;
+  /* The fit, worked out in CSS: the same figure KeyPlan.tsx computes once it
+     is live, so the server-rendered plan is already framed and nothing jumps
+     on hydration. tan(atan2()) is how two lengths divide to a number. */
+  --fit: calc(min(tan(atan2(100cqw, 1700px)), tan(atan2(100cqh, 900px))) * 0.94);
+  --inv: clamp(1, 0.95 / var(--fit), 1.7);
+  --inv-soft: min(var(--inv), 1.25);
+  transform: translate3d(
+      calc((100cqw - 1700px * var(--fit)) / 2),
+      calc((100cqh - 900px * var(--fit)) / 2),
+      0
+    )
+    scale(var(--fit));
   transform-origin: 0 0;
   transition-property: transform;
   transition-timing-function: var(--ease-plate);
@@ -159,7 +181,7 @@ html[data-mode='annotated'] .markup {
 .dimText {
   fill: var(--accent);
   font-family: var(--font-label), monospace;
-  font-size: 11px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.08em;
   text-anchor: middle;
@@ -197,9 +219,10 @@ html[data-mode='annotated'] .markup {
   padding-top: 6px;
   border-top: var(--lw-hair) dashed var(--accent-line);
   font-family: var(--font-label), monospace;
-  font-size: 8.5px;
+  font-size: calc(8.5px * var(--inv, 1));
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--accent);
 }
 
@@ -223,10 +246,14 @@ html[data-mode='annotated'] .plateFoot {
   padding-top: 4px;
   border-top: var(--lw-hair) solid var(--rule);
   font-family: var(--font-label), monospace;
-  font-size: 8.5px;
-  /* The shortest sheets are only 180 units tall, so the record is set tight
-     enough to fit them without clipping. */
+  font-size: calc(8.5px * var(--inv, 1));
   line-height: 1.32;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  /* A record that outruns a short sheet fades out instead of being cut
+     through the middle of a row. */
+  mask-image: linear-gradient(#000 calc(100% - 14px), transparent);
 }
 
 html[data-mode='raw'] .plateRecord {
@@ -235,7 +262,7 @@ html[data-mode='raw'] .plateRecord {
 
 .recordRow {
   display: grid;
-  grid-template-columns: 62px 1fr;
+  grid-template-columns: calc(62px * var(--inv, 1)) 1fr;
   gap: 8px;
 }
 
@@ -258,12 +285,14 @@ html[data-mode='raw'] .plateBody {
 
 .provenance {
   display: none;
-  flex-direction: column;
-  gap: 2px;
-  margin: var(--s-3) 0 0;
+  /* Set as a run, not a stack: four stacked lines outgrow the furniture box
+     and disappear under the sheet below it. */
+  flex-wrap: wrap;
+  gap: 0 12px;
+  margin: var(--s-2) 0 0;
   font-family: var(--font-label), monospace;
-  font-size: 9px;
-  line-height: 1.5;
+  font-size: calc(9px * var(--inv-soft, 1));
+  line-height: 1.4;
   color: var(--ink-3);
 }
 
@@ -297,7 +326,10 @@ html[data-mode='raw'] .legendRow[data-layer='record'] {
   position: absolute;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Anchored to the foot of its box: when the type is enlarged the block
+     grows up into the plan's margin, never down onto the sheet below. */
+  justify-content: flex-end;
+  padding-bottom: 6px;
   pointer-events: none;
 }
 
@@ -323,7 +355,7 @@ html[data-mode='raw'] .legendRow[data-layer='record'] {
    read as a title block rather than as seven equal cards. */
 .headlineName {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 62px;
+  font-size: 58px;
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.03em;
@@ -338,19 +370,31 @@ html[data-mode='raw'] .headlineName {
   letter-spacing: -0.045em;
 }
 
+/* Same reason on the sheets: a mono title at the serif's size wraps. */
+html[data-mode='annotated'] .plateTitle,
+html[data-mode='raw'] .plateTitle {
+  font-size: calc(18px * var(--inv-soft, 1));
+  letter-spacing: -0.02em;
+}
+
 .headlineRole {
   font-family: var(--font-label), monospace;
-  font-size: 10px;
-  letter-spacing: var(--track-label);
+  font-size: calc(10px * var(--inv-soft, 1));
+  letter-spacing: 0.1em;
+  white-space: nowrap;
   text-transform: uppercase;
   color: var(--accent);
 }
 
 .headlineNote {
-  margin-top: var(--s-3);
-  font-size: 11px;
-  line-height: 1.6;
+  margin-top: var(--s-2);
+  font-size: calc(11px * var(--inv-soft, 1));
+  line-height: 1.5;
   color: var(--ink-3);
+}
+
+.hintTouch {
+  display: none;
 }
 
 .headlineNote kbd {
@@ -388,6 +432,10 @@ html[data-mode='raw'] .headlineName {
     transform var(--d-2) var(--ease-plate);
 }
 
+.plate > * {
+  transition: opacity var(--d-2) var(--ease-plate);
+}
+
 /* The set is issued sheet by sheet: each one lands on the board a beat after
    the last. `backwards` rather than `forwards` matters, because a forwards
    fill would pin transform at the end keyframe and the hover lift below would
@@ -420,8 +468,16 @@ html[data-mode='raw'] .headlineName {
 /* Attention is singular, but not blind: the sheets a hovered sheet is
    cross-referenced to stay up and take the accent, and only the unrelated
    ones recede. Hovering anything therefore draws its own subgraph. */
+/* The sheet itself stays opaque: leaders run underneath it, and a see-through
+   sheet would show them crossing its face. Only what is printed on it fades. */
 .plate[data-dim] {
-  opacity: 0.32;
+  background: color-mix(in srgb, var(--paper-raised) 42%, var(--paper));
+  border-color: var(--rule);
+  box-shadow: none;
+}
+
+.plate[data-dim] > * {
+  opacity: 0.3;
 }
 
 .plate[data-linked] {
@@ -471,7 +527,7 @@ html[data-mode='raw'] .headlineName {
   padding: 5px 10px;
   font-family: var(--font-label), monospace;
   font-variant-numeric: tabular-nums;
-  font-size: 11px;
+  font-size: calc(11px * var(--inv-soft, 1));
   font-weight: 600;
   letter-spacing: 0.12em;
   color: var(--paper-raised);
@@ -490,7 +546,7 @@ html[data-mode='raw'] .headlineName {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding-left: 58px;
+  padding-left: calc(58px * var(--inv-soft, 1));
   padding-bottom: 5px;
   min-height: 26px;
   /* The title strip is never the thing that gives way when a sheet is tight. */
@@ -500,17 +556,23 @@ html[data-mode='raw'] .headlineName {
 
 .plateTitle {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 22px;
+  font-size: calc(22px * var(--inv-soft, 1));
   line-height: 1.05;
   color: var(--ink);
 }
 
 .plateSubtitle {
   font-family: var(--font-label), monospace;
-  font-size: 9px;
-  letter-spacing: 0.08em;
+  font-size: calc(9px * var(--inv, 1));
+  line-height: 1.3;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-3);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
 .plateBody {
@@ -521,6 +583,9 @@ html[data-mode='raw'] .headlineName {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  /* More rows than the sheet has room for run out under a fade, the way a
+     partial view is broken off, rather than stopping mid-row. */
+  mask-image: linear-gradient(#000 calc(100% - 14px), transparent);
 }
 
 /* Each row of the miniature contents: a sheet number, a title, a fact.
@@ -538,19 +603,19 @@ html[data-mode='raw'] .headlineName {
 }
 
 .plateBody[data-numbered] .item {
-  grid-template-columns: 42px 1fr auto;
+  grid-template-columns: calc(42px * var(--inv, 1)) 1fr auto;
 }
 
 .itemSheet {
   font-family: var(--font-label), monospace;
   font-variant-numeric: tabular-nums;
-  font-size: 8px;
+  font-size: calc(8px * var(--inv, 1));
   letter-spacing: 0.06em;
   color: var(--accent);
 }
 
 .itemTitle {
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--inv, 1));
   line-height: 1.35;
   color: var(--ink-2);
   overflow: hidden;
@@ -563,12 +628,12 @@ html[data-mode='raw'] .headlineName {
 .itemMeta {
   display: none;
   font-family: var(--font-label), monospace;
-  font-size: 8px;
+  font-size: calc(8px * var(--inv, 1));
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-4);
   white-space: nowrap;
-  max-width: 19ch;
+  max-width: 34ch;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -585,7 +650,7 @@ html[data-mode='raw'] .headlineName {
   padding-top: 7px;
   border-top: 1px solid var(--rule);
   font-family: var(--font-label), monospace;
-  font-size: 8.5px;
+  font-size: calc(8.5px * var(--inv, 1));
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-4);
@@ -629,18 +694,23 @@ html[data-mode='raw'] .headlineName {
    transition never costs a layout pass. */
 
 .plane[data-lod='far'] .plateBody,
-.plane[data-lod='far'] .plateFoot,
+.plane[data-lod='far'] .plateRecord,
 .plane[data-lod='far'] .headlineNote {
   opacity: 0;
   pointer-events: none;
 }
 
-.plane[data-lod='far'] .plateTitle {
-  font-size: 23px;
-}
-
 .plane[data-lod='far'] .notes {
   opacity: 0;
+}
+
+/* Pulled back, type is enlarged to stay readable, so the rows need the space
+   the footer would take. It returns as soon as the camera closes in. */
+.plane[data-lod='far'] .plateFoot,
+.plane[data-lod='overview'] .plateFoot,
+.plane[data-lod='far'] .instrFoot,
+.plane[data-lod='overview'] .instrFoot {
+  display: none;
 }
 
 .plateBody,
@@ -673,7 +743,7 @@ html[data-mode='raw'] .headlineName {
   background: var(--ink);
   color: var(--paper-raised);
   font-family: var(--font-label), monospace;
-  font-size: 9px;
+  font-size: calc(9px * var(--inv-soft, 1));
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -696,15 +766,15 @@ html[data-mode='raw'] .headlineName {
   display: grid;
   grid-template-columns: 22px 1fr;
   gap: 8px;
-  font-size: 10.5px;
-  line-height: 1.5;
+  font-size: calc(10.5px * var(--inv-soft, 1));
+  line-height: 1.45;
   color: var(--ink-2);
 }
 
 .noteNo {
   font-family: var(--font-label), monospace;
   font-variant-numeric: tabular-nums;
-  font-size: 9px;
+  font-size: calc(9px * var(--inv-soft, 1));
   color: var(--accent);
 }
 
@@ -793,7 +863,7 @@ html[data-mode='raw'] .headlineName {
 
 .instrName {
   font-family: var(--font-label), monospace;
-  font-size: 9.5px;
+  font-size: calc(9.5px * var(--inv-soft, 1));
   font-weight: 600;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -801,7 +871,7 @@ html[data-mode='raw'] .headlineName {
 }
 
 .instrNote {
-  font-size: 9.5px;
+  font-size: calc(9.5px * var(--inv-soft, 1));
   line-height: 1.35;
   color: var(--ink-3);
 }
@@ -817,7 +887,7 @@ html[data-mode='raw'] .headlineName {
   min-width: 17px;
   padding: 1px 0;
   font-family: var(--font-label), monospace;
-  font-size: 9px;
+  font-size: calc(9px * var(--inv-soft, 1));
   text-align: center;
   color: var(--paper-raised);
   background: var(--ink);
@@ -859,16 +929,19 @@ html[data-mode='raw'] .headlineName {
    mode simply has more air rather than the block having to grow. */
 .legend {
   gap: 3px;
-  padding-bottom: 10px;
+  padding-bottom: 8px;
   font-family: var(--font-label), monospace;
-  font-size: 9px;
+  /* Held closer to drafted size than the rest: annotated mode prints two
+     extra rows here and the block cannot grow. */
+  font-size: calc(9px * min(var(--inv-soft, 1), 1.1));
+  line-height: 1.25;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
 .legend .furnitureTitle {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .legendRow {
@@ -1020,10 +1093,15 @@ html[data-mode='raw'] .headlineName {
     overflow: visible;
   }
 
+  .stage::after {
+    display: none;
+  }
+
   .surface {
     position: static;
     overflow: visible;
     touch-action: auto;
+    container-type: normal;
     padding: var(--plate-top) var(--sheet-gutter) var(--plate-bottom);
   }
 
@@ -1035,6 +1113,9 @@ html[data-mode='raw'] .headlineName {
     width: auto !important;
     height: auto !important;
     transform: none !important;
+    /* Nothing is scaled here, so nothing is compensated for. */
+    --inv: 1;
+    --inv-soft: 1;
   }
 
   .leaders,
@@ -1054,12 +1135,28 @@ html[data-mode='raw'] .headlineName {
   }
 
   .header {
-    margin-bottom: var(--s-5);
+    order: -2;
+    margin-bottom: var(--s-2);
   }
 
-  /* The tray leads on a narrow sheet. It is the only thing between the name
-     and a list of links, and it is the part worth touching. Relative rather
-     than static so the invitation ring still frames the tray. */
+  .hintKeys {
+    display: none;
+  }
+
+  .hintTouch {
+    display: inline;
+  }
+
+  .headlineRole {
+    white-space: normal;
+  }
+
+  .plateSubtitle {
+    font-size: var(--t-micro);
+  }
+
+  /* The tray follows the name on a narrow sheet: who this is comes first, and
+     the tools sit between that and the list of sheets. */
   .instruments {
     /* Relative rather than static so the invitation ring still frames the
        tray, which means the plan coordinates have to be cleared by hand or
@@ -1129,5 +1226,12 @@ html[data-mode='raw'] .headlineName {
   .plateOpen {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* A printed key cap is noise where there is no keyboard to press it on. */
+@media (hover: none) {
+  .instrKey {
+    display: none;
   }
 }

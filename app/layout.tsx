@@ -19,7 +19,7 @@ import { buildMetadata } from '@/lib/metadata';
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
-  style: ['normal', 'italic'],
+  style: ['normal'],
   variable: '--font-serif',
   display: 'swap',
 });
@@ -59,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#ece6d9" />
+        <meta name="theme-color" content="#ded2b8" />
         <JsonLd />
       </head>
       <body suppressHydrationWarning>

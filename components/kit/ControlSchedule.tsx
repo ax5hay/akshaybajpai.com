@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Stamp, Switch } from './Controls';
 import { useToast } from '@/components/system/ToastProvider';
 import { useMode } from '@/components/system/ModeProvider';
-import { MODE_INFO } from '@/lib/mode';
+import { MODE_INFO, MODES } from '@/lib/mode';
 import styles from './ControlSchedule.module.css';
 
 /**
@@ -68,7 +68,9 @@ export function ControlSchedule() {
           Issue revision
         </Button>
 
-        <Button onClick={cycleMode}>Next mode · {MODE_INFO[mode].label}</Button>
+        <Button onClick={cycleMode}>
+          Next mode · {MODE_INFO[MODES[(MODES.indexOf(mode) + 1) % MODES.length]].label}
+        </Button>
 
         <Button
           variant="ghost"

@@ -140,6 +140,29 @@
   }
 }
 
+/* Below this width a full-size sheet reaches under the block, so at rest it
+   shrinks to the sheet number and gives the prose its line endings back. */
+@media (max-width: 86rem) {
+  .block:not([data-expanded]) {
+    width: auto;
+  }
+
+  .block:not([data-expanded]) .title {
+    display: none;
+  }
+}
+
+/* Same once the reader is into the sheet at any width: a wide schedule runs
+   the full board, and its right-hand column should not pass behind a label
+   that is only repeating the heading they have already read. */
+.block[data-compact]:not([data-expanded]) {
+  width: auto;
+}
+
+.block[data-compact]:not([data-expanded]) .title {
+  display: none;
+}
+
 /* The title block would cover half a phone screen, so it collapses to a bar. */
 @media (max-width: 40rem) {
   .block {

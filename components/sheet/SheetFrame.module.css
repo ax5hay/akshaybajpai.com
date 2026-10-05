@@ -7,6 +7,13 @@
   contain: strict;
 }
 
+.trimMask {
+  position: absolute;
+  inset: 0;
+  border: var(--sheet-margin) solid var(--paper);
+  transition: border-color var(--d-3) var(--ease-mech);
+}
+
 .border {
   position: absolute;
   inset: var(--sheet-margin);
