@@ -17,6 +17,12 @@
   initial-value: -25%;
 }
 
+@property --slant {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 6%;
+}
+
 @property --p {
   syntax: '<number>';
   inherits: true;
@@ -44,16 +50,15 @@
   /* Progress, written by Preloader.tsx as the set is issued. */
   --p: 0;
   --task: 'Setting type';
-  /* Three acts. The staged entrance; then a slow breath while the set is
-     fetched, for as long as that takes; and, under [data-ready] below, the
+  /* Three acts. The staged entrance; then a tour of the three modes, looping
+     for as long as the set takes to fetch; and, under [data-ready] below, the
      run-out. The last entry is a failsafe that removes the cover whatever
      else has or has not happened. */
   animation:
     pre-seam-outer 3600ms linear both,
     pre-seam-inner 3600ms linear both,
-    pre-breathe-outer 3200ms ease-in-out 3600ms infinite alternate,
-    pre-breathe-inner 3200ms ease-in-out 3600ms infinite alternate,
-    pre-failsafe 1ms linear 15s forwards;
+    pre-tour 6000ms linear 3600ms infinite,
+    pre-failsafe 1ms linear 22s forwards;
 }
 
 :global(html[data-mode='annotated']) .pre {
@@ -107,21 +112,42 @@
   }
 }
 
-@keyframes pre-breathe-outer {
-  from {
-    --s2: 66.667%;
-  }
-  to {
-    --s2: 63.5%;
-  }
-}
-
-@keyframes pre-breathe-inner {
-  from {
+/* The tour. Each mode in turn is given most of the sheet, and the seams lean
+   further as they travel, so the cut is never the same shape twice. It starts
+   and ends on even thirds, which is where the entrance leaves the seams and
+   where the loop has to close. */
+@keyframes pre-tour {
+  0% {
     --s1: 33.333%;
+    --s2: 66.667%;
+    --slant: 6%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
   }
-  to {
-    --s1: 36.5%;
+  10%,
+  28% {
+    --s1: 60%;
+    --s2: 82%;
+    --slant: 9%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  40%,
+  58% {
+    --s1: 15%;
+    --s2: 85%;
+    --slant: 4%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  70%,
+  88% {
+    --s1: 14%;
+    --s2: 38%;
+    --slant: 9%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  100% {
+    --s1: 33.333%;
+    --s2: 66.667%;
+    --slant: 6%;
   }
 }
 
@@ -131,8 +157,9 @@
   animation:
     pre-out-outer 900ms cubic-bezier(0.7, 0, 0.2, 1) 480ms both,
     pre-out-inner 900ms cubic-bezier(0.7, 0, 0.2, 1) 480ms both,
+    pre-out-slant 900ms cubic-bezier(0.7, 0, 0.2, 1) 480ms both,
     pre-lift 680ms cubic-bezier(0.7, 0, 0.2, 1) 1500ms both,
-    pre-failsafe 1ms linear 15s forwards;
+    pre-failsafe 1ms linear 22s forwards;
 }
 
 /* Skipped: no stamp, no ceremony, just the seams out and the cover up. */
@@ -140,8 +167,9 @@
   animation:
     pre-out-outer 360ms cubic-bezier(0.7, 0, 0.2, 1) both,
     pre-out-inner 360ms cubic-bezier(0.7, 0, 0.2, 1) both,
+    pre-out-slant 360ms cubic-bezier(0.7, 0, 0.2, 1) both,
     pre-lift 460ms cubic-bezier(0.7, 0, 0.2, 1) 320ms both,
-    pre-failsafe 1ms linear 15s forwards;
+    pre-failsafe 1ms linear 22s forwards;
 }
 
 .pre[data-hurry] .stamp {
@@ -163,6 +191,15 @@
   }
   to {
     --s1: var(--f1);
+  }
+}
+
+@keyframes pre-out-slant {
+  from {
+    --slant: var(--r3, 6%);
+  }
+  to {
+    --slant: 6%;
   }
 }
 
@@ -191,10 +228,11 @@
   animation:
     pre-seam-outer 3600ms linear both,
     pre-seam-inner 3600ms linear both,
-    pre-out-outer 900ms cubic-bezier(0.7, 0, 0.2, 1) 5000ms forwards,
-    pre-out-inner 900ms cubic-bezier(0.7, 0, 0.2, 1) 5000ms forwards,
-    pre-lift 680ms cubic-bezier(0.7, 0, 0.2, 1) 6000ms forwards,
-    pre-meter 4400ms linear 600ms both;
+    pre-tour 6000ms linear 3600ms 1,
+    pre-out-outer 900ms cubic-bezier(0.7, 0, 0.2, 1) 9700ms forwards,
+    pre-out-inner 900ms cubic-bezier(0.7, 0, 0.2, 1) 9700ms forwards,
+    pre-lift 680ms cubic-bezier(0.7, 0, 0.2, 1) 10700ms forwards,
+    pre-meter 8200ms linear 600ms both;
 }
 
 @keyframes pre-meter {
@@ -468,15 +506,58 @@
   white-space: nowrap;
 }
 
-.sub {
+/* ---- The notice ------------------------------------------------------------
+   "Best viewed on desktop" is half of why the cover exists, so it is set to be
+   read: a lead in the print's own ink at a size nobody has to lean in for,
+   and one sentence after it that depends on the screen. */
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0;
-  max-width: 34em;
+  max-width: 38rem;
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: clamp(0.875rem, 1.25vw, 1.0625rem);
-  line-height: 1.5;
-  color: var(--p-quiet);
   text-wrap: balance;
   animation: pre-ink 600ms ease 820ms both;
+}
+
+.noticeLead {
+  font-size: clamp(1.125rem, 1.9vw, 1.625rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  color: var(--p-ink);
+}
+
+.noticeWide,
+.noticeNarrow {
+  font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+  line-height: 1.5;
+  color: var(--p-quiet);
+}
+
+.noticeNarrow {
+  display: none;
+}
+
+/* A narrow screen, or one driven by a finger, is the reader this was written
+   for: there it is boxed and ruled like a note on a drawing. */
+@media (max-width: 60rem), (pointer: coarse) {
+  .noticeWide {
+    display: none;
+  }
+
+  .noticeNarrow {
+    display: block;
+  }
+
+  .notice {
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--p-rule);
+    border-top: 3px solid var(--p-accent);
+  }
 }
 
 /* ---- Progress: the set being issued, sheet by sheet ---------------------- */
@@ -599,7 +680,7 @@
 }
 
 :global(html:not([data-js])) .stamp {
-  animation: pre-strike 420ms cubic-bezier(0.34, 1.4, 0.5, 1) 4600ms both;
+  animation: pre-strike 420ms cubic-bezier(0.34, 1.4, 0.5, 1) 9300ms both;
 }
 
 @keyframes pre-plot {
@@ -632,16 +713,123 @@
 
 /* ---- Band labels: each print signs itself while all three are showing. ---- */
 
+/* Each label rides its own band: its position is worked out from the two
+   seams, at the height the label sits, so it stays centred in its print while
+   the seams travel. */
 .band {
+  --foot: calc(var(--slant) * 0.72);
   position: absolute;
-  bottom: clamp(1.25rem, 5vh, 3rem);
+  bottom: clamp(1rem, 3.2vh, 2rem);
   translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35em;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: clamp(0.5625rem, 0.8vw, 0.6875rem);
   letter-spacing: 0.22em;
   text-transform: uppercase;
+  text-align: center;
   white-space: nowrap;
   animation: pre-ink 500ms ease 3400ms both;
+}
+
+.band b {
+  font-weight: 600;
+}
+
+.band[data-band='a'] {
+  left: calc((var(--s1) - var(--foot)) / 2);
+  color: #5c5548;
+}
+
+.band[data-band='a'] b {
+  color: #983729;
+}
+
+.band[data-band='b'] {
+  left: calc((var(--s1) + var(--s2)) / 2 - var(--foot));
+  color: #9dbdd9;
+}
+
+.band[data-band='b'] b {
+  color: #ffc75a;
+}
+
+.band[data-band='c'] {
+  left: calc((var(--s2) - var(--foot) + 100%) / 2);
+  color: #85857f;
+}
+
+.band[data-band='c'] b {
+  color: #8fe388;
+}
+
+/* Name and one-line description. Shown for the mode the tour is on; a narrow
+   band has no room for more than its revision letter. */
+.bandMore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+  animation: pre-tour-a 6000ms linear 3600ms infinite;
+}
+
+.bandBlurb {
+  letter-spacing: 0.06em;
+  text-transform: none;
+  opacity: 0.85;
+}
+
+.band[data-band='a'] .bandMore {
+  animation-name: pre-tour-a;
+}
+
+.band[data-band='b'] .bandMore {
+  animation-name: pre-tour-b;
+}
+
+.band[data-band='c'] .bandMore {
+  animation-name: pre-tour-c;
+}
+
+@keyframes pre-tour-a {
+  0%,
+  4%,
+  34%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  28% {
+    opacity: 1;
+  }
+}
+
+@keyframes pre-tour-b {
+  0%,
+  34%,
+  64%,
+  100% {
+    opacity: 0;
+  }
+  40%,
+  58% {
+    opacity: 1;
+  }
+}
+
+@keyframes pre-tour-c {
+  0%,
+  64%,
+  94%,
+  100% {
+    opacity: 0;
+  }
+  70%,
+  88% {
+    opacity: 1;
+  }
 }
 
 .pre[data-ready] .band {
@@ -651,7 +839,118 @@
 :global(html:not([data-js])) .band {
   animation:
     pre-ink 500ms ease 3400ms both,
-    pre-fade 260ms ease 4900ms forwards;
+    pre-fade 260ms ease 9600ms forwards;
+}
+
+/* ---- The way in -------------------------------------------------------------
+   A real button, sized to be found and read without hunting. It carries its
+   own stock so it is legible over whichever print is behind it, and it is
+   inert, and says so, until the set has actually loaded. */
+
+.enter {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(4.25rem, 12vh, 7rem);
+  translate: -50% 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.8125rem, 1vw, 0.9375rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #141417;
+  background: #fcfaf4;
+  border: 2px solid #141417;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 18px 40px -14px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  animation: pre-ink 500ms ease 1000ms both;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    translate 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.enter:disabled {
+  cursor: progress;
+  color: #5c5548;
+  background: rgba(252, 250, 244, 0.86);
+  border-color: rgba(20, 20, 23, 0.4);
+  box-shadow: none;
+}
+
+.enter:not(:disabled):hover,
+.enter:not(:disabled):focus-visible {
+  color: #fcfaf4;
+  background: #983729;
+  border-color: #983729;
+  translate: -50% -2px;
+}
+
+.enter:focus-visible {
+  outline: 2px solid #ffc75a;
+  outline-offset: 4px;
+}
+
+.enter kbd {
+  padding: 0.25em 0.55em;
+  font: inherit;
+  font-size: 0.8em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: inherit;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+}
+
+/* It arrives the way the issue stamp does, then rings once or twice so an
+   eye resting on the name is told there is something to press. */
+.pre[data-loaded] .enter {
+  animation: pre-offer 460ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
+}
+
+.pre[data-loaded] .enter::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #ffc75a;
+  pointer-events: none;
+  opacity: 0;
+  animation: pre-ring 1800ms cubic-bezier(0.16, 1, 0.3, 1) 500ms 3;
+}
+
+@keyframes pre-offer {
+  from {
+    scale: 0.92;
+  }
+}
+
+@keyframes pre-ring {
+  0% {
+    opacity: 0.9;
+    inset: -2px;
+  }
+  100% {
+    opacity: 0;
+    inset: -16px;
+  }
+}
+
+.pre[data-ready] .enter {
+  animation: pre-fade 200ms ease both;
+  pointer-events: none;
+}
+
+/* Nothing to press without script: the cover leaves on its own clock. */
+:global(html:not([data-js])) .enter {
+  display: none;
 }
 
 @keyframes pre-fade {
@@ -660,44 +959,9 @@
   }
 }
 
-.band b {
-  margin-right: 0.6em;
-  font-weight: 600;
-}
-
-.band[data-band='a'] {
-  left: 15%;
-  color: #5c5548;
-}
-
-.band[data-band='a'] b {
-  color: #983729;
-}
-
-.band[data-band='b'] {
-  left: 48.5%;
-  color: #9dbdd9;
-}
-
-.band[data-band='b'] b {
-  color: #ffc75a;
-}
-
-.band[data-band='c'] {
-  left: 82%;
-  color: #85857f;
-}
-
-.band[data-band='c'] b {
-  color: #8fe388;
-}
-
 /* A phone has no width to set the name on one line, and three slanted bands
    over a two-line name still register: the layout is the same in each. */
 @media (max-width: 40rem) {
-  .pre {
-    --slant: 12%;
-  }
 
   .name {
     font-size: clamp(3.4rem, 21vw, 6rem);
@@ -727,22 +991,18 @@
     letter-spacing: 0.16em;
   }
 
-  /* The steeper slant moves the foot of each band left. */
-  .band[data-band='a'] {
-    left: 10.5%;
+  .bandBlurb {
+    display: none;
   }
 
-  .band[data-band='b'] {
-    left: 37.5%;
+  .enter {
+    bottom: clamp(4rem, 11vh, 6rem);
+    min-height: 3.5rem;
+    max-width: calc(100% - 2rem);
   }
 
-  .band[data-band='c'] {
-    left: 77%;
-  }
-
-  .band b {
-    display: block;
-    margin: 0 0 0.3em;
+  .enter kbd {
+    display: none;
   }
 }
 

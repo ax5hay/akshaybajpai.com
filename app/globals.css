@@ -91,7 +91,7 @@
      animation waits this long so the set is plotted as the cover comes off
      and not behind it. With script the wait is not timed at all: see
      html[data-cover] below. */
-  --boot: 6100ms;
+  --boot: 10800ms;
 
   /* The lens inverts whatever it covers. Markup revealed inside it is drawn
      in the colours that come out of that inversion as amber on deep blue. */

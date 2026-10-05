@@ -19,10 +19,23 @@ import styles from './Preloader.module.css';
  * it is done the cover is stamped, the seams run out in favour of the mode
  * the reader is in, and it lifts; from then on every sheet opens instantly.
  *
- * WHAT HOLDS IT UP. Nothing, for long: a ceiling releases it whatever the
- * network is doing, any key or press skips it, a metered or slow connection
- * only fetches the seven section sheets, and without script the stylesheet
- * runs the whole sequence, and removes it, on a fixed clock.
+ * WHAT IT SAYS. That this is best seen on a desktop. That is half of why the
+ * cover exists, so it is set as a notice, not a caption, and it changes with
+ * the screen it finds itself on.
+ *
+ * WHAT IT TOURS. Once the three prints stand side by side, the seams travel:
+ * each mode in turn is given most of the sheet and says what it is. The tour
+ * loops for as long as the fetching takes and plays through once regardless.
+ *
+ * HOW IT ENDS. The moment the set is actually loaded, a button offers the way
+ * in, and Enter, Space or Escape do the same. Nobody is made to sit through
+ * a show to reach a page that is already there. Left alone, the cover
+ * finishes its tour, is stamped, and lifts on its own.
+ *
+ * WHAT HOLDS IT UP. Nothing, for long: loading is given up on after twelve
+ * seconds and the way in is offered anyway, a metered or slow connection only
+ * fetches the seven section sheets, and without script the stylesheet runs
+ * the whole sequence, and removes it, on a fixed clock.
  */
 
 export interface CoverSheet {
@@ -31,16 +44,21 @@ export interface CoverSheet {
   href: string;
 }
 
-/** Long enough after the triptych forms to be read as one. */
-const MIN_MS = 5600;
-/** Leave by now however the fetching is going. */
-const MAX_MS = 10000;
+/** The staged entrance, then one full tour of the three modes. */
+const INTRO_MS = 3600;
+const TOUR_MS = 6000;
+/** Left alone, the cover leaves when the tour has played through once. */
+const MIN_MS = INTRO_MS + TOUR_MS + 300;
+/** Stop waiting on the network by now, and offer the way in regardless. */
+const LOAD_CEILING_MS = 12000;
 /** Seams out, then lift. Mirrors the `[data-ready]` animations. */
 const LIFT_AT_MS = 1500;
 const GONE_AT_MS = 2200;
 /** The same, when the reader has asked to get on with it. */
 const HURRY_LIFT_AT_MS = 320;
 const HURRY_GONE_AT_MS = 800;
+/** Earliest the way in is shown: the button itself inks in at one second. */
+const OFFER_FROM_MS = 1400;
 /** The count starts once the progress block has inked in. */
 const COUNT_FROM_MS = 1300;
 
@@ -84,8 +102,17 @@ function Print({ total }: { total: number }) {
         <span className={styles.tick} />
       </span>
 
-      <p className={styles.sub}>
-        Drawn for a wide screen. Open it on desktop for the full set, at full thrust.
+      {/* Half the reason the cover exists. Which sentence follows the lead
+          depends on the screen: see the media queries in the stylesheet. */}
+      <p className={styles.notice}>
+        <span className={styles.noticeLead}>Best viewed on desktop.</span>
+        <span className={styles.noticeWide}>
+          You are on a wide screen: this is the full set, at full thrust.
+        </span>
+        <span className={styles.noticeNarrow}>
+          This set is drawn for a wide screen. It holds on a phone; the plan, the lens and the
+          transitions open up on a desktop.
+        </span>
       </p>
 
       <span className={styles.progress}>
@@ -102,6 +129,9 @@ function Print({ total }: { total: number }) {
 
 export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
   const [done, setDone] = useState(false);
+  /** The set is in the cache: the way in can be offered. */
+  const [loaded, setLoaded] = useState(false);
+  const enter = useRef<() => void>(() => {});
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -162,6 +192,7 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       const live = getComputedStyle(el);
       el.style.setProperty('--r1', live.getPropertyValue('--s1'));
       el.style.setProperty('--r2', live.getPropertyValue('--s2'));
+      el.style.setProperty('--r3', live.getPropertyValue('--slant'));
       el.setAttribute('data-ready', '');
       timers.push(
         setTimeout(
@@ -181,15 +212,35 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       );
     };
 
+    let offered = false;
+    /** Everything has landed (or been given up on): offer the way in. */
+    const offer = () => {
+      if (offered) return;
+      offered = true;
+      // As soon as that is true, bar the first beat in which the cover is
+      // still drawing itself and there is nowhere yet to put a button.
+      const untilDrawn = Math.max(0, OFFER_FROM_MS - (performance.now() - started));
+      timers.push(
+        setTimeout(() => {
+          setLoaded(true);
+          enter.current = () => release(true);
+        }, untilDrawn)
+      );
+      // And leave unprompted once the tour has played through.
+      const untilToured = Math.max(0, MIN_MS - (performance.now() - started));
+      timers.push(setTimeout(() => release(), untilToured));
+    };
+
+    // On what has actually landed, not on what the paced count has got
+    // round to showing: the way in is offered the moment it is real.
     const settle = () => {
-      if (pending.size || landedQueue.length || !fontsReady || !lensReady) return;
-      const wait = Math.max(0, MIN_MS - (performance.now() - started));
-      timers.push(setTimeout(() => release(), wait));
+      if (pending.size || !fontsReady || !lensReady) return;
+      offer();
     };
 
     // One sheet per beat, with the beat set so a full set counts up across
     // the time the triptych is forming.
-    const beat = Math.max(55, Math.min(140, (MIN_MS - COUNT_FROM_MS - 900) / total));
+    const beat = Math.max(55, Math.min(140, (INTRO_MS + 1400 - COUNT_FROM_MS) / total));
     let ticker: ReturnType<typeof setInterval> | undefined;
     timers.push(
       setTimeout(() => {
@@ -198,7 +249,6 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
           if (!sheet) return;
           issued += 1;
           show(`${sheet.sheet} · ${sheet.title}`);
-          settle();
         }, beat);
       }, COUNT_FROM_MS)
     );
@@ -213,6 +263,7 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       if (!sheet) return;
       pending.delete(href);
       landedQueue.push(sheet);
+      settle();
     };
     const watcher =
       'PerformanceObserver' in window
@@ -235,12 +286,18 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
     wanted.forEach((s) => router.prefetch(s.href));
     settle();
 
-    // The prefetching carries on behind the page either way; skipping only
-    // stops the reader having to watch it.
-    const skip = () => release(true);
-    const ceiling = setTimeout(() => release(), MAX_MS);
-    window.addEventListener('keydown', skip);
-    window.addEventListener('pointerdown', skip);
+    // A network that never answers must not keep the door shut. Whatever is
+    // still outstanding carries on fetching behind the page.
+    const ceiling = setTimeout(offer, LOAD_CEILING_MS);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Escape') return;
+      if (!offered) return;
+      // Left to the button when it has focus, or it would fire twice.
+      if (event.target instanceof HTMLButtonElement) return;
+      event.preventDefault();
+      enter.current();
+    };
+    window.addEventListener('keydown', onKey, true);
 
     return () => {
       watcher?.disconnect();
@@ -248,8 +305,7 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       if (ticker) clearInterval(ticker);
       timers.forEach(clearTimeout);
       timers = [];
-      window.removeEventListener('keydown', skip);
-      window.removeEventListener('pointerdown', skip);
+      window.removeEventListener('keydown', onKey, true);
     };
     // Runs once: the cover belongs to the load, not to later navigations.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -258,29 +314,55 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
   if (done) return null;
 
   return (
-    <div ref={ref} className={styles.pre} aria-hidden="true">
-      <div className={`${styles.layer} ${styles.raw}`}>
+    <div ref={ref} className={styles.pre} data-loaded={loaded || undefined}>
+      {/* The three prints say the same thing three times over; assistive
+          technology is given the button and nothing else to wade through. */}
+      <div className={`${styles.layer} ${styles.raw}`} aria-hidden="true">
         <Print total={sheets.length} />
       </div>
-      <div className={`${styles.layer} ${styles.annot}`}>
+      <div className={`${styles.layer} ${styles.annot}`} aria-hidden="true">
         <Print total={sheets.length} />
       </div>
-      <div className={`${styles.layer} ${styles.paper}`}>
+      <div className={`${styles.layer} ${styles.paper}`} aria-hidden="true">
         <Print total={sheets.length} />
       </div>
 
-      <span className={`${styles.seam} ${styles.seamOuter}`} />
-      <span className={`${styles.seam} ${styles.seamInner}`} />
+      <span className={`${styles.seam} ${styles.seamOuter}`} aria-hidden="true" />
+      <span className={`${styles.seam} ${styles.seamInner}`} aria-hidden="true" />
 
-      <span className={styles.band} data-band="a">
-        <b>Rev A</b> Artifact
-      </span>
-      <span className={styles.band} data-band="b">
-        <b>Rev B</b> Annotated
-      </span>
-      <span className={styles.band} data-band="c">
-        <b>Rev C</b> Raw
-      </span>
+      {(
+        [
+          ['a', 'A', 'Artifact', 'The drawing as issued'],
+          ['b', 'B', 'Annotated', 'Engineering markup exposed'],
+          ['c', 'C', 'Raw', 'Source, stripped of presentation'],
+        ] as const
+      ).map(([band, rev, name, blurb]) => (
+        <span key={band} className={styles.band} data-band={band} aria-hidden="true">
+          <b>Rev {rev}</b>
+          <span className={styles.bandMore}>
+            <span className={styles.bandName}>{name}</span>
+            <span className={styles.bandBlurb}>{blurb}</span>
+          </span>
+        </span>
+      ))}
+
+      {/* The way in. Inert until the set has actually loaded, so it never
+          promises a page that is not there yet. */}
+      <button
+        type="button"
+        className={styles.enter}
+        disabled={!loaded}
+        onClick={() => enter.current()}
+      >
+        {loaded ? (
+          <>
+            <span>Skip intro · Enter the set</span>
+            <kbd aria-hidden="true">Enter ↵</kbd>
+          </>
+        ) : (
+          <span>Loading the set…</span>
+        )}
+      </button>
     </div>
   );
 }

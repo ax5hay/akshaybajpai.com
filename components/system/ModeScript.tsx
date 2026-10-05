@@ -22,7 +22,7 @@ const script = `(function(){
 document.documentElement.dataset.js='';
 try{
 if(matchMedia('(prefers-reduced-motion: reduce)').matches||sessionStorage.getItem('plate.booted')){document.documentElement.dataset.preloaded=''}
-else{sessionStorage.setItem('plate.booted','1');document.documentElement.dataset.cover='';setTimeout(function(){document.documentElement.dataset.issued=''},15000)}
+else{sessionStorage.setItem('plate.booted','1');document.documentElement.dataset.cover='';setTimeout(function(){document.documentElement.dataset.issued=''},22000)}
 }catch(e){document.documentElement.dataset.preloaded=''}
 try{
 var m=new URLSearchParams(location.search).get('mode');
