@@ -44,7 +44,8 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 ```
 
 > **Best viewed on desktop.** The set is drawn for a wide screen: the pannable plan, the
-> lens and the sheet transitions open up there. It holds on a phone as a stacked index.
+> lens and the sheet transitions open up there. The phone is not that plan made small; it
+> is [a drawing of its own](#a-106--on-a-phone).
 
 ## Drawing index
 
@@ -58,6 +59,8 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 | [`A-103`](#a-103--the-figures) | **The figures** | Hand-drafted SVG, and operable schematics |
 | [`A-104`](#a-104--the-instruments) | **The instruments** | Lens, index, zone cursor, issue as PDF |
 | [`A-105`](#a-105--moving-between-sheets) | **Moving between sheets** | View transitions, keyboard, reduced motion |
+| [`A-106`](#a-106--on-a-phone) | **On a phone** | The title sheet, the pile, the dock |
+| [`A-107`](#a-107--margin-notes) | **Margin notes** | How a reader learns the set can be operated |
 | [`S-201`](#s-201--how-it-is-built) | **How it is built** | Architecture, sheet registry, component kit |
 | [`S-202`](#s-202--content-pipeline) | **Content pipeline** | Markdown in, numbered sheets out |
 | [`W-401`](#w-401--run-it-locally) | **Run it locally** | Quick start and scripts |
@@ -231,12 +234,17 @@ set as a notice and changes with the screen: a confirmation on a wide one, an ex
 a phone.
 
 **How it ends.** The moment the set has actually loaded, a button offers the way in, and
-<kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>Esc</kbd> do the same. Left alone, the cover
-finishes its tour, is stamped *Issued · Cleared for full thrust*, and lifts.
+<kbd>Enter</kbd> does the same. Beside the button a counter runs down to the moment the
+cover will lift by itself. **Any other key, or a tap anywhere off the button, holds it
+there**: the count stops, the tour carries on, and the reader stays as long as they like.
+The same again resumes it. Left alone, the cover is stamped *Issued · Cleared for full
+thrust*, and lifts.
 
 | Property | Behaviour |
 |:---------|:----------|
 | Frequency | Once per visit. `ModeScript` decides before first paint |
+| Way in | Offered the moment the set has loaded; <kbd>Enter</kbd> or the button |
+| Hold | Any other key, or a tap off the button, stops the count; again to resume |
 | Reduced motion | Never shown |
 | Slow or metered connection | Only the seven section sheets are prefetched |
 | A network that never answers | Loading is given up on after 12 s and the way in is offered anyway |
@@ -448,9 +456,10 @@ whatever is named `sheet` after it.
 | <kbd>/</kbd> · <kbd>⌘K</kbd> | Open the sheet index |
 | <kbd>D</kbd> | Cycle drawing mode |
 | <kbd>L</kbd> | Toggle the lens |
-| <kbd>Esc</kbd> | Close the index, stow the lens, or leave the cover |
+| <kbd>Esc</kbd> | Close the index or stow the lens |
 | <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | Walk between sheets on the plan, move a comparison divider, nudge the lens |
-| <kbd>Enter</kbd> · <kbd>Space</kbd> | Leave the cover once the set has loaded |
+| <kbd>Enter</kbd> | Leave the cover once the set has loaded |
+| any other key | Hold the cover, or resume its count |
 
 Shortcuts are suppressed while typing in a field, and every one is also a button somewhere
 on screen.
@@ -458,6 +467,61 @@ on screen.
 **Reduced motion.** Under `prefers-reduced-motion` every journey is removed and every state
 change kept: no cover, no plot, no transitions, no inertia. **Without view transitions**
 (older browsers) sheets change plainly and a mode change is instant.
+
+---
+
+## A-106 · On a phone
+
+<div align="center">
+<img src="docs/media/phone.jpg" alt="Four phone screens: the cover with its count, the title sheet, the pile of sheets, and a sheet in annotated mode" width="100%" />
+</div>
+
+A phone cannot pan a plan two thousand units wide, so it is not asked to. Below `60rem` the
+same registry is drawn as something else.
+
+| Part | What it is |
+|:-----|:-----------|
+| **Title sheet** | The first screen: north point, the name at the full width of the stock, the issue stamp struck beside it, and the plan itself at thumbnail size |
+| **The plan, small** | A miniature of the real arrangement. Tap a sheet and the pile turns to it; the sheet being read stays lit |
+| **The pile** | The seven sheets are `position: sticky`, each pinned a little lower than the last, so every sheet slides up and comes to rest on the one before with its edge left showing. No script moves anything |
+| **Figures plot on arrival** | Each sheet's figure is drawn as it comes into view, not all seven at once off-screen |
+| **The dock** | Below `40rem` the instruments leave the rail for a bar at the foot, where a thumb is: sheet number and title block, index, lens, and the `A · B · C` mode switch |
+| **Reading line** | Along the top of the dock a dimension line fills as the sheet is read, driven by a CSS scroll timeline |
+
+Scrolling the pile holds 60 fps (median frame 16.7 ms, worst 21.8 ms, headless Chromium at
+390 × 844). Nothing on a phone uses `backdrop-filter`.
+
+> [!WARNING]
+> Nothing may overhang the side of the screen, even for one frame of an animation. On a
+> phone a single overhanging element widens the whole layout viewport, and everything fixed
+> to the screen (the dock, the cover) is then laid out too wide. `.stage` clips with
+> `overflow-x: clip`, not `hidden`, so the sticky pile still has the page to stick to.
+
+---
+
+## A-107 · Margin notes
+
+How a reader learns the set can be operated
+([`Hints.tsx`](components/system/Hints.tsx)). One note at a time, keyed like a note on a
+drawing, saying one thing the reader can do **where they are, on the device they are
+holding**.
+
+| Rule | |
+|:-----|:--|
+| Each note is shown | Once, ever |
+| A page shows | At most three, one after another |
+| The reader can | Dismiss one, or turn them all off for good |
+| They wait for | The cover sheet to lift |
+| They step aside for | The index, the lens and the open title block |
+| Reduced motion | The note stays until dismissed; nothing times out |
+
+<div align="center">
+<img src="docs/media/note.jpg" alt="A margin note on the key plan: a numbered bubble, one instruction, and a depleting rule" width="62%" />
+</div>
+
+The dwell is the note's own depletion rule, a CSS animation, and the note leaves on its
+`animationend`. So a pointer over the note, or a finger on it, pauses the rule and the
+dwell with it, with no timer to keep in step.
 
 ---
 
@@ -540,6 +604,7 @@ flowchart LR
 | `sheet/Loupe` | The inspection lens |
 | `sheet/ZoneCursor` | Lights the margin zone under the pointer |
 | `system/Preloader` | The cover sheet |
+| `system/Hints` | Margin notes: one thing to do, where you are, once |
 | `system/SheetTransition` | View-transition navigation |
 | `system/ModeProvider` · `ModeScript` | Mode state, and its pre-paint resolution |
 | `system/InstrumentProvider` | Owns the lens and index so any surface can offer them |
@@ -721,6 +786,7 @@ load figures are pessimistic.
 | First-load JavaScript, key plan | 122 kB |
 | First-load JavaScript, a sheet | 109 to 113 kB |
 | Pan and zoom on the key plan | 60 fps (median frame 16.7 ms, worst 19.7 ms) |
+| Scrolling the pile on a phone | 60 fps (median frame 16.7 ms, worst 21.8 ms) |
 | Cumulative layout shift | 0 |
 | Lighthouse accessibility | 100 on the key plan and on a case study |
 | Lighthouse best practices · SEO | 100 · 100 |
@@ -733,12 +799,6 @@ where they are unsupported.
 ---
 
 <div align="center">
-
-<img src="docs/media/phone.jpg" alt="The site on a phone: the cover, the stacked key plan, and a sheet in annotated mode" width="88%" />
-
-<sub>On a phone: the cover with its notice, the plan as a stacked index, a sheet in annotated mode.</sub>
-
-<br/><br/>
 
 **In thrust we trust.**
 

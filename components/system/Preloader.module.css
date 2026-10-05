@@ -1017,3 +1017,227 @@
     display: none;
   }
 }
+
+/* =============================================================================
+   THE WAY IN, with its count. A row: the counter bubble, then the button.
+   Under it, one line saying what the count is and how to stop it.
+   ========================================================================== */
+
+/* Room for it: the composition is centred in what is left above. */
+.layer {
+  padding-bottom: clamp(9.5rem, 24vh, 14rem);
+}
+
+.way {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(5rem, 11.5vh, 7.5rem);
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  animation: pre-ink 500ms ease 1000ms both;
+}
+
+.wayRow {
+  display: flex;
+  align-items: stretch;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 18px 40px -14px rgba(0, 0, 0, 0.6);
+}
+
+/* The button gives up the positioning it had when it stood alone. */
+.way .enter {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  translate: none;
+  box-shadow: none;
+  border-left: none;
+  animation: none;
+}
+
+.way .enter:not(:disabled):hover,
+.way .enter:not(:disabled):focus-visible {
+  translate: none;
+}
+
+.pre[data-loaded] .wayRow {
+  animation: pre-offer 460ms cubic-bezier(0.34, 1.4, 0.5, 1) both;
+}
+
+.pre[data-ready] .way {
+  animation: pre-fade 200ms ease both;
+  pointer-events: none;
+}
+
+.ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 3.25rem;
+  color: #fcfaf4;
+  background: #141417;
+  border: 2px solid #141417;
+}
+
+.ring svg {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  rotate: -90deg;
+}
+
+.ringTrack,
+.ringRun {
+  fill: none;
+  stroke-width: 2;
+}
+
+.ringTrack {
+  stroke: rgba(252, 250, 244, 0.22);
+}
+
+/* One unit of dash, slid off the end over exactly the seconds on the count. */
+.ringRun {
+  stroke: #ffc75a;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: pre-count var(--count, 8s) linear forwards;
+}
+
+@keyframes pre-count {
+  to {
+    stroke-dashoffset: 1;
+  }
+}
+
+.pre[data-held] .ringRun {
+  animation-play-state: paused;
+}
+
+.ringNo {
+  position: relative;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pause {
+  display: block;
+  width: 0.6rem;
+  height: 0.75rem;
+  border-left: 0.2rem solid #ffc75a;
+  border-right: 0.2rem solid #ffc75a;
+}
+
+/* Legible over any of the three prints, so it carries its own ground. */
+.wayHint {
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: center;
+  color: #e9e6dc;
+  background: rgba(8, 8, 10, 0.78);
+}
+
+.wayHint b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #ffc75a;
+}
+
+.byTouch {
+  display: none;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .byKey {
+    display: none;
+  }
+
+  .byTouch {
+    display: inline;
+  }
+}
+
+:global(html:not([data-js])) .way {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  .layer {
+    padding-bottom: 11.5rem;
+  }
+
+  .way {
+    bottom: 4.6rem;
+    width: calc(100% - 2rem);
+  }
+
+  .wayRow {
+    width: 100%;
+  }
+
+  .way .enter {
+    flex: 1;
+    justify-content: center;
+    min-height: 3.5rem;
+    padding: 0 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  .ring {
+    flex-basis: 3.5rem;
+  }
+
+  .wayHint {
+    font-size: 0.8125rem;
+  }
+}
+
+/* The one column is the width of the screen and no wider. Left to size itself
+   it takes the longest unbroken thing in the composition as its minimum, and
+   on a phone that pushed the whole print off the right edge. */
+.layer {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.comp {
+  min-width: 0;
+}
+
+.progress {
+  width: 100%;
+  max-width: 26rem;
+}
+
+@media (max-width: 40rem) {
+  .comp {
+    width: 100%;
+  }
+
+  .name {
+    max-width: 100%;
+  }
+}
+
+/* The composition centres its children, and a centred flex child is as wide
+   as its longest line unless told otherwise. Told otherwise. */
+.comp > *,
+.nameBox > .name {
+  max-width: 100%;
+}
+
+.notice {
+  max-width: min(38rem, 100%);
+}

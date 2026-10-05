@@ -214,3 +214,102 @@
     gap: var(--s-2);
   }
 }
+
+/* =============================================================================
+   PHONE. The rail keeps what identifies the set and where you are; the
+   controls leave it for a dock at the foot of the screen, where a thumb is.
+   The dock shares its bar with the title block (see TitleBlock.module.css).
+   ========================================================================== */
+
+@media (max-width: 40rem) {
+  .rail {
+    /* Above the title block, so the docked controls can sit on its bar. */
+    z-index: calc(var(--z-titleblock) + 1);
+    padding: 0 var(--s-2);
+    /* Solid, and no backdrop-filter: a filter here would make the rail the
+       containing block for the fixed dock below and drag it back up, and on
+       a phone the blur is the most expensive thing on the page. */
+    background: var(--paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .markText {
+    display: flex;
+  }
+
+  .set {
+    display: none;
+  }
+
+  .project {
+    font-size: var(--t-micro);
+    letter-spacing: 0.1em;
+  }
+
+  /* Only the sheet you are on: there is no room for the trail to it. */
+  .locus {
+    display: flex;
+    margin-inline: auto 0;
+    padding: var(--s-1) var(--s-2);
+    /* On the bright stock: at this size the label needs the contrast. */
+    background: var(--paper-raised);
+    border-color: var(--rule-strong);
+  }
+
+  .locus .crumb {
+    font-size: var(--t-mini);
+    color: var(--ink);
+  }
+
+  .locus .crumb[aria-current] {
+    color: var(--accent);
+  }
+
+  .locus .crumb[data-root]:not(:only-child),
+  .crumbSep {
+    display: none;
+  }
+
+  .controls {
+    position: fixed;
+    right: calc(var(--sheet-margin) + var(--lw-med));
+    bottom: calc(var(--sheet-margin) + var(--lw-med));
+    height: calc(var(--titleblock-h) - var(--lw-med) * 2);
+    margin: 0;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  /* Each control is a cell of the bar, ruled off from the next, and at least
+     44px wide: the size a thumb can find without looking. */
+  .control {
+    justify-content: center;
+    min-width: 2.75rem;
+    padding: 0;
+    background: none;
+    border: none;
+    border-left: var(--lw-thin) solid var(--rule);
+    color: var(--ink);
+  }
+
+  .control svg,
+  .indexGlyph {
+    scale: 1.25;
+  }
+
+  .control:active {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .control[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper-raised);
+  }
+
+  /* The expanded title block needs the whole bar. */
+  :global(body:has(aside[data-expanded])) .controls {
+    display: none;
+  }
+}

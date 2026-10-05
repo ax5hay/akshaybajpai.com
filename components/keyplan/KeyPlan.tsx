@@ -119,6 +119,39 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   const nextMode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
 
   const stageRef = useRef<HTMLDivElement>(null);
+  const planeRef = useRef<HTMLDivElement>(null);
+  /** On a narrow sheet: the card the reader has scrolled to. */
+  const [current, setCurrent] = useState<string | null>(null);
+
+  /**
+   * Where each card of the stacked deck would sit if it were not stuck. The
+   * cards are `position: sticky`, so their live offsets say where they are
+   * pinned, not where they belong; this adds the heights up instead.
+   */
+  const deckTops = useCallback(() => {
+    const plane = planeRef.current;
+    if (!plane) return [];
+    const cards = Array.from(plane.querySelectorAll<HTMLElement>('[data-plan-sheet]'));
+    const strip = plane.querySelector<HTMLElement>('[data-plan-title]');
+    const gap = parseFloat(getComputedStyle(plane).rowGap) || 0;
+    let y = plane.getBoundingClientRect().top + window.scrollY + (strip?.offsetHeight ?? 0) + gap;
+    return cards.map((el) => {
+      const top = y;
+      y += el.offsetHeight + gap;
+      return { el, top, pin: parseFloat(getComputedStyle(el).top) || 0 };
+    });
+  }, []);
+
+  /** Tap a sheet on the miniature plan: bring its card to the top of the pile. */
+  const jumpTo = useCallback(
+    (sheet: string) => {
+      const card = deckTops().find((c) => c.el.dataset.sheet === sheet);
+      if (!card) return;
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: card.top - card.pin, behavior: calm ? 'auto' : 'smooth' });
+    },
+    [deckTops]
+  );
   const [camera, setCamera] = useState<Camera>({ scale: 1, x: 0, y: 0 });
   const [animating, setAnimating] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -200,6 +233,57 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   useEffect(() => () => {
     if (flyTimer.current) clearTimeout(flyTimer.current);
   }, []);
+
+  // The stacked deck, on a narrow sheet. Two jobs: plot each card's figure as
+  // it comes into view instead of all at once off-screen, and keep the
+  // miniature plan pointing at the card being read.
+  useEffect(() => {
+    if (interactive) return;
+    const plane = planeRef.current;
+    if (!plane || !window.matchMedia('(max-width: 59.999rem)').matches) return;
+
+    const cards = Array.from(plane.querySelectorAll<HTMLElement>('[data-plan-sheet]'));
+    const seen = new IntersectionObserver(
+      (entries, io) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.setAttribute('data-seen', '');
+          io.unobserve(entry.target);
+        }
+      },
+      { rootMargin: '0px 0px -18% 0px' }
+    );
+    cards.forEach((card) => seen.observe(card));
+
+    let frame = 0;
+    let tops = deckTops();
+    const read = () => {
+      frame = 0;
+      const line = window.scrollY + window.innerHeight * 0.42;
+      let at: string | null = null;
+      for (const card of tops) if (card.top <= line) at = card.el.dataset.sheet ?? null;
+      setCurrent(at);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(read);
+    };
+    const onResize = () => {
+      tops = deckTops();
+      onScroll();
+    };
+    // Fonts landing changes every card's height.
+    document.fonts.ready.then(onResize);
+    read();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => {
+      seen.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [interactive, deckTops]);
 
   /** Zoom about a point in stage coordinates, keeping that point fixed. */
   const zoomAt = useCallback((factor: number, px: number, py: number) => {
@@ -561,6 +645,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       >
         <div
           className={styles.plane}
+          ref={planeRef}
           data-plan-plane
           data-lod={lod}
           data-animating={animating || undefined}
@@ -708,7 +793,11 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
           </svg>
 
           {/* Title strip, down the right edge where a drawing carries it. */}
-          <div className={styles.titleStrip} style={place(KEY_PLAN_FURNITURE.title)}>
+          <div
+            className={styles.titleStrip}
+            style={place(KEY_PLAN_FURNITURE.title)}
+            data-plan-title
+          >
             <div className={styles.north} aria-hidden="true">
               <svg viewBox="0 0 48 48" className={styles.northPoint}>
                 <circle cx="24" cy="26" r="17" />
@@ -748,6 +837,58 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                 </span>
                 <span>KeyPlan.tsx, client, no data fetch</span>
               </p>
+            </div>
+
+            {/* The plan itself, small. On a narrow sheet there is no room to
+                pan the real one, so it is drawn at the size of a thumbnail and
+                does one job: tap a sheet and the pile below turns to it. */}
+            <div className={styles.mini} aria-hidden="true">
+              <span className={styles.miniLabel}>
+                <span>Key plan</span>
+                <span>Tap a sheet</span>
+              </span>
+              <svg
+                viewBox={`-6 -6 ${KEY_PLAN_SHEETS_WIDTH + 12} ${KEY_PLAN_HEIGHT + 12}`}
+                className={styles.miniPlan}
+              >
+                {Object.entries(KEY_PLAN_FURNITURE)
+                  .filter(([name]) => name !== 'title')
+                  .map(([name, r]) => (
+                    <rect
+                      key={name}
+                      x={r.x}
+                      y={r.y}
+                      width={r.w}
+                      height={r.h}
+                      className={styles.miniFurniture}
+                    />
+                  ))}
+                {plates.map((plate) => (
+                  <g
+                    key={plate.sheet}
+                    className={styles.miniSheet}
+                    data-on={current === plate.sheet || undefined}
+                    onClick={() => jumpTo(plate.sheet)}
+                  >
+                    <rect
+                      x={plate.rect.x}
+                      y={plate.rect.y}
+                      width={plate.rect.w}
+                      height={plate.rect.h}
+                    />
+                    <text
+                      x={plate.rect.x + plate.rect.w / 2}
+                      y={plate.rect.y + plate.rect.h / 2 + 24}
+                    >
+                      {plate.sheet}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+              <span className={styles.miniCue}>
+                {plates.length} sheets, stacked below
+                <span className={styles.miniArrow} />
+              </span>
             </div>
 
             {/* Struck by hand, so a degree or two off square. */}

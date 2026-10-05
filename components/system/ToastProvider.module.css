@@ -129,10 +129,19 @@
   }
 }
 
+/* On a phone the foot of the screen is the dock and the margin notes, so
+   notices are stamped at the head of the sheet, under the rail. */
 @media (max-width: 40rem) {
   .stack {
-    left: var(--sheet-margin);
-    right: var(--sheet-margin);
+    top: calc(var(--sheet-margin) + var(--rail-h) + var(--s-2));
+    bottom: auto;
+    left: calc(var(--sheet-margin) + var(--s-2));
+    right: calc(var(--sheet-margin) + var(--s-2));
     max-width: none;
+    flex-direction: column;
+  }
+
+  .toast {
+    padding: var(--s-2) var(--s-3) var(--s-3);
   }
 }
