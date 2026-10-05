@@ -50,6 +50,13 @@ html[data-mode='annotated'] .leader {
   opacity: 1;
 }
 
+/* Under the lens, a note is written where the barrel passes over it. */
+html[data-lens]:not([data-mode='annotated']) .note {
+  opacity: 1;
+  clip-path: circle(var(--lr, 0px) at var(--lx, 0px) var(--ly, 0px));
+  --accent: var(--lens-ink);
+}
+
 html[data-mode='annotated'] .note {
   opacity: 1;
   pointer-events: auto;

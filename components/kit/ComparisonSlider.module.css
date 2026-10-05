@@ -113,7 +113,7 @@
   font-size: var(--t-micro);
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--ink-4);
+  color: var(--ink-2);
   pointer-events: none;
 }
 

@@ -40,6 +40,9 @@
   border-radius: 50%;
   backdrop-filter: invert(1) hue-rotate(8deg) saturate(1.7) contrast(1.06);
   -webkit-backdrop-filter: invert(1) hue-rotate(8deg) saturate(1.7) contrast(1.06);
+  /* White stock inverts to black, which is a negative, not a blueprint. A
+     wash of Prussian blue over the inversion is what makes it a cyanotype. */
+  background: rgba(14, 58, 128, 0.46);
 }
 
 /* The technical layer. Drawn across the whole viewport and revealed by the

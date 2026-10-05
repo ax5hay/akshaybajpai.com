@@ -9,8 +9,10 @@ import { ModeScript } from '@/components/system/ModeScript';
 import { InstrumentProvider } from '@/components/system/InstrumentProvider';
 import { ModeProvider } from '@/components/system/ModeProvider';
 import { ToastProvider } from '@/components/system/ToastProvider';
+import { SheetTransitionProvider } from '@/components/system/SheetTransition';
 import { PlateMetaProvider } from '@/components/sheet/PlateMetaProvider';
 import { SheetFrame } from '@/components/sheet/SheetFrame';
+import { ZoneCursor } from '@/components/sheet/ZoneCursor';
 import { SheetRail } from '@/components/sheet/SheetRail';
 import { TitleBlock } from '@/components/sheet/TitleBlock';
 import { buildSheetIndex } from '@/lib/sheet-index';
@@ -67,14 +69,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ModeProvider>
             <InstrumentProvider>
               <PlateMetaProvider>
+                <SheetTransitionProvider>
                 <SkipLink />
                 <RevealObserver />
                 <SheetFrame />
+                <ZoneCursor />
                 <SheetRail entries={sheetIndex} />
                 <main id="main-content" className="plate-main">
                   {children}
                 </main>
                 <TitleBlock />
+                </SheetTransitionProvider>
               </PlateMetaProvider>
             </InstrumentProvider>
           </ModeProvider>

@@ -27,6 +27,45 @@ const THEME_COLOR: Record<Mode, string> = {
   raw: '#08080a',
 };
 
+type WipeDocument = Document & {
+  startViewTransition?: (update: () => void) => { finished: Promise<void> };
+};
+
+/** Where the last press landed, so the new mode can develop out from it. */
+const lastPress = { x: 0, y: 0, at: 0 };
+
+/**
+ * Apply a mode change as an exposure spreading from where it was asked for:
+ * the press if there was one, otherwise the switch in the rail.
+ */
+function develop(apply: () => void) {
+  const doc = document as WipeDocument;
+  const root = document.documentElement;
+  if (
+    !doc.startViewTransition ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    'wipe' in root.dataset
+  ) {
+    apply();
+    return;
+  }
+
+  let { x, y } = lastPress;
+  if (performance.now() - lastPress.at > 500) {
+    const dial = document.querySelector('[role="radiogroup"]')?.getBoundingClientRect();
+    x = dial ? dial.left + dial.width / 2 : window.innerWidth / 2;
+    y = dial ? dial.top + dial.height / 2 : 0;
+  }
+  root.style.setProperty('--wipe-x', `${x}px`);
+  root.style.setProperty('--wipe-y', `${y}px`);
+  root.dataset.wipe = '';
+
+  doc
+    .startViewTransition(apply)
+    .finished.catch(() => {})
+    .finally(() => delete root.dataset.wipe);
+}
+
 function paintThemeColor(mode: Mode) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[mode]);
 }
@@ -51,7 +90,9 @@ export function ModeProvider({ children }: { children: ReactNode }) {
       // has not yet flushed. Side effects stay out of the state updater.
       if (document.documentElement.dataset.mode === next) return;
 
-      document.documentElement.dataset.mode = next;
+      develop(() => {
+        document.documentElement.dataset.mode = next;
+      });
       paintThemeColor(next);
       try {
         localStorage.setItem(MODE_STORAGE_KEY, next);
@@ -76,6 +117,16 @@ export function ModeProvider({ children }: { children: ReactNode }) {
     const index = isMode(current) ? MODES.indexOf(current) : 0;
     setMode(MODES[(index + 1) % MODES.length]);
   }, [setMode]);
+
+  useEffect(() => {
+    const onPress = (event: PointerEvent) => {
+      lastPress.x = event.clientX;
+      lastPress.y = event.clientY;
+      lastPress.at = performance.now();
+    };
+    window.addEventListener('pointerdown', onPress, true);
+    return () => window.removeEventListener('pointerdown', onPress, true);
+  }, []);
 
   // `D` cycles the drawing mode from anywhere, except while typing.
   useEffect(() => {

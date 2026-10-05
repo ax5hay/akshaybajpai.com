@@ -8,6 +8,7 @@ import {
   GENERAL_NOTES,
   KEY_PLAN_FURNITURE,
   KEY_PLAN_HEIGHT,
+  KEY_PLAN_SHEETS_WIDTH,
   KEY_PLAN_WIDTH,
   keyPlanPlates,
   PLATES,
@@ -18,6 +19,9 @@ import { useInstruments } from '@/components/system/InstrumentProvider';
 import { useMode } from '@/components/system/ModeProvider';
 import { useToast } from '@/components/system/ToastProvider';
 import { MODE_INFO, MODES } from '@/lib/mode';
+import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
+import { lastSheetPath, useSheetTransition } from '@/components/system/SheetTransition';
+import { plateForPath } from '@/lib/plates';
 import styles from './KeyPlan.module.css';
 
 export interface PlateItem {
@@ -51,6 +55,10 @@ interface Camera {
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+
+/** Sheets wide enough to set their figure beside the contents, not above. */
+const SIDE_FIGURE = new Set(['work', 'essays', 'contact']);
+const ISSUE_STAMP = '2026.09';
 
 /** Plan-space rectangle to absolute CSS geometry. */
 const place = (r: { x: number; y: number; w: number; h: number }) => ({
@@ -115,10 +123,30 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   const [animating, setAnimating] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [interactive, setInteractive] = useState(false);
+  const { navigate, supported: canMorph } = useSheetTransition();
+
+  // Read during the first render, not in an effect: the transition snapshots
+  // the plan as soon as it mounts, and the name has to be on the plate by then.
+  const [returning, setReturning] = useState<string | null>(() => {
+    const from = lastSheetPath();
+    return from ? (plateForPath(from)?.sheet ?? null) : null;
+  });
+  useEffect(() => {
+    if (!returning) return;
+    const timer = setTimeout(() => setReturning(null), 900);
+    return () => clearTimeout(timer);
+  }, [returning]);
 
   // Drag bookkeeping lives in a ref so pointermove never triggers a render
   // it does not need; only the camera state does.
   const drag = useRef({ active: false, moved: 0, px: 0, py: 0, ox: 0, oy: 0, captured: false });
+  // Last few samples of the drag, so letting go carries the plan on.
+  const fling = useRef({ vx: 0, vy: 0, t: 0, x: 0, y: 0, frame: 0 });
+  const stopFling = useCallback(() => {
+    if (fling.current.frame) cancelAnimationFrame(fling.current.frame);
+    fling.current.frame = 0;
+  }, []);
+  useEffect(() => stopFling, [stopFling]);
   const flyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stageSize = useRef({ width: 0, height: 0 });
 
@@ -202,6 +230,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     if (!stage || !interactive) return;
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
+      stopFling();
       const rect = stage.getBoundingClientRect();
       zoomAt(
         Math.exp(-event.deltaY * (event.ctrlKey ? 0.01 : 0.0016)),
@@ -211,7 +240,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
     return () => stage.removeEventListener('wheel', onWheel);
-  }, [interactive, zoomAt]);
+  }, [interactive, zoomAt, stopFling]);
 
   const onPointerDown = (event: React.PointerEvent) => {
     if (!interactive || event.button !== 0) return;
@@ -224,6 +253,8 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       oy: camera.y,
       captured: false,
     };
+    stopFling();
+    fling.current = { vx: 0, vy: 0, t: performance.now(), x: event.clientX, y: event.clientY, frame: 0 };
     setAnimating(false);
     // Capture is deliberately NOT taken here. Capturing on pointerdown makes
     // the browser retarget the subsequent click to the capturing element, so
@@ -244,6 +275,16 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       d.captured = true;
     }
 
+    // Velocity, smoothed so one jittery sample does not decide the throw.
+    const f = fling.current;
+    const now = performance.now();
+    const dt = Math.max(1, now - f.t);
+    f.vx = f.vx * 0.6 + ((event.clientX - f.x) / dt) * 0.4;
+    f.vy = f.vy * 0.6 + ((event.clientY - f.y) / dt) * 0.4;
+    f.t = now;
+    f.x = event.clientX;
+    f.y = event.clientY;
+
     setCamera((cam) => bound({ ...cam, x: d.ox + dx, y: d.oy + dy }));
   };
 
@@ -254,6 +295,59 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       (event.currentTarget as HTMLElement).releasePointerCapture?.(event.pointerId);
       drag.current.captured = false;
     }
+
+    // A sheet of paper pushed across a board does not stop dead. Skipped if
+    // the hand had already come to rest, or the reader wants no motion.
+    const f = fling.current;
+    const resting = performance.now() - f.t > 80 || Math.hypot(f.vx, f.vy) < 0.15;
+    if (resting || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let last = performance.now();
+    const glide = (now: number) => {
+      const dt = Math.min(32, now - last);
+      last = now;
+      const decay = Math.pow(0.994, dt);
+      f.vx *= decay;
+      f.vy *= decay;
+      setCamera((cam) => bound({ ...cam, x: cam.x + f.vx * dt, y: cam.y + f.vy * dt }));
+      f.frame = Math.hypot(f.vx, f.vy) > 0.02 ? requestAnimationFrame(glide) : 0;
+    };
+    f.frame = requestAnimationFrame(glide);
+  };
+
+  /**
+   * Arrow keys walk the plan: from a focused sheet to the nearest one lying
+   * in that direction, so the set can be read across without a pointer.
+   */
+  const onPlateKeyDown = (event: React.KeyboardEvent, plate: PlacedPlate) => {
+    const heading: Record<string, [number, number]> = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
+    const dir = heading[event.key];
+    if (!dir) return;
+
+    const from = { x: plate.rect.x + plate.rect.w / 2, y: plate.rect.y + plate.rect.h / 2 };
+    let best: PlacedPlate | null = null;
+    let bestCost = Infinity;
+    for (const other of plates) {
+      if (other === plate) continue;
+      const dx = other.rect.x + other.rect.w / 2 - from.x;
+      const dy = other.rect.y + other.rect.h / 2 - from.y;
+      const along = dx * dir[0] + dy * dir[1];
+      if (along <= 0) continue;
+      // Distance along the heading, with drift off it counted double.
+      const cost = along + Math.abs(dx * dir[1] + dy * dir[0]) * 2;
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = other;
+      }
+    }
+    if (!best) return;
+    event.preventDefault();
+    stageRef.current?.querySelector<HTMLElement>(`[data-sheet="${best.sheet}"]`)?.focus();
   };
 
   /** Move the camera to frame one plate, then hand off to the router. */
@@ -286,11 +380,18 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       drag.current.moved = 0;
       return;
     }
-    if (!interactive || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     event.preventDefault();
-    if (!flyTo(plate)) {
+    // Where the browser can do it, the sheet itself grows into the page.
+    // The camera fly is the fallback for the ones that cannot.
+    if (canMorph) {
+      setReturning(null);
+      navigate(plate.href, event.currentTarget as HTMLElement);
+      return;
+    }
+    if (!interactive || !flyTo(plate)) {
       router.push(plate.href);
       return;
     }
@@ -460,6 +561,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       >
         <div
           className={styles.plane}
+          data-plan-plane
           data-lod={lod}
           data-animating={animating || undefined}
           style={{
@@ -530,6 +632,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             className={styles.markup}
             viewBox={`0 0 ${KEY_PLAN_WIDTH} ${KEY_PLAN_HEIGHT}`}
             aria-hidden="true"
+            data-lens-layer
           >
             {/* Chain dimension: column widths and gutters, then the overall. */}
             <g className={styles.dim}>
@@ -555,9 +658,9 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                 </g>
               ))}
               <line
-                x1={KEY_PLAN_WIDTH}
+                x1={KEY_PLAN_SHEETS_WIDTH}
                 y1={DIM_Y - 7}
-                x2={KEY_PLAN_WIDTH}
+                x2={KEY_PLAN_SHEETS_WIDTH}
                 y2={DIM_Y + 7}
                 className={styles.dimTick}
               />
@@ -604,30 +707,85 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             </g>
           </svg>
 
-          <div className={styles.header} style={place(KEY_PLAN_FURNITURE.headline)}>
-            <h1 className={styles.headline}>
-              <span className={styles.headlineName}>Akshay Bajpai</span>
-              <span className={styles.headlineRole}>Architect of systems · Builder of intelligence</span>
-            </h1>
-            <p className={styles.headlineNote}>
-              This site is a drawing set. Every section is a numbered sheet on the plan below.{' '}
-              <span className={styles.hintKeys}>
-                Open one, or press <kbd>/</kbd> for the index.
+          {/* Title strip, down the right edge where a drawing carries it. */}
+          <div className={styles.titleStrip} style={place(KEY_PLAN_FURNITURE.title)}>
+            <div className={styles.north} aria-hidden="true">
+              <svg viewBox="0 0 48 48" className={styles.northPoint}>
+                <circle cx="24" cy="26" r="17" />
+                <path d="M24 43V5M24 5l-6 15M24 5l6 15" />
+                <path d="M7 26h34" className={styles.northFaint} />
+              </svg>
+              <span className={styles.northText}>
+                <span>Key plan</span>
+                <span>General arrangement</span>
+                <span>Sheet 1 of {PLATES.length}</span>
               </span>
-              <span className={styles.hintTouch}>Open one, or use the sheet index.</span>
-            </p>
+            </div>
 
-            {/* Raw: what the plan is generated from. */}
-            <p className={styles.provenance}>
-              <span>lib/plates.ts</span>
-              <span>
-                PLATES: Plate[] = {PLATES.length}, {plates.length} placed on G-000
-              </span>
-              <span>
-                plan {KEY_PLAN_WIDTH} × {KEY_PLAN_HEIGHT} units, {leaders.length} refs resolved
-              </span>
-              <span>KeyPlan.tsx, client, no data fetch</span>
-            </p>
+            <div className={styles.header}>
+              <h1 className={styles.headline}>
+                <span className={styles.headlineName}>Akshay Bajpai</span>
+                <span className={styles.headlineRole}>
+                  Architect of systems · Builder of intelligence
+                </span>
+              </h1>
+              <p className={styles.headlineNote}>
+                This site is a drawing set. Every section is a numbered sheet on the plan.{' '}
+                <span className={styles.hintKeys}>
+                  Open one, or press <kbd>/</kbd> for the index.
+                </span>
+                <span className={styles.hintTouch}>Open one, or use the sheet index.</span>
+              </p>
+
+              {/* Raw: what the plan is generated from. */}
+              <p className={styles.provenance}>
+                <span>lib/plates.ts</span>
+                <span>
+                  PLATES: Plate[] = {PLATES.length}, {plates.length} placed on G-000
+                </span>
+                <span>
+                  plan {KEY_PLAN_WIDTH} × {KEY_PLAN_HEIGHT} units, {leaders.length} refs resolved
+                </span>
+                <span>KeyPlan.tsx, client, no data fetch</span>
+              </p>
+            </div>
+
+            {/* Struck by hand, so a degree or two off square. */}
+            <div className={styles.stamp} aria-hidden="true">
+              <span>Issued for review</span>
+              <span>{ISSUE_STAMP}</span>
+            </div>
+
+            {/* Revision schedule, read off the sheets rather than written
+                down twice. */}
+            <div className={styles.revs} aria-hidden="true">
+              <span className={styles.revTitle}>Revision schedule</span>
+              {revisions.map(([rev, sheets]) => (
+                <span key={rev} className={styles.revRow}>
+                  <span className={styles.revLetter}>{rev}</span>
+                  <span className={styles.revSheets}>{sheets.join('  ')}</span>
+                </span>
+              ))}
+            </div>
+
+            <dl className={styles.titleCells} aria-hidden="true">
+              <div>
+                <dt>Drawn</dt>
+                <dd>A. Bajpai</dd>
+              </div>
+              <div>
+                <dt>Issued</dt>
+                <dd>{ISSUE_STAMP}</dd>
+              </div>
+              <div>
+                <dt>Scale</dt>
+                <dd>1:50</dd>
+              </div>
+              <div className={styles.titleSheet}>
+                <dt>Sheet</dt>
+                <dd>G-000</dd>
+              </div>
+            </dl>
           </div>
 
           {plates.map((plate, index) => (
@@ -639,7 +797,18 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               prefetch={false}
               className={styles.plate}
               data-discipline={plate.discipline}
-              style={{ ...place(plate.rect), '--i': index } as React.CSSProperties}
+              data-id={plate.id}
+              data-sheet={plate.sheet}
+              data-plan-sheet
+              onKeyDown={(e) => onPlateKeyDown(e, plate)}
+              style={
+                {
+                  ...place(plate.rect),
+                  '--i': index,
+                  // Coming back from a sheet, this is the plate it folds into.
+                  viewTransitionName: returning === plate.sheet ? 'sheet' : undefined,
+                } as React.CSSProperties
+              }
               data-wide={plate.rect.w >= 600 || undefined}
               data-linked={(lit && plate.sheet !== hovered && lit.has(plate.sheet)) || undefined}
               data-dim={(lit && !lit.has(plate.sheet)) || undefined}
@@ -662,20 +831,35 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                 <span className={styles.plateSubtitle}>{plate.subtitle}</span>
               </span>
 
-              {/* Rows only reserve a sheet-number gutter when the plate
-                  actually numbers its contents, so unnumbered lists get the
-                  full width for their titles. */}
               <span
                 className={styles.plateBody}
-                data-numbered={(contents[plate.id] ?? []).some((i) => i.sheet) || undefined}
+                data-layout={SIDE_FIGURE.has(plate.id) ? 'side' : 'band'}
               >
-                {(contents[plate.id] ?? []).map((item, i) => (
-                  <span key={i} className={styles.item}>
-                    {item.sheet && <span className={styles.itemSheet}>{item.sheet}</span>}
-                    <span className={styles.itemTitle}>{item.title}</span>
-                    {item.meta && <span className={styles.itemMeta}>{item.meta}</span>}
+                {hasFigure(plate.id) && (
+                  <span className={styles.plateFig}>
+                    <PlateFigure id={plate.id} />
+                    <span className={styles.figCap}>
+                      <span className={styles.figNo}>{index + 1}</span>
+                      <span className={styles.figName}>{figureCaption(plate.id)}</span>
+                    </span>
                   </span>
-                ))}
+                )}
+
+                {/* Rows only reserve a sheet-number gutter when the plate
+                    actually numbers its contents, so unnumbered lists get the
+                    full width for their titles. */}
+                <span
+                  className={styles.rows}
+                  data-numbered={(contents[plate.id] ?? []).some((i) => i.sheet) || undefined}
+                >
+                  {(contents[plate.id] ?? []).map((item, i) => (
+                    <span key={i} className={styles.item}>
+                      {item.sheet && <span className={styles.itemSheet}>{item.sheet}</span>}
+                      <span className={styles.itemTitle}>{item.title}</span>
+                      {item.meta && <span className={styles.itemMeta}>{item.meta}</span>}
+                    </span>
+                  ))}
+                </span>
               </span>
 
               {/* Annotated: the sheet states its own placement on the plan. */}
@@ -824,16 +1008,6 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               <span className={styles.legendSwatch} data-kind="record" />
               Sheet record, as authored
             </span>
-            {/* Revision schedule, read off the sheets rather than written
-                down twice. Dense small type is what a drawing is made of. */}
-            <span className={styles.revTitle}>Revision schedule</span>
-            {revisions.map(([rev, sheets]) => (
-              <span key={rev} className={styles.revRow}>
-                <span className={styles.revLetter}>{rev}</span>
-                <span className={styles.revSheets}>{sheets.join('  ')}</span>
-              </span>
-            ))}
-
             <span className={styles.legendScale}>
               <span className={styles.scaleBar} />
               <span>Plan 1:50 at fit</span>

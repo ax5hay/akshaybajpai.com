@@ -29,6 +29,8 @@ interface Props {
   stack?: string[];
   metrics?: string[];
   adjacent?: AdjacentSheet[];
+  /** An operable figure for this sheet, set ahead of the prose. */
+  figure?: React.ReactNode;
 }
 
 /** A detail sheet: one article, drawn at full size. */
@@ -47,6 +49,7 @@ export function ArticlePlate({
   stack,
   metrics,
   adjacent = [],
+  figure,
 }: Props) {
   const issued = formatDate(date, 'short');
   const repo = parseGithubRepo(client);
@@ -102,6 +105,8 @@ export function ArticlePlate({
       ) : (
         <MetricSchedule metrics={metrics} />
       )}
+
+      {figure}
 
       <div className="prose prose-lead" dangerouslySetInnerHTML={{ __html: html }} />
 

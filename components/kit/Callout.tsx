@@ -21,7 +21,7 @@ export function Callout({ note, children }: Props) {
     <div className={styles.host}>
       {children}
       <span className={styles.leader} aria-hidden="true" />
-      <aside className={styles.note}>
+      <aside className={styles.note} data-lens-layer>
         <span className={styles.no} aria-hidden="true" />
         <span className={styles.body}>{note}</span>
       </aside>

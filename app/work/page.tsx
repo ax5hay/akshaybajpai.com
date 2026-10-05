@@ -35,6 +35,7 @@ export default async function WorkIndexPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      figure={PLATE.id}
       facts={[{ k: 'Sheets', v: String(rows.length) }]}
       record={[{ k: 'series', v: 'W-4xx' }, { k: 'count', v: String(rows.length) }]}
       wide

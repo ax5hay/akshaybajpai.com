@@ -102,6 +102,8 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
   const pos = useRef({ x: 0, y: 0 });
   const drag = useRef<{ dx: number; dy: number } | null>(null);
   const probeList = useRef<Probe[]>([]);
+  /** Markup layers the lens reveals, with where each sits and how it is scaled. */
+  const layers = useRef<Array<{ el: HTMLElement; x: number; y: number; k: number }>>([]);
 
   /** Measure once per layout change; moving the lens must not re-measure. */
   const measure = useCallback(() => {
@@ -141,8 +143,10 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
     document.querySelectorAll(PROBE_SELECTOR).forEach((el) => {
       if (seen.has(el) || found.length >= PROBE_LIMIT) return;
       seen.add(el);
+      // The root carries font-variable classes that look like module names.
+      if (el === document.documentElement || el === document.body) return;
       // The lens is not part of the drawing and must not inspect itself.
-      if (el.closest(`.${styles.loupe}, .${styles.xray}`)) return;
+      if (el.closest(`.${styles.loupe}, .${styles.xray}, [data-lens-skip]`)) return;
 
       const r = el.getBoundingClientRect();
       if (r.width < 16 || r.height < 7) return;
@@ -177,6 +181,16 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
         p.labelled = true;
       });
 
+    layers.current = Array.from(document.querySelectorAll<HTMLElement>('[data-lens-layer]')).map(
+      (el) => {
+        const r = el.getBoundingClientRect();
+        // Layers on the key plan live inside a scaled plane; the clip is set
+        // in their own units, so the lens position is divided back down.
+        const own = el.offsetWidth || el.clientWidth || r.width || 1;
+        return { el, x: r.left, y: r.top, k: r.width / own || 1 };
+      }
+    );
+
     probeList.current = found;
     setProbes(found);
   }, []);
@@ -190,6 +204,11 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
     }
     if (xrayRef.current) {
       xrayRef.current.style.clipPath = `circle(${half - WALL}px at ${x + half}px ${y + half}px)`;
+    }
+    for (const layer of layers.current) {
+      layer.el.style.setProperty('--lx', `${(x + half - layer.x) / layer.k}px`);
+      layer.el.style.setProperty('--ly', `${(y + half - layer.y) / layer.k}px`);
+      layer.el.style.setProperty('--lr', `${(half - WALL) / layer.k}px`);
     }
     if (readoutRef.current) {
       // Everything containing the crosshair, largest first, is the containment
@@ -225,6 +244,21 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
     }
   }, [size]);
 
+  // While the lens is out, the annotation layer is live in every mode and
+  // shown only through the barrel. The flag goes on before the first
+  // measurement so those layers have a box to be measured.
+  useEffect(() => {
+    document.documentElement.dataset.lens = '';
+    return () => {
+      delete document.documentElement.dataset.lens;
+      for (const { el } of layers.current) {
+        el.style.removeProperty('--lx');
+        el.style.removeProperty('--ly');
+        el.style.removeProperty('--lr');
+      }
+    };
+  }, []);
+
   // Open centred in the viewport, then take the first measurement.
   useEffect(() => {
     pos.current = {
@@ -254,7 +288,12 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
 
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
+    // The key plan moves under the lens without scrolling the page.
+    const plane = document.querySelector('[data-plan-plane]');
+    const camera = plane ? new MutationObserver(schedule) : null;
+    if (plane) camera?.observe(plane, { attributes: true, attributeFilter: ['style', 'data-lod'] });
     return () => {
+      camera?.disconnect();
       if (frame) cancelAnimationFrame(frame);
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);

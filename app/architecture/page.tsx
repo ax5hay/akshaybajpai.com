@@ -26,6 +26,7 @@ export default function ArchitecturePage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      figure={PLATE.id}
       lead={<p>System design, infrastructure patterns, and how I think about structure.</p>}
       record={[
         { k: 'invariants', v: 'operator authority · output traceability · no silent execution' },

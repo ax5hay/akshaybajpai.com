@@ -1,0 +1,246 @@
+.figure {
+  margin: var(--s-10) 0;
+}
+
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lw-thin);
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-bottom: none;
+}
+
+.pick {
+  flex: 1 1 9rem;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-3);
+  background: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--ink-2);
+  transition:
+    background-color var(--d-1) var(--ease-plate),
+    color var(--d-1) var(--ease-plate);
+}
+
+.pick:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.pick[aria-checked='true'] {
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.pickNo {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.pick[aria-checked='true'] .pickNo {
+  color: inherit;
+  opacity: 0.6;
+}
+
+.field {
+  padding: clamp(0.75rem, 3vw, 1.5rem);
+  border: var(--lw-thin) solid var(--rule-strong);
+  background-image:
+    linear-gradient(var(--grid-minor) var(--lw-hair), transparent var(--lw-hair)),
+    linear-gradient(90deg, var(--grid-minor) var(--lw-hair), transparent var(--lw-hair));
+  background-size: 16px 16px;
+  overflow-x: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  min-width: 30rem;
+  height: auto;
+}
+
+.edge {
+  fill: none;
+  stroke: var(--ink-4);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  transition: stroke var(--d-2) var(--ease-plate);
+}
+
+/* The live path: solid, heavier, and running in the direction of travel. */
+.edge[data-on] {
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-dasharray: 7 4;
+  animation: flow 700ms linear infinite;
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -11;
+  }
+}
+
+.user {
+  fill: var(--paper-raised);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.node rect {
+  fill: var(--paper-raised);
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+  transition:
+    stroke var(--d-2) var(--ease-plate),
+    stroke-width var(--d-2) var(--ease-plate);
+}
+
+.node[data-on] rect {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.name,
+.port,
+.baseText,
+.exit text {
+  font-family: var(--font-label), monospace;
+  letter-spacing: 0.08em;
+}
+
+.name {
+  font-size: 7.5px;
+  font-weight: 600;
+  fill: var(--ink-3);
+  transition: fill var(--d-2) var(--ease-plate);
+}
+
+.node[data-on] .name {
+  fill: var(--ink);
+}
+
+.port {
+  font-size: 7px;
+  font-variant-numeric: tabular-nums;
+  fill: var(--ink-4);
+}
+
+.node[data-on] .port {
+  fill: var(--accent);
+}
+
+.base {
+  fill: var(--paper-sunk);
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+}
+
+.baseText {
+  font-size: 6.5px;
+  fill: var(--ink-3);
+}
+
+.exit rect {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.exit text {
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  fill: var(--accent);
+}
+
+/* An escalation is a filled stamp, not an outline: it is the loud exit. */
+.exit[data-escalated] rect {
+  fill: var(--accent);
+}
+
+.exit[data-escalated] text {
+  fill: var(--paper-raised);
+}
+
+.readout {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-top: none;
+  background: var(--paper-raised);
+}
+
+.says {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-lg);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+
+.path,
+.flags {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+}
+
+.flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  color: var(--ink-3);
+}
+
+.flags [data-hot] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.note {
+  font-size: var(--t-sm);
+  line-height: var(--lh-normal);
+  color: var(--ink-3);
+}
+
+.caption {
+  display: flex;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+
+.captionNo {
+  flex-shrink: 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edge[data-on] {
+    animation: none;
+  }
+}
+
+@media print {
+  .picker {
+    display: none;
+  }
+}

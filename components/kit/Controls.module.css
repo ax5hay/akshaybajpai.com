@@ -174,7 +174,7 @@
 
 .switchOn {
   order: 2;
-  color: var(--ink-4);
+  color: var(--ink-2);
 }
 
 .switchOff {
@@ -187,7 +187,7 @@
 }
 
 .switchInput:checked ~ .switchTrack .switchOff {
-  color: var(--ink-4);
+  color: var(--ink-2);
 }
 
 .switchInput:focus-visible ~ .switchTrack {

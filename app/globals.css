@@ -86,6 +86,11 @@
   --z-grain: 100;
   /* The lens sits above the grain so its optic is not veiled by paper fibre. */
   --z-loupe: 150;
+
+  /* The lens inverts whatever it covers. Markup revealed inside it is drawn
+     in the colours that come out of that inversion as amber on deep blue. */
+  --lens-ink: #0a3fa8;
+  --lens-ground: #f2e9d2;
 }
 
 /* -----------------------------------------------------------------------------
@@ -470,6 +475,79 @@ html[data-mode='raw'] .display {
 
 .plate-enter {
   animation: plate-settle 260ms var(--ease-plate) both;
+}
+
+/* Once sheets are changing by view transition, that is the entrance. This
+   would have the incoming sheet snapshotted at opacity zero. */
+html[data-vt] .plate-enter {
+  animation: none;
+}
+
+/* =============================================================================
+   SHEET TRANSITIONS. Whatever is named `sheet` before a route change morphs
+   into whatever is named `sheet` after it; see SheetTransition.tsx.
+   ========================================================================== */
+
+html:not([data-wipe]) .plate:not(.plate-bleed) {
+  view-transition-name: sheet;
+}
+
+::view-transition-group(sheet) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The two ends are different shapes, a landscape plate and a tall page, so
+   each is pinned to the top of the moving box and cropped, never stretched. */
+::view-transition-old(sheet),
+::view-transition-new(sheet) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+::view-transition-old(sheet) {
+  animation-duration: 240ms;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+}
+
+/* MODE CHANGE: the new state is exposed outward from the switch, the way a
+   print develops, instead of every colour fading at once. */
+html[data-wipe],
+html[data-wipe] *,
+html[data-wipe] *::before,
+html[data-wipe] *::after {
+  transition: none !important;
+}
+
+html[data-wipe]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-wipe]::view-transition-new(root) {
+  animation: mode-wipe 780ms cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+@keyframes mode-wipe {
+  from {
+    clip-path: circle(0 at var(--wipe-x, 50%) var(--wipe-y, 0px));
+  }
+  to {
+    clip-path: circle(150vmax at var(--wipe-x, 50%) var(--wipe-y, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
 /* =============================================================================
@@ -881,9 +959,88 @@ html[data-mode='raw'] [data-raw] {
   }
 }
 
+/* =============================================================================
+   PRINT: issue the sheet. Whatever mode is on screen, paper gets the artifact:
+   black ink on white stock, the chrome struck, and a title strip on the sheet
+   itself (PlateShell prints one) in place of the fixed block.
+   ========================================================================== */
+
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
 @media print {
+  html,
+  html[data-mode] {
+    color-scheme: light;
+    --paper: #fff !important;
+    --paper-deep: #fff !important;
+    --paper-raised: #fff !important;
+    --paper-sunk: #f3f1ec !important;
+    --ink: #000 !important;
+    --ink-2: #222 !important;
+    --ink-3: #555 !important;
+    --ink-4: #777 !important;
+    --rule-faint: rgba(0, 0, 0, 0.15) !important;
+    --rule: rgba(0, 0, 0, 0.35) !important;
+    --rule-strong: rgba(0, 0, 0, 0.7) !important;
+    --rule-ink: #000 !important;
+    --grid-minor: rgba(0, 0, 0, 0.07) !important;
+    --accent: #983729 !important;
+    --accent-line: rgba(152, 55, 41, 0.6) !important;
+    --sheet-sheen: transparent !important;
+    --shadow-lift: none !important;
+    --shadow-deep: none !important;
+    --font-display: var(--font-serif) !important;
+    --font-body: var(--font-sans) !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
   body::before,
-  body::after {
-    display: none;
+  body::after,
+  body > a,
+  body > header,
+  body > aside,
+  body > div[aria-hidden='true'],
+  [role='region'][aria-label='Notices'] {
+    display: none !important;
+  }
+
+  .plate {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: none;
+  }
+
+  .plate-enter,
+  [data-reveal],
+  [data-reveal-stagger] > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .prose h2,
+  .prose h3 {
+    break-after: avoid;
+  }
+
+  .prose pre,
+  .prose blockquote,
+  figure {
+    break-inside: avoid;
+  }
+
+  a {
+    text-decoration: none;
   }
 }

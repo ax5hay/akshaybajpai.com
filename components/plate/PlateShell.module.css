@@ -141,6 +141,70 @@ html[data-mode='annotated'] .title {
   background: var(--ink);
 }
 
+/* ---- Figure ----------------------------------------------------------------
+   Drawn on the sheet itself, over a faint construction grid, and labelled the
+   way a detail is: number in a bubble, title, then sheet and scale. */
+
+.figure {
+  margin: 0 0 var(--s-12);
+}
+
+.figureField {
+  padding: clamp(1rem, 4vw, 2.25rem);
+  background-image:
+    linear-gradient(var(--grid-minor) var(--lw-hair), transparent var(--lw-hair)),
+    linear-gradient(90deg, var(--grid-minor) var(--lw-hair), transparent var(--lw-hair));
+  background-size: 16px 16px;
+  border: var(--lw-thin) solid var(--rule);
+  --fw: 1.15;
+  --fig-delay: 240ms;
+}
+
+.figureField svg {
+  width: 100%;
+  height: auto;
+  max-height: 24rem;
+}
+
+.figureCaption {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.figureNo {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  border: var(--lw-thin) solid var(--ink-2);
+  border-radius: 50%;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.figureTitle {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.figureScale {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The figure is presentation; the record view drops it. */
+html[data-mode='raw'] .figure {
+  display: none;
+}
+
 /* ---- Cross-references ----------------------------------------------------- */
 
 .refs {
@@ -285,5 +349,72 @@ html[data-mode='annotated'] .title {
      leave each fact in a block of dead space. */
   .fact {
     flex: 0 0 auto;
+  }
+}
+
+/* ---- Printed title strip ---------------------------------------------------- */
+
+.printBlock {
+  display: none;
+}
+
+@media print {
+  .printBlock {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto auto;
+    align-items: stretch;
+    margin-top: 2rem;
+    border: 1.5pt solid #000;
+    font-family: var(--font-label), monospace;
+    font-size: 8pt;
+    break-inside: avoid;
+  }
+
+  .printBlock > * {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2pt;
+    padding: 6pt 9pt;
+    border-left: 0.75pt solid #000;
+  }
+
+  .printBlock > :first-child {
+    border-left: none;
+  }
+
+  .printSet {
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .printSet span,
+  .printCell span {
+    font-size: 6pt;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .printCell {
+    max-width: 16rem;
+  }
+
+  .printSheet {
+    font-size: 20pt;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .refs,
+  .raw {
+    display: none !important;
+  }
+
+  /* A screen-resolution grid rasterises to a blur on paper. */
+  .figureField {
+    background-image: none;
   }
 }
