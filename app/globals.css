@@ -853,6 +853,26 @@ html[data-js] [data-reveal-stagger].is-revealed > * {
   }
 }
 
+/* On a phone the section strip rides under the rail, so a heading jumped to
+   has to land below both. */
+@media (max-width: 40rem) {
+  [data-sections] .prose h2 {
+    scroll-margin-top: calc(var(--sheet-margin) + var(--rail-h) + 5.5rem);
+  }
+
+  /* A table wider than the sheet scrolls inside itself, not the page. */
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prose th,
+  .prose td {
+    min-width: 6.5rem;
+  }
+}
+
 /* A link that leaves the set says so. */
 .prose a[href^='http']::after {
   content: '↗';

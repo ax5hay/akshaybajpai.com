@@ -349,3 +349,89 @@ html[data-mode='raw'] .metric {
     gap: var(--s-3);
   }
 }
+
+/* =============================================================================
+   TOUCH. There is no hover to ink a row's profile in, so it is inked by the
+   row's own passage up the screen: a view timeline, which costs no script.
+   ========================================================================== */
+
+@media (hover: none) {
+  .profile {
+    position: relative;
+  }
+
+  @supports (animation-timeline: view()) {
+    .profile::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      mix-blend-mode: multiply;
+      transform-origin: left center;
+      animation: profile-read linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 55%;
+    }
+
+    html[data-mode='annotated'] .profile::after,
+    html[data-mode='raw'] .profile::after {
+      mix-blend-mode: normal;
+      opacity: 0.55;
+    }
+  }
+
+  /* A pressed row answers at once; the hover tint would otherwise stick to
+     the last row touched. */
+  .link:hover {
+    background: none;
+  }
+
+  .link:active {
+    background: var(--accent-soft);
+  }
+}
+
+@keyframes profile-read {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* The stack key is one line that swipes, with the next tag showing at the
+   edge to say so; wrapped, it pushed the first case study off the screen. */
+@media (max-width: 48rem) {
+  .keyTags {
+    flex-wrap: nowrap;
+    margin-inline: calc(var(--sheet-pad, 0px) * -1);
+    padding: 2px var(--sheet-pad, 0px);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+  }
+
+  .keyTags::-webkit-scrollbar {
+    display: none;
+  }
+
+  .keyTag {
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+
+  .keyTag:last-child {
+    margin-right: 2.5rem;
+  }
+
+  .keyLabel::after {
+    content: ' · swipe';
+    font-weight: 400;
+  }
+}

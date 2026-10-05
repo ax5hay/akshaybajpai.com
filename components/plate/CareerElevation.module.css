@@ -256,3 +256,23 @@
     display: block !important;
   }
 }
+
+@media (max-width: 40rem) {
+  .year {
+    font-size: 13px;
+  }
+
+  .stepper button {
+    min-height: 3rem;
+    flex: 1;
+  }
+
+  .stepper span {
+    flex: 0 0 auto;
+    padding: 0 var(--s-3);
+  }
+
+  :global(html[data-js]) .role[data-on] {
+    min-height: 15rem;
+  }
+}
