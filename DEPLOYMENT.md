@@ -313,6 +313,7 @@ Then update the custom domain in the Pages settings and the DNS record.
 |:--------|:-------------|:----|
 | **Build fails with a type error in a file you did not touch** | A stray, untracked `.ts` or `.tsx` file locally. `tsc` checks every file in the tree, tracked or not | Delete or fix the stray file. CI is unaffected, because it only has tracked files |
 | **Build fails locally at the export step** | Something is holding `out/` open, usually a preview server | Stop the server, build, start it again |
+| **Site loads unstyled just after a deploy** (plain text, no layout) | A CDN edge served the new HTML but answered 404 for the newly named CSS, and cached that 404 for ten minutes | The page now retries a failed stylesheet under a fresh URL by itself (`ModeScript`). If it is ever seen again, a reload a minute later clears it |
 | **Run succeeded, site unchanged** | `max-age=600` caching | Hard reload, or wait ten minutes |
 | **Site serves on `ax5hay.github.io` but not the custom domain** | `out/CNAME` was missing from the artifact | Check the *Preserve CNAME* step ran; re-save the custom domain in Pages settings |
 | **Certificate warning** | Custom domain was removed and re-added, and the new certificate is still being issued | Wait; then re-tick **Enforce HTTPS** |
@@ -333,6 +334,7 @@ These come with the host, and are accepted trade-offs for a free static site.
 | **One cache policy for every file** | Pages sends `max-age=600` for everything, including content-hashed assets that could be cached forever. Returning visitors revalidate after ten minutes |
 | **No custom headers** | No Content-Security-Policy, HSTS preload or custom caching can be set from this repository |
 | **No server** | Anything dynamic has to be a third-party service called from the browser, as the contact form is |
+| **Deploys are not atomic across the CDN** | For a short while after a deploy, an edge can hold new HTML and old assets. Hashed file names change every build, so the mismatch shows as missing CSS; the page retries those requests |
 | **No preview deployments** | A pull request is not built anywhere until it merges. Build locally before merging |
 | **One site per repository** | There is no staging copy; `main` is production |
 | **Compression** | Pages serves gzip. Brotli is not offered |
