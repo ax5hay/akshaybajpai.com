@@ -84,7 +84,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className={styles.stack} role="region" aria-label="Notices">
+      <div className={styles.stack} role="region" aria-label="Notices" data-lens-skip>
         {toasts.map((t) => (
           <output key={t.id} className={styles.toast} data-tone={t.tone}>
             <span className={styles.kind}>{t.kind}</span>

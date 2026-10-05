@@ -30,6 +30,7 @@ export default function ContactPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      figure={PLATE.id}
       lead={<p>Let&apos;s build something that matters.</p>}
       record={CHANNELS.map((c) => ({ k: c.label.toLowerCase(), v: c.value }))}
     >

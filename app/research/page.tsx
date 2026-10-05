@@ -22,6 +22,7 @@ export default function ResearchPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      figure={PLATE.id}
       lead={<p>Published work and experimental directions.</p>}
       facts={[
         { k: 'Degree', v: 'MSc AI, 9.8/10' },

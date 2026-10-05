@@ -57,6 +57,8 @@ export function TitleBlock() {
       >
         <span className={styles.sheetNo}>{meta.sheet}</span>
         <span className={styles.title}>{meta.title}</span>
+        {/* Zone under the pointer, written by ZoneCursor. */}
+        <span className={styles.gridRef} data-grid-ref aria-hidden="true" />
         <span className={styles.chevron} aria-hidden="true" />
         <span className="u-visually-hidden">
           {expanded ? 'Collapse title block' : 'Expand title block'}
@@ -95,6 +97,9 @@ export function TitleBlock() {
 
         <button type="button" className={styles.copy} onClick={copyReference}>
           Copy sheet reference
+        </button>
+        <button type="button" className={styles.copy} onClick={() => window.print()}>
+          Issue this sheet as PDF
         </button>
       </div>
     </aside>

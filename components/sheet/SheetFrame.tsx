@@ -11,36 +11,36 @@ const ZONE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
  */
 export function SheetFrame() {
   return (
-    <div className={styles.frame} aria-hidden="true">
+    <div className={styles.frame} aria-hidden="true" data-lens-skip>
       {/* Trim: nothing is drawn outside the border, so a sheet scrolling past
           is cut off at it instead of running out under the zone numbers. */}
       <div className={styles.trimMask} />
-      <div className={styles.border} />
+      <div className={styles.border} data-zone-field />
 
       <div className={`${styles.ruler} ${styles.rulerTop}`}>
         {ZONE_NUMBERS.map((n) => (
-          <span key={n} className={styles.zone}>
+          <span key={n} className={styles.zone} data-zone-col={n}>
             {n}
           </span>
         ))}
       </div>
       <div className={`${styles.ruler} ${styles.rulerBottom}`}>
         {ZONE_NUMBERS.map((n) => (
-          <span key={n} className={styles.zone}>
+          <span key={n} className={styles.zone} data-zone-col={n}>
             {n}
           </span>
         ))}
       </div>
       <div className={`${styles.ruler} ${styles.rulerLeft}`}>
-        {ZONE_LETTERS.map((l) => (
-          <span key={l} className={styles.zone}>
+        {ZONE_LETTERS.map((l, row) => (
+          <span key={l} className={styles.zone} data-zone-row={row}>
             {l}
           </span>
         ))}
       </div>
       <div className={`${styles.ruler} ${styles.rulerRight}`}>
-        {ZONE_LETTERS.map((l) => (
-          <span key={l} className={styles.zone}>
+        {ZONE_LETTERS.map((l, row) => (
+          <span key={l} className={styles.zone} data-zone-row={row}>
             {l}
           </span>
         ))}

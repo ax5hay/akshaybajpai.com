@@ -18,6 +18,10 @@
   transition: height var(--d-2) var(--ease-mech), border-color var(--d-2);
 }
 
+:global(html:not([data-wipe])) .rail {
+  view-transition-name: rail;
+}
+
 .rail[data-condensed] {
   --rail-h: 2.75rem;
   border-bottom-color: var(--rule-strong);

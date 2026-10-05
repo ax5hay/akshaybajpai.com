@@ -106,6 +106,20 @@ Cross-references are real links, and the title block always reports the sheet yo
 are actually on, including detail sheets, which carry their own number rather
 than their section's.
 
+### Drawings, not just sheets
+
+Every general-arrangement sheet carries a figure, drafted by hand as SVG in
+[`components/figures/PlateFigure.tsx`](components/figures/PlateFigure.tsx): a
+section through a governed platform, an exploded axonometric, an elevation
+along the career datum, a benchmark plot, a lever, a survey traverse, a
+transmittal. The key plan shows each one in miniature and the sheet itself
+shows it at full size.
+
+They are drawn in four line weights (heavy for what a section cuts, medium for
+outlines, thin for detail, hair for hatching), and they plot themselves: every
+stroke carries `pathLength={1}`, so one CSS rule can run a pen along all of
+them in the order a draughtsman would put the lines down.
+
 ---
 
 ## The instruments
@@ -146,8 +160,15 @@ caps are dropped on devices with no keyboard to press them on.
 <sub><b>The lens is an x-ray, not a magnifier.</b> It outlines, names, and measures every element it
 covers, and the readout under the barrel prints the containment chain at the crosshair.</sub>
 
-Optically it is a `backdrop-filter: invert()`, so the page underneath is
-recomposited rather than re-rendered. The technical layer is drawn once across
+It looks through to the blueprint. Inside the barrel the sheet is a cyanotype,
+and the annotation layer (dimensions, the revision cloud, margin notes) is
+written in wherever the lens passes, in every mode. The markup is already in
+the page; `Loupe.tsx` keeps a clip circle on each `[data-lens-layer]` in that
+layer's own coordinates, and the pen is loaded with the colour that inverts to
+amber.
+
+Optically it is a `backdrop-filter: invert()` under a wash of Prussian blue, so
+the page underneath is recomposited rather than re-rendered. The technical layer is drawn once across
 the whole viewport and revealed through a moving `clip-path` circle, which makes
 a drag cost one style write instead of a re-measure of the page.
 
@@ -172,7 +193,9 @@ of each other the innermost one wins and the rest are left to the readout.
 | Sheet index | <kbd>/</kbd> | Fuzzy-ranked search across the whole set |
 | Drawing mode | <kbd>D</kbd> | Cycles artifact, annotated, raw |
 | Comparison sliders | <kbd>←</kbd> <kbd>→</kbd> | Native range input, so keyboard and screen readers work unmodified |
-| Key plan camera | drag, scroll | Pan and zoom, with level of detail tied to scale |
+| Key plan camera | drag, scroll, arrows | Pan with inertia, zoom, and walk sheet to sheet with the arrow keys |
+| Zone cursor | move the pointer | The margin rulers ring the zone you are in and the title block reads out the grid reference |
+| Issue as PDF | title block | Prints the sheet as black ink on white stock with its own title strip |
 
 State for the lens and the index lives in `InstrumentProvider`, above the rail,
 precisely so that any surface can offer them. The key plan is the surface that
@@ -224,6 +247,10 @@ its part name, and the verbatim Markdown is printed at the top.
 a board a full tone deeper than the sheets pinned to it, ink-weight sheet
 boundaries, ruled contents tables, and reversed header bars on the furniture. No
 markup at all, because an issued print does not carry any.
+
+A mode change is exposed, not faded: the new state spreads outward from the
+switch as a view transition with a growing circular clip, the way a print
+develops. Without the API, or with reduced motion, it simply changes.
 
 ### Why it is CSS-only
 
@@ -309,6 +336,16 @@ flowchart TD
 
 Things to know before editing it:
 
+- **The plan is 2080 × 900 units.** The sheets take the left 1700 and a title
+  strip runs down the right edge, where a drawing carries it: north point, the
+  name at display size, an issue stamp, the revision schedule, and the sheet
+  number. The extra width is what lets the plan fill a laptop window.
+- **The plan plots itself on first load.** Each sheet boundary is ruled edge by
+  edge by a pen (four gradients grown in turn), the stock arrives under it,
+  the contents ink in, and the cross-references are plotted last. After the
+  first sheet transition of a visit this is switched off for good
+  (`html[data-vt]`): returning to the plan is a fold-back, not a replay.
+
 - **Plate rectangles are authored, not computed.** The general arrangement is a
   designed composition; a force layout would undo that.
 - **Type holds its size as the camera pulls out.** The plan is drafted in plan
@@ -373,6 +410,10 @@ metric schedule, and adjacent sheets.
 
 | Component | Purpose |
 |:----------|:--------|
+| `figures/PlateFigure` | The drafted figure for each sheet, self-plotting |
+| `figures/PipelineFigure` | Operable schematic on the AURIXA case study: choose a request, trace its path |
+| `sheet/ZoneCursor` | Lights the margin zone under the pointer |
+| `system/SheetTransition` | View-transition navigation between sheets |
 | `kit/ComparisonSlider` | Two clipped layers in permanent register; the divider is a native range input, so keyboard and screen-reader behaviour come free |
 | `kit/Callout` | Keyed margin note, numbered by CSS counter so notes renumber themselves |
 | `kit/DimensionLine` | Drafting dimension that measures itself and prints the real rendered width |
@@ -390,13 +431,22 @@ metric schedule, and adjacent sheets.
 
 ## Interaction model
 
+Navigation between sheets is one continuous move.
+[`SheetTransition.tsx`](components/system/SheetTransition.tsx) wraps every
+in-site route change in a view transition: whatever is named `sheet` before the
+change morphs into whatever is named `sheet` after it. A plate on the key plan
+grows into the page it stands for and folds back onto the plan on the way home;
+between two content sheets the outgoing one reshapes into the incoming one. The
+rail, frame and title block are named separately so they hold still. Browsers
+without the API get the camera fly and a plain route change.
+
 | Key | Action |
 |:----|:-------|
 | <kbd>/</kbd> | Open the sheet index |
 | <kbd>D</kbd> | Cycle drawing mode |
 | <kbd>L</kbd> | Toggle the inspection loupe |
 | <kbd>Esc</kbd> | Close the index, or stow the loupe |
-| <kbd>←</kbd> <kbd>→</kbd> | Move the comparison divider, nudge the lens, or walk the mode switch |
+| <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | Walk between sheets on the key plan, move the comparison divider, nudge the lens, or walk the mode switch |
 
 Shortcuts are suppressed while typing in a field, and every one of them is also
 printed as a button on the key plan's instrument tray, so the site is fully
@@ -521,6 +571,7 @@ app/
 
 components/
 ├── keyplan/              # KeyPlan
+├── figures/              # drafted figures, operable case-study figures
 ├── plate/                # PlateShell, ArticlePlate, Chronology, forms
 ├── kit/                  # sliders, controls, callouts, dimensions, schedules
 ├── sheet/                # frame, rail, title block, index, loupe, plate meta

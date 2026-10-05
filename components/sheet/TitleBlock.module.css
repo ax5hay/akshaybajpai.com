@@ -12,9 +12,13 @@
   box-shadow: var(--shadow-deep);
 }
 
+:global(html:not([data-wipe])) .block {
+  view-transition-name: titleblock;
+}
+
 .toggle {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: var(--s-3);
   width: 100%;
@@ -47,6 +51,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.gridRef {
+  min-width: 2.2em;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-align: right;
+  color: var(--ink-3);
+}
+
+.gridRef:empty {
+  display: none;
 }
 
 .chevron {
@@ -147,7 +165,8 @@
     width: auto;
   }
 
-  .block:not([data-expanded]) .title {
+  .block:not([data-expanded]) .title,
+  .block:not([data-expanded]) .gridRef {
     display: none;
   }
 }
@@ -159,7 +178,8 @@
   width: auto;
 }
 
-.block[data-compact]:not([data-expanded]) .title {
+.block[data-compact]:not([data-expanded]) .title,
+.block[data-compact]:not([data-expanded]) .gridRef {
   display: none;
 }
 

@@ -79,7 +79,7 @@ export const PLATES: Plate[] = [
     scale: '1:1',
     revision: 'C',
     refs: ['R-301', 'W-400', 'C-700'],
-    rect: { x: 0, y: 150, w: 420, h: 250 },
+    rect: { x: 0, y: 0, w: 420, h: 290 },
   },
   {
     id: 'research',
@@ -91,7 +91,7 @@ export const PLATES: Plate[] = [
     scale: '1:1',
     revision: 'B',
     refs: ['A-101', 'W-400'],
-    rect: { x: 0, y: 420, w: 420, h: 200 },
+    rect: { x: 0, y: 310, w: 420, h: 270 },
   },
   {
     id: 'architecture',
@@ -103,7 +103,7 @@ export const PLATES: Plate[] = [
     scale: '1:20',
     revision: 'C',
     refs: ['W-400', 'B-500', 'E-600'],
-    rect: { x: 0, y: 640, w: 420, h: 250 },
+    rect: { x: 0, y: 600, w: 420, h: 290 },
   },
   {
     id: 'work',
@@ -151,7 +151,7 @@ export const PLATES: Plate[] = [
     scale: 'NTS',
     revision: 'B',
     refs: ['A-101', 'W-400'],
-    rect: { x: 1240, y: 420, w: 460, h: 200 },
+    rect: { x: 1240, y: 420, w: 460, h: 225 },
   },
 ];
 
@@ -190,26 +190,29 @@ export function keyPlanPlates(): PlacedPlate[] {
 }
 
 /**
- * The plan's own coordinate space. Roughly 16:9 so it fills a landscape
- * viewport when fitted, leaving the margins a drawing sheet should have.
+ * The plan's own coordinate space. Wider than 16:9 because a browser window
+ * loses rows to its own chrome: the sheets take the left 1700 units and a
+ * title strip runs down the right edge, where a drawing carries it.
  */
-export const KEY_PLAN_WIDTH = 1700;
+export const KEY_PLAN_WIDTH = 2080;
 export const KEY_PLAN_HEIGHT = 900;
+/** Right edge of the sheets themselves, which is what the dimensions measure. */
+export const KEY_PLAN_SHEETS_WIDTH = 1700;
 
 /** Non-navigable furniture drawn alongside the plates. */
 export const KEY_PLAN_FURNITURE = {
-  headline: { x: 0, y: 0, w: 430, h: 145 },
+  /** Title strip: north point, name, issue stamp, revisions, sheet number. */
+  title: { x: 1740, y: 0, w: 340, h: 890 },
+  /* The three blocks share a datum: three header bars on one line is what
+     makes the bottom of the plan read as drawn rather than as boxes that
+     happened to land near each other. */
   notes: { x: 460, y: 665, w: 450, h: 225 },
+  legend: { x: 930, y: 665, w: 270, h: 225 },
   /**
-   * The instrument tray. It shares the bottom band with the notes so that the
-   * lens, the index and the drawing modes are printed on the first sheet a
-   * reader ever sees, rather than waiting to be found in the rail.
+   * The instrument tray, printed on the first sheet a reader ever sees so the
+   * lens, the index and the drawing modes do not wait to be found in the rail.
    */
-  instruments: { x: 930, y: 665, w: 270, h: 225 },
-  /* Shares the datum with the notes and the tray: three header bars on one
-     line is what makes the bottom of the plan read as drawn rather than as
-     three boxes that happened to land near each other. */
-  legend: { x: 1240, y: 665, w: 460, h: 225 },
+  instruments: { x: 1240, y: 665, w: 460, h: 225 },
 } as const;
 
 /**

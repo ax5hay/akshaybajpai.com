@@ -24,6 +24,7 @@ export default function AboutPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      figure={PLATE.id}
       lead={<p>Architect of systems. Builder of intelligence.</p>}
       record={[
         { k: 'name', v: 'Akshay Bajpai' },

@@ -7,6 +7,10 @@
   contain: strict;
 }
 
+:global(html:not([data-wipe])) .frame {
+  view-transition-name: frame;
+}
+
 .trimMask {
   position: absolute;
   inset: 0;
@@ -33,7 +37,38 @@
 }
 
 .zone {
+  position: relative;
   line-height: 1;
+  transition: color var(--d-1) var(--ease-plate);
+}
+
+/* The zone the pointer is in, struck on all four rulers: a short accent tick
+   under the figure, as if checked off with the markup pen. */
+.zone[data-on] {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.zone::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  translate: -50% -50%;
+  border: var(--lw-thin) solid var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  scale: 0.6;
+  transition:
+    opacity var(--d-1) var(--ease-plate),
+    scale var(--d-2) var(--ease-snap);
+}
+
+.zone[data-on]::after {
+  opacity: 0.7;
+  scale: 1;
 }
 
 .rulerTop,

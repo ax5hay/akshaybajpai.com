@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { DISCIPLINES, getPlateBySheet, type Discipline } from '@/lib/plates';
 import { SetPlateMeta } from '@/components/sheet/PlateMetaProvider';
+import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
 import styles from './PlateShell.module.css';
 
 export interface PlateFact {
@@ -27,6 +28,8 @@ export interface PlateShellProps {
   /** Extra key/value rows for the raw record. */
   record?: PlateFact[];
   wide?: boolean;
+  /** Id of the drafted figure this sheet carries, as on the key plan. */
+  figure?: string;
   children: ReactNode;
 }
 
@@ -49,6 +52,7 @@ export function PlateShell({
   source,
   record = [],
   wide = false,
+  figure,
   children,
 }: PlateShellProps) {
   const headFacts: PlateFact[] = [
@@ -112,6 +116,28 @@ export function PlateShell({
         <div className={styles.headRule} aria-hidden="true" />
       </header>
 
+      {/* The sheet's drawing: the same figure the key plan shows in miniature,
+          here at the size it was drafted for. */}
+      {figure && hasFigure(figure) && (
+        <figure
+          className={styles.figure}
+          data-annotate="Figure"
+          data-raw="figure ← props.figure"
+          data-bound
+        >
+          <div className={styles.figureField}>
+            <PlateFigure id={figure} />
+          </div>
+          <figcaption className={styles.figureCaption}>
+            <span className={styles.figureNo}>1</span>
+            <span className={styles.figureTitle}>{figureCaption(figure)}</span>
+            <span className={styles.figureScale}>
+              {sheet} · {scale}
+            </span>
+          </figcaption>
+        </figure>
+      )}
+
       <div className={styles.body} data-annotate="Body" data-raw="div.body ← props.children">
         {children}
       </div>
@@ -140,6 +166,28 @@ export function PlateShell({
           </ul>
         </nav>
       )}
+
+      {/* Title strip for the printed sheet. On screen the fixed title block
+          does this job; on paper every page needs its own. */}
+      <footer className={styles.printBlock} aria-hidden="true">
+        <span className={styles.printSet}>
+          Architecture of Intelligence
+          <span>Drawing set · Akshay Bajpai · akshaybajpai.com</span>
+        </span>
+        <span className={styles.printCell}>
+          <span>Title</span>
+          {title}
+        </span>
+        <span className={styles.printCell}>
+          <span>Rev</span>
+          {revision}
+        </span>
+        <span className={styles.printCell}>
+          <span>Issued</span>
+          {issued}
+        </span>
+        <span className={styles.printSheet}>{sheet}</span>
+      </footer>
 
       {/* Raw record: the sheet stripped to the data it was drawn from. */}
       <div className={styles.raw}>
