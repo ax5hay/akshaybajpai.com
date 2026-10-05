@@ -62,27 +62,40 @@
 
 .adjacentList {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--lw-thin);
-  background: var(--rule);
-  border: var(--lw-thin) solid var(--rule);
+  background: var(--rule-strong);
+  border: var(--lw-med) solid var(--rule-strong);
+}
+
+/* The next sheet takes the full width and the display face: it is the one
+   the reader is most likely to want, so it is the one drawn largest. */
+.adjacentList li[data-next] {
+  grid-column: 1 / -1;
 }
 
 .adjacentLink {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
   height: 100%;
-  padding: var(--s-4);
-  background: var(--paper);
-  transition: background-color var(--d-2);
+  padding: var(--s-4) var(--s-12) var(--s-4) var(--s-4);
+  background: var(--paper-raised);
+  transition:
+    background-color var(--d-2) var(--ease-plate),
+    color var(--d-2) var(--ease-plate);
 }
 
-.adjacentLink:hover {
-  background: var(--accent-soft);
+.adjacentLink:hover,
+.adjacentLink:focus-visible {
+  background: var(--ink);
 }
 
 .adjacentSheet {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
   font-family: var(--font-label), monospace;
   font-variant-numeric: tabular-nums;
   font-size: var(--t-micro);
@@ -91,9 +104,65 @@
   color: var(--accent);
 }
 
+.adjacentNext {
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
 .adjacentTitle {
   font-size: var(--t-sm);
   line-height: var(--lh-snug);
   color: var(--ink);
   text-wrap: pretty;
+  transition: color var(--d-2) var(--ease-plate);
+}
+
+li[data-next] .adjacentLink {
+  padding-block: var(--s-6);
+}
+
+li[data-next] .adjacentTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-2xl);
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+
+html[data-mode='annotated'] li[data-next] .adjacentTitle,
+html[data-mode='raw'] li[data-next] .adjacentTitle {
+  font-size: var(--t-lg);
+  text-transform: uppercase;
+}
+
+.adjacentLink:hover .adjacentTitle,
+.adjacentLink:focus-visible .adjacentTitle {
+  color: var(--paper-raised);
+}
+
+.adjacentLink:hover .adjacentNext,
+.adjacentLink:focus-visible .adjacentNext {
+  color: var(--paper-sunk);
+}
+
+.adjacentArrow {
+  position: absolute;
+  right: var(--s-4);
+  top: 50%;
+  translate: 0 -50%;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-lg);
+  color: var(--accent);
+  transition: translate var(--d-2) var(--ease-plate);
+}
+
+.adjacentLink:hover .adjacentArrow,
+.adjacentLink:focus-visible .adjacentArrow {
+  translate: 0.35rem -50%;
+}
+
+@media (max-width: 34rem) {
+  .adjacentList {
+    grid-template-columns: 1fr;
+  }
 }

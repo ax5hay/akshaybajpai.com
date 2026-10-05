@@ -24,16 +24,89 @@ export interface WorkFrontmatter extends BaseFrontmatter {
   metrics?: string[];
 }
 
+/** One `##` section of an article: where it is, what it is called, how long. */
+export interface ContentSection {
+  id: string;
+  title: string;
+  words: number;
+}
+
 export interface ContentEntry<T = BaseFrontmatter> {
   slug: string;
   frontmatter: T;
   content: string;
   html: string;
+  sections: ContentSection[];
+}
+
+/** Heading text to an anchor: lower case, words joined by hyphens. */
+function slugify(text: string): string {
+  return (
+    text
+      .toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'section'
+  );
+}
+
+/** Slugs in document order, with repeats numbered so every anchor is unique. */
+function uniqueSlugs(titles: string[]): string[] {
+  const seen = new Map<string, number>();
+  return titles.map((title) => {
+    const base = slugify(title);
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    return n ? `${base}-${n + 1}` : base;
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const headingText = (node: any): string =>
+  node.value ?? (node.children ?? []).map(headingText).join('');
+
+/**
+ * Give every `##` heading an id, so a section can be linked to, jumped to
+ * from the sheet's profile, and tracked as the reader passes it.
+ */
+function remarkSectionIds() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tree: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const headings = tree.children.filter((n: any) => n.type === 'heading' && n.depth === 2);
+    const ids = uniqueSlugs(headings.map(headingText));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    headings.forEach((node: any, i: number) => {
+      node.data = { ...node.data, hProperties: { ...node.data?.hProperties, id: ids[i] } };
+    });
+  };
+}
+
+/**
+ * The sections of an article and the words in each, read off the Markdown.
+ * Fenced code is skipped when looking for headings, so a `##` inside a code
+ * block is not mistaken for one.
+ */
+function readSections(markdown: string): ContentSection[] {
+  const found: Array<{ title: string; words: number }> = [];
+  let fenced = false;
+  for (const line of markdown.split('\n')) {
+    if (/^```/.test(line)) fenced = !fenced;
+    const heading = !fenced && line.match(/^##\s+(.+?)\s*$/);
+    if (heading) {
+      found.push({ title: heading[1].replace(/[*_`]/g, ''), words: 0 });
+    } else if (found.length) {
+      found[found.length - 1].words += line.split(/\s+/).filter(Boolean).length;
+    }
+  }
+  const ids = uniqueSlugs(found.map((s) => s.title));
+  return found.map((s, i) => ({ id: ids[i], ...s }));
 }
 
 const markdownProcessor = remark()
   .use(remarkGfm)
   .use(remarkSvgBlock)
+  .use(remarkSectionIds)
   .use(remarkRehype)
   .use(rehypeStringify);
 
@@ -47,6 +120,7 @@ async function parseMarkdownFile<T>(filePath: string, slug: string): Promise<Con
     frontmatter: data as T,
     content,
     html,
+    sections: readSections(content),
   };
 }
 

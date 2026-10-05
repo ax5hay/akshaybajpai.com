@@ -1,0 +1,258 @@
+.figure {
+  margin: var(--s-10) 0 var(--s-12);
+}
+
+.field {
+  padding: clamp(0.75rem, 3vw, 1.75rem) clamp(0.5rem, 2vw, 1.25rem) var(--s-2);
+  border: var(--lw-thin) solid var(--rule-strong);
+  background-image:
+    linear-gradient(var(--grid-minor) var(--lw-hair), transparent var(--lw-hair)),
+    linear-gradient(90deg, var(--grid-minor) var(--lw-hair), transparent var(--lw-hair));
+  background-size: 16px 16px;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.ground {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+}
+
+.hatch {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 0.6;
+}
+
+.volume {
+  cursor: pointer;
+  outline: none;
+}
+
+.hit {
+  fill: transparent;
+}
+
+.outline {
+  fill: var(--paper-raised);
+  stroke: var(--ink);
+  stroke-width: 1.4;
+  transition:
+    fill var(--d-2) var(--ease-plate),
+    stroke var(--d-2) var(--ease-plate),
+    stroke-width var(--d-2) var(--ease-plate);
+}
+
+.floors {
+  fill: none;
+  stroke: var(--ink-4);
+  stroke-width: 0.6;
+  transition: stroke var(--d-2) var(--ease-plate);
+}
+
+/* The chosen volume is poched in the accent, floors reversed out of it. */
+.volume[data-on] .outline {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.volume[data-on] .floors {
+  stroke: var(--paper-raised);
+}
+
+.volume:focus-visible .outline {
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+/* Rides to the head of whichever volume is chosen. */
+.level {
+  transition: transform var(--d-3) var(--ease-plate);
+}
+
+.level path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.level .levelMark {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.tick {
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+
+.year {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  fill: var(--ink-3);
+}
+
+/* ---- Readout --------------------------------------------------------------- */
+
+.roles {
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-top: none;
+  background: var(--paper-raised);
+}
+
+.role {
+  padding: var(--s-5);
+  border-top: var(--lw-thin) solid var(--rule-faint);
+}
+
+.role:first-child {
+  border-top: none;
+}
+
+/* With script only the chosen role is read out. Without it, and in print,
+   all six follow the elevation in order. */
+:global(html[data-js]) .role:not([data-on]) {
+  display: none;
+}
+
+:global(html[data-js]) .role[data-on] {
+  border-top: none;
+  min-height: 11.5rem;
+  animation: role-in var(--d-3) var(--ease-plate);
+}
+
+@keyframes role-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.roleYear {
+  display: block;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.roleTitle {
+  margin-top: var(--s-2);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  color: var(--ink);
+}
+
+:global(html[data-mode='annotated']) .roleTitle,
+:global(html[data-mode='raw']) .roleTitle {
+  font-size: var(--t-lg);
+  text-transform: uppercase;
+}
+
+.roleContext {
+  display: block;
+  margin-top: var(--s-1);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.roleText {
+  margin-top: var(--s-3);
+  font-size: var(--t-base);
+  line-height: var(--lh-normal);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.stepper {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-top: none;
+  background: var(--paper-sunk);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+:global(html[data-js]) .stepper {
+  display: flex;
+}
+
+.stepper button {
+  min-height: 2.75rem;
+  padding: 0 var(--s-4);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink);
+  transition: color var(--d-1), background-color var(--d-1);
+}
+
+.stepper button:hover:not(:disabled) {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.stepper button:disabled {
+  color: var(--ink-4);
+  cursor: default;
+}
+
+.caption {
+  display: flex;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+
+.captionNo {
+  flex-shrink: 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(html[data-js]) .role[data-on] {
+    animation: none;
+  }
+}
+
+@media print {
+  .stepper {
+    display: none !important;
+  }
+
+  .role {
+    display: block !important;
+  }
+}

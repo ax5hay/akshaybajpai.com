@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { PlateShell } from '@/components/plate/PlateShell';
 import { ExtractionFigure } from '@/components/plate/ExtractionFigure';
 import { ControlSchedule } from '@/components/kit/ControlSchedule';
+import { Schematic } from '@/components/figures/Schematic';
+import { SCHEMATICS } from '@/components/figures/schematics';
 import { Callout } from '@/components/kit/Callout';
 import { DimensionLine } from '@/components/kit/DimensionLine';
 import { getPlateByHref } from '@/lib/plates';
@@ -64,6 +66,11 @@ export default function ArchitecturePage() {
           forward-deployed stacks on AWS CDK (Lambda, API Gateway, RDS, Redis, secrets) are
           different packaging of the same idea: scale the concern that hurts, not the whole binary.
         </p>
+      </div>
+
+      <Schematic spec={SCHEMATICS['gateway-first-routing']} figure="Fig. 2" />
+
+      <div className="prose">
         <p>
           When throughput dominates (video ingest, restaurant demand sensing, finance onboarding),
           I reach for Kafka (or equivalent) ingestion, asynchronous inference, WebSocket fan-out

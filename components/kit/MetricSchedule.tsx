@@ -1,3 +1,4 @@
+import { CountUp } from './CountUp';
 import styles from './MetricSchedule.module.css';
 
 /**
@@ -27,7 +28,7 @@ export function MetricSchedule({ metrics }: { metrics?: string[] }) {
           return (
             <li key={metric} className={styles.row}>
               <span className={styles.no}>{String(i + 1).padStart(2, '0')}</span>
-              {value && <span className={styles.value}>{value}</span>}
+              {value && <CountUp value={value} className={styles.value} />}
               <span className={styles.label} data-full={!value || undefined}>
                 {label}
               </span>

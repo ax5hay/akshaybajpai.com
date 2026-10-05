@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PlateShell } from '@/components/plate/PlateShell';
+import { RecordSchedule } from '@/components/plate/RecordSchedule';
 import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
 
@@ -42,6 +43,57 @@ export default function ResearchPage() {
           Computer Science &amp; Engineering from Rajiv Gandhi Prodyogiki Vishwavidyalaya, Bhopal
           (2017–2021), with honours.
         </p>
+      </div>
+
+      <RecordSchedule
+        title="Schedule of record"
+        rows={[
+          {
+            when: '2024',
+            kind: 'Publication · lead author',
+            title: 'Chapter 17: machine learning approaches to medical diagnosis',
+            detail: (
+              <>
+                In <em>ML for Medical Diagnosis in Data-Centric Business and Application</em>, 3rd
+                edition. Springer, ISBN 978-3-031-60815-5.
+              </>
+            ),
+          },
+          {
+            when: '2021–2023',
+            kind: 'Degree',
+            title: 'MSc, Artificial Intelligence & Intelligent Systems',
+            detail: 'Lviv Polytechnic National University. Awarded with distinction.',
+            mark: '9.8/10',
+          },
+          {
+            when: '2021–2023',
+            kind: "Master's thesis",
+            title: (
+              <Link href="/work/alzheimers-ml-thesis-research/">
+                Alzheimer&apos;s classification on OASIS biomarkers
+              </Link>
+            ),
+            detail:
+              'Nine models benchmarked with explicit preprocessing choices and recall-weighted evaluation.',
+            mark: '9 models',
+          },
+          {
+            when: 'Undergraduate',
+            kind: 'Research study',
+            title: "Comparative study of Alzheimer's diagnosis using machine learning",
+            detail: 'Authored at IIT Gandhinagar. The methodological foundation for the thesis.',
+          },
+          {
+            when: '2017–2021',
+            kind: 'Degree',
+            title: 'B.Tech, Computer Science & Engineering',
+            detail: 'Rajiv Gandhi Prodyogiki Vishwavidyalaya, Bhopal. Awarded with honours.',
+          },
+        ]}
+      />
+
+      <div className="prose">
         <p>
           <strong>Peer-reviewed publication.</strong> I am lead author on Chapter 17, machine
           learning approaches to medical diagnosis, in{' '}

@@ -795,6 +795,73 @@ html[data-js] [data-reveal-stagger].is-revealed > * {
   vertical-align: top;
 }
 
+/* ---- Numbered sections ------------------------------------------------------
+   Inside an article the `##` headings are numbered like the parts of a
+   drawing, the number hung in the sheet's own margin. Each is also a
+   reference: pressing one copies sheet, section and link (ProseTools.tsx). */
+
+[data-sections] {
+  counter-reset: section;
+}
+
+[data-sections] .prose h2 {
+  counter-increment: section;
+  /* Lands clear of the fixed rail when jumped to. */
+  scroll-margin-top: calc(var(--sheet-margin) + var(--rail-h) + var(--s-8));
+  cursor: pointer;
+  transition: color var(--d-1);
+}
+
+[data-sections] .prose h2::after {
+  content: counter(section, decimal-leading-zero);
+  position: absolute;
+  right: 100%;
+  top: calc(var(--s-4) + 0.5em);
+  margin-right: var(--s-5);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+[data-sections] .prose h2:hover,
+[data-sections] .prose h2:focus-visible {
+  color: var(--accent);
+}
+
+@media (hover: hover) {
+  [data-sections] .prose h2:hover::after {
+    content: 'copy ref ' counter(section, decimal-leading-zero);
+  }
+}
+
+/* No margin to hang it in: the number sits at the end of the heading's rule. */
+@media (max-width: 60rem) {
+  [data-sections] .prose h2::after,
+  [data-sections] .prose h2:hover::after {
+    content: counter(section, decimal-leading-zero);
+    right: 0;
+    top: calc(var(--s-3) * -1);
+    margin: 0;
+    padding-left: var(--s-2);
+    background: var(--paper-raised);
+    translate: 0 -50%;
+  }
+}
+
+/* A link that leaves the set says so. */
+.prose a[href^='http']::after {
+  content: '↗';
+  margin-left: 0.15em;
+  font-family: var(--font-label), monospace;
+  font-size: 0.72em;
+  color: var(--accent);
+}
+
 /* Drop cap: only on paper. Blueprint and raw are technical documents. */
 html[data-mode='artifact'] .prose-lead > p:first-of-type::first-letter {
   float: left;

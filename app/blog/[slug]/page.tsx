@@ -41,6 +41,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
       discipline="B"
       date={post.frontmatter.pubDate}
       html={post.html}
+      sections={post.sections}
       source={post.content}
       readingTime={estimateReadingTime(post.content)}
       seriesHref="/blog/"

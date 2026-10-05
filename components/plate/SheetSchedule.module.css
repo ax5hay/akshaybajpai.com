@@ -4,7 +4,7 @@
 
 .columns {
   display: grid;
-  grid-template-columns: 5rem 1fr 7rem;
+  grid-template-columns: 5rem 1fr 11rem;
   gap: var(--s-4);
   padding: var(--s-2) 0;
   border-bottom: var(--lw-med) solid var(--rule-strong);
@@ -31,7 +31,7 @@
 .link {
   position: relative;
   display: grid;
-  grid-template-columns: 5rem 1fr 7rem;
+  grid-template-columns: 5rem 1fr 11rem;
   gap: var(--s-4);
   padding: var(--s-5) 0;
   transition: background-color var(--d-2) var(--ease-plate);
@@ -156,7 +156,139 @@ html[data-mode='raw'] .title {
   color: var(--ink-3);
 }
 
+/* ---- Stack key: the filter ----------------------------------------------- */
+
+.key {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: var(--s-4);
+  align-items: baseline;
+  margin-bottom: var(--s-6);
+  padding: var(--s-4) 0;
+  border-top: var(--lw-thin) solid var(--rule);
+  border-bottom: var(--lw-thin) solid var(--rule);
+}
+
+.keyLabel {
+  padding-left: var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.keyTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.keyTag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 2rem;
+  padding: 0 var(--s-3);
+  border: var(--lw-thin) solid var(--rule-strong);
+  background: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition:
+    color var(--d-1),
+    background-color var(--d-1),
+    border-color var(--d-1);
+}
+
+.keyTag:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.keyTag[aria-pressed='true'] {
+  color: var(--paper-raised);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.keyCount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+/* Struck back, not removed: the schedule keeps its length and numbering. */
+.row {
+  transition: opacity var(--d-2) var(--ease-plate);
+}
+
+.row[data-struck] {
+  opacity: 0.28;
+}
+
+.row[data-struck] .link:hover {
+  background: none;
+}
+
+.tag {
+  transition:
+    color var(--d-1),
+    border-color var(--d-1),
+    background-color var(--d-1);
+}
+
+.tag[data-on] {
+  color: var(--paper-raised);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* The lead figure for a case study, set where the eye lands at the row end. */
+.metric {
+  max-width: 11rem;
+  margin-bottom: var(--s-1);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-md);
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: right;
+  white-space: normal;
+  text-wrap: balance;
+  color: var(--accent);
+}
+
+html[data-mode='annotated'] .metric,
+html[data-mode='raw'] .metric {
+  font-size: var(--t-xs);
+}
+
 @media (max-width: 48rem) {
+  .key {
+    grid-template-columns: 1fr;
+    gap: var(--s-2);
+  }
+
+  .keyLabel {
+    padding-left: 0;
+  }
+
+  .metric {
+    max-width: none;
+    margin: 0;
+    text-align: left;
+    flex-basis: 100%;
+  }
+
+  .meta {
+    flex-wrap: wrap;
+  }
+
   .columns {
     display: none;
   }
