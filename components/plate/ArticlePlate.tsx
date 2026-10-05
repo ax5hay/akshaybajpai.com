@@ -29,7 +29,11 @@ interface Props {
   stack?: string[];
   metrics?: string[];
   adjacent?: AdjacentSheet[];
-  /** An operable figure for this sheet, set ahead of the prose. */
+  /**
+   * An operable figure for this sheet. Where the article already carries a
+   * diagram typed out as a code block, the figure is drawn in its place;
+   * otherwise it is set ahead of the prose.
+   */
   figure?: React.ReactNode;
 }
 
@@ -106,9 +110,32 @@ export function ArticlePlate({
         <MetricSchedule metrics={metrics} />
       )}
 
-      {figure}
-
-      <div className="prose prose-lead" dangerouslySetInnerHTML={{ __html: html }} />
+      {(() => {
+        // An unlabelled code block in a case study is a diagram in ASCII. The
+        // verbatim source keeps it; the sheet draws it.
+        const typed = figure ? html.match(/<pre><code>[\s\S]*?<\/code><\/pre>/) : null;
+        if (!figure || !typed || typed.index === undefined) {
+          return (
+            <>
+              {figure}
+              <div className="prose prose-lead" dangerouslySetInnerHTML={{ __html: html }} />
+            </>
+          );
+        }
+        return (
+          <>
+            <div
+              className="prose prose-lead"
+              dangerouslySetInnerHTML={{ __html: html.slice(0, typed.index) }}
+            />
+            {figure}
+            <div
+              className="prose"
+              dangerouslySetInnerHTML={{ __html: html.slice(typed.index + typed[0].length) }}
+            />
+          </>
+        );
+      })()}
 
       {adjacent.length > 0 && (
         <nav className={styles.adjacent} aria-label="Adjacent sheets">

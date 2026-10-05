@@ -52,9 +52,12 @@ export function SheetTransitionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const committed = useRef<(() => void) | null>(null);
+  /** The route currently on screen, which lags a popstate by one commit. */
+  const shown = useRef(pathname);
 
   // The new route has rendered: let the transition take its second snapshot.
   useEffect(() => {
+    shown.current = pathname;
     committed.current?.();
     committed.current = null;
   }, [pathname]);
@@ -89,6 +92,38 @@ export function SheetTransitionProvider({ children }: { children: ReactNode }) {
     },
     [router]
   );
+
+  // The back and forward buttons too. The router handles `popstate` itself and
+  // would swap the page before a transition could photograph the old one, so
+  // the event is held, a transition is opened, and the same event is replayed
+  // inside it for the router to act on. This listener is attached before the
+  // router's (a child's effects run first), which is what lets it go first.
+  useEffect(() => {
+    let replaying = false;
+
+    const onPop = (event: PopStateEvent) => {
+      if (replaying) return;
+      const from = shown.current;
+      if (from === window.location.pathname || !canTransition()) return;
+
+      event.stopImmediatePropagation();
+      previousPath = from;
+      document.documentElement.dataset.vt = '';
+      (document as TransitionDocument).startViewTransition!(
+        () =>
+          new Promise<void>((resolve) => {
+            committed.current = resolve;
+            replaying = true;
+            window.dispatchEvent(new PopStateEvent('popstate', { state: event.state }));
+            replaying = false;
+            setTimeout(resolve, 1600);
+          })
+      );
+    };
+
+    window.addEventListener('popstate', onPop, true);
+    return () => window.removeEventListener('popstate', onPop, true);
+  }, []);
 
   // Every in-site link takes the same road, without each one opting in.
   // Capture phase, so the link's own handler sees the event already handled.
