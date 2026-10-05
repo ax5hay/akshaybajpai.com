@@ -87,6 +87,11 @@
   /* The lens sits above the grain so its optic is not veiled by paper fibre. */
   --z-loupe: 150;
 
+  /* How long the cover sheet holds the board on a first load. Every entrance
+     animation waits this long, so the set is plotted as the cover comes off
+     and not behind it. Zero once the cover has played. */
+  --boot: 2850ms;
+
   /* The lens inverts whatever it covers. Markup revealed inside it is drawn
      in the colours that come out of that inversion as amber on deep blue. */
   --lens-ink: #0a3fa8;
@@ -473,8 +478,18 @@ html[data-mode='raw'] .display {
   }
 }
 
+html[data-preloaded] {
+  --boot: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --boot: 0ms;
+  }
+}
+
 .plate-enter {
-  animation: plate-settle 260ms var(--ease-plate) both;
+  animation: plate-settle 260ms var(--ease-plate) var(--boot) both;
 }
 
 /* Once sheets are changing by view transition, that is the entrance. This

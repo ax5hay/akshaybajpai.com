@@ -157,7 +157,7 @@ html[data-mode='annotated'] .title {
   background-size: 16px 16px;
   border: var(--lw-thin) solid var(--rule);
   --fw: 1.15;
-  --fig-delay: 240ms;
+  --fig-delay: calc(var(--boot) + 240ms);
 }
 
 .figureField svg {

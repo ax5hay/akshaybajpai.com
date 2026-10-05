@@ -8,12 +8,8 @@ import {
 } from '@/lib/content';
 import { adjacentSheets, detailSheetFor } from '@/lib/sheet-index';
 import { buildMetadata } from '@/lib/metadata';
-import { PipelineFigure } from '@/components/figures/PipelineFigure';
-
-/** Case studies that carry a figure the reader can operate, by slug. */
-const OPERABLE_FIGURES: Record<string, React.ReactNode> = {
-  'aurixa-conversational-ai-orchestration': <PipelineFigure />,
-};
+import { Schematic } from '@/components/figures/Schematic';
+import { SCHEMATICS } from '@/components/figures/schematics';
 
 export async function generateStaticParams() {
   const slugs = await getAllSlugs('work');
@@ -61,7 +57,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
       stack={fm.stack}
       metrics={fm.metrics}
       adjacent={adjacent}
-      figure={OPERABLE_FIGURES[slug]}
+      figure={SCHEMATICS[slug] ? <Schematic spec={SCHEMATICS[slug]} /> : undefined}
     />
   );
 }

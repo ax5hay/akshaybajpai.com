@@ -156,19 +156,38 @@
 }
 
 .exit text {
-  font-size: 8.5px;
+  font-size: 7.5px;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   fill: var(--accent);
 }
 
 /* An escalation is a filled stamp, not an outline: it is the loud exit. */
-.exit[data-escalated] rect {
+.exit[data-hot] rect {
   fill: var(--accent);
 }
 
-.exit[data-escalated] text {
+.exit[data-hot] text {
   fill: var(--paper-raised);
+}
+
+.swipe {
+  display: none;
+  padding: var(--s-2) var(--s-4);
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-top: none;
+  background: var(--paper-sunk);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+@media (max-width: 36rem) {
+  .swipe {
+    display: block;
+  }
 }
 
 .readout {

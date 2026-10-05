@@ -71,6 +71,26 @@ products stapled together. This version commits to **one metaphor, end to end**.
 
 ---
 
+## The cover sheet
+
+A first load opens on a cover: one composition, printed three times, once per
+drawing mode, with the three prints stacked in exact register. Same type, same
+size, same position, different ink: solid on paper, line work on cyanotype,
+scanlines on source. Two slanted seams cut between them, so the name reads
+straight across all three, then the seams run out in favour of the mode you are
+in and the cover lifts off the board.
+
+- **It is CSS, including its own removal**, so it cannot strand a reader whose
+  script never arrives. The seams are two registered custom properties
+  (`--s1`, `--s2`); every clip is computed from the pair, which is why the
+  prints and the hairlines on their edges cannot drift apart.
+- **It plays once per visit.** `ModeScript` sets `data-preloaded` before paint
+  on later loads. Any key or press skips it. Reduced motion never sees it.
+- **The set waits for it.** Entrance animations are offset by `--boot`, so the
+  plan is plotted as the cover comes off and not behind it.
+
+---
+
 ## The idea
 
 The site is a drawing set, and the metaphor is load-bearing rather than decorative.
@@ -411,7 +431,7 @@ metric schedule, and adjacent sheets.
 | Component | Purpose |
 |:----------|:--------|
 | `figures/PlateFigure` | The drafted figure for each sheet, self-plotting |
-| `figures/PipelineFigure` | Operable schematic on the AURIXA case study: choose a request, trace its path |
+| `figures/Schematic` | Operable schematic on every case study: choose a scenario, trace its path. The drawings are data in `figures/schematics.ts`, each taken from the study it sits in |
 | `sheet/ZoneCursor` | Lights the margin zone under the pointer |
 | `system/SheetTransition` | View-transition navigation between sheets |
 | `kit/ComparisonSlider` | Two clipped layers in permanent register; the divider is a native range input, so keyboard and screen-reader behaviour come free |
@@ -437,8 +457,10 @@ in-site route change in a view transition: whatever is named `sheet` before the
 change morphs into whatever is named `sheet` after it. A plate on the key plan
 grows into the page it stands for and folds back onto the plan on the way home;
 between two content sheets the outgoing one reshapes into the incoming one. The
-rail, frame and title block are named separately so they hold still. Browsers
-without the API get the camera fly and a plain route change.
+rail, frame and title block are named separately so they hold still. The back
+and forward buttons take the same road: the `popstate` is held, a transition is
+opened, and the event is replayed inside it for the router. Browsers without
+the API get the camera fly and a plain route change.
 
 | Key | Action |
 |:----|:-------|
@@ -507,6 +529,12 @@ metrics: ["97% accuracy", "p99 < 120ms"]
 
 `metrics` entries are split into value and label by `MetricSchedule`, so write
 them as `"97% accuracy"` rather than as a sentence.
+
+A case study can carry an operable schematic: add an entry for its slug to
+[`components/figures/schematics.ts`](components/figures/schematics.ts). If the
+Markdown has a diagram typed out as an unlabelled code block, the schematic is
+drawn in its place on the sheet (raw mode still prints the block verbatim);
+otherwise it is set ahead of the prose. Only put in it what the study says.
 
 </details>
 

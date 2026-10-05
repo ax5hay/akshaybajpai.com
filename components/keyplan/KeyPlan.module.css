@@ -340,7 +340,7 @@ html[data-mode='raw'] .legendRow[data-layer='record'] {
   padding: 0 0 0 22px;
   border-left: var(--lw-med) solid var(--rule-ink);
   animation: plan-ink 700ms var(--ease-plate) backwards;
-  animation-delay: 200ms;
+  animation-delay: calc(var(--boot) + 200ms);
 }
 
 .north {
@@ -479,7 +479,7 @@ html[data-mode='raw'] .plateTitle {
   opacity: 0.82;
   rotate: -4deg;
   animation: stamp-strike 380ms var(--ease-snap) backwards;
-  animation-delay: 1500ms;
+  animation-delay: calc(var(--boot) + 1500ms);
 }
 
 .stamp span:last-child {
@@ -582,7 +582,7 @@ html[data-mode='raw'] .stamp {
     box-shadow var(--d-2) var(--ease-plate),
     transform var(--d-2) var(--ease-plate);
   /* Issue order: each sheet starts a beat after the last. */
-  --at: calc(var(--i, 0) * 90ms + 120ms);
+  --at: calc(var(--boot) + var(--i, 0) * 90ms + 120ms);
   animation: sheet-edge 300ms var(--ease-plate) backwards;
   animation-delay: calc(var(--at) + 520ms);
 }
@@ -723,7 +723,7 @@ html[data-mode='raw'] .stamp {
 .legend,
 .instruments {
   animation: plan-ink 700ms var(--ease-plate) backwards;
-  animation-delay: 900ms;
+  animation-delay: calc(var(--boot) + 900ms);
 }
 
 /* Cross-references are plotted last, left to right across the board, once
@@ -739,7 +739,7 @@ html[data-mode='raw'] .stamp {
 
 .leaders {
   animation: plan-plot 900ms var(--ease-mech) backwards;
-  animation-delay: 1100ms;
+  animation-delay: calc(var(--boot) + 1100ms);
 }
 
 /* Sheet number tag, reversed out in the top-left as on a drawing. These are
@@ -1146,7 +1146,7 @@ html[data-mode='raw'] .stamp {
   /* Invisible at rest so reduced motion, which collapses the animation to
      nothing, leaves no ring stranded around the tray. */
   opacity: 0;
-  animation: tray-invite 2000ms var(--ease-plate) 1600ms 3 backwards;
+  animation: tray-invite 2000ms var(--ease-plate) calc(var(--boot) + 1600ms) 3 backwards;
 }
 
 .instrument {
