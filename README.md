@@ -71,6 +71,26 @@ products stapled together. This version commits to **one metaphor, end to end**.
 
 ---
 
+## The cover sheet
+
+A first load opens on a cover: one composition, printed three times, once per
+drawing mode, with the three prints stacked in exact register. Same type, same
+size, same position, different ink: solid on paper, line work on cyanotype,
+scanlines on source. Two slanted seams cut between them, so the name reads
+straight across all three, then the seams run out in favour of the mode you are
+in and the cover lifts off the board.
+
+- **It is CSS, including its own removal**, so it cannot strand a reader whose
+  script never arrives. The seams are two registered custom properties
+  (`--s1`, `--s2`); every clip is computed from the pair, which is why the
+  prints and the hairlines on their edges cannot drift apart.
+- **It plays once per visit.** `ModeScript` sets `data-preloaded` before paint
+  on later loads. Any key or press skips it. Reduced motion never sees it.
+- **The set waits for it.** Entrance animations are offset by `--boot`, so the
+  plan is plotted as the cover comes off and not behind it.
+
+---
+
 ## The idea
 
 The site is a drawing set, and the metaphor is load-bearing rather than decorative.

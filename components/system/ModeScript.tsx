@@ -11,9 +11,14 @@ import { MODE_STORAGE_KEY } from '@/lib/mode';
  * It also stamps `data-js` on the root. The scroll reveals start from
  * invisible, and they key off that flag so a reader whose script never
  * arrives still gets the whole sheet.
+ *
+ * And it decides whether the cover sheet plays: once per visit. On later
+ * loads in the same session it sets `data-preloaded`, which removes the cover
+ * and the delay the rest of the entrance was waiting behind it.
  */
 const script = `(function(){
 document.documentElement.dataset.js='';
+try{if(sessionStorage.getItem('plate.booted')){document.documentElement.dataset.preloaded=''}else{sessionStorage.setItem('plate.booted','1')}}catch(e){}
 try{
 var m=new URLSearchParams(location.search).get('mode');
 if(m!=='artifact'&&m!=='annotated'&&m!=='raw'){m=localStorage.getItem('${MODE_STORAGE_KEY}')}

@@ -1,0 +1,569 @@
+/* The cover sheet: one composition, printed in all three modes, in register.
+
+   --s1 is the paper/cyanotype seam and --s2 the cyanotype/source seam, each
+   as a position across the viewport. Registering them lets the browser
+   interpolate them, and every clip below is computed from the pair, so the
+   three prints and the two hairlines on their edges can never drift apart. */
+
+@property --s1 {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: -25%;
+}
+
+@property --s2 {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: -25%;
+}
+
+@property --issued {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.pre {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: #08080a;
+  /* How far each seam leans: its top sits this far right of its foot. */
+  --slant: 6%;
+  /* Where the seams finish: off the right edge, leaving paper everywhere.
+     The other two modes move these so the cover resolves into them. */
+  --f1: 131%;
+  --f2: 131%;
+  animation:
+    pre-seam-outer 3200ms linear both,
+    pre-seam-inner 3200ms linear both,
+    pre-lift 3200ms linear both;
+}
+
+:global(html[data-mode='annotated']) .pre {
+  --f1: -25%;
+}
+
+:global(html[data-mode='raw']) .pre {
+  --f1: -25%;
+  --f2: -25%;
+}
+
+/* Later loads in the same visit, and readers who want no motion, go straight
+   to the set. */
+:global(html[data-preloaded]) .pre {
+  display: none;
+}
+
+.pre[data-skip] {
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+@keyframes pre-seam-outer {
+  0%,
+  14% {
+    --s2: -25%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  40%,
+  66% {
+    --s2: 66.667%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  84%,
+  100% {
+    --s2: var(--f2);
+  }
+}
+
+@keyframes pre-seam-inner {
+  0%,
+  20% {
+    --s1: -25%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  46%,
+  66% {
+    --s1: 33.333%;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  84%,
+  100% {
+    --s1: var(--f1);
+  }
+}
+
+/* Lifted off the board, upward, like a cover sheet turned back. */
+@keyframes pre-lift {
+  0%,
+  86% {
+    transform: none;
+    visibility: visible;
+    animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  100% {
+    transform: translate3d(0, -101%, 0);
+    visibility: hidden;
+  }
+}
+
+/* ---- The three prints ---------------------------------------------------- */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.25rem, 5vw, 4rem);
+}
+
+/* Source: unlit, a tight grid, phosphor green. */
+.raw {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 16px 16px,
+    #08080a;
+  --p-ink: #d6d6d0;
+  --p-quiet: #85857f;
+  --p-accent: #8fe388;
+  --p-rule: rgba(255, 255, 255, 0.2);
+  --p-tag-ink: #08080a;
+}
+
+/* Cyanotype: Prussian blue, a ruled graph, the markup pen in amber. */
+.annot {
+  background:
+    linear-gradient(rgba(140, 195, 255, 0.16) 1px, transparent 1px) 50% 50% / 120px 120px,
+    linear-gradient(90deg, rgba(140, 195, 255, 0.16) 1px, transparent 1px) 50% 50% / 120px 120px,
+    linear-gradient(rgba(140, 195, 255, 0.08) 1px, transparent 1px) 50% 50% / 24px 24px,
+    linear-gradient(90deg, rgba(140, 195, 255, 0.08) 1px, transparent 1px) 50% 50% / 24px 24px,
+    radial-gradient(ellipse at 50% 45%, #0d3050, #061a2e 78%);
+  --p-ink: #e6f1fc;
+  --p-quiet: #9dbdd9;
+  --p-accent: #ffc75a;
+  --p-rule: rgba(198, 227, 255, 0.5);
+  --p-tag-ink: #082139;
+  clip-path: polygon(
+    0 0,
+    calc(var(--s2) + var(--slant)) 0,
+    calc(var(--s2) - var(--slant)) 100%,
+    0 100%
+  );
+}
+
+/* Artifact: warm stock, dense ink, one hot colour. */
+.paper {
+  background:
+    linear-gradient(rgba(20, 20, 23, 0.07) 1px, transparent 1px) 50% 50% / 120px 120px,
+    linear-gradient(90deg, rgba(20, 20, 23, 0.07) 1px, transparent 1px) 50% 50% / 120px 120px,
+    radial-gradient(ellipse at 50% 42%, #f1e9d6, #d9ccae 82%);
+  --p-ink: #141417;
+  --p-quiet: #5c5548;
+  --p-accent: #983729;
+  --p-rule: rgba(20, 20, 23, 0.55);
+  --p-tag-ink: #fcfaf4;
+  clip-path: polygon(
+    0 0,
+    calc(var(--s1) + var(--slant)) 0,
+    calc(var(--s1) - var(--slant)) 100%,
+    0 100%
+  );
+}
+
+/* ---- Seams ---------------------------------------------------------------
+   A hairline riding each cut, so the edge between two prints is a drawn line
+   and not just where one colour stops. */
+
+.seam {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.seamOuter {
+  background: #ffc75a;
+  clip-path: polygon(
+    calc(var(--s2) + var(--slant) - 1.5px) 0,
+    calc(var(--s2) + var(--slant) + 0.5px) 0,
+    calc(var(--s2) - var(--slant) + 0.5px) 100%,
+    calc(var(--s2) - var(--slant) - 1.5px) 100%
+  );
+}
+
+.seamInner {
+  background: #983729;
+  clip-path: polygon(
+    calc(var(--s1) + var(--slant) - 1.5px) 0,
+    calc(var(--s1) + var(--slant) + 0.5px) 0,
+    calc(var(--s1) - var(--slant) + 0.5px) 100%,
+    calc(var(--s1) - var(--slant) - 1.5px) 100%
+  );
+}
+
+/* ---- The composition -----------------------------------------------------
+   Identical in all three prints. Anything that would change its layout from
+   one print to the next would break the register, so the prints differ only
+   in paint, and the per-mode extras are absolutely positioned. */
+
+.comp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.9rem, 2.4vh, 1.75rem);
+  max-width: 100%;
+  text-align: center;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.625rem, 1vw, 0.75rem);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--p-quiet);
+  animation: pre-ink 500ms ease 250ms both;
+}
+
+.tag {
+  padding: 0.3em 0.6em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--p-tag-ink);
+  background: var(--p-ink);
+}
+
+.nameBox {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.6rem, 1.6vh, 1.1rem);
+}
+
+.rule {
+  width: clamp(4rem, 9vw, 8rem);
+  height: clamp(4px, 0.5vw, 7px);
+  background: var(--p-accent);
+  transform-origin: left center;
+  animation: pre-rule 520ms cubic-bezier(0.7, 0, 0.2, 1) 120ms both;
+}
+
+.name {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(3.4rem, 13.2vw, 14rem);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  color: var(--p-ink);
+  /* Plotted left to right. The negative insets keep the descender and the
+     overhang of the italic-ish J out of the clip. */
+  animation: pre-plot 720ms cubic-bezier(0.7, 0, 0.2, 1) 180ms both;
+}
+
+/* Cyanotype prints the letters as line work, the way a tracing would. */
+.annot .name {
+  color: rgba(230, 241, 252, 0.07);
+  -webkit-text-stroke: clamp(1px, 0.11vw, 1.75px) #e6f1fc;
+}
+
+/* Source prints them as scanlines: the outline, and what it is filled from. */
+.raw .name {
+  color: transparent;
+  background: repeating-linear-gradient(0deg, #8fe388 0 1px, transparent 1px 5px);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 1px rgba(143, 227, 136, 0.9);
+}
+
+.guides,
+.open,
+.close {
+  display: none;
+  position: absolute;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.5625rem, 0.8vw, 0.6875rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--p-accent);
+  pointer-events: none;
+  animation: pre-ink 500ms ease 900ms both;
+}
+
+.annot .guides {
+  display: block;
+  inset: 0;
+}
+
+/* Construction lines: cap height, x-height and baseline, run the full width
+   of the print as they would be on the board. */
+.guides span {
+  position: absolute;
+  left: -100vw;
+  right: -100vw;
+  font-size: 0;
+  border-top: 1px dashed rgba(255, 199, 90, 0.55);
+}
+
+.annot .guides [data-line='cap'] {
+  top: calc(100% - clamp(3.4rem, 13.2vw, 14rem) * 0.86);
+}
+
+.annot .guides [data-line='x'] {
+  top: calc(100% - clamp(3.4rem, 13.2vw, 14rem) * 0.645);
+}
+
+.annot .guides [data-line='base'] {
+  top: calc(100% - clamp(3.4rem, 13.2vw, 14rem) * 0.14);
+}
+
+.raw .open,
+.raw .close {
+  display: block;
+  text-transform: none;
+  letter-spacing: 0.06em;
+}
+
+.open {
+  left: 0;
+  bottom: calc(clamp(3.4rem, 13.2vw, 14rem) * 0.9 + 0.2em);
+}
+
+.close {
+  right: 0;
+  top: 100%;
+}
+
+.dim {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  color: var(--p-accent);
+  transform-origin: center;
+  animation: pre-dim 700ms cubic-bezier(0.7, 0, 0.2, 1) 520ms both;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: var(--p-rule);
+}
+
+.tick {
+  width: 1.5px;
+  height: 0.8rem;
+  background: var(--p-rule);
+  transform: skewX(-30deg);
+}
+
+.role {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.5625rem, 0.95vw, 0.75rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sub {
+  margin: 0;
+  max-width: 34em;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(0.875rem, 1.25vw, 1.0625rem);
+  line-height: 1.5;
+  color: var(--p-quiet);
+  text-wrap: balance;
+  animation: pre-ink 600ms ease 820ms both;
+}
+
+.count {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(0.5625rem, 0.8vw, 0.6875rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--p-quiet);
+  animation:
+    pre-ink 500ms ease 900ms both,
+    pre-issue 1900ms cubic-bezier(0.3, 0, 0.2, 1) 700ms both;
+}
+
+.countNo {
+  color: var(--p-accent);
+  font-weight: 600;
+}
+
+.countNo::after {
+  counter-reset: issued var(--issued);
+  content: counter(issued, decimal-leading-zero);
+}
+
+@keyframes pre-issue {
+  from {
+    --issued: 0;
+  }
+  to {
+    --issued: var(--total);
+  }
+}
+
+@keyframes pre-plot {
+  from {
+    clip-path: inset(-12% 100% -18% -4%);
+  }
+  to {
+    clip-path: inset(-12% -4% -18% -4%);
+  }
+}
+
+@keyframes pre-rule {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes pre-dim {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+@keyframes pre-ink {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---- Band labels: each print signs itself while all three are showing. ---- */
+
+.band {
+  position: absolute;
+  bottom: clamp(1.25rem, 5vh, 3rem);
+  translate: -50% 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.5625rem, 0.8vw, 0.6875rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: pre-band 3200ms linear both;
+}
+
+.band b {
+  margin-right: 0.6em;
+  font-weight: 600;
+}
+
+.band[data-band='a'] {
+  left: 15%;
+  color: #5c5548;
+}
+
+.band[data-band='a'] b {
+  color: #983729;
+}
+
+.band[data-band='b'] {
+  left: 48.5%;
+  color: #9dbdd9;
+}
+
+.band[data-band='b'] b {
+  color: #ffc75a;
+}
+
+.band[data-band='c'] {
+  left: 82%;
+  color: #85857f;
+}
+
+.band[data-band='c'] b {
+  color: #8fe388;
+}
+
+@keyframes pre-band {
+  0%,
+  44% {
+    opacity: 0;
+  }
+  50%,
+  62% {
+    opacity: 1;
+  }
+  68%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* A phone has no width to set the name on one line, and three slanted bands
+   over a two-line name still register: the layout is the same in each. */
+@media (max-width: 40rem) {
+  .pre {
+    --slant: 12%;
+  }
+
+  .name {
+    font-size: clamp(3.4rem, 21vw, 6rem);
+    white-space: normal;
+  }
+
+  .guides,
+  .raw .open,
+  .raw .close {
+    display: none !important;
+  }
+
+  .role {
+    white-space: normal;
+    letter-spacing: 0.14em;
+  }
+
+  /* With the role on two lines there is no run left for a dimension line. */
+  .line,
+  .tick {
+    display: none;
+  }
+
+  .kicker {
+    flex-wrap: wrap;
+    justify-content: center;
+    letter-spacing: 0.16em;
+  }
+
+  /* The steeper slant moves the foot of each band left. */
+  .band[data-band='a'] {
+    left: 10.5%;
+  }
+
+  .band[data-band='b'] {
+    left: 37.5%;
+  }
+
+  .band[data-band='c'] {
+    left: 77%;
+  }
+
+  .band b {
+    display: block;
+    margin: 0 0 0.3em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pre {
+    display: none;
+  }
+}
+
+@media print {
+  .pre {
+    display: none;
+  }
+}
