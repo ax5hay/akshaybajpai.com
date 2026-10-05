@@ -156,6 +156,41 @@ html[data-mode='raw'] .title {
   color: var(--ink-3);
 }
 
+/* The article's section profile at thumbnail size: the same strip the sheet
+   itself opens with, so the index shows the shape of what is behind it. */
+.profile {
+  display: flex;
+  width: 100%;
+  height: 0.5rem;
+  margin-top: var(--s-2);
+  border: var(--lw-thin) solid var(--ink-3);
+}
+
+.profile span {
+  flex-basis: 0;
+  border-left: var(--lw-thin) solid var(--ink-3);
+  transition: background-color var(--d-2) var(--ease-plate);
+}
+
+.profile span:first-child {
+  border-left: none;
+}
+
+/* On hover the strip is inked in, left to right, as if being read. */
+.link:hover .profile span,
+.link:focus-visible .profile span {
+  background: var(--accent);
+  transition-delay: calc(var(--n, 0) * 45ms);
+}
+
+.profile span:nth-child(2) { --n: 1; }
+.profile span:nth-child(3) { --n: 2; }
+.profile span:nth-child(4) { --n: 3; }
+.profile span:nth-child(5) { --n: 4; }
+.profile span:nth-child(6) { --n: 5; }
+.profile span:nth-child(7) { --n: 6; }
+.profile span:nth-child(n + 8) { --n: 7; }
+
 /* ---- Stack key: the filter ----------------------------------------------- */
 
 .key {
@@ -287,6 +322,11 @@ html[data-mode='raw'] .metric {
 
   .meta {
     flex-wrap: wrap;
+  }
+
+  .profile {
+    flex-basis: 100%;
+    margin-top: 0;
   }
 
   .columns {

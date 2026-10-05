@@ -48,6 +48,20 @@ export function PlateMetaProvider({ children }: { children: ReactNode }) {
 
   const [override, setOverrideState] = useState<{ path: string; meta: PlateMeta } | null>(null);
 
+  // The unissued sheet is exported once and served for any unknown address.
+  // It was rendered knowing nothing of that address, so until the reader
+  // navigates away the address must not be used to guess a sheet either, or
+  // the first client render disagrees with the HTML and React throws the
+  // whole tree away. not-found.tsx marks the document before hydration.
+  const unissued = useRef(
+    typeof document !== 'undefined' && 'unissued' in document.documentElement.dataset
+  );
+  const landedOn = useRef(pathname);
+  if (unissued.current && landedOn.current !== pathname) {
+    unissued.current = false;
+    delete document.documentElement.dataset.unissued;
+  }
+
   // The override is tagged with the route that set it. Clearing it from an
   // effect here instead would lose every detail sheet's number: child effects
   // run first, so the incoming plate would set its override and this provider
@@ -58,7 +72,7 @@ export function PlateMetaProvider({ children }: { children: ReactNode }) {
 
   const meta = useMemo<PlateMeta>(() => {
     if (override && override.path === pathname) return override.meta;
-    const plate = plateForPath(pathname);
+    const plate = unissued.current ? undefined : plateForPath(pathname);
     if (!plate) return FALLBACK;
     return {
       sheet: plate.sheet,

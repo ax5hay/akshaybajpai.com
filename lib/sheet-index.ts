@@ -87,3 +87,51 @@ export async function adjacentSheets(
     };
   });
 }
+
+export interface SheetRef {
+  sheet: string;
+  title: string;
+  href: string;
+}
+
+/**
+ * Cross-references for one sheet, read off the Markdown: the sheets its text
+ * links to, and the sheets whose text links to it. Nothing is inferred; a
+ * sheet with no links in either direction has no cross-references.
+ */
+export async function crossReferences(href: string): Promise<{ out: SheetRef[]; in: SheetRef[] }> {
+  const [index, work, blog, essays] = await Promise.all([
+    buildSheetIndex(),
+    getCollection('work'),
+    getCollection('blog'),
+    getCollection('essays'),
+  ]);
+  const byHref = new Map(index.map((e) => [e.href, e]));
+  const ref = (h: string): SheetRef | null => {
+    const entry = byHref.get(h);
+    return entry ? { sheet: entry.sheet, title: entry.title, href: entry.href } : null;
+  };
+  const linksIn = (markdown: string) =>
+    [...markdown.matchAll(/\]\((\/[^)#\s]*)/g)].map((m) => (m[1].endsWith('/') ? m[1] : `${m[1]}/`));
+
+  const sources = [
+    ...work.map((e) => ({ href: `/work/${e.slug}/`, content: e.content })),
+    ...blog.map((e) => ({ href: `/blog/${e.slug}/`, content: e.content })),
+    ...essays.map((e) => ({ href: `/essays/${e.slug}/`, content: e.content })),
+  ];
+
+  const unique = (refs: Array<SheetRef | null>) => {
+    const seen = new Set<string>();
+    return refs.filter((r): r is SheetRef => {
+      if (!r || r.href === href || seen.has(r.href)) return false;
+      seen.add(r.href);
+      return true;
+    });
+  };
+
+  const self = sources.find((s) => s.href === href);
+  return {
+    out: unique(self ? linksIn(self.content).map(ref) : []),
+    in: unique(sources.filter((s) => linksIn(s.content).includes(href)).map((s) => ref(s.href))),
+  };
+}

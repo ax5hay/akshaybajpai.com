@@ -6,7 +6,7 @@ import {
   estimateReadingTime,
   type WorkFrontmatter,
 } from '@/lib/content';
-import { adjacentSheets, detailSheetFor } from '@/lib/sheet-index';
+import { adjacentSheets, crossReferences, detailSheetFor } from '@/lib/sheet-index';
 import { buildMetadata } from '@/lib/metadata';
 import { Schematic } from '@/components/figures/Schematic';
 import { SCHEMATICS } from '@/components/figures/schematics';
@@ -36,9 +36,10 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
   if (!study) notFound();
 
   const fm = study.frontmatter;
-  const [sheet, adjacent] = await Promise.all([
+  const [sheet, adjacent, xrefs] = await Promise.all([
     detailSheetFor('work', slug),
     adjacentSheets('work', slug, 3),
+    crossReferences(`/work/${slug}/`),
   ]);
 
   return (
@@ -58,6 +59,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
       stack={fm.stack}
       metrics={fm.metrics}
       adjacent={adjacent}
+      xrefs={xrefs}
       figure={SCHEMATICS[slug] ? <Schematic spec={SCHEMATICS[slug]} /> : undefined}
     />
   );

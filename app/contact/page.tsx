@@ -1,5 +1,6 @@
 import { PlateShell } from '@/components/plate/PlateShell';
 import { CorrespondenceForm } from '@/components/plate/CorrespondenceForm';
+import { CopyValue } from '@/components/kit/CopyValue';
 import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
 import { SOCIAL } from '@/lib/constants';
@@ -54,6 +55,10 @@ export default function ContactPage() {
               >
                 {channel.value}
               </a>
+              <CopyValue
+                value={channel.href.replace(/^mailto:/, '')}
+                className={styles.copy}
+              />
             </dd>
           </div>
         ))}

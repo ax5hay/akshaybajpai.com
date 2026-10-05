@@ -41,6 +41,88 @@
   color: var(--ink-3);
 }
 
+/* ---- Cross-references in the text ---------------------------------------- */
+
+.xrefs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--s-6) var(--s-8);
+  margin-top: var(--s-16);
+  padding-top: var(--s-5);
+  border-top: var(--lw-thin) solid var(--rule);
+}
+
+.xrefList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.xref {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.xrefBubble {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  place-items: center;
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: var(--lw-thin) solid var(--ink-2);
+  border-radius: 50%;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+  transition:
+    background-color var(--d-2) var(--ease-plate),
+    border-color var(--d-2) var(--ease-plate),
+    color var(--d-2) var(--ease-plate);
+}
+
+.xrefBubble span:first-child {
+  align-self: end;
+  width: 100%;
+  padding-bottom: 2px;
+  text-align: center;
+  border-bottom: var(--lw-thin) solid currentColor;
+}
+
+.xrefBubble span:last-child {
+  align-self: start;
+  padding-top: 2px;
+  color: var(--accent);
+}
+
+.xrefTitle {
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+  text-wrap: pretty;
+  transition: color var(--d-1);
+}
+
+.xref:hover .xrefBubble,
+.xref:focus-visible .xrefBubble {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper-raised);
+}
+
+.xref:hover .xrefBubble span:last-child,
+.xref:focus-visible .xrefBubble span:last-child {
+  color: var(--paper-raised);
+}
+
+.xref:hover .xrefTitle {
+  color: var(--accent);
+}
+
 /* ---- Adjacent sheets --------------------------------------------------- */
 
 .adjacent {

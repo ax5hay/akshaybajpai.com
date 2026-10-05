@@ -541,6 +541,10 @@ The frame is the same on every route. What is drawn inside it is not.
 | **`R-301` Research** | A ruled **schedule of record** for degrees, the publication and the studies |
 | **`S-201` Structural Principles** | A second operable schematic, of the gateway-first routing tiers the page describes |
 | **`W-400` Works** | A **stack key** above the schedule. Choosing a tag strikes the other sheets back without removing them, so the schedule keeps its length and numbering. Each row carries its lead figure |
+| **Index sheets** (`W-400`, `B-500`, `E-600`) | Every row carries its article's **section profile at thumbnail size**, inked in left to right on hover |
+| **Articles that cite each other** | **Cross-references in the text**: the sheets this one links to and the sheets that link here, each named by a split-circle bubble. Read off the Markdown links at build time; a sheet with none shows none |
+| **`C-700` Correspondence** | The form is a **transmittal**: dated, with tick-box subjects, a live word count, and a stamp when it has gone. Each channel has a copy control |
+| **`X-999` Sheet Not Issued** | Prints the reference that was followed, struck through, and offers the **nearest issued sheets** by shared words in the address |
 | **Every sheet** | A reading line along the foot of the rail, driven by a CSS scroll timeline |
 
 The section widths, counts and reading times come from the Markdown at build time
@@ -627,6 +631,8 @@ flowchart LR
 | `plate/CareerElevation` | The career as an operable elevation |
 | `plate/RecordSchedule` | Ruled schedule of degrees, publications and studies |
 | `kit/CountUp` | A measured figure that counts up to itself |
+| `kit/CopyValue` | Copy control for a printed value |
+| `plate/NearestSheets` | Suggestions on the unissued sheet |
 | `sheet/SheetFrame` | Drawing border, zone rulers, trim |
 | `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
 | `sheet/TitleBlock` | Bottom-right title block, grid reference, copy and print |

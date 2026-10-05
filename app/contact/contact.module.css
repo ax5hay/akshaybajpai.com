@@ -47,3 +47,37 @@
   color: var(--accent);
   background-size: 100% var(--lw-thin);
 }
+
+.channel dd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.copy {
+  flex-shrink: 0;
+  padding: 2px var(--s-2);
+  border: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  transition:
+    color var(--d-1),
+    border-color var(--d-1),
+    background-color var(--d-1);
+}
+
+.copy:hover,
+.copy:focus-visible {
+  color: var(--paper-raised);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.channel {
+  background: var(--paper-raised);
+}
