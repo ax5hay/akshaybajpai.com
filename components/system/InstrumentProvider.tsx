@@ -111,8 +111,22 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
     }
     if (invited) return;
 
-    setInviting(true);
-    const timer = setTimeout(() => {
+    // Not while the cover sheet is still up: wait for it to report the set
+    // issued, then give the reader a moment with the plan first.
+    const root = document.documentElement;
+    const covered = () => 'cover' in root.dataset && !('issued' in root.dataset);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const watch = new MutationObserver(() => {
+      if (covered()) return;
+      watch.disconnect();
+      begin();
+    });
+
+    const begin = () => {
+      setInviting(true);
+      timer = setTimeout(announce, 2200);
+    };
+    const announce = () => {
       toast({
         kind: 'This set is instrumented',
         message: 'Open the lens to x-ray any sheet, or switch the drawing mode to see the markup.',
@@ -125,9 +139,15 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
       } catch {
         /* nothing to persist to */
       }
-    }, 2200);
+    };
 
-    return () => clearTimeout(timer);
+    if (covered()) watch.observe(root, { attributes: true });
+    else begin();
+
+    return () => {
+      watch.disconnect();
+      if (timer) clearTimeout(timer);
+    };
   }, [toast]);
 
   const value = useMemo<Instruments>(

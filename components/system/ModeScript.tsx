@@ -12,13 +12,18 @@ import { MODE_STORAGE_KEY } from '@/lib/mode';
  * invisible, and they key off that flag so a reader whose script never
  * arrives still gets the whole sheet.
  *
- * And it decides whether the cover sheet plays: once per visit. On later
- * loads in the same session it sets `data-preloaded`, which removes the cover
- * and the delay the rest of the entrance was waiting behind it.
+ * And it decides whether the cover sheet plays: once per visit, and never
+ * for a reader who asks for reduced motion. When it will play, `data-cover`
+ * holds the set's own entrance animations until the cover reports the set
+ * issued; the timer here releases them regardless, so a cover that never
+ * hydrates cannot leave the page waiting behind it.
  */
 const script = `(function(){
 document.documentElement.dataset.js='';
-try{if(sessionStorage.getItem('plate.booted')){document.documentElement.dataset.preloaded=''}else{sessionStorage.setItem('plate.booted','1')}}catch(e){}
+try{
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||sessionStorage.getItem('plate.booted')){document.documentElement.dataset.preloaded=''}
+else{sessionStorage.setItem('plate.booted','1');document.documentElement.dataset.cover='';setTimeout(function(){document.documentElement.dataset.issued=''},15000)}
+}catch(e){document.documentElement.dataset.preloaded=''}
 try{
 var m=new URLSearchParams(location.search).get('mode');
 if(m!=='artifact'&&m!=='annotated'&&m!=='raw'){m=localStorage.getItem('${MODE_STORAGE_KEY}')}
