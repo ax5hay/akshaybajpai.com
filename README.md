@@ -1,330 +1,491 @@
 <div align="center">
 
+<a href="https://www.akshaybajpai.com">
+  <img src="docs/media/cover.jpg" alt="The cover sheet: the name Akshay Bajpai printed across three bands, paper, cyanotype and source, in exact register" width="100%" />
+</a>
+
+<br/><br/>
+
 # The Architecture of Intelligence
 
-**A personal site issued as a drawing set.**
+**A personal site, issued as a drawing set.**
 
-Every route is a numbered sheet. The homepage is the key plan those sheets sit on.<br/>
-It is an instrument, not a brochure: re-issue the whole set in three states,<br/>
-or put an x-ray lens over any part of it and read what it is made of.
+Every route is a numbered sheet. The homepage is the key plan they sit on.<br/>
+The whole set re-issues in three states, and a lens shows what any part of it is made of.
 
 <br/>
 
-[![Live site](https://img.shields.io/badge/live-www.akshaybajpai.com-1a1a1e?style=for-the-badge&labelColor=ece6d9&color=8c2f24)](https://www.akshaybajpai.com)
+[![Open the live site](https://img.shields.io/badge/open_the_set-www.akshaybajpai.com-141417?style=for-the-badge&labelColor=ded2b8&color=983729)](https://www.akshaybajpai.com)
+
 [![Deploy](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml/badge.svg)](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml)
-
-![Next.js](https://img.shields.io/badge/Next.js_15-000?style=flat-square&logo=next.js)
-![React](https://img.shields.io/badge/React_19-20232a?style=flat-square&logo=react)
+![Next.js 15](https://img.shields.io/badge/Next.js_15-141417?style=flat-square&logo=next.js)
+![React 19](https://img.shields.io/badge/React_19-20232a?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript_5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Static export](https://img.shields.io/badge/static_export-37_pages-4a4a52?style=flat-square)
+![Static export](https://img.shields.io/badge/static_export-32_sheets-5c5548?style=flat-square)
 ![Shared JS](https://img.shields.io/badge/shared_JS-103_kB-2d6a4f?style=flat-square)
-![Runtime deps](https://img.shields.io/badge/3D_%2F_animation_libs-none-8c2f24?style=flat-square)
-
-<br/>
+![Animation and 3D libraries](https://img.shields.io/badge/animation_%2F_3D_libs-none-983729?style=flat-square)
+![Hosting](https://img.shields.io/badge/hosting-GitHub_Pages,_free-141417?style=flat-square&logo=github)
 
 **Open a mode directly ·**
-[Artifact](https://www.akshaybajpai.com/architecture/?mode=artifact) ·
-[Annotated](https://www.akshaybajpai.com/architecture/?mode=annotated) ·
-[Raw](https://www.akshaybajpai.com/architecture/?mode=raw)
-
-<br/>
-
-![The key plan, G-000](docs/media/key.png)
-
-<sub><b>G-000 · Key plan.</b> The homepage is a pannable, zoomable general arrangement. Every sheet is<br/>
-drawn in place, joined by leaders with split-circle cross-reference bubbles. Hovering a sheet lights<br/>
-the ones it references and sends the rest back, so the plan reads out its own wiring.</sub>
+[Artifact](https://www.akshaybajpai.com/?mode=artifact) ·
+[Annotated](https://www.akshaybajpai.com/?mode=annotated) ·
+[Raw](https://www.akshaybajpai.com/?mode=raw)
 
 </div>
 
----
+<br/>
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│  ARCHITECTURE OF INTELLIGENCE              SHEET   G-000   REV    D  │
-│  Drawing set · Akshay Bajpai               SCALE   1:50    ISSUED    │
-│  Next.js 15 · static export · GitHub Pages                 2026.09   │
-└──────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│  ARCHITECTURE OF INTELLIGENCE                  SHEET   G-000    REV    D   │
+│  Drawing set · Akshay Bajpai                   SCALE   1:50     ISSUED     │
+│  Next.js 15 · static export · GitHub Pages                      2026.09    │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
-The previous version of this site had a Three.js neural map on the homepage and
-conventional pages everywhere else, joined by an iframe overlay. It read as two
-products stapled together. This version commits to **one metaphor, end to end**.
-
----
+> **Best viewed on desktop.** The set is drawn for a wide screen: the pannable plan, the
+> lens and the sheet transitions open up there. It holds on a phone as a stacked index.
 
 ## Drawing index
 
 | Sheet | Section | What it covers |
 |:------|:--------|:---------------|
-| [`G-001`](#the-idea) | **The idea** | Why a drawing set, and what that buys |
-| [`G-002`](#the-instruments) | **The instruments** | The lens, the index, the mode switch |
-| [`G-003`](#drawing-modes) | **Drawing modes** | The three states and why they are CSS-only |
-| [`G-004`](#sheet-registry) | **Sheet registry** | Numbering, disciplines, routes |
-| [`S-001`](#key-plan) | **Key plan** | Camera, level of detail, leader geometry |
-| [`S-002`](#how-a-plate-is-composed) | **Plate composition** | `PlateShell` and the component kit |
-| [`S-003`](#interaction-model) | **Interaction** | Keyboard, motion, accessibility |
-| [`W-001`](#content-pipeline) | **Content pipeline** | Markdown in, static sheets out |
-| [`W-002`](#quick-start) | **Quick start** | Run it locally |
-| [`W-003`](#project-structure) | **Project structure** | Where everything lives |
-| [`C-001`](#deployment) | **Deployment** | Build, CI, and the live domain |
+| [`G-001`](#g-001--the-idea) | **The idea** | Why a drawing set, and what the metaphor buys |
+| [`G-002`](#g-002--a-tour-in-pictures) | **A tour in pictures** | The whole site in nine frames |
+| [`G-003`](#g-003--the-cover-sheet) | **The cover sheet** | The preloader that actually preloads |
+| [`A-101`](#a-101--the-key-plan) | **The key plan** | Camera, level of detail, the plot, the title strip |
+| [`A-102`](#a-102--three-drawing-modes) | **Three drawing modes** | Artifact, annotated, raw, and why they are CSS |
+| [`A-103`](#a-103--the-figures) | **The figures** | Hand-drafted SVG, and operable schematics |
+| [`A-104`](#a-104--the-instruments) | **The instruments** | Lens, index, zone cursor, issue as PDF |
+| [`A-105`](#a-105--moving-between-sheets) | **Moving between sheets** | View transitions, keyboard, reduced motion |
+| [`S-201`](#s-201--how-it-is-built) | **How it is built** | Architecture, sheet registry, component kit |
+| [`S-202`](#s-202--content-pipeline) | **Content pipeline** | Markdown in, numbered sheets out |
+| [`W-401`](#w-401--run-it-locally) | **Run it locally** | Quick start and scripts |
+| [`W-402`](#w-402--project-structure) | **Project structure** | Where everything lives |
+| [`C-701`](#c-701--deployment) | **Deployment** | GitHub Pages, for free. Full runbook in [DEPLOYMENT.md](DEPLOYMENT.md) |
+| [`C-702`](#c-702--measured) | **Measured** | Weight, frame rate, accessibility |
 
 ---
 
-## The cover sheet
+## G-001 · The idea
 
-A first load opens on a cover, and the cover does the loading.
-
-**What it shows.** One composition, printed three times, once per drawing mode,
-with the three prints stacked in exact register: same type, same size, same
-position, different ink. Solid on paper, line work on cyanotype, scanlines on
-source. The source print comes first; the cyanotype is exposed across it; the
-paper is laid across that; then two slanted seams draw back and all three stand
-side by side with the name running straight through them.
-
-**What it does.** While that plays it issues the set: waits for the typefaces,
-fetches the inspection lens, and prefetches every other sheet into the router's
-cache. The counter, the meter and the line naming the sheet in hand are that
-work, not a timer (a prefetch has no promise, so each payload is watched for as
-a resource entry). When it is done the cover is stamped, the seams run out in
-favour of the mode you are in, and it lifts. Every sheet then opens instantly.
-
-- **It cannot hold the page.** It leaves after ten seconds whatever the network
-  is doing, any key or press skips it, and a metered or slow connection only
-  fetches the seven section sheets.
-- **It plays once per visit**, and never under reduced motion. `ModeScript`
-  decides before paint.
-- **The set waits for it without guessing.** `html[data-cover]` pauses the
-  set's entrance animations at their first frame until the cover reports
-  `data-issued`, so the plan is plotted as the cover comes off however long
-  the fetching took. An inline timer releases them regardless.
-- **Without script** the stylesheet runs the same three acts on a fixed clock
-  and removes the cover itself.
-
----
-
-## The idea
-
-The site is a drawing set, and the metaphor is load-bearing rather than decorative.
-
-<table>
-<tr><td width="33%">
-
-### Sheets, not pages
-
-Every route carries a number, a discipline, a scale, and a revision: `A-101 The
-Architect`, `S-201 Structural Principles`, `W-402 AIDA`. The numbers *are* the
-navigation.
-
-</td><td width="33%">
-
-### A key plan, not a landing page
-
-The homepage is `G-000`, a general arrangement showing where every sheet sits.
-Clicking one flies the camera to it before the route changes, so the zoom is
-continuous rather than a cut.
-
-</td><td width="33%">
-
-### Chrome that never leaves
-
-The drawing frame, zone rulers, trim marks, rail, and title block persist across
-navigation. Changing route reads as a new sheet laid on the same board.
-
-</td></tr>
-</table>
-
-Cross-references are real links, and the title block always reports the sheet you
-are actually on, including detail sheets, which carry their own number rather
-than their section's.
-
-### Drawings, not just sheets
-
-Every general-arrangement sheet carries a figure, drafted by hand as SVG in
-[`components/figures/PlateFigure.tsx`](components/figures/PlateFigure.tsx): a
-section through a governed platform, an exploded axonometric, an elevation
-along the career datum, a benchmark plot, a lever, a survey traverse, a
-transmittal. The key plan shows each one in miniature and the sheet itself
-shows it at full size.
-
-They are drawn in four line weights (heavy for what a section cuts, medium for
-outlines, thin for detail, hair for hatching), and they plot themselves: every
-stroke carries `pathLength={1}`, so one CSS rule can run a pen along all of
-them in the order a draughtsman would put the lines down.
-
----
-
-## The instruments
-
-A set that can be operated is worth nothing if nobody works out that it can be.
-So the tools are **printed on the first sheet you land on**, named, with their
-keys, as a block of plan furniture beside the general notes. Nothing here has to
-be discovered by clicking around and getting lucky.
+The previous version of this site had a Three.js neural map on the homepage and conventional
+pages everywhere else, joined by an iframe overlay. It read as two products stapled together.
+This version commits to **one metaphor, end to end**, and the metaphor is load-bearing.
 
 <table>
 <tr>
-<td width="46%" valign="top">
+<td width="33%" valign="top">
 
-![The instrument tray on the key plan](docs/media/tray.png)
+### Sheets, not pages
+
+Every route carries a number, a discipline, a scale and a revision: `A-101 The Architect`,
+`S-201 Structural Principles`, `W-405 AURIXA`. The numbers *are* the navigation.
 
 </td>
-<td width="54%" valign="top">
+<td width="33%" valign="top">
 
-**Drawn, not hidden.** The tray is a real part of the drawing, in the same
-reversed-header style as the legend and the general notes. Each row is a button
-that does the thing it describes, and each prints the keyboard shortcut for it.
+### A key plan, not a landing page
 
-On a first visit the tray pulses three times and a toast says what the set can
-do. Both are `localStorage`-gated and never appear again, and both stop the
-moment anything is operated.
+The homepage is `G-000`, a general arrangement showing where every sheet sits. Click one
+and that sheet grows into the page it stands for.
 
-On narrow screens the tray sits directly under the name, and the printed key
-caps are dropped on devices with no keyboard to press them on.
+</td>
+<td width="33%" valign="top">
+
+### Chrome that never leaves
+
+The drawing frame, zone rulers, rail and title block persist across navigation. A route
+change reads as a new sheet laid on the same board.
 
 </td>
 </tr>
 </table>
 
-### The inspection lens
+It is an instrument, not a brochure. There is **no animation library, no state library and
+no 3D runtime** in it: the rebuild removed `three`, `gsap` and `lenis`, and everything you
+see move is CSS, SVG and the View Transitions API.
 
-![The lens over S-201](docs/media/lens.png)
+---
 
-<sub><b>The lens is an x-ray, not a magnifier.</b> It outlines, names, and measures every element it
-covers, and the readout under the barrel prints the containment chain at the crosshair.</sub>
+## G-002 · A tour in pictures
 
-It looks through to the blueprint. Inside the barrel the sheet is a cyanotype,
-and the annotation layer (dimensions, the revision cloud, margin notes) is
-written in wherever the lens passes, in every mode. The markup is already in
-the page; `Loupe.tsx` keeps a clip circle on each `[data-lens-layer]` in that
-layer's own coordinates, and the pen is loaded with the colour that inverts to
-amber.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-Optically it is a `backdrop-filter: invert()` under a wash of Prussian blue, so
-the page underneath is recomposited rather than re-rendered. The technical layer is drawn once across
-the whole viewport and revealed through a moving `clip-path` circle, which makes
-a drag cost one style write instead of a re-measure of the page.
+<img src="docs/media/key-plan.jpg" alt="The key plan in artifact mode" />
 
-It only names what is actually on the sheet: elements that are faded out or
-clipped away are skipped, and where nested boxes would print their names on top
-of each other the innermost one wins and the rest are left to the readout.
+**The key plan.** Seven sheets on a board, each with a drafted figure, joined by
+cross-reference leaders. Pan it, zoom it, or walk it with the arrow keys.
+
+</td>
+<td width="50%" valign="top">
+
+<img src="docs/media/key-plan-hover.jpg" alt="Hovering a sheet lights the sheets it references" />
+
+**It reads out its own wiring.** Hover a sheet and the ones it references stay lit while
+the rest fall back.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+<img src="docs/media/key-plan-annotated.jpg" alt="The key plan in annotated mode: cyanotype with amber markup" />
+
+**Annotated.** Cyanotype, with the markup pen on: chain dimensions, a revision cloud, and
+a placement note on every sheet.
+
+</td>
+<td valign="top">
+
+<img src="docs/media/key-plan-raw.jpg" alt="The key plan in raw mode: each sheet shows the record it was drawn from" />
+
+**Raw.** Presentation stripped. Each sheet prints the record it was drawn from.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+<img src="docs/media/sheet.jpg" alt="A content sheet: Structural Principles, with its figure" />
+
+**A sheet.** White stock on the board, with its figure at full size and the same title
+block that was on the plan.
+
+</td>
+<td valign="top">
+
+<img src="docs/media/lens.jpg" alt="The inspection lens over a sheet, showing a cyanotype view with a margin note" />
+
+**The lens.** Looks through to the blueprint: the annotation layer appears only where you
+hold it, in every mode.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+<img src="docs/media/schematic.jpg" alt="An operable schematic: a request traced through a service pipeline to an escalation" />
+
+**Operable schematics.** Every case study has one. Choose a scenario and its path is
+traced through the pipeline the study describes.
+
+</td>
+<td valign="top">
+
+<img src="docs/media/index.jpg" alt="The sheet index, searching for rag" />
+
+**The sheet index.** Press <kbd>/</kbd>. Ranked search across all 32 sheets, anchored to
+word starts so `rag` finds RAG and not “leverage”.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+<img src="docs/media/mode-wipe.jpg" alt="A mode change developing outward in a circle" />
+
+**A mode change develops.** The new state is exposed outward from where you asked for it,
+the way a print develops.
+
+</td>
+<td valign="top">
+
+<img src="docs/media/print.jpg" alt="A sheet issued as a PDF: black ink on white with a title strip" />
+
+**Issue as PDF.** Any sheet prints as black ink on white stock with its own title strip,
+whatever mode is on screen.
+
+</td>
+</tr>
+</table>
+
+---
+
+## G-003 · The cover sheet
+
+A first load opens on a cover, and the cover does the loading.
+
+<table>
+<tr>
+<td width="25%" valign="top"><img src="docs/media/cover-1-source.jpg" alt="Act one: the name plotted as green scanlines" /><br/><sub><b>1 · Source.</b> The name is plotted as scanlines.</sub></td>
+<td width="25%" valign="top"><img src="docs/media/cover-2-cyanotype.jpg" alt="Act two: the cyanotype exposed across the sheet" /><br/><sub><b>2 · Cyanotype.</b> Exposed across the whole sheet.</sub></td>
+<td width="25%" valign="top"><img src="docs/media/cover-3-paper.jpg" alt="Act three: paper laid across the cyanotype" /><br/><sub><b>3 · Paper.</b> Laid across that, in solid ink.</sub></td>
+<td width="25%" valign="top"><img src="docs/media/cover-4-tour.jpg" alt="Act four: the seams travel and one mode takes most of the sheet" /><br/><sub><b>4 · Tour.</b> The seams travel; each mode takes the sheet in turn.</sub></td>
+</tr>
+</table>
+
+**What it shows.** One composition printed three times, once per drawing mode, with the
+three prints stacked in exact register: same type, same size, same position, different ink.
+Two slanted seams cut between them, so the name reads straight across all three.
+
+**What it does.** While that plays it issues the set: waits for the typefaces, fetches the
+lens, and prefetches every other sheet into the router's cache. The counter, the meter and
+the line naming the sheet in hand report that work. After the cover, opening any sheet makes
+no further page request.
+
+**What it says.** *Best viewed on desktop.* That is half of why the cover exists, so it is
+set as a notice and changes with the screen: a confirmation on a wide one, an explanation on
+a phone.
+
+**How it ends.** The moment the set has actually loaded, a button offers the way in, and
+<kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>Esc</kbd> do the same. Left alone, the cover
+finishes its tour, is stamped *Issued · Cleared for full thrust*, and lifts.
+
+| Property | Behaviour |
+|:---------|:----------|
+| Frequency | Once per visit. `ModeScript` decides before first paint |
+| Reduced motion | Never shown |
+| Slow or metered connection | Only the seven section sheets are prefetched |
+| A network that never answers | Loading is given up on after 12 s and the way in is offered anyway |
+| No JavaScript | The stylesheet runs the sequence on a fixed clock and removes the cover itself |
+| The set behind it | Paused at its first frame (`html[data-cover]`) until the cover reports `data-issued` |
+
+<details>
+<summary><b>How the register is kept</b></summary>
+
+<br/>
+
+The seams are two registered custom properties, `--s1` and `--s2`, plus `--slant`. Every
+clip path, both hairlines and all three band labels are computed from those values, which is
+why the prints cannot drift apart while the seams travel. Per-mode extras (construction
+lines on the cyanotype, the `</h1>` tag on source) are absolutely positioned so they never
+move the layout the three prints share.
+
+A router prefetch returns no promise, so each sheet's payload is watched for as a
+`PerformanceObserver` resource entry. The visible count is paced to the animation: it never
+shows a sheet that has not landed, it just does not show them all in one frame.
+
+See [`components/system/Preloader.tsx`](components/system/Preloader.tsx).
+
+</details>
+
+---
+
+## A-101 · The key plan
+
+The homepage is plain DOM under a single CSS transform. No canvas, no WebGL.
+
+```mermaid
+flowchart LR
+  REG["lib/plates.ts<br/>authored rectangles"] --> PLANE["plane<br/>2080 × 900 units"]
+  CONTENT["content collections"] --> PLANE
+  PLANE --> CAM["camera<br/>scale · x · y"]
+  CAM --> XFORM["translate3d + scale"]
+  CAM --> LOD{"scale"}
+  LOD -->|"< 0.42"| FAR["far<br/>titles and figures"]
+  LOD -->|"< 0.73"| OVER["overview<br/>enlarged type"]
+  LOD -->|"< 1.1"| MID["mid<br/>contents"]
+  LOD -->|"≥ 1.1"| NEAR["near<br/>full detail"]
+```
+
+| Decision | Why |
+|:---------|:----|
+| **Rectangles are authored, not computed** | The general arrangement is a designed composition; a force layout would undo it |
+| **Type holds its size as the camera pulls out** | The plan is drafted in plan units, so a fitted plan on a laptop would print rows at half size. The plane carries `--inv`, roughly the inverse of the scale, and each sheet shows as many rows as fit |
+| **The fit is computed twice, to the same figure** | Once in CSS from container units, so the server-rendered plan is framed before any script runs; once in `KeyPlan.tsx` when the camera goes live. Change `FIT` and `--fit` together |
+| **The plan plots itself** | A pen rules each sheet boundary edge by edge, the stock arrives under it, the figures stroke in, and the leaders are plotted last. Switched off after the first sheet transition of a visit |
+| **Leaders run between sheet edges** | A centre-to-centre line would pass under an opaque sheet and never be seen |
+| **Dimmed sheets stay opaque** | Leaders run underneath, and a see-through sheet would show them crossing its face |
+| **Only camera state re-renders** | Drag bookkeeping lives in a ref, so `pointermove` never triggers a render it does not need |
+| **The camera is bounded and has inertia** | The plan cannot be panned off the stage, and a pan glides to a stop |
+| **A title strip down the right edge** | North point, the name at display size, an issue stamp, the revision schedule and the sheet number, where a drawing carries them |
+
+Below `60rem` the same registry renders as a stacked index: the name, the instrument tray,
+then the sheets, each with its figure.
+
+---
+
+## A-102 · Three drawing modes
+
+The switch in the rail re-issues the set. **The modes differ in what they say, not only in
+what colour they say it in.**
+
+| | `REV A` · Artifact | `REV B` · Annotated | `REV C` · Raw |
+|:--|:--|:--|:--|
+| **Reads as** | The drawing as issued | The same drawing with the markup pen on | The drawing stripped to its source |
+| **Stock** | Warm paper on a kraft board | Cyanotype | Unlit black |
+| **Display face** | Instrument Serif | IBM Plex Mono | IBM Plex Mono |
+| **On the key plan** | Figures and contents | Chain dimensions, revision cloud, placement notes | The record each sheet was drawn from |
+| **On a sheet** | Prose and figure | Numbered margin notes, self-measuring dimensions | Every part outlined and named, plus the verbatim Markdown |
+
+<table>
+<tr>
+<td width="50%"><img src="docs/media/sheet-annotated.jpg" alt="A sheet in annotated mode with margin notes" /></td>
+<td width="50%"><img src="docs/media/sheet-raw.jpg" alt="A sheet in raw mode with its record and source" /></td>
+</tr>
+</table>
+
+### Why it is CSS-only
+
+Mode lives in a `data-mode` attribute on `<html>`. Every mode is a palette plus a set of
+`display` rules. There are no mode branches in React.
+
+```mermaid
+flowchart LR
+  QUERY["?mode= in the URL"] --> SCRIPT
+  STORE[("localStorage<br/>plate.mode")] --> SCRIPT["ModeScript<br/>inline, before paint"]
+  SCRIPT --> HTML["html[data-mode]"]
+  HTML --> CSS["palette swap"]
+  HTML --> SHOW["show / hide the record"]
+  HTML --> PEN["annotation layer"]
+  PROVIDER["ModeProvider"] -. reads back .-> HTML
+```
+
+1. **All three modes ship as static markup.** No second render and no hydration flash,
+   which is why they can differ in substance and still cost nothing to switch between.
+2. **The mode resolves before first paint**, so a sheet never renders on paper and then
+   re-inks to blueprint.
+3. **Switching repaints but never reflows.** Annotations are drawn into margin the prose
+   already left empty.
+
+> [!WARNING]
+> `ModeScript` is a server component and inlines the storage key **literally**. That key
+> lives in `lib/mode.ts`, which deliberately carries no `'use client'` directive. Importing
+> it from a client module yields a client-reference stub at build time and silently breaks
+> persistence.
+
+---
+
+## A-103 · The figures
+
+A drawing set with nothing drawn in it is a filing system.
+
+<img src="docs/media/figure.jpg" alt="Section through a governed platform, drawn in drafting line weights" width="100%" />
+
+### Drafted figures
+
+Every general-arrangement sheet carries a figure, drawn by hand as SVG in
+[`components/figures/PlateFigure.tsx`](components/figures/PlateFigure.tsx). The key plan
+shows each one in miniature; the sheet shows it at full size.
+
+| Sheet | Figure |
+|:------|:-------|
+| `A-101` The Architect | Elevation along the career datum |
+| `R-301` Research | Benchmark plot, nine models |
+| `S-201` Structural Principles | Section through a governed platform |
+| `W-400` Works | Exploded axonometric of a platform |
+| `E-600` Essays | Detail of a leverage point |
+| `B-500` Field Notes | Survey traverse, one station per note |
+| `C-700` Correspondence | A transmittal, in elevation |
+
+They are drawn in four line weights (heavy for what a section cuts, medium for outlines,
+thin for detail, hair for hatching) and **they plot themselves**: every stroke carries
+`pathLength={1}`, so one CSS rule can run a pen along all of them in the order a
+draughtsman would put the lines down.
+
+### Operable schematics
+
+Every case study carries a schematic the reader can operate
+([`Schematic.tsx`](components/figures/Schematic.tsx), with the drawings as data in
+[`schematics.ts`](components/figures/schematics.ts)). Choose a scenario and its path lights
+through the pipeline, with the outcome and a one-line note.
+
+> [!IMPORTANT]
+> A schematic only contains what its case study says: the stages, the branches, the
+> outcomes, the figures. Where a study gives no number, the schematic gives none.
+
+Where an article already has a diagram typed out as an unlabelled code block, the schematic
+is drawn in its place on the sheet. Raw mode still prints the block verbatim.
+
+---
+
+## A-104 · The instruments
+
+A set that can be operated is worth nothing if nobody works out that it can be. So the
+tools are **printed on the first sheet you land on**, named, with their keys.
+
+| Instrument | Key | What it does |
+|:-----------|:----|:-------------|
+| **Inspection lens** | <kbd>L</kbd> | Looks through to the blueprint, and names and measures whatever it covers |
+| **Sheet index** | <kbd>/</kbd> or <kbd>⌘K</kbd> | Ranked search across the whole set |
+| **Drawing mode** | <kbd>D</kbd> | Cycles artifact, annotated, raw |
+| **Key plan camera** | drag · scroll · arrows | Pan with inertia, zoom, walk sheet to sheet |
+| **Zone cursor** | move the pointer | The margin rulers ring the zone you are in; the title block reads out the grid reference |
+| **Issue as PDF** | title block | Prints the sheet with its own title strip |
+| **Comparison slider** | <kbd>←</kbd> <kbd>→</kbd> | A native range input, so keyboard and screen readers work unmodified |
+
+### The lens
+
+Inside the barrel the sheet is a cyanotype, and the annotation layer (dimensions, the
+revision cloud, margin notes) is written in wherever the lens passes, in every mode. The
+markup is already in the page: `Loupe.tsx` keeps a clip circle on each `[data-lens-layer]`
+in that layer's own coordinates, and the pen is loaded with the colour that inverts to amber.
 
 - **Drag** the barrel, or nudge it with the arrow keys.
 - **Scroll** over it to change the diameter.
 - <kbd>Esc</kbd> or double-click to stow it.
 
+It only names what is actually on the sheet: elements that are faded out or clipped away are
+skipped, and where nested boxes would print their names on top of each other, the innermost
+wins.
+
 > [!WARNING]
-> The barrel shadow must be `box-shadow`, never `filter: drop-shadow()`. Any
-> `filter` on an ancestor makes it a **backdrop root**, which leaves the optic
-> with nothing behind it to invert and turns the lens into an empty circle.
-
-### The rest
-
-| Instrument | Key | What it does |
-|:-----------|:----|:-------------|
-| Inspection lens | <kbd>L</kbd> | Outlines, names, and measures whatever it covers |
-| Sheet index | <kbd>/</kbd> | Fuzzy-ranked search across the whole set |
-| Drawing mode | <kbd>D</kbd> | Cycles artifact, annotated, raw |
-| Comparison sliders | <kbd>←</kbd> <kbd>→</kbd> | Native range input, so keyboard and screen readers work unmodified |
-| Key plan camera | drag, scroll, arrows | Pan with inertia, zoom, and walk sheet to sheet with the arrow keys |
-| Zone cursor | move the pointer | The margin rulers ring the zone you are in and the title block reads out the grid reference |
-| Issue as PDF | title block | Prints the sheet as black ink on white stock with its own title strip |
-
-State for the lens and the index lives in `InstrumentProvider`, above the rail,
-precisely so that any surface can offer them. The key plan is the surface that
-takes it up.
+> The barrel shadow must be `box-shadow`, never `filter: drop-shadow()`. Any `filter` on an
+> ancestor makes it a **backdrop root**, which leaves the optic with nothing behind it to
+> invert and turns the lens into an empty circle.
 
 ---
 
-## Drawing modes
+## A-105 · Moving between sheets
 
-The switch in the rail re-issues the set. This is the *dev-aligned* view of the
-site, and it is a first-class state rather than a debug toggle.
+Navigation is one continuous move.
+[`SheetTransition.tsx`](components/system/SheetTransition.tsx) wraps every in-site route
+change in a view transition: whatever is named `sheet` before the change morphs into
+whatever is named `sheet` after it.
 
-**The three modes differ in what they say, not only in what colour they say it
-in.** Each one adds or removes real content.
+- A plate on the key plan **grows into** the page it stands for.
+- Going home, the page **folds back** onto its plate.
+- Between two content sheets, one **reshapes** into the next.
+- The rail, frame and title block are named separately, so they hold still.
+- The **back and forward buttons** take the same road: the `popstate` is held, a
+  transition is opened, and the event is replayed inside it for the router.
 
-<table>
-<tr>
-<td width="50%" valign="top">
+| Key | Action |
+|:----|:-------|
+| <kbd>/</kbd> · <kbd>⌘K</kbd> | Open the sheet index |
+| <kbd>D</kbd> | Cycle drawing mode |
+| <kbd>L</kbd> | Toggle the lens |
+| <kbd>Esc</kbd> | Close the index, stow the lens, or leave the cover |
+| <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | Walk between sheets on the plan, move a comparison divider, nudge the lens |
+| <kbd>Enter</kbd> · <kbd>Space</kbd> | Leave the cover once the set has loaded |
 
-![Annotated mode](docs/media/annot.png)
+Shortcuts are suppressed while typing in a field, and every one is also a button somewhere
+on screen.
 
-**`REV B` · Annotated**
+**Reduced motion.** Under `prefers-reduced-motion` every journey is removed and every state
+change kept: no cover, no plot, no transitions, no inertia. **Without view transitions**
+(older browsers) sheets change plainly and a mode change is instant.
 
-Cyanotype, and the markup pen turns on. The key plan grows a chain dimension
-across the composition, a revision cloud and triangle over the most recently
-issued sheet, and a placement note on every sheet giving its grid reference,
-its size in plan units, and its discipline. On a content sheet you get numbered
-margin callouts on leader lines and dimension lines that measure themselves and
-print the real rendered width.
+---
 
-</td>
-<td width="50%" valign="top">
-
-![Raw mode](docs/media/raw.png)
-
-**`REV C` · Raw**
-
-Presentation stripped. Each sheet on the plan replaces its contents table with
-the record it was drawn from: route, source file, id, discipline, rect, refs,
-entry count. The title block states the plan's own provenance. On a content
-sheet the prose stays, every structural element is outlined and labelled with
-its part name, and the verbatim Markdown is printed at the top.
-
-</td>
-</tr>
-</table>
-
-`REV A · Artifact` is the drawing as issued, and it is the default. Warm stock,
-a board a full tone deeper than the sheets pinned to it, ink-weight sheet
-boundaries, ruled contents tables, and reversed header bars on the furniture. No
-markup at all, because an issued print does not carry any.
-
-A mode change is exposed, not faded: the new state spreads outward from the
-switch as a view transition with a growing circular clip, the way a print
-develops. Without the API, or with reduced motion, it simply changes.
-
-### Why it is CSS-only
-
-Mode lives in a `data-mode` attribute on `<html>`. Every mode is a palette plus a
-set of `display` rules. There are no mode branches in React.
+## S-201 · How it is built
 
 ```mermaid
-flowchart LR
-  QUERY["?mode= in URL"] --> SCRIPT
-  STORE[("localStorage<br/>plate.mode")] --> SCRIPT["ModeScript<br/>inline, pre-paint"]
-  SCRIPT --> HTML["html[data-mode]"]
-  HTML --> CSS["globals.css<br/>palette swap"]
-  HTML --> SHOW["PlateShell<br/>show / hide raw record"]
-  HTML --> PEN["annotation layer<br/>callouts + dimensions"]
-  PROVIDER["ModeProvider"] -. reads back .-> HTML
+flowchart TD
+  subgraph BUILD["Build time"]
+    MD["content/*.md"] --> PIPE["remark pipeline"]
+    REG["lib/plates.ts<br/>sheet registry"] --> IDX["lib/sheet-index.ts<br/>numbering"]
+    PIPE --> ROUTES["app/**/page.tsx"]
+    IDX --> ROUTES
+    ROUTES --> OUT["out/<br/>static HTML, CSS, JS"]
+  end
+  subgraph RUN["In the browser"]
+    OUT --> LAYOUT["layout.tsx<br/>frame · rail · title block"]
+    LAYOUT --> PROV["providers<br/>mode · instruments · transitions"]
+    PROV --> PLAN["KeyPlan"]
+    PROV --> SHELL["PlateShell"]
+  end
+  OUT --> PAGES["GitHub Pages"]
 ```
 
-Three consequences worth keeping:
+### Sheet registry
 
-1. **All three modes ship as static markup.** No second render, no hydration
-   flash. The server already emitted every mode's content, including the
-   records and the markup layer, which is why they can differ in substance and
-   still cost nothing to switch between.
-2. **The mode resolves before first paint**, so the sheet never renders on paper
-   and then re-inks to blueprint.
-3. **Switching repaints but never reflows.** The measure is the same width in all
-   three modes; annotations are drawn into margin the prose already left empty.
-
-> [!WARNING]
-> `ModeScript` is a server component and inlines the storage key **literally**.
-> That key therefore lives in `lib/mode.ts`, which deliberately carries no
-> `'use client'` directive. Importing it from `ModeProvider` instead yields a
-> client-reference stub at build time and silently breaks persistence. The
-> shipped script ends up reading `localStorage.getItem('function(){throw ...}')`.
-
----
-
-## Sheet registry
-
-[`lib/plates.ts`](lib/plates.ts) is the single source of truth. Numbers follow
-drawing convention: a discipline letter, then a series where `x00` is the general
-arrangement and `x01…` are its detail sheets.
+[`lib/plates.ts`](lib/plates.ts) is the single source of truth. Numbers follow drawing
+convention: a discipline letter, then a series where `x00` is the general arrangement and
+`x01…` are its detail sheets.
 
 | Sheet | Discipline | Route | Content |
 |:------|:-----------|:------|:--------|
@@ -332,168 +493,81 @@ arrangement and `x01…` are its detail sheets.
 | `A-101` | Architectural | `/about/` | The Architect |
 | `S-201` | Structural | `/architecture/` | Structural Principles |
 | `R-301` | Research | `/research/` | Research |
-| `W-400` | Works | `/work/` | Works index |
-| `W-401…` | Works | `/work/[slug]/` | Case studies |
-| `B-500` | Field Notes | `/blog/` | Blog index |
-| `B-501…` | Field Notes | `/blog/[slug]/` | Posts |
-| `E-600` | Essays | `/essays/` | Essays index |
-| `E-601…` | Essays | `/essays/[slug]/` | Essays |
+| `W-400` · `W-401…` | Works | `/work/` · `/work/[slug]/` | Case studies |
+| `B-500` · `B-501…` | Field Notes | `/blog/` · `/blog/[slug]/` | Posts |
+| `E-600` · `E-601…` | Essays | `/essays/` · `/essays/[slug]/` | Essays |
 | `C-700` | Correspondence | `/contact/` | Contact |
 | `X-999` | Unissued | 404 | Sheet Not Issued |
 
 Detail sheets are numbered at build time by [`lib/sheet-index.ts`](lib/sheet-index.ts),
-which walks each collection in publication order. **Adding a case study renumbers
-the W series automatically**: nothing is hand-maintained.
+which walks each collection in publication order. **Adding a case study renumbers the W
+series automatically.**
 
----
+### How a plate is composed
 
-## Key plan
-
-The homepage is rendered in plain DOM with a single CSS transform. No canvas, no
-WebGL.
-
-```mermaid
-flowchart TD
-  REG["lib/plates.ts<br/>authored rects"] --> PLANE["plane<br/>1700 × 900 units"]
-  CONTENT["content collections"] --> PLANE
-  PLANE --> CAM["camera<br/>scale, x, y"]
-  CAM --> XFORM["translate3d + scale<br/>transform-origin 0 0"]
-  CAM --> LOD{"scale"}
-  LOD -->|"< 0.42"| FAR["far - titles only"]
-  LOD -->|"< 0.73"| OVER["overview - enlarged type, as many rows as fit"]
-  LOD -->|"< 1.1"| MID["mid - contents"]
-  LOD -->|"≥ 1.1"| NEAR["near - full detail"]
-  XFORM --> FLY["click - fly camera to the sheet, then route"]
-```
-
-Things to know before editing it:
-
-- **The plan is 2080 × 900 units.** The sheets take the left 1700 and a title
-  strip runs down the right edge, where a drawing carries it: north point, the
-  name at display size, an issue stamp, the revision schedule, and the sheet
-  number. The extra width is what lets the plan fill a laptop window.
-- **The plan plots itself on first load.** Each sheet boundary is ruled edge by
-  edge by a pen (four gradients grown in turn), the stock arrives under it,
-  the contents ink in, and the cross-references are plotted last. After the
-  first sheet transition of a visit this is switched off for good
-  (`html[data-vt]`): returning to the plan is a fold-back, not a replay.
-
-- **Plate rectangles are authored, not computed.** The general arrangement is a
-  designed composition; a force layout would undo that.
-- **Type holds its size as the camera pulls out.** The plan is drafted in plan
-  units, so a fitted plan on a laptop would print its rows at half size. The
-  plane carries `--inv`, roughly the inverse of the camera scale, and the type
-  is multiplied by it; each sheet then shows as many rows as fit and fades the
-  rest out, instead of showing all of them at a size nobody can read.
-- **The fit is computed twice, to the same figure.** Once in CSS, from container
-  units, so the server-rendered plan is framed before any script runs, and once
-  in `KeyPlan.tsx` when the camera goes live. Change `FIT` and `--fit` together.
-- **Only camera state re-renders.** Drag bookkeeping lives in a ref, so
-  `pointermove` never triggers a render it does not need.
-- **Leaders run between plate *edges*, not centres.** A centre-to-centre line
-  would pass under an opaque sheet and never be seen, so each end is pulled back
-  to the boundary and the run lives in the gutters.
-- **Cross-reference bubbles walk the leader until they find room.** The split
-  circle naming each pair is drawn under the sheets, so it steps along the line
-  from the midpoint outward and takes the first spot no plate covers. A leader
-  with no clear spot simply goes unlabelled, as it would on paper.
-- **Hovering reads out the subgraph.** The hovered sheet, everything it
-  references, and everything that references it all stay lit and take the
-  accent; the rest fade their contents but stay opaque, because leaders run
-  underneath the sheets and a see-through sheet would show them.
-- **The furniture is data, not decoration.** The revision schedule in the legend
-  is derived from the sheets themselves, so it cannot drift out of date.
-- **Narrow screens get a stacked index.** Pan and zoom need a pointer and room
-  for the plan; below `60rem` the same registry renders as a list, with the
-  instrument tray between the name and the sheets.
-
-The composition is tuned for artifact mode specifically, because that is the
-only mode that has to earn its contrast rather than getting it free from a dark
-field: the board sits a full tone under the sheets, sheet boundaries are drawn
-in ink rather than in a tint, each sheet carries a ruled title strip, and the
-three furniture blocks share a bottom datum so their reversed headers line up.
-
----
-
-## How a plate is composed
-
-`PlateShell` is the one wrapper every content route uses. It renders the header,
-body, cross-references, and raw record together, and lets CSS decide which the
-current mode shows. The plate is drawn as a sheet of stock on the board, the
-same object the key plan shows in miniature, and the frame trims anything that
-scrolls past the drawing border.
+`PlateShell` is the one wrapper every content route uses. It renders the header, figure,
+body, cross-references and raw record together, and lets CSS decide which the current mode
+shows.
 
 ```mermaid
-flowchart TD
+flowchart LR
   ROUTE["app/*/page.tsx"] --> SHELL["PlateShell"]
-  SHELL --> META["SetPlateMeta → title block + rail"]
-  SHELL --> HEAD["header - sheet tag, title, lead, sheet data"]
-  SHELL --> BODY["body (children)"]
+  SHELL --> META["SetPlateMeta<br/>title block + rail"]
+  SHELL --> HEAD["header"]
+  SHELL --> FIG["figure"]
+  SHELL --> BODY["body"]
   SHELL --> REFS["cross-references"]
-  SHELL --> RAW["raw record + Markdown source"]
-  HEAD -. hidden in raw .-> RAW
-  BODY -. hidden in raw .-> RAW
+  SHELL --> RAW["raw record + source"]
 ```
 
-Detail routes go through `ArticlePlate`, which adds the back link, stack tags,
-metric schedule, and adjacent sheets.
+<details>
+<summary><b>Component kit</b></summary>
 
-### Component kit
+<br/>
 
 | Component | Purpose |
 |:----------|:--------|
+| `keyplan/KeyPlan` | The general arrangement: camera, level of detail, leaders, furniture |
 | `figures/PlateFigure` | The drafted figure for each sheet, self-plotting |
-| `figures/Schematic` | Operable schematic on every case study: choose a scenario, trace its path. The drawings are data in `figures/schematics.ts`, each taken from the study it sits in |
-| `sheet/ZoneCursor` | Lights the margin zone under the pointer |
-| `system/SheetTransition` | View-transition navigation between sheets |
-| `kit/ComparisonSlider` | Two clipped layers in permanent register; the divider is a native range input, so keyboard and screen-reader behaviour come free |
-| `kit/Callout` | Keyed margin note, numbered by CSS counter so notes renumber themselves |
-| `kit/DimensionLine` | Drafting dimension that measures itself and prints the real rendered width |
-| `kit/Controls` | `Button`, `Switch`, `Stamp` |
-| `kit/MetricSchedule` | Outcomes as a numbered, ruled schedule |
-| `kit/ControlSchedule` | Live specimen panel; its switches write to `<html>` |
+| `figures/Schematic` | Operable schematic; drawings are data in `figures/schematics.ts` |
+| `plate/PlateShell` | Wrapper for every content sheet |
+| `plate/ArticlePlate` | Detail sheet: back link, stack, metrics, schematic, adjacent sheets |
+| `plate/SheetSchedule` | Ruled, numbered index table fronting each collection |
+| `sheet/SheetFrame` | Drawing border, zone rulers, trim |
 | `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
-| `sheet/TitleBlock` | Expandable bottom-right title block |
-| `sheet/SheetIndex` | Full-set search, fuzzy-ranked |
-| `sheet/Loupe` | Draggable x-ray inspection lens |
+| `sheet/TitleBlock` | Bottom-right title block, grid reference, copy and print |
+| `sheet/SheetIndex` | Full-set search |
+| `sheet/Loupe` | The inspection lens |
+| `sheet/ZoneCursor` | Lights the margin zone under the pointer |
+| `system/Preloader` | The cover sheet |
+| `system/SheetTransition` | View-transition navigation |
+| `system/ModeProvider` · `ModeScript` | Mode state, and its pre-paint resolution |
 | `system/InstrumentProvider` | Owns the lens and index so any surface can offer them |
-| `system/ToastProvider` | Rubber-stamp toasts |
+| `system/ToastProvider` | Rubber-stamp notices, one per subject |
+| `kit/ComparisonSlider` | Two clipped layers in register behind a native range input |
+| `kit/Callout` | Keyed margin note, numbered by CSS counter |
+| `kit/DimensionLine` | Drafting dimension that measures itself |
+| `kit/MetricSchedule` · `ControlSchedule` · `Controls` | Schedules, switches, buttons, stamps |
+
+</details>
+
+### Tech stack
+
+| Layer | Technology |
+|:------|:-----------|
+| Framework | [Next.js 15](https://nextjs.org/), App Router, static export |
+| UI | React 19 |
+| Language | TypeScript 5.7 |
+| Styling | CSS Modules and custom properties |
+| Motion | CSS, SVG, View Transitions API |
+| Markdown | remark, remark-gfm, gray-matter |
+| Fonts | Instrument Serif, IBM Plex Sans and Mono, via `next/font` |
+| Contact form | [Formspree](https://formspree.io/) (the only third-party runtime service) |
+| Hosting | GitHub Pages, deployed by GitHub Actions |
 
 ---
 
-## Interaction model
-
-Navigation between sheets is one continuous move.
-[`SheetTransition.tsx`](components/system/SheetTransition.tsx) wraps every
-in-site route change in a view transition: whatever is named `sheet` before the
-change morphs into whatever is named `sheet` after it. A plate on the key plan
-grows into the page it stands for and folds back onto the plan on the way home;
-between two content sheets the outgoing one reshapes into the incoming one. The
-rail, frame and title block are named separately so they hold still. The back
-and forward buttons take the same road: the `popstate` is held, a transition is
-opened, and the event is replayed inside it for the router. Browsers without
-the API get the camera fly and a plain route change.
-
-| Key | Action |
-|:----|:-------|
-| <kbd>/</kbd> | Open the sheet index |
-| <kbd>D</kbd> | Cycle drawing mode |
-| <kbd>L</kbd> | Toggle the inspection loupe |
-| <kbd>Esc</kbd> | Close the index, or stow the loupe |
-| <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | Walk between sheets on the key plan, move the comparison divider, nudge the lens, or walk the mode switch |
-
-Shortcuts are suppressed while typing in a field, and every one of them is also
-printed as a button on the key plan's instrument tray, so the site is fully
-operable without knowing a single key.
-
-Under `prefers-reduced-motion` all motion is removed, including the key plan's
-camera fly and the tray's first-visit pulse. Staggered entrances reset their
-`animation-delay` as well as their duration, because a `backwards` fill would
-otherwise hold each element at its start keyframe for the length of the delay.
-
----
-
-## Content pipeline
+## S-202 · Content pipeline
 
 Markdown is read at **build time** only. There is no runtime CMS and no database.
 
@@ -502,31 +576,27 @@ flowchart LR
   FM["frontmatter"] --> GM["gray-matter"]
   BODY["Markdown body"] --> RM["remark + gfm"]
   RM --> SVG["remark-svg-block"] --> RH["remark-rehype"] --> RS["rehype-stringify"]
-  RS --> HTML["entry.html"]
   GM --> ROUTE["app/.../[slug]/page.tsx"]
-  HTML --> ROUTE
+  RS --> ROUTE
   ROUTE --> SHEET["numbered sheet"]
 ```
 
-The raw Markdown is also handed to `PlateShell` verbatim, and that is what raw mode
-prints.
-
 | Collection | Path | Frontmatter |
 |:-----------|:-----|:------------|
-| `blog` | `content/blog/` | `title`, `description`, `pubDate`, `draft?`: included in RSS |
+| `blog` | `content/blog/` | `title`, `description`, `pubDate`, `draft?` (included in RSS) |
 | `essays` | `content/essays/` | same |
-| `work` | `content/work/` | + `client?`, `stack?`, `metrics?` |
+| `work` | `content/work/` | plus `client?`, `stack?`, `metrics?` |
 
 <details>
 <summary><b>Authoring a new sheet</b></summary>
 
 <br/>
 
-1. Add a `.md` file under `content/blog/`, `content/essays/`, or `content/work/`.
-2. Include required frontmatter (`title`, `description`, `pubDate`).
-3. Set `draft: true` to exclude it from production builds.
-4. Run `npm run build`, and `generateStaticParams` picks up the slug and the sheet
-   number is assigned automatically.
+1. Add a `.md` file under `content/blog/`, `content/essays/` or `content/work/`.
+2. Include the required frontmatter (`title`, `description`, `pubDate`).
+3. Set `draft: true` to keep it out of the build.
+4. Push to `main`. The slug is picked up, the sheet number is assigned, and the sheet
+   appears on the key plan, in the index, in the sitemap and on the cover's count.
 
 ```yaml
 ---
@@ -539,38 +609,18 @@ metrics: ["97% accuracy", "p99 < 120ms"]
 ---
 ```
 
-`metrics` entries are split into value and label by `MetricSchedule`, so write
-them as `"97% accuracy"` rather than as a sentence.
+`metrics` entries are split into value and label by `MetricSchedule`, so write them as
+`"97% accuracy"` and not as a sentence.
 
-A case study can carry an operable schematic: add an entry for its slug to
-[`components/figures/schematics.ts`](components/figures/schematics.ts). If the
-Markdown has a diagram typed out as an unlabelled code block, the schematic is
-drawn in its place on the sheet (raw mode still prints the block verbatim);
-otherwise it is set ahead of the prose. Only put in it what the study says.
+To give a case study an operable schematic, add an entry for its slug to
+[`components/figures/schematics.ts`](components/figures/schematics.ts). Only put in it what
+the study says.
 
 </details>
 
 ---
 
-## Tech stack
-
-| Layer | Technology |
-|:------|:-----------|
-| Framework | [Next.js 15](https://nextjs.org/): App Router, SSG, static export |
-| UI | React 19 |
-| Language | TypeScript 5.7 |
-| Styling | CSS Modules + custom properties |
-| Markdown | remark, remark-gfm, gray-matter |
-| Fonts | Instrument Serif, IBM Plex Sans / Mono via `next/font` |
-| CI/CD | GitHub Actions → GitHub Pages |
-
-**No animation library, no state library, no 3D runtime.** The rebuild removed
-`three`, `gsap`, and `lenis`. Shared JS is ~**103 kB** across **37** statically
-exported pages.
-
----
-
-## Quick start
+## W-401 · Run it locally
 
 ```bash
 npm ci
@@ -580,109 +630,117 @@ npm run dev          # http://localhost:3000
 | Script | What it does |
 |:-------|:-------------|
 | `npm run dev` | Dev server |
-| `npm run build` | Static export to `out/`, plus `rss.xml` |
+| `npm run build` | Static export to `out/`, then `rss.xml` |
 | `npm run typecheck` | `tsc --noEmit` |
 
-To preview exactly what ships, serve the export rather than the dev server:
+To preview exactly what ships, serve the export and not the dev server:
 
 ```bash
 npm run build
 npx serve out
 ```
 
+> [!TIP]
+> The cover plays once per browser tab session. To see it again, open a new tab or a
+> private window.
+
 > [!WARNING]
-> Stop any server holding `out/` before running `npm run build`. The export step
-> clears that directory and the build will fail, sometimes quietly, if it is
-> locked.
+> `npm run build` deletes and recreates `out/`. Stop any server holding that directory
+> first, and restart it afterwards.
 
 ---
 
-## Project structure
+## W-402 · Project structure
 
 ```
 app/
-├── layout.tsx            # sheet chrome: frame, rail, title block, providers
-├── template.tsx          # per-navigation enter animation
-├── globals.css           # tokens, three mode palettes, annotation layer
+├── layout.tsx            # sheet chrome, providers, the cover
+├── template.tsx          # per-navigation settle animation
+├── globals.css           # tokens, three palettes, transitions, print
 ├── page.tsx              # G-000 key plan
-├── about|research|architecture|contact/
-├── work|blog|essays/     # index + [slug] detail sheets
+├── about · research · architecture · contact/
+├── work · blog · essays/ # index + [slug] detail sheets
+├── sitemap.ts · robots.ts
 └── not-found.tsx         # X-999
 
 components/
 ├── keyplan/              # KeyPlan
-├── figures/              # drafted figures, operable case-study figures
-├── plate/                # PlateShell, ArticlePlate, Chronology, forms
-├── kit/                  # sliders, controls, callouts, dimensions, schedules
-├── sheet/                # frame, rail, title block, index, loupe, plate meta
-└── system/               # mode provider / script / selector, toasts
+├── figures/              # drafted figures, operable schematics
+├── plate/                # PlateShell, ArticlePlate, schedules, forms
+├── kit/                  # sliders, controls, callouts, dimensions
+├── sheet/                # frame, rail, title block, index, lens, zone cursor
+└── system/               # cover, modes, instruments, transitions, toasts
 
 lib/
 ├── plates.ts             # sheet registry and key plan geometry
 ├── sheet-index.ts        # detail sheet numbering and adjacency
-├── mode.ts               # mode vocabulary - no 'use client', see warning above
+├── mode.ts               # mode vocabulary; no 'use client', see A-102
 ├── content.ts            # Markdown pipeline
 └── metadata.ts · format.ts · constants.ts
 
 content/                  # blog, essays, work Markdown
-docs/media/               # README screenshots
-public/og.jpg             # share card: the key plan at 1200 × 630
+scripts/generate-rss.mjs  # post-build RSS
+public/                   # favicon, logo, share card, web manifest
+docs/media/               # the screenshots on this page
+.github/workflows/        # deploy.yml
+CNAME                     # www.akshaybajpai.com
 ```
 
 ---
 
-## Deployment
+## C-701 · Deployment
 
-Push to `main` triggers the deploy workflow. Nothing manual after the initial
-GitHub Pages setup.
+The site is hosted on **GitHub Pages, for free**, at
+[www.akshaybajpai.com](https://www.akshaybajpai.com). A push to `main` builds and deploys
+it in about a minute. Nothing is manual after the one-time setup.
 
 ```mermaid
 flowchart LR
   PUSH["push to main"] --> CI["npm ci"] --> BUILD["npm run build"]
-  BUILD --> CNAME["write out/CNAME"] --> VERIFY["verify out/index.html"]
-  VERIFY --> UPLOAD["upload-pages-artifact"] --> DEPLOY["deploy-pages"]
+  BUILD --> CNAME["write out/CNAME"] --> VERIFY["verify the artifact"]
+  VERIFY --> UPLOAD["upload-pages-artifact"] --> DEPLOY["deploy-pages<br/>up to 3 attempts"]
   DEPLOY --> LIVE["www.akshaybajpai.com"]
 ```
 
-<details>
-<summary><b>One-time setup, and what not to commit</b></summary>
+**The full runbook is in [DEPLOYMENT.md](DEPLOYMENT.md):** how the pipeline works, DNS and
+HTTPS, one-time setup, verifying a deploy, rolling back, and troubleshooting.
 
-<br/>
+---
 
-1. **Settings → Pages → Build and deployment:** Source = **GitHub Actions**
-2. Ensure the repo-root `CNAME` contains `www.akshaybajpai.com`
-3. DNS: `CNAME` record `www` → `<user>.github.io`
+## C-702 · Measured
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full runbook.
+Measured on the production build. Frame times are from headless Chromium on an Apple
+laptop; Lighthouse is its mobile preset against a local server with no compression, so its
+load figures are pessimistic.
 
-`node_modules/`, `.next/`, `out/`, `*.tsbuildinfo`, and `.env*` are ignored.
-Static assets are served from `public/` only. The repo root is not a web root.
+| Metric | Value |
+|:-------|:------|
+| Sheets in the set | 32 |
+| Runtime dependencies | 8, none of them animation, state or 3D |
+| Shared JavaScript | 103 kB |
+| First-load JavaScript, key plan | 122 kB |
+| First-load JavaScript, a sheet | 109 to 113 kB |
+| Pan and zoom on the key plan | 60 fps (median frame 16.7 ms, worst 19.7 ms) |
+| Cumulative layout shift | 0 |
+| Lighthouse accessibility | 100 on the key plan and on a case study |
+| Lighthouse best practices · SEO | 100 · 100 |
+| Lighthouse performance (mobile, uncompressed) | 75 to 81 |
+| Requests on navigation after the cover | None for pages; the set is already cached |
 
-</details>
-
-<details>
-<summary><b>Configuration reference</b></summary>
-
-<br/>
-
-`next.config.ts`:
-
-```ts
-const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  images: { unoptimized: true },
-  compress: true,
-  poweredByHeader: false,
-  reactStrictMode: true,
-};
-```
-
-</details>
+Not yet verified: Safari and Firefox. The view transitions degrade to plain navigation
+where they are unsupported.
 
 ---
 
 <div align="center">
+
+<img src="docs/media/phone.jpg" alt="The site on a phone: the cover, the stacked key plan, and a sheet in annotated mode" width="88%" />
+
+<sub>On a phone: the cover with its notice, the plan as a stacked index, a sheet in annotated mode.</sub>
+
+<br/><br/>
+
+**In thrust we trust.**
 
 <sub>Content and design © Akshay Bajpai. All rights reserved.</sub>
 
