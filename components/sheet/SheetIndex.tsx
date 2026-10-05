@@ -23,10 +23,39 @@ interface Props {
   currentSheet: string;
 }
 
+/** Position of `q` at the start of a word in `text`, or -1. */
+function wordStart(text: string, q: string): number {
+  let at = text.indexOf(q);
+  while (at > -1) {
+    if (at === 0 || !/[a-z0-9]/.test(text[at - 1])) return at;
+    at = text.indexOf(q, at + 1);
+  }
+  return -1;
+}
+
+/**
+ * Abbreviation match: every letter of the query either opens a word or
+ * continues the run the previous letter was in. "fdai" finds
+ * "Forward-Deployed AI"; "rag" does not find "peRformAnce enGineering".
+ */
+function abbreviates(text: string, q: string): boolean {
+  let i = 0;
+  let previous = -2;
+  for (let at = 0; at < text.length && i < q.length; at += 1) {
+    if (text[at] !== q[i]) continue;
+    const opensWord = at === 0 || !/[a-z0-9]/.test(text[at - 1]);
+    if (!opensWord && previous !== at - 1) continue;
+    previous = at;
+    i += 1;
+  }
+  return i === q.length;
+}
+
 /**
  * Ranked match. A sheet number beats everything, then a title prefix, then a
- * title substring by position, then the description. Last resort is a
- * subsequence over the title, so "fdai" still finds "Forward-Deployed AI".
+ * word in the title by position, then a word in the description. Matches are
+ * anchored to the start of a word throughout, so "rag" finds RAG and not
+ * "leverage". Last resort is an abbreviation over the title.
  */
 function score(entry: IndexEntry, query: string): number {
   const q = query.toLowerCase();
@@ -36,17 +65,17 @@ function score(entry: IndexEntry, query: string): number {
   if (sheet.startsWith(q) || sheet.replace('-', '').startsWith(q.replace('-', ''))) return 1000;
   if (title.startsWith(q)) return 800;
 
-  const at = title.indexOf(q);
+  const at = wordStart(title, q);
   if (at > -1) return 600 - at;
 
-  if (entry.subtitle.toLowerCase().includes(q)) return 300;
-  if (entry.group.toLowerCase().includes(q)) return 200;
+  if (wordStart(entry.subtitle.toLowerCase(), q) > -1) return 300;
+  if (wordStart(entry.group.toLowerCase(), q) > -1) return 200;
 
-  let i = 0;
-  for (const ch of title) {
-    if (ch === q[i]) i += 1;
-    if (i === q.length) return 120;
-  }
+  // Mid-word hits are only worth showing once the query is long enough to
+  // mean something on its own.
+  if (q.length >= 4 && title.includes(q)) return 160;
+  if (abbreviates(title, q)) return 120;
+  if (q.length >= 4 && entry.subtitle.toLowerCase().includes(q)) return 80;
   return 0;
 }
 
@@ -103,6 +132,24 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
     if (event.key === 'Escape') {
       event.preventDefault();
       onClose();
+      return;
+    }
+    // A modal keeps the focus it took: Tab cycles inside the panel instead
+    // of walking out into the sheet behind the scrim.
+    if (event.key === 'Tab') {
+      const stops = event.currentTarget.querySelectorAll<HTMLElement>('input, button');
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      if (!first || !last) return;
+      const active = document.activeElement;
+      const inside = Array.from(stops).includes(active as HTMLElement);
+      if (event.shiftKey && (active === first || !inside)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !inside)) {
+        event.preventDefault();
+        first.focus();
+      }
       return;
     }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
@@ -183,6 +230,8 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
                 )}
                 <Link
                   href={entry.href}
+                  prefetch={false}
+                  tabIndex={-1}
                   data-row={i}
                   className={styles.row}
                   data-active={i === active || undefined}
@@ -207,9 +256,6 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
           </span>
           <span>
             <kbd>↵</kbd> open
-          </span>
-          <span>
-            <kbd>D</kbd> change mode
           </span>
           <span>
             <kbd>Esc</kbd> close

@@ -38,7 +38,7 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
   return (
     <>
       <header className={styles.rail} data-condensed={condensed || undefined}>
-        <Link href="/" className={styles.mark} aria-label="Key plan, G-000">
+        <Link href="/" className={styles.mark} title="Key plan, G-000">
           <span className={styles.monogram} aria-hidden="true">
             AB
           </span>
@@ -68,6 +68,7 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
             className={styles.control}
             onClick={openIndex}
             aria-haspopup="dialog"
+            aria-label="Index"
           >
             <span className={styles.indexGlyph} aria-hidden="true">
               <span />
@@ -82,7 +83,12 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
             type="button"
             className={styles.control}
             onClick={toggleLens}
+            // The lens ships as its own chunk; fetch it on intent so the
+            // barrel is there by the time the click lands.
+            onPointerEnter={() => void import('./Loupe')}
+            onFocus={() => void import('./Loupe')}
             aria-pressed={lensOn}
+            aria-label="Lens"
           >
             <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
               <circle cx="5" cy="5" r="3.5" stroke="currentColor" strokeWidth="1.2" fill="none" />

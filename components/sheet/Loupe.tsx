@@ -50,7 +50,13 @@ interface Probe {
   w: number;
   h: number;
   label: string;
+  /** Whether this box prints its own name, or leaves it to the readout. */
+  labelled: boolean;
 }
+
+/** Advance of one label character, in px, at the size the x-ray sets them. */
+const LABEL_CHAR_W = 6.1;
+const LABEL_H = 12;
 
 /**
  * Name an element the way a developer would recognise it. Sheets already carry
@@ -64,7 +70,9 @@ function describe(el: Element): string {
   const annotated = el.getAttribute('data-annotate');
   if (annotated) return annotated.toLowerCase();
 
-  const cls = String((el as HTMLElement).className || '').split(/\s+/)[0] ?? '';
+  // The attribute, not the property: on SVG elements `className` is an
+  // SVGAnimatedString and stringifies to "[object SVGAnimatedString]".
+  const cls = (el.getAttribute('class') ?? '').split(/\s+/)[0] ?? '';
   const mod = cls.match(/^([A-Za-z]+)_([A-Za-z0-9]+)__/);
   if (mod) return `${mod[1]}.${mod[2]}`;
 
@@ -100,6 +108,36 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
     const seen = new Set<Element>();
     const found: Probe[] = [];
 
+    // An x-ray of something that is not on the sheet is noise: rows the key
+    // plan has faded out, or that a short sheet has clipped away, would all
+    // draw as stacks of empty boxes. Clip rectangles are cached per pass.
+    const clips = new Map<Element, DOMRect | null>();
+    const clipOf = (el: Element) => {
+      let clip = clips.get(el);
+      if (clip === undefined) {
+        const style = getComputedStyle(el);
+        clip =
+          style.overflowX !== 'visible' || style.overflowY !== 'visible'
+            ? el.getBoundingClientRect()
+            : null;
+        clips.set(el, clip);
+      }
+      return clip;
+    };
+    const onSheet = (el: Element, r: DOMRect) => {
+      const shown = (
+        el as Element & { checkVisibility?: (o: Record<string, boolean>) => boolean }
+      ).checkVisibility?.({ opacityProperty: true, visibilityProperty: true, checkOpacity: true });
+      if (shown === false) return false;
+      for (let up = el.parentElement; up && up !== document.body; up = up.parentElement) {
+        const clip = clipOf(up);
+        if (!clip) continue;
+        if (r.bottom <= clip.top || r.top >= clip.bottom) return false;
+        if (r.right <= clip.left || r.left >= clip.right) return false;
+      }
+      return true;
+    };
+
     document.querySelectorAll(PROBE_SELECTOR).forEach((el) => {
       if (seen.has(el) || found.length >= PROBE_LIMIT) return;
       seen.add(el);
@@ -110,9 +148,34 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
       if (r.width < 16 || r.height < 7) return;
       if (r.bottom < 0 || r.top > window.innerHeight) return;
       if (r.right < 0 || r.left > window.innerWidth) return;
+      if (!onSheet(el, r)) return;
 
-      found.push({ x: r.x, y: r.y, w: r.width, h: r.height, label: describe(el) });
+      found.push({
+        x: r.x,
+        y: r.y,
+        w: r.width,
+        h: r.height,
+        label: describe(el),
+        labelled: false,
+      });
     });
+
+    // Nested boxes share a top-left corner, so naming all of them stacks the
+    // names into one unreadable smear. The innermost boxes claim their corner
+    // first; anything that would print over a name already set goes without.
+    const taken: Array<{ x: number; y: number; w: number }> = [];
+    [...found]
+      .sort((a, b) => a.w * a.h - b.w * b.h)
+      .forEach((p) => {
+        if (p.w < LABEL_MIN_W || p.h < LABEL_MIN_H) return;
+        const w = p.label.length * LABEL_CHAR_W + 8;
+        const clash = taken.some(
+          (t) => p.x < t.x + t.w && p.x + w > t.x && Math.abs(p.y - t.y) < LABEL_H
+        );
+        if (clash) return;
+        taken.push({ x: p.x, y: p.y, w });
+        p.labelled = true;
+      });
 
     probeList.current = found;
     setProbes(found);
@@ -272,14 +335,17 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
               {/* Set inside the box: a label above it would be clipped away
                   exactly when the lens is over that edge. Boxes too small to
                   hold their own name are left to the readout. */}
-              {p.w >= LABEL_MIN_W && p.h >= LABEL_MIN_H && (
+              {p.labelled && (
                 <>
                   <text x={p.x + 4} y={p.y + 11} className={styles.boxLabel}>
                     {p.label}
                   </text>
-                  <text x={p.x + 4} y={p.y + p.h - 4} className={styles.boxDim}>
-                    {Math.round(p.w)} × {Math.round(p.h)}
-                  </text>
+                  {/* The size needs a line of its own under the name. */}
+                  {p.h >= LABEL_MIN_H * 2 && (
+                    <text x={p.x + 4} y={p.y + p.h - 4} className={styles.boxDim}>
+                      {Math.round(p.w)} × {Math.round(p.h)}
+                    </text>
+                  )}
                 </>
               )}
             </g>

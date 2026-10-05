@@ -32,8 +32,15 @@ export type KeyPlanContents = Record<string, PlateItem[]>;
 const MIN_SCALE = 0.35;
 const MAX_SCALE = 2.6;
 const FLY_MS = 340;
+/** Share of the stage the fitted plan takes. Mirrored by `--fit` in the CSS. */
+const FIT = 0.94;
+/** Plan that must stay on the stage, in px, so a pan can never lose the drawing. */
+const KEEP_IN_VIEW = 140;
 /** Travel, in px, that separates a click on a sheet from a pan of the plan. */
 const DRAG_SLOP = 4;
+/** Dimension strings stand off the plan, clear of the sheets and bubbles. */
+const DIM_Y = KEY_PLAN_HEIGHT + 12;
+const DIM_X = -14;
 /** Radius of a cross-reference bubble, in plan units. */
 const XREF_R = 17;
 
@@ -68,7 +75,7 @@ const gridRef = (r: KeyPlanRect) => {
  * Scalloped outline used to ring a revised area, as on an issued drawing.
  * Walks the perimeter placing one arc per step so the bulges face outward.
  */
-const revisionCloud = (r: KeyPlanRect, step = 34, bulge = 11) => {
+const revisionCloud = (r: KeyPlanRect, step = 22, bulge = 14) => {
   const pts: Array<[number, number]> = [];
   const edge = (x1: number, y1: number, x2: number, y2: number) => {
     const len = Math.hypot(x2 - x1, y2 - y1);
@@ -113,13 +120,26 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
   // it does not need; only the camera state does.
   const drag = useRef({ active: false, moved: 0, px: 0, py: 0, ox: 0, oy: 0, captured: false });
   const flyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stageSize = useRef({ width: 0, height: 0 });
+
+  /** Hold the camera so some of the plan always stays on the stage. */
+  const bound = useCallback((cam: Camera): Camera => {
+    const { width, height } = stageSize.current;
+    if (!width || !height) return cam;
+    return {
+      scale: cam.scale,
+      x: clamp(cam.x, KEEP_IN_VIEW - KEY_PLAN_WIDTH * cam.scale, width - KEEP_IN_VIEW),
+      y: clamp(cam.y, KEEP_IN_VIEW - KEY_PLAN_HEIGHT * cam.scale, height - KEEP_IN_VIEW),
+    };
+  }, []);
 
   /** Camera that frames the whole plan inside the stage. */
   const fitCamera = useCallback((): Camera => {
     const stage = stageRef.current;
     if (!stage) return { scale: 1, x: 0, y: 0 };
     const { width, height } = stage.getBoundingClientRect();
-    const scale = Math.min(width / KEY_PLAN_WIDTH, height / KEY_PLAN_HEIGHT) * 0.9;
+    stageSize.current = { width, height };
+    const scale = Math.min(width / KEY_PLAN_WIDTH, height / KEY_PLAN_HEIGHT) * FIT;
     return {
       scale,
       x: (width - KEY_PLAN_WIDTH * scale) / 2,
@@ -159,9 +179,9 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     setCamera((cam) => {
       const scale = clamp(cam.scale * factor, MIN_SCALE, MAX_SCALE);
       const ratio = scale / cam.scale;
-      return { scale, x: px - (px - cam.x) * ratio, y: py - (py - cam.y) * ratio };
+      return bound({ scale, x: px - (px - cam.x) * ratio, y: py - (py - cam.y) * ratio });
     });
-  }, []);
+  }, [bound]);
 
   const zoomCentre = useCallback(
     (factor: number) => {
@@ -174,17 +194,24 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     [zoomAt]
   );
 
-  const onWheel = (event: React.WheelEvent) => {
-    if (!interactive) return;
+  // Bound natively rather than through React, whose wheel listeners are
+  // passive: a trackpad pinch arrives as ctrl+wheel, and unless it is
+  // cancelled the browser zooms the whole page along with the plan.
+  useEffect(() => {
     const stage = stageRef.current;
-    if (!stage) return;
-    const rect = stage.getBoundingClientRect();
-    zoomAt(
-      Math.exp(-event.deltaY * 0.0016),
-      event.clientX - rect.left,
-      event.clientY - rect.top
-    );
-  };
+    if (!stage || !interactive) return;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const rect = stage.getBoundingClientRect();
+      zoomAt(
+        Math.exp(-event.deltaY * (event.ctrlKey ? 0.01 : 0.0016)),
+        event.clientX - rect.left,
+        event.clientY - rect.top
+      );
+    };
+    stage.addEventListener('wheel', onWheel, { passive: false });
+    return () => stage.removeEventListener('wheel', onWheel);
+  }, [interactive, zoomAt]);
 
   const onPointerDown = (event: React.PointerEvent) => {
     if (!interactive || event.button !== 0) return;
@@ -217,7 +244,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       d.captured = true;
     }
 
-    setCamera((cam) => ({ ...cam, x: d.ox + dx, y: d.oy + dy }));
+    setCamera((cam) => bound({ ...cam, x: d.ox + dx, y: d.oy + dy }));
   };
 
   const endDrag = (event: React.PointerEvent) => {
@@ -288,7 +315,20 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     }));
   };
 
-  const lod = camera.scale < 0.62 ? 'far' : camera.scale < 1.1 ? 'mid' : 'near';
+  // Type on the plan is drafted in plan units, so a fitted plan on a laptop
+  // would print it at half size. `inv` scales it back up as the camera pulls
+  // out; each sheet then shows as many rows as fit rather than all of them at
+  // a size nobody can read. Stepped so a zoom does not relayout every frame.
+  const inv = interactive ? Math.round(clamp(0.95 / camera.scale, 1, 1.7) * 20) / 20 : 1;
+  const lod = !interactive
+    ? 'mid'
+    : camera.scale < 0.42
+      ? 'far'
+      : inv > 1.3
+        ? 'overview'
+        : camera.scale < 1.1
+          ? 'mid'
+          : 'near';
 
   // Cross-reference leaders, deduplicated so each pair is drawn once.
   const leaders = useMemo(() => {
@@ -412,7 +452,6 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       <div
         className={styles.surface}
         ref={stageRef}
-        onWheel={onWheel}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
@@ -426,6 +465,11 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
           style={{
             width: KEY_PLAN_WIDTH,
             height: KEY_PLAN_HEIGHT,
+            // Until the camera is live the CSS fit supplies both of these, so
+            // the plan is framed and legible before any script has run.
+            ...(interactive
+              ? ({ '--inv': inv, '--inv-soft': Math.min(inv, 1.25) } as React.CSSProperties)
+              : null),
             transform: interactive
               ? `translate3d(${camera.x}px, ${camera.y}px, 0) scale(${camera.scale})`
               : undefined,
@@ -491,42 +535,48 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             <g className={styles.dim}>
               {chain.map((run) => (
                 <g key={`c${run.x}`}>
-                  <line x1={run.x} y1={402} x2={run.x} y2={418} className={styles.dimTick} />
-                  <line
-                    x1={run.x + 6}
-                    y1={410}
-                    x2={run.x + run.w - 6}
-                    y2={410}
-                    className={styles.dimLine}
-                  />
-                  <text x={run.x + run.w / 2} y={407} className={styles.dimText}>
-                    {run.gutter ? run.w : `${run.w}`}
-                  </text>
+                  <line x1={run.x} y1={DIM_Y - 7} x2={run.x} y2={DIM_Y + 7} className={styles.dimTick} />
+                  {/* Gutters are ticked but not figured: the number would sit
+                      on top of the next band's. */}
+                  {!run.gutter && (
+                    <>
+                      <line
+                        x1={run.x + 6}
+                        y1={DIM_Y}
+                        x2={run.x + run.w - 6}
+                        y2={DIM_Y}
+                        className={styles.dimLine}
+                      />
+                      <text x={run.x + run.w / 2} y={DIM_Y - 5} className={styles.dimText}>
+                        {run.w}
+                      </text>
+                    </>
+                  )}
                 </g>
               ))}
               <line
                 x1={KEY_PLAN_WIDTH}
-                y1={402}
+                y1={DIM_Y - 7}
                 x2={KEY_PLAN_WIDTH}
-                y2={418}
+                y2={DIM_Y + 7}
                 className={styles.dimTick}
               />
 
-              {/* Overall height, taken up the first gutter. */}
-              <line x1={440} y1={6} x2={440} y2={KEY_PLAN_HEIGHT - 6} className={styles.dimLine} />
-              <line x1={432} y1={0} x2={448} y2={0} className={styles.dimTick} />
+              {/* Overall height, stood off the left edge of the plan. */}
+              <line x1={DIM_X} y1={6} x2={DIM_X} y2={KEY_PLAN_HEIGHT - 6} className={styles.dimLine} />
+              <line x1={DIM_X - 7} y1={0} x2={DIM_X + 7} y2={0} className={styles.dimTick} />
               <line
-                x1={432}
+                x1={DIM_X - 7}
                 y1={KEY_PLAN_HEIGHT}
-                x2={448}
+                x2={DIM_X + 7}
                 y2={KEY_PLAN_HEIGHT}
                 className={styles.dimTick}
               />
               <text
-                x={440}
-                y={KEY_PLAN_HEIGHT / 2}
+                x={DIM_X}
+                y={KEY_PLAN_HEIGHT / 2 - 5}
                 className={styles.dimText}
-                transform={`rotate(-90 440 ${KEY_PLAN_HEIGHT / 2})`}
+                transform={`rotate(-90 ${DIM_X} ${KEY_PLAN_HEIGHT / 2})`}
               >
                 {KEY_PLAN_HEIGHT}
               </text>
@@ -538,10 +588,10 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             {/* Revision cloud and triangle over the most recently issued sheet. */}
             <path
               d={revisionCloud({
-                x: revised.rect.x - 7,
-                y: revised.rect.y - 7,
-                w: revised.rect.w + 14,
-                h: revised.rect.h + 14,
+                x: revised.rect.x - 4,
+                y: revised.rect.y - 4,
+                w: revised.rect.w + 8,
+                h: revised.rect.h + 8,
               })}
               className={styles.cloud}
             />
@@ -560,8 +610,11 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               <span className={styles.headlineRole}>Architect of systems · Builder of intelligence</span>
             </h1>
             <p className={styles.headlineNote}>
-              This site is a drawing set. Every section is a numbered sheet on the plan below.
-              Open one, or press <kbd>/</kbd> for the index.
+              This site is a drawing set. Every section is a numbered sheet on the plan below.{' '}
+              <span className={styles.hintKeys}>
+                Open one, or press <kbd>/</kbd> for the index.
+              </span>
+              <span className={styles.hintTouch}>Open one, or use the sheet index.</span>
             </p>
 
             {/* Raw: what the plan is generated from. */}
@@ -581,6 +634,9 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             <Link
               key={plate.sheet}
               href={plate.href}
+              // Seven sheets prefetched on load is most of the page weight
+              // again; prefetch the one the reader is actually reaching for.
+              prefetch={false}
               className={styles.plate}
               data-discipline={plate.discipline}
               style={{ ...place(plate.rect), '--i': index } as React.CSSProperties}
@@ -588,9 +644,15 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               data-linked={(lit && plate.sheet !== hovered && lit.has(plate.sheet)) || undefined}
               data-dim={(lit && !lit.has(plate.sheet)) || undefined}
               onClick={(e) => onPlateClick(e, plate)}
-              onMouseEnter={() => setHovered(plate.sheet)}
+              onMouseEnter={() => {
+                setHovered(plate.sheet);
+                router.prefetch(plate.href);
+              }}
               onMouseLeave={() => setHovered(null)}
-              onFocus={() => onPlateFocus(plate)}
+              onFocus={() => {
+                router.prefetch(plate.href);
+                onPlateFocus(plate);
+              }}
               aria-label={`${plate.sheet}. ${plate.title}. ${plate.subtitle}`}
             >
               <span className={styles.plateTag}>{plate.sheet}</span>

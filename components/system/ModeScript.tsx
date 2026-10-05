@@ -7,8 +7,13 @@ import { MODE_STORAGE_KEY } from '@/lib/mode';
  *
  * A `?mode=` parameter wins over the stored preference so a specific view can
  * be linked to, and is then persisted like any other choice.
+ *
+ * It also stamps `data-js` on the root. The scroll reveals start from
+ * invisible, and they key off that flag so a reader whose script never
+ * arrives still gets the whole sheet.
  */
 const script = `(function(){
+document.documentElement.dataset.js='';
 try{
 var m=new URLSearchParams(location.search).get('mode');
 if(m!=='artifact'&&m!=='annotated'&&m!=='raw'){m=localStorage.getItem('${MODE_STORAGE_KEY}')}

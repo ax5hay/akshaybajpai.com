@@ -21,11 +21,17 @@ export interface ToastSpec {
   detail?: string;
   tone?: ToastTone;
   duration?: number;
+  /**
+   * Notices in the same group replace one another, so flicking through the
+   * drawing modes leaves one slip on the sheet rather than a pile of them.
+   */
+  group?: string;
 }
 
-interface Toast extends Required<Omit<ToastSpec, 'detail'>> {
+interface Toast extends Required<Omit<ToastSpec, 'detail' | 'group'>> {
   id: number;
   detail?: string;
+  group?: string;
 }
 
 interface ToastContextValue {
@@ -50,10 +56,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toast = useCallback(
-    ({ kind = 'Note', message, detail, tone = 'note', duration = 3800 }: ToastSpec) => {
+    ({ kind = 'Note', message, detail, tone = 'note', duration = 3800, group }: ToastSpec) => {
       const id = nextId++;
       // Cap the stack so a key held down cannot bury the sheet in slips.
-      setToasts((current) => [...current.slice(-2), { id, kind, message, detail, tone, duration }]);
+      setToasts((current) => [
+        ...current.filter((t) => !group || t.group !== group).slice(-1),
+        { id, kind, message, detail, tone, duration, group },
+      ]);
       timers.current.set(
         id,
         setTimeout(() => dismiss(id), duration)

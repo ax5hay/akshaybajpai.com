@@ -9,9 +9,11 @@
   gap: var(--s-4);
   height: var(--rail-h, 3.25rem);
   padding: 0 var(--s-3);
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: blur(10px) saturate(1.1);
-  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  /* Dense enough that a sheet passing underneath reads as a shadow, not as
+     a second line of text behind the controls. */
+  background: color-mix(in srgb, var(--paper) 95%, transparent);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
   border-bottom: var(--lw-thin) solid var(--rule);
   transition: height var(--d-2) var(--ease-mech), border-color var(--d-2);
 }
@@ -70,7 +72,7 @@
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
   letter-spacing: 0.1em;
-  color: var(--ink-4);
+  color: var(--ink-3);
   white-space: nowrap;
 }
 

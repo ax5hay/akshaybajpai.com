@@ -15,7 +15,8 @@
   position: absolute;
   top: 0.65em;
   left: 100%;
-  width: var(--s-8);
+  /* Runs out across the sheet's own margin to a note set on the board. */
+  width: calc(var(--sheet-pad, 0px) + var(--s-2));
   height: var(--lw-thin);
   margin-left: var(--s-3);
   background: var(--accent-line, var(--accent));
@@ -29,7 +30,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--s-2);
   width: 12rem;
-  margin-left: calc(var(--s-8) + var(--s-6));
+  margin-left: calc(var(--sheet-pad, 0px) + var(--s-6));
   font-family: var(--font-label), monospace;
   font-size: var(--t-mini);
   line-height: 1.5;

@@ -107,8 +107,10 @@ html[data-mode='artifact'] {
 
   --ink: #141417;
   --ink-2: #413c34;
-  --ink-3: #6f675a;
-  --ink-4: #948a75;
+  /* The two quiet inks still have to be read: --ink-3 clears 4.5:1 on the
+     board, --ink-4 clears it on a sheet. */
+  --ink-3: #5c5548;
+  --ink-4: #6f6655;
 
   --rule-faint: rgba(20, 20, 23, 0.12);
   --rule: rgba(20, 20, 23, 0.28);
@@ -120,9 +122,9 @@ html[data-mode='artifact'] {
   --grid-size: 24px;
 
   /* Vermilion: revision marks, callout leaders, the one hot colour on paper */
-  --accent: #9e3b2e;
-  --accent-soft: rgba(158, 59, 46, 0.14);
-  --accent-line: rgba(158, 59, 46, 0.55);
+  --accent: #983729;
+  --accent-soft: rgba(152, 55, 41, 0.14);
+  --accent-line: rgba(152, 55, 41, 0.55);
   --accent-2: #2f5d8c;
   --accent-2-soft: rgba(47, 93, 140, 0.13);
 
@@ -158,8 +160,8 @@ html[data-mode='annotated'] {
 
   --ink: #e6f1fc;
   --ink-2: #9dbdd9;
-  --ink-3: #6389ab;
-  --ink-4: #456780;
+  --ink-3: #7b9ebf;
+  --ink-4: #6a8dab;
 
   --rule-faint: rgba(157, 207, 255, 0.12);
   --rule: rgba(157, 207, 255, 0.28);
@@ -202,9 +204,9 @@ html[data-mode='raw'] {
   --paper-sunk: #000;
 
   --ink: #d6d6d0;
-  --ink-2: #8d8d86;
-  --ink-3: #5d5d58;
-  --ink-4: #3c3c39;
+  --ink-2: #a3a39c;
+  --ink-3: #85857f;
+  --ink-4: #74746e;
 
   --rule-faint: rgba(255, 255, 255, 0.06);
   --rule: rgba(255, 255, 255, 0.14);
@@ -474,7 +476,9 @@ html[data-mode='raw'] .display {
    REVEAL: plates draw themselves in, the way ink lands on paper.
    ========================================================================== */
 
-[data-reveal] {
+/* Gated on html[data-js], which the pre-paint script sets: without it a
+   reader whose script never arrives would be left with an invisible sheet. */
+html[data-js] [data-reveal] {
   opacity: 0;
   transform: translateY(14px);
   transition:
@@ -482,12 +486,12 @@ html[data-mode='raw'] .display {
     transform var(--d-4) var(--ease-plate);
 }
 
-[data-reveal].is-revealed {
+html[data-js] [data-reveal].is-revealed {
   opacity: 1;
   transform: none;
 }
 
-[data-reveal-stagger] > * {
+html[data-js] [data-reveal-stagger] > * {
   opacity: 0;
   transform: translateY(12px);
   transition:
@@ -495,7 +499,7 @@ html[data-mode='raw'] .display {
     transform var(--d-3) var(--ease-plate);
 }
 
-[data-reveal-stagger].is-revealed > * {
+html[data-js] [data-reveal-stagger].is-revealed > * {
   opacity: 1;
   transform: none;
 }
@@ -706,28 +710,45 @@ html[data-mode='artifact'] .prose-lead > p:first-of-type::first-letter {
   position: relative;
   z-index: var(--z-sheet);
   min-height: 100svh;
+  /* Contains the sheet's margins. Left to collapse, they would pass through
+     to <body> and open a strip of the darker root background under the rail. */
+  display: flow-root;
 }
 
-/* Standard content plate: a measure-width column inside the sheet margins.
-   Margin notes number themselves per sheet, so the counter resets here. */
+/* Standard content plate: one sheet of stock lying on the board, the same
+   object the key plan draws in miniature, so opening a sheet from the plan
+   lands on the thing that was clicked. Margin notes number themselves per
+   sheet, so the counter resets here. */
 .plate {
+  --sheet-pad: clamp(1.25rem, 5vw, 4.5rem);
   counter-reset: callout;
-  padding:
-    var(--plate-top)
-    calc(var(--sheet-margin) + var(--sheet-gutter))
-    var(--plate-bottom);
-  max-width: calc(var(--measure) + (var(--sheet-margin) + var(--sheet-gutter)) * 2);
-  margin-inline: auto;
+  position: relative;
+  width: calc(100% - (var(--sheet-margin) + var(--s-3)) * 2);
+  max-width: calc(var(--measure) + var(--sheet-pad) * 2);
+  margin: var(--plate-top) auto var(--plate-bottom);
+  padding: clamp(1.5rem, 5vw, 4rem) var(--sheet-pad) clamp(2rem, 6vw, 5rem);
+  background: linear-gradient(177deg, var(--sheet-sheen) 0%, transparent 28rem),
+    var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-lift);
+  transition:
+    background-color var(--d-3) var(--ease-mech),
+    border-color var(--d-3) var(--ease-mech);
 }
 
 .plate-wide {
-  max-width: calc(var(--measure-wide) + (var(--sheet-margin) + var(--sheet-gutter)) * 2);
+  max-width: calc(var(--measure-wide) + var(--sheet-pad) * 2);
 }
 
-/* Full-bleed plate for drawings that own the whole sheet, e.g. the key plan. */
+/* Full-bleed plate for drawings that own the whole board, e.g. the key plan. */
 .plate-bleed {
-  padding: 0;
+  width: auto;
   max-width: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
 }
 
 /* =============================================================================
@@ -748,7 +769,9 @@ html[data-mode='artifact'] .prose-lead > p:first-of-type::first-letter {
   position: absolute;
   top: 0;
   right: 100%;
-  margin-right: var(--s-5);
+  /* Off the sheet and onto the board: markup about a sheet is written beside
+     it, not across its own margin. */
+  margin-right: calc(var(--sheet-pad, 0px) + var(--s-5));
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
   letter-spacing: 0.08em;
@@ -786,8 +809,8 @@ html[data-mode='raw'] [data-raw] {
   outline-offset: 4px;
 }
 
-@media (max-width: 60rem) {
-  /* No room for margin annotations on narrow sheets. */
+@media (max-width: 78rem) {
+  /* No board left beside the sheet to write margin annotations on. */
   [data-annotate]::after,
   [data-raw]::before {
     display: none;

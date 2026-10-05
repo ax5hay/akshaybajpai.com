@@ -71,7 +71,10 @@ export function PlateShell({
         refs={refs}
       />
 
-      <header className={styles.head} data-reveal>
+      {/* Not scroll-revealed: this is the first thing on every sheet, and
+          holding it invisible until hydration made it the last thing to
+          paint. The template's settle animation carries the entrance. */}
+      <header className={styles.head}>
         <p className={styles.eyebrow}>
           <span className={styles.sheetTag}>{sheet}</span>
           <span className={styles.hairline} aria-hidden="true" />

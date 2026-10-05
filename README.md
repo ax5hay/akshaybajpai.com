@@ -132,7 +132,8 @@ On a first visit the tray pulses three times and a toast says what the set can
 do. Both are `localStorage`-gated and never appear again, and both stop the
 moment anything is operated.
 
-On narrow screens the tray moves to the very top, above the name.
+On narrow screens the tray sits directly under the name, and the printed key
+caps are dropped on devices with no keyboard to press them on.
 
 </td>
 </tr>
@@ -149,6 +150,10 @@ Optically it is a `backdrop-filter: invert()`, so the page underneath is
 recomposited rather than re-rendered. The technical layer is drawn once across
 the whole viewport and revealed through a moving `clip-path` circle, which makes
 a drag cost one style write instead of a re-measure of the page.
+
+It only names what is actually on the sheet: elements that are faded out or
+clipped away are skipped, and where nested boxes would print their names on top
+of each other the innermost one wins and the rest are left to the readout.
 
 - **Drag** the barrel, or nudge it with the arrow keys.
 - **Scroll** over it to change the diameter.
@@ -295,7 +300,8 @@ flowchart TD
   PLANE --> CAM["camera<br/>scale, x, y"]
   CAM --> XFORM["translate3d + scale<br/>transform-origin 0 0"]
   CAM --> LOD{"scale"}
-  LOD -->|"< 0.62"| FAR["far - titles only"]
+  LOD -->|"< 0.42"| FAR["far - titles only"]
+  LOD -->|"< 0.73"| OVER["overview - enlarged type, as many rows as fit"]
   LOD -->|"< 1.1"| MID["mid - contents"]
   LOD -->|"≥ 1.1"| NEAR["near - full detail"]
   XFORM --> FLY["click - fly camera to the sheet, then route"]
@@ -305,6 +311,14 @@ Things to know before editing it:
 
 - **Plate rectangles are authored, not computed.** The general arrangement is a
   designed composition; a force layout would undo that.
+- **Type holds its size as the camera pulls out.** The plan is drafted in plan
+  units, so a fitted plan on a laptop would print its rows at half size. The
+  plane carries `--inv`, roughly the inverse of the camera scale, and the type
+  is multiplied by it; each sheet then shows as many rows as fit and fades the
+  rest out, instead of showing all of them at a size nobody can read.
+- **The fit is computed twice, to the same figure.** Once in CSS, from container
+  units, so the server-rendered plan is framed before any script runs, and once
+  in `KeyPlan.tsx` when the camera goes live. Change `FIT` and `--fit` together.
 - **Only camera state re-renders.** Drag bookkeeping lives in a ref, so
   `pointermove` never triggers a render it does not need.
 - **Leaders run between plate *edges*, not centres.** A centre-to-centre line
@@ -316,12 +330,13 @@ Things to know before editing it:
   with no clear spot simply goes unlabelled, as it would on paper.
 - **Hovering reads out the subgraph.** The hovered sheet, everything it
   references, and everything that references it all stay lit and take the
-  accent; the rest fall back to 32% opacity.
+  accent; the rest fade their contents but stay opaque, because leaders run
+  underneath the sheets and a see-through sheet would show them.
 - **The furniture is data, not decoration.** The revision schedule in the legend
   is derived from the sheets themselves, so it cannot drift out of date.
 - **Narrow screens get a stacked index.** Pan and zoom need a pointer and room
-  for the plan; below `60rem` the same registry renders as a list, led by the
-  instrument tray.
+  for the plan; below `60rem` the same registry renders as a list, with the
+  instrument tray between the name and the sheets.
 
 The composition is tuned for artifact mode specifically, because that is the
 only mode that has to earn its contrast rather than getting it free from a dark
@@ -335,7 +350,9 @@ three furniture blocks share a bottom datum so their reversed headers line up.
 
 `PlateShell` is the one wrapper every content route uses. It renders the header,
 body, cross-references, and raw record together, and lets CSS decide which the
-current mode shows.
+current mode shows. The plate is drawn as a sheet of stock on the board, the
+same object the key plan shows in miniature, and the frame trims anything that
+scrolls past the drawing border.
 
 ```mermaid
 flowchart TD
@@ -518,6 +535,7 @@ lib/
 
 content/                  # blog, essays, work Markdown
 docs/media/               # README screenshots
+public/og.jpg             # share card: the key plan at 1200 × 630
 ```
 
 ---
