@@ -31,6 +31,12 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Search Console and Bing Webmaster ownership tokens, set under
+          # Settings → Secrets and variables → Actions → Variables. Either may
+          # be absent; the meta tag is simply not issued.
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+          BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
 
       - name: Preserve CNAME
         run: echo "www.akshaybajpai.com" > out/CNAME

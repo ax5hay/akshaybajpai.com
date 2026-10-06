@@ -7,16 +7,21 @@ import { SCHEMATICS } from '@/components/figures/schematics';
 import { Callout } from '@/components/kit/Callout';
 import { DimensionLine } from '@/components/kit/DimensionLine';
 import { getPlateByHref } from '@/lib/plates';
-import { buildMetadata } from '@/lib/metadata';
+import { buildMetadata, breadcrumbs, webPage } from '@/lib/metadata';
+import { JsonLd } from '@/components/JsonLd';
 
 const PLATE = getPlateByHref('/architecture/')!;
 
-export const metadata = buildMetadata({
-  title: 'Architecture · Akshay Bajpai | AI Architect & Technology Leader',
+const META = {
+  title: 'Structural Principles · How I design AI platforms',
   description:
     'How I design AI platforms: governed agents, hybrid retrieval, event-driven inference, and infrastructure as product.',
   path: '/architecture/',
-});
+  card: 'architecture',
+  keywords: ['AI platform architecture', 'governed agents', 'hybrid RAG', 'LLM gateway', 'multi-tenant LLM platform', 'Akshay Bajpai'],
+};
+
+export const metadata = buildMetadata(META);
 
 export default function ArchitecturePage() {
   return (
@@ -28,6 +33,16 @@ export default function ArchitecturePage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      jsonLd={[
+        webPage({
+          path: META.path,
+          name: META.title,
+          description: META.description,
+          type: 'WebPage',
+          card: META.card,
+        }),
+        breadcrumbs([{ name: 'S-201 Structural Principles', path: META.path }]),
+      ]}
       figure={PLATE.id}
       lead={<p>System design, infrastructure patterns, and how I think about structure.</p>}
       record={[

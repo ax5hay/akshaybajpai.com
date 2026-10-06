@@ -2,16 +2,21 @@ import Link from 'next/link';
 import { PlateShell } from '@/components/plate/PlateShell';
 import { RecordSchedule } from '@/components/plate/RecordSchedule';
 import { getPlateByHref } from '@/lib/plates';
-import { buildMetadata } from '@/lib/metadata';
+import { buildMetadata, breadcrumbs, webPage, PERSON_ID } from '@/lib/metadata';
+import { JsonLd } from '@/components/JsonLd';
 
 const PLATE = getPlateByHref('/research/')!;
 
-export const metadata = buildMetadata({
-  title: 'Research · Akshay Bajpai | AI Architect & Technology Leader',
+const META = {
+  title: 'Research · Medical AI, thesis and publication',
   description:
     "Published medical AI research, Master's thesis on dementia classification, and ongoing work in robust AI infrastructure.",
   path: '/research/',
-});
+  card: 'research',
+  keywords: ['Akshay Bajpai research', 'machine learning for medical diagnosis', 'Springer chapter', 'Alzheimer\'s classification', 'MSc thesis AI'],
+};
+
+export const metadata = buildMetadata(META);
 
 export default function ResearchPage() {
   return (
@@ -23,6 +28,31 @@ export default function ResearchPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      jsonLd={[
+        webPage({
+          path: META.path,
+          name: META.title,
+          description: META.description,
+          type: 'WebPage',
+          card: META.card,
+          extra: {
+          mainEntity: {
+            '@type': 'Chapter',
+            name: 'Chapter 17: Machine learning approaches to medical diagnosis',
+            author: { '@id': PERSON_ID },
+            datePublished: '2024',
+            isPartOf: {
+              '@type': 'Book',
+              name: 'ML for Medical Diagnosis in Data-Centric Business and Application',
+              bookEdition: '3rd',
+              isbn: '978-3-031-60815-5',
+              publisher: { '@type': 'Organization', name: 'Springer' },
+            },
+          },
+        },
+        }),
+        breadcrumbs([{ name: 'R-301 Research', path: META.path }]),
+      ]}
       figure={PLATE.id}
       lead={<p>Published work and experimental directions.</p>}
       facts={[

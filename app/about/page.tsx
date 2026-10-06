@@ -3,16 +3,21 @@ import { PlateShell } from '@/components/plate/PlateShell';
 import { CareerElevation } from '@/components/plate/CareerElevation';
 import { Callout } from '@/components/kit/Callout';
 import { getPlateByHref } from '@/lib/plates';
-import { buildMetadata } from '@/lib/metadata';
+import { buildMetadata, breadcrumbs, webPage, PERSON_ID } from '@/lib/metadata';
+import { JsonLd } from '@/components/JsonLd';
 
 const PLATE = getPlateByHref('/about/')!;
 
-export const metadata = buildMetadata({
-  title: 'About · Akshay Bajpai | AI Architect & Technology Leader',
+const META = {
+  title: 'The Architect · About Akshay Bajpai',
   description:
     'Forward-deployed AI engineer: multi-tenant platforms, governed agents, clinical and operational intelligence from research to production.',
   path: '/about/',
-});
+  card: 'about',
+  keywords: ['Akshay Bajpai', 'about Akshay Bajpai', 'ax5hay', 'AI architect New Delhi', 'forward-deployed AI engineer', 'MSc Artificial Intelligence'],
+};
+
+export const metadata = buildMetadata(META);
 
 export default function AboutPage() {
   return (
@@ -24,6 +29,17 @@ export default function AboutPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      jsonLd={[
+        webPage({
+          path: META.path,
+          name: META.title,
+          description: META.description,
+          type: 'ProfilePage',
+          card: META.card,
+          extra: { mainEntity: { '@id': PERSON_ID } },
+        }),
+        breadcrumbs([{ name: 'A-101 The Architect', path: META.path }]),
+      ]}
       lead={<p>Architect of systems. Builder of intelligence.</p>}
       record={[
         { k: 'name', v: 'Akshay Bajpai' },

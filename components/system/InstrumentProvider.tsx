@@ -26,6 +26,9 @@ interface Instruments {
   closeIndex: () => void;
   /** True on a reader's first visit, until they operate something. */
   inviting: boolean;
+  /** A query the index should open with, from `?q=`; consumed once. */
+  queryPreset: string | null;
+  clearQueryPreset: () => void;
 }
 
 const InstrumentContext = createContext<Instruments | null>(null);
@@ -70,6 +73,17 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
       group: 'lens',
     });
   }, [lensOn, toast]);
+
+  // `?q=` opens the index with the query filled in: the site's search
+  // endpoint, as declared to search engines in the WebSite schema.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (!q) return;
+    setInviting(false);
+    setIndexOpen(true);
+    setQueryPreset(q);
+  }, []);
+  const [queryPreset, setQueryPreset] = useState<string | null>(null);
 
   const openIndex = useCallback(() => {
     setInviting(false);
@@ -141,9 +155,10 @@ export function InstrumentProvider({ children }: { children: ReactNode }) {
     return () => watch.disconnect();
   }, []);
 
+  const clearQueryPreset = useCallback(() => setQueryPreset(null), []);
   const value = useMemo<Instruments>(
-    () => ({ lensOn, toggleLens, indexOpen, openIndex, closeIndex, inviting }),
-    [lensOn, toggleLens, indexOpen, openIndex, closeIndex, inviting],
+    () => ({ lensOn, toggleLens, indexOpen, openIndex, closeIndex, inviting, queryPreset, clearQueryPreset }),
+    [lensOn, toggleLens, indexOpen, openIndex, closeIndex, inviting, queryPreset, clearQueryPreset],
   );
 
   return <InstrumentContext.Provider value={value}>{children}</InstrumentContext.Provider>;

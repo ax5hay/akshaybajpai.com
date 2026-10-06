@@ -31,7 +31,7 @@ Static files, built by GitHub Actions, served by GitHub Pages, for free.
 | **Trigger** | Any push to `main`, which in practice means merging a pull request |
 | **Time to live** | About one minute; the last six deploys took 55 to 90 seconds |
 | **What is deployed** | The `out/` directory from `npm run build`: static HTML, CSS, JS, fonts |
-| **Server-side code** | None. No functions, no database, no environment variables, no secrets |
+| **Server-side code** | None. No functions, no database, no secrets; two optional build variables for search-engine verification |
 | **Cost** | Nothing for hosting, CI or the certificate. The domain registration is the only bill |
 | **Third-party runtime service** | Formspree, for the contact form |
 
@@ -86,7 +86,7 @@ The workflow is [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). 
 | `build` | Checkout | `actions/checkout@v4` | |
 | | Setup Node | Node 20 with the npm cache | Keeps installs to a few seconds |
 | | Install | `npm ci` | Exact versions from `package-lock.json` |
-| | Build | `npm run build` | `next build` exports to `out/`, then `scripts/generate-rss.mjs` writes `out/rss.xml`, then `scripts/strip-polyfills.mjs` removes the `nomodule` polyfill bundle from every page |
+| | Build | `npm run build` | `next build` exports to `out/`; then `scripts/generate-rss.mjs` writes `out/rss.xml` and `out/llms.txt`, `scripts/generate-og.mjs` draws a share card per sheet into `out/og/`, and `scripts/strip-polyfills.mjs` removes the `nomodule` polyfill bundle from every page |
 | | Preserve CNAME | Writes `www.akshaybajpai.com` to `out/CNAME` | Pages reads the custom domain from the artifact. Without this file a deploy would drop the domain |
 | | Verify artifact | Fails unless `out/index.html` and `out/CNAME` exist | Stops an empty or domainless site from going live |
 | | Upload | `actions/upload-pages-artifact@v4` | Hands `out/` to the deploy job |
@@ -120,10 +120,11 @@ out/
 ├── set/index.html              # the whole set as one document, for print
 ├── 404.html                    # X-999, Sheet Not Issued
 ├── _next/static/               # hashed JS, CSS and self-hosted fonts
-├── sitemap.xml                 # from app/sitemap.ts
+├── sitemap.xml                 # from app/sitemap.ts, with each sheet's real issue date
 ├── robots.txt                  # from app/robots.ts
-├── rss.xml                     # from scripts/generate-rss.mjs (blog only)
-├── og.jpg · logo.png · favicon.svg · site.webmanifest
+├── rss.xml · llms.txt          # from scripts/generate-rss.mjs: one feed of every sheet, and the set described for models
+├── og/<sheet>.png              # from scripts/generate-og.mjs: one share card per sheet
+├── og.jpg · logo.png · favicon.svg · site.webmanifest · humans.txt
 └── CNAME                       # written by the workflow
 ```
 
@@ -144,6 +145,19 @@ without module support and marks it `nomodule`. `scripts/strip-polyfills.mjs` re
 tag from every page and deletes the file, since no browser that needs it can show the site.
 If a page ever appears with the tag, that step did not run: check the build log for
 *Stripped the polyfill script from N of N pages*.
+
+**The share cards are drawn, not uploaded.** `scripts/generate-og.mjs` renders a
+1200 × 630 card for every sheet with [satori](https://github.com/vercel/satori) and
+`@resvg/resvg-js`, from the same frontmatter that makes the page, in the three faces
+vendored under `scripts/fonts/`. The build log says *Drew N share cards into out/og/*; N
+should equal the number of sheets minus one (the key plan keeps `public/og.jpg`). The
+resvg binary is a platform-specific optional dependency; `package-lock.json` pins the
+Linux x64 build the runner needs, so do not prune optional dependencies from it.
+
+**Search-engine verification is a build variable.** The build step passes
+`GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` from the repository's Actions
+variables into `app/layout.tsx`, which issues the ownership `<meta>` tags when they are
+set and nothing when they are not. See [§7](#7--one-time-setup).
 
 ---
 
@@ -226,7 +240,7 @@ curl -sI https://akshaybajpai.com/      | grep -iE '^HTTP|^location'
 curl -sI http://www.akshaybajpai.com/   | grep -iE '^HTTP|^location'
 
 # The supporting files are there
-for p in sitemap.xml robots.txt rss.xml og.jpg; do
+for p in sitemap.xml robots.txt rss.xml llms.txt humans.txt og.jpg og/about.png; do
   curl -s -o /dev/null -w "%{http_code}  $p\n" "https://www.akshaybajpai.com/$p"
 done
 
@@ -248,6 +262,8 @@ Then look at it:
 - [ ] Press **▶ Tour** on the key plan; it visits each sheet and stops on <kbd>Esc</kbd>.
 - [ ] Open `/set/` and print to PDF; every sheet starts a new page.
 - [ ] Follow a link to a path that does not exist; the unissued sheet offers the nearest ones.
+- [ ] Open `/?q=rag`; the index opens on the query, with no cover sheet first.
+- [ ] Paste a sheet's URL into a chat or social app; its own card appears, not the home card.
 
 > [!TIP]
 > If the site looks unchanged after a successful run, it is almost always the cache. Pages
@@ -298,22 +314,34 @@ Already done for this repository. Recorded for a fork, or for rebuilding from no
 5. **Environment.** The `github-pages` environment is created by the first deploy. Its
    branch policy should allow `main` only.
 
-No secrets, tokens or environment variables are required. The workflow authenticates with
-the `id-token` permission GitHub grants it.
+6. **Search engines.** Optional, and the only configuration that is not in the code.
+   Add the site in [Google Search Console](https://search.google.com/search-console)
+   (choose the *URL prefix* property, `https://www.akshaybajpai.com/`, and the *HTML tag*
+   method) and in [Bing Webmaster Tools](https://www.bing.com/webmasters) (the
+   *meta tag* method). Each gives a token; store them under Settings → Secrets and
+   variables → Actions → **Variables** as `GOOGLE_SITE_VERIFICATION` and
+   `BING_SITE_VERIFICATION`, then re-run the deploy. The next build issues the tags, and
+   the verification buttons will pass. Submit `https://www.akshaybajpai.com/sitemap.xml`
+   in both consoles once they do. Bing feeds DuckDuckGo and the model-backed engines
+   that use its index, so the second one matters more than it looks.
+
+No secrets are required. The workflow authenticates with the `id-token` permission GitHub
+grants it; the two verification variables above are optional and public by nature.
 
 <details>
 <summary><b>Changing the domain</b></summary>
 
 <br/>
 
-Four places name it, and all four have to change together:
+Five places name it, and all five have to change together:
 
 | Where | What |
 |:------|:-----|
 | `CNAME` | The domain |
 | `.github/workflows/deploy.yml` | The `echo "…" > out/CNAME` step |
-| `lib/constants.ts` | `SITE_URL`, used for canonical URLs, the sitemap and share cards |
-| `scripts/generate-rss.mjs` | `SITE`, used for feed links |
+| `lib/constants.ts` | `SITE_URL`, used for canonical URLs, the sitemap, the structured data and share cards |
+| `scripts/generate-rss.mjs` | `SITE`, used for feed links and `llms.txt` |
+| `scripts/generate-og.mjs` | The domain printed on every card |
 
 Then update the custom domain in the Pages settings and the DNS record.
 

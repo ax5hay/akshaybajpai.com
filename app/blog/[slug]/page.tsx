@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { ArticlePlate } from '@/components/plate/ArticlePlate';
 import { getAllSlugs, getEntry, estimateReadingTime } from '@/lib/content';
 import { adjacentSheets, crossReferences, detailSheetFor } from '@/lib/sheet-index';
-import { buildMetadata } from '@/lib/metadata';
+import { article, breadcrumbs, buildMetadata } from '@/lib/metadata';
 
 export async function generateStaticParams() {
   const slugs = await getAllSlugs('blog');
@@ -15,10 +15,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!post) return {};
 
   return buildMetadata({
-    title: `${post.frontmatter.title} · Akshay Bajpai`,
+    title: post.frontmatter.title,
     description: post.frontmatter.description,
     path: `/blog/${slug}/`,
     type: 'article',
+    card: `blog-${slug}`,
     publishedTime: new Date(post.frontmatter.pubDate).toISOString(),
   });
 }
@@ -47,6 +48,23 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
       readingTime={estimateReadingTime(post.content)}
       seriesHref="/blog/"
       seriesLabel="Field Notes"
+      jsonLd={[
+        article({
+          path: `/blog/${slug}/`,
+          title: post.frontmatter.title,
+          description: post.frontmatter.description,
+          published: post.frontmatter.pubDate,
+          words: post.content.trim().split(/\s+/).length,
+          minutes: estimateReadingTime(post.content),
+          section: 'Field Notes',
+          card: `blog-${slug}`,
+          kind: 'BlogPosting',
+        }),
+        breadcrumbs([
+          { name: 'B-500 Field Notes', path: '/blog/' },
+          { name: `${sheet} ${post.frontmatter.title}`, path: `/blog/${slug}/` },
+        ]),
+      ]}
       adjacent={adjacent}
       xrefs={xrefs}
     />

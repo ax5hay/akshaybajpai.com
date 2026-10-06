@@ -2,16 +2,22 @@ import { PlateShell } from '@/components/plate/PlateShell';
 import { SheetSchedule, type ScheduleRow } from '@/components/plate/SheetSchedule';
 import { getCollection, estimateReadingTime } from '@/lib/content';
 import { detailSheetNumber, getPlateByHref } from '@/lib/plates';
-import { buildMetadata } from '@/lib/metadata';
+import { SITE_URL } from '@/lib/constants';
+import { buildMetadata, breadcrumbs, webPage } from '@/lib/metadata';
+import { JsonLd } from '@/components/JsonLd';
 
 const PLATE = getPlateByHref('/essays/')!;
 
-export const metadata = buildMetadata({
-  title: 'Essays · Akshay Bajpai | AI Architect & Technology Leader',
+const META = {
+  title: 'Essays · Systems, cost and trust',
   description:
     'Long-form essays on systems thinking, the architecture of trust, minimalism as engineering, and why performance is a feature.',
   path: '/essays/',
-});
+  card: 'essays',
+  keywords: ['AI essays', 'world models', 'JEPA', 'reinforcement learning', 'AI architecture essays', 'Akshay Bajpai essays'],
+};
+
+export const metadata = buildMetadata(META);
 
 export default async function EssaysIndexPage() {
   const entries = await getCollection('essays');
@@ -35,6 +41,27 @@ export default async function EssaysIndexPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      jsonLd={[
+        webPage({
+          path: META.path,
+          name: META.title,
+          description: META.description,
+          type: 'CollectionPage',
+          card: META.card,
+          extra: {
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: rows.map((row, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: `${row.sheet} ${row.title}`,
+              url: `${SITE_URL}${row.href}`,
+            })),
+          },
+        },
+        }),
+        breadcrumbs([{ name: 'E-600 Essays', path: META.path }]),
+      ]}
       figure={PLATE.id}
       facts={[{ k: 'Sheets', v: String(rows.length) }]}
       record={[{ k: 'series', v: 'E-6xx' }, { k: 'count', v: String(rows.length) }]}

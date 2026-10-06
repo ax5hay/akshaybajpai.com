@@ -4,17 +4,22 @@ import { CopyValue } from '@/components/kit/CopyValue';
 import { LocalTime } from '@/components/plate/LocalTime';
 import { PlateFigure } from '@/components/figures/PlateFigure';
 import { getPlateByHref } from '@/lib/plates';
-import { buildMetadata } from '@/lib/metadata';
+import { buildMetadata, breadcrumbs, webPage, PERSON_ID } from '@/lib/metadata';
+import { JsonLd } from '@/components/JsonLd';
 import { SOCIAL } from '@/lib/constants';
 import styles from './contact.module.css';
 
 const PLATE = getPlateByHref('/contact/')!;
 
-export const metadata = buildMetadata({
-  title: 'Contact · Akshay Bajpai | AI Architect & Technology Leader',
+const META = {
+  title: 'Correspondence · Contact Akshay Bajpai',
   description: 'Get in touch for AI systems, architecture, or performance-critical product work.',
   path: '/contact/',
-});
+  card: 'contact',
+  keywords: ['contact Akshay Bajpai', 'hire AI architect', 'forward-deployed AI engineer contact', 'Akshay Bajpai email'],
+};
+
+export const metadata = buildMetadata(META);
 
 const CHANNELS = [
   { label: 'Email', value: SOCIAL.email, href: `mailto:${SOCIAL.email}` },
@@ -35,6 +40,17 @@ export default function ContactPage() {
       scale={PLATE.scale}
       revision={PLATE.revision}
       refs={PLATE.refs}
+      jsonLd={[
+        webPage({
+          path: META.path,
+          name: META.title,
+          description: META.description,
+          type: 'ContactPage',
+          card: META.card,
+          extra: { mainEntity: { '@id': PERSON_ID } },
+        }),
+        breadcrumbs([{ name: 'C-700 Correspondence', path: META.path }]),
+      ]}
       wide
       lead={<p>Let&apos;s build something that matters.</p>}
       record={CHANNELS.map((c) => ({ k: c.label.toLowerCase(), v: c.value }))}
