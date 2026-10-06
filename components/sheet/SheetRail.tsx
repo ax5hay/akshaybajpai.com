@@ -32,6 +32,22 @@ export function SheetRail() {
     closeIndex();
   }, [pathname, closeIndex]);
 
+  // A finger cannot hover the buttons that fetch the index and the lens ahead
+  // of a press, so on a touch screen both are fetched once the page is idle,
+  // and the index is mounted closed so its first open is its second: the
+  // lazy component resolves and evaluates while nobody is waiting on it.
+  const [warm, setWarm] = useState(false);
+  useEffect(() => {
+    if (!window.matchMedia('(hover: none)').matches) return;
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1500));
+    const cancel = window.cancelIdleCallback ?? clearTimeout;
+    const id = idle(() => {
+      void import('./Loupe');
+      setWarm(true);
+    });
+    return () => cancel(id as number);
+  }, []);
+
   // The rail thins once the reader is into the sheet, giving the drawing room.
   useEffect(() => {
     const onScroll = () => setCondensed(window.scrollY > 64);
@@ -107,8 +123,8 @@ export function SheetRail() {
         </div>
       </header>
 
-      {indexOpen && (
-        <SheetIndex entries={entries} open onClose={closeIndex} currentSheet={meta.sheet} />
+      {(indexOpen || warm) && (
+        <SheetIndex entries={entries} open={indexOpen} onClose={closeIndex} currentSheet={meta.sheet} />
       )}
 
       {lensOn && <Loupe onDismiss={toggleLens} />}

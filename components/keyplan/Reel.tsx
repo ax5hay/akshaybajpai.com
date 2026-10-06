@@ -58,6 +58,7 @@ export function Reel({
   useEffect(() => {
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    document.documentElement.dataset.dialog = '';
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
       if (event.key === 'ArrowRight') go(1);
@@ -65,6 +66,7 @@ export function Reel({
     };
     window.addEventListener('keydown', onKey);
     return () => {
+      delete document.documentElement.dataset.dialog;
       document.body.style.overflow = previous;
       window.removeEventListener('keydown', onKey);
     };
@@ -145,7 +147,7 @@ export function Reel({
       <div
         ref={cardRef}
         key={plate.sheet}
-        className={`${styles.card} ${plate.id === 'contact' ? 'reversed' : ''}`}
+        className={`${styles.card} composited ${plate.id === 'contact' ? 'reversed' : ''}`}
       >
         <span className={styles.tag}>{plate.sheet}</span>
         <h2 className={styles.title}>{plate.title}</h2>

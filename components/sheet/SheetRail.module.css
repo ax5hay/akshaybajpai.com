@@ -320,7 +320,7 @@
   }
 
   /* The expanded title block needs the whole bar. */
-  :global(body:has(aside[data-expanded])) .controls {
+  :global(html[data-titleblock]) .controls {
     display: none;
   }
 }

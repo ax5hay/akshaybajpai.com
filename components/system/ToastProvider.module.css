@@ -148,7 +148,7 @@
 
 /* A notice does not sit over the index, which is the whole screen there. */
 @media (max-width: 44rem) {
-  :global(body:has([role='dialog'])) .stack {
+  :global(html[data-dialog]) .stack {
     display: none;
   }
 }

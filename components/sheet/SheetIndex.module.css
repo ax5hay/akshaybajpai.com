@@ -559,6 +559,15 @@ html[data-mode='raw'] .previewTitle {
     background: var(--paper-deep);
   }
 
+  .scrim {
+    overscroll-behavior: contain;
+    touch-action: none;
+  }
+
+  .list {
+    touch-action: pan-y;
+  }
+
   .panel {
     width: 100%;
     height: 100dvh;
