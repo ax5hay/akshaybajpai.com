@@ -1139,6 +1139,14 @@ links to, so the engine's picture of him matches the site's.
   recrawls what changed and trusts the rest. `/set/` is excluded and marked `noindex`;
   it is for printing, and would otherwise compete with every page it contains.
 
+### Every sheet, from every page
+
+The index a reader opens is a dialog that mounts on demand, so its links are not in the
+HTML a crawler is handed, and the key plan links to the seven section sheets and none of
+the twenty-seven behind them. Search Console counted nine internal links across the whole
+set. The layout now issues the same register once per page as a static, hidden `<nav>`:
+thirty-six links on every sheet, no node on screen, no weight on the page.
+
 ### The search endpoint
 
 The `WebSite` node declares a `SearchAction` with `/?q={search_term_string}`. It is a
@@ -1170,6 +1178,7 @@ argument; those are the evidence.
 | Share cards | `scripts/generate-og.mjs`, fonts under `scripts/fonts/` |
 | Feed and `llms.txt` | `scripts/generate-rss.mjs` |
 | Sitemap, robots | `app/sitemap.ts`, `app/robots.ts` |
+| Sheet register: every sheet linked from every page | `components/sheet/Register.tsx`, a hidden `<nav>` in the layout; the index is its screen form |
 | Search endpoint | `InstrumentProvider` reads `?q=`; `ModeScript` skips the cover for it |
 | Verification tags | `app/layout.tsx`, from `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` |
 
