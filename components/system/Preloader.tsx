@@ -323,7 +323,7 @@ export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
       if (issued === 1) show('Type set');
       settle();
     });
-    import('@/components/sheet/Loupe')
+    Promise.all([import('@/components/sheet/Loupe'), import('@/components/sheet/SheetIndex')])
       .catch(() => {})
       .then(() => {
         lensReady = true;

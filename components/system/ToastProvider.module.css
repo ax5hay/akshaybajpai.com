@@ -145,3 +145,10 @@
     padding: var(--s-2) var(--s-3) var(--s-3);
   }
 }
+
+/* A notice does not sit over the index, which is the whole screen there. */
+@media (max-width: 44rem) {
+  :global(body:has([role='dialog'])) .stack {
+    display: none;
+  }
+}

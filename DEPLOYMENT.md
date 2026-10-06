@@ -234,6 +234,10 @@ Then look at it:
 - [ ] Click a sheet on the key plan; it grows into its page.
 - [ ] Press <kbd>D</kbd> twice; both other modes render.
 - [ ] Open one case study and operate its schematic.
+- [ ] Press <kbd>/</kbd>; the index opens with a preview beside the list.
+- [ ] On a phone, or a narrow window: the pile scrolls, the dock is at the foot, and on an
+      article the section strip rides under the rail.
+- [ ] Follow a link to a path that does not exist; the unissued sheet offers the nearest ones.
 
 > [!TIP]
 > If the site looks unchanged after a successful run, it is almost always the cache. Pages
@@ -321,6 +325,7 @@ Then update the custom domain in the Pages settings and the DNS record.
 | **A new post is missing** | `draft: true` in its frontmatter, or a missing `title`, `description` or `pubDate` | Fix the frontmatter and merge |
 | **A sheet's number changed** | Detail sheets are numbered by publication date, so adding or re-dating one renumbers the series | Expected. Link to sheets by URL, not by number |
 | **Contact form fails** | Formspree is unreachable or its endpoint changed | The form already tells the visitor to email instead. The endpoint is in `components/plate/CorrespondenceForm.tsx` |
+| **A hint note never appears** | Each is shown once per browser, ever, and "No more notes" turns them off | Clear `plate.notes` and `plate.notes.off` from the site's local storage |
 | **The cover sheet does not appear** | It plays once per tab session, and never under reduced motion | Open a new tab or a private window |
 
 ---

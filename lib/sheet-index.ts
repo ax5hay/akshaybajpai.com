@@ -1,6 +1,13 @@
 import { getCollection } from '@/lib/content';
+import { parseContentDate } from '@/lib/format';
 import { COLLECTION_SERIES, PLATES, detailSheetNumber, type SeriesName } from '@/lib/plates';
 import type { IndexEntry } from '@/components/sheet/SheetIndex';
+
+/** Year and month, as stamped on a sheet. */
+function stamp(date: string): string {
+  const d = parseContentDate(date);
+  return `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+}
 
 /**
  * Builds the complete drawing index at build time: the seven general
@@ -30,6 +37,8 @@ export async function buildSheetIndex(): Promise<IndexEntry[]> {
       href: `/work/${entry.slug}/`,
       discipline: COLLECTION_SERIES.work.discipline,
       group: 'Works · details',
+      issued: stamp(entry.frontmatter.pubDate),
+      profile: entry.sections.map((section) => section.words),
     })),
     ...essays.map((entry, i) => ({
       sheet: detailSheetNumber('essays', i),
@@ -38,6 +47,8 @@ export async function buildSheetIndex(): Promise<IndexEntry[]> {
       href: `/essays/${entry.slug}/`,
       discipline: COLLECTION_SERIES.essays.discipline,
       group: 'Essays · details',
+      issued: stamp(entry.frontmatter.pubDate),
+      profile: entry.sections.map((section) => section.words),
     })),
     ...blog.map((entry, i) => ({
       sheet: detailSheetNumber('blog', i),
@@ -46,6 +57,8 @@ export async function buildSheetIndex(): Promise<IndexEntry[]> {
       href: `/blog/${entry.slug}/`,
       discipline: COLLECTION_SERIES.blog.discipline,
       group: 'Field notes · details',
+      issued: stamp(entry.frontmatter.pubDate),
+      profile: entry.sections.map((section) => section.words),
     })),
   ];
 
