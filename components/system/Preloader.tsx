@@ -79,7 +79,7 @@ function Print({ total }: { total: number }) {
 
       <span className={styles.nameBox}>
         <span className={styles.rule} />
-        <span className={styles.name}>Akshay Bajpai</span>
+        <span className={`${styles.name} composited`}>Akshay Bajpai</span>
 
         {/* Cyanotype only: the construction lines the letters sit on. */}
         <span className={styles.guides}>
@@ -387,13 +387,13 @@ export function Preloader() {
     >
       {/* The three prints say the same thing three times over; assistive
           technology is given the button and nothing else to wade through. */}
-      <div className={`${styles.layer} ${styles.raw}`} aria-hidden="true">
+      <div className={`${styles.layer} ${styles.raw} composited`} aria-hidden="true">
         <Print total={issuing} />
       </div>
-      <div className={`${styles.layer} ${styles.annot}`} aria-hidden="true">
+      <div className={`${styles.layer} ${styles.annot} composited`} aria-hidden="true">
         <Print total={issuing} />
       </div>
-      <div className={`${styles.layer} ${styles.paper}`} aria-hidden="true">
+      <div className={`${styles.layer} ${styles.paper} composited`} aria-hidden="true">
         <Print total={issuing} />
       </div>
 

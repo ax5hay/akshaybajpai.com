@@ -171,6 +171,13 @@ export function KeyPlan({
   const [animating, setAnimating] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [interactive, setInteractive] = useState(false);
+  // The wide plan's furniture (leaders, markup, legend, tray, camera controls,
+  // the strip's cells) is hidden by CSS on a narrow sheet but was still in
+  // the DOM, a third of the page, hydrated and recalculated on every mode
+  // change. The server has to render it (it cannot know the screen), so the
+  // first client render keeps it and the next one, once the width is known,
+  // leaves it out.
+  const [wide, setWide] = useState(true);
   const { navigate, supported: canMorph } = useSheetTransition();
 
   // Read during the first render, not in an effect: the transition snapshots
@@ -294,6 +301,7 @@ export function KeyPlan({
     const query = window.matchMedia('(min-width: 60rem)');
     const sync = () => {
       setInteractive(query.matches);
+      setWide(query.matches);
       if (query.matches) setCamera(fitCamera());
     };
     sync();
@@ -308,6 +316,15 @@ export function KeyPlan({
   useEffect(() => () => {
     if (flyTimer.current) clearTimeout(flyTimer.current);
   }, []);
+
+  // The phone's tour is its own chunk; fetched once the plan is idle so the
+  // first tap on it does not wait on the network.
+  useEffect(() => {
+    if (interactive || !window.matchMedia('(hover: none)').matches) return;
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 2500));
+    const id = idle(() => void import('./Reel'));
+    return () => (window.cancelIdleCallback ?? clearTimeout)(id as number);
+  }, [interactive]);
 
   // The postmark pulses forever. Not while its sheet is off the screen.
   useEffect(() => {
@@ -786,6 +803,7 @@ export function KeyPlan({
           }}
           onTransitionEnd={() => setAnimating(false)}
         >
+          {wide && (
           <svg
             className={styles.leaders}
             viewBox={`0 0 ${KEY_PLAN_WIDTH} ${KEY_PLAN_HEIGHT}`}
@@ -831,10 +849,12 @@ export function KeyPlan({
               );
             })}
           </svg>
+          )}
 
           {/* Markup layer. Annotation is drawn over the drawing, not under it,
               so this sits above the sheets and is inert to the pointer. CSS
               alone decides whether it prints. */}
+          {wide && (
           <svg
             className={styles.markup}
             viewBox={`0 0 ${KEY_PLAN_WIDTH} ${KEY_PLAN_HEIGHT}`}
@@ -913,12 +933,13 @@ export function KeyPlan({
               <text y={5}>{revised.revision}</text>
             </g>
           </svg>
+          )}
 
           {/* The reader's route: a survey traverse over the sheets they have
               read, in the order they reached them. Drawn over the drawing,
               inert to the pointer, and absent until there are two stations
               to join. */}
-          {stations.length > 0 && (
+          {wide && stations.length > 0 && (
             <svg
               className={styles.route}
               viewBox={`0 0 ${KEY_PLAN_WIDTH} ${KEY_PLAN_HEIGHT}`}
@@ -946,6 +967,7 @@ export function KeyPlan({
             style={place(KEY_PLAN_FURNITURE.title)}
             data-plan-title
           >
+            {wide && (
             <div className={styles.north} aria-hidden="true">
               <svg viewBox="0 0 48 48" className={styles.northPoint}>
                 <circle cx="24" cy="26" r="17" />
@@ -958,6 +980,7 @@ export function KeyPlan({
                 <span>Sheet 1 of {PLATES.length}</span>
               </span>
             </div>
+            )}
 
             <div className={styles.header}>
               <h1 className={styles.headline}>
@@ -1114,6 +1137,7 @@ export function KeyPlan({
 
             {/* Revision schedule, read off the sheets rather than written
                 down twice. */}
+            {wide && (
             <div className={styles.revs} aria-hidden="true">
               <span className={styles.revTitle}>Revision schedule</span>
               {revisions.map(([rev, sheets]) => (
@@ -1123,6 +1147,8 @@ export function KeyPlan({
                 </span>
               ))}
             </div>
+
+            )}
 
             <dl className={styles.titleCells} aria-hidden="true">
               <div>
@@ -1191,7 +1217,15 @@ export function KeyPlan({
 
               <span className={styles.plateHead}>
                 <span className={styles.plateTitle}>{plate.title}</span>
-                <span className={styles.plateSubtitle}>{plate.subtitle}</span>
+                <span
+                  className={
+                    plate.id === 'contact'
+                      ? `${styles.plateSubtitle} composited-pulse`
+                      : styles.plateSubtitle
+                  }
+                >
+                  {plate.subtitle}
+                </span>
               </span>
 
               <span
@@ -1289,6 +1323,7 @@ export function KeyPlan({
           {/* Instrument tray. The set can be operated, and this is where it
               says so: named tools with their keys, on the plan itself, so no
               one has to discover them by chance. */}
+          {wide && (
           <div
             className={styles.instruments}
             style={place(KEY_PLAN_FURNITURE.instruments)}
@@ -1350,7 +1385,9 @@ export function KeyPlan({
               Drag to pan · Scroll to zoom · Click any sheet to open it
             </span>
           </div>
+          )}
 
+          {wide && (
           <div className={styles.legend} style={place(KEY_PLAN_FURNITURE.legend)} aria-hidden="true">
             <span className={styles.furnitureTitle}>Legend</span>
             <span className={styles.legendRow}>
@@ -1382,9 +1419,11 @@ export function KeyPlan({
               <span>Plan 1:50 at fit</span>
             </span>
           </div>
+          )}
         </div>
       </div>
 
+      {wide && (
       <div className={styles.controls}>
         <button
           type="button"
@@ -1428,6 +1467,7 @@ export function KeyPlan({
           ?
         </button>
       </div>
+      )}
 
       {/* The tour's caption: where it is, what the sheet is, and the ways
           out of it. The rule along its foot is the hold running down. */}

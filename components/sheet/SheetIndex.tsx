@@ -120,6 +120,17 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const restoreFocus = useRef<HTMLElement | null>(null);
+  // The preview is only shown beside the list on a wide screen; on a narrow
+  // one it was still being rendered (a drafted figure, hundreds of paths)
+  // and then hidden, which was most of what a phone paid to open the index.
+  const [showPreview, setShowPreview] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 62rem)');
+    const sync = () => setShowPreview(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
 
   const groups = useMemo(() => {
     const counts = new Map<string, number>();
@@ -151,10 +162,19 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
     if (!window.matchMedia('(hover: none)').matches) inputRef.current?.focus();
 
     // The index is a modal surface; the sheet behind it must not scroll.
+    // Changing the body's overflow relays out the whole page behind, which
+    // on a phone was most of the cost of opening. There the panel covers the
+    // screen and contains its own scrolling, so the body is left alone.
+    const lock = !window.matchMedia('(max-width: 44rem)').matches;
     const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    if (lock) document.body.style.overflow = 'hidden';
+    // Notes and notices step aside for it. A flag on the root is matched by
+    // one rule; `body:has([role=dialog])` meant restyling the whole page
+    // every time the index opened or closed.
+    document.documentElement.dataset.dialog = '';
     return () => {
-      document.body.style.overflow = previous;
+      delete document.documentElement.dataset.dialog;
+      if (lock) document.body.style.overflow = previous;
       restoreFocus.current?.focus();
     };
   }, [open]);
@@ -346,7 +366,7 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
 
           {/* The sheet under the cursor, drawn in small. Decorative: every
               word of it is already in the row it previews. */}
-          {shown && (
+          {shown && showPreview && (
             <aside className={styles.preview} aria-hidden="true" key={shown.href}>
               <span className={styles.previewTag}>{shown.sheet}</span>
               <span className={styles.previewSeries}>

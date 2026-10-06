@@ -18,6 +18,10 @@ export function TitleBlock() {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-titleblock', expanded);
+    return () => document.documentElement.removeAttribute('data-titleblock');
+  }, [expanded]);
   // The system share sheet, where there is one. Known only after mounting.
   const [canShare, setCanShare] = useState(false);
   useEffect(() => setCanShare(typeof navigator.share === 'function'), []);

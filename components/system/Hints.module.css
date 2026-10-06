@@ -225,8 +225,8 @@
 }
 
 /* A note steps aside for anything the reader has opened over the sheet. */
-:global(body:has(aside[data-expanded])) .note,
-:global(body:has([role='dialog'])) .note,
+:global(html[data-titleblock]) .note,
+:global(html[data-dialog]) .note,
 :global(html[data-lens]) .note {
   display: none;
 }
