@@ -359,6 +359,13 @@ is public by design, which is why they are **Variables** and not Secrets.
 
 ### Google Search Console
 
+> [!NOTE]
+> **Already done for akshaybajpai.com.** A *Domain* property exists, verified through a
+> DNS record at Cloudflare; it covers `www`, the apex, `http` and `https` together, and
+> no `GOOGLE_SITE_VERIFICATION` variable is needed. Start at *Verify and submit*, step 10,
+> and give the sitemap as its full URL, which a Domain property requires. The steps
+> below are recorded for a fork, or for a property that has to be made again.
+
 **Create the property**
 
 1. Open [search.google.com/search-console](https://search.google.com/search-console) and
@@ -389,14 +396,18 @@ is public by design, which is why they are **Variables** and not Secrets.
 **Verify and submit**
 
 9. Back in Search Console, **Verify**. *Ownership verified* → **Go to property**.
-10. **Sitemaps** (left menu) → *Add a new sitemap* → `sitemap.xml` → **Submit**. Status
-    should read *Success*, 35 discovered URLs, within minutes to a day.
+10. **Sitemaps** (left menu) → *Add a new sitemap* →
+    `https://www.akshaybajpai.com/sitemap.xml` → **Submit**. Status should read
+    *Success*, 35 discovered URLs, within minutes to a day.
 11. **URL Inspection** (left menu, or the search bar at the top) → paste
     `https://www.akshaybajpai.com/` → **Request indexing**. Repeat for `/about/`,
     `/work/`, `/research/` and the newest essays. This is the one control that
     genuinely shortens the first crawl; the quota is about ten a day.
 12. **Settings → Users and permissions** → add a second owner (another address of yours)
     so the property cannot be lost with one account.
+13. **Pages** (under *Indexing*) → read the *Not indexed* reasons. *Discovered* or
+    *Crawled – currently not indexed* is queue time. *Alternate page with proper
+    canonical tag* on the apex or on `/set/` is correct. Anything else is worth a look.
 
 What to expect: a first crawl within one to three days; the name query ranking within one
 to three weeks; the **Performance** report filling after about 48 hours of data. Under
@@ -410,8 +421,8 @@ structured data has been read; green there means the graph parsed.
 1. Open [bing.com/webmasters](https://www.bing.com/webmasters) and sign in — with the
    same Google account used for Search Console, so the import can see it.
 2. Choose **Import your sites from GSC** → **Import** → authorise → tick
-   `https://www.akshaybajpai.com/` → **Import**. Verification and the sitemap come over.
-   Skip to *Then, either way*.
+   `akshaybajpai.com` → **Import**. Verification and the sitemap come over; a Domain
+   property imports like any other. Skip to *Then, either way*.
 
 **The long way**
 
