@@ -4,8 +4,8 @@
     "description": "The Architecture of Intelligence, issued as a drawing set. Forward-deployed AI engineering: LLM platforms, governed agents, hybrid RAG, and systems built to be operated.",
     "icons": [
         {
-            "src": "/logo.png",
-            "sizes": "192x192",
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
             "type": "image/png"
         },
         {

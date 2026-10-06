@@ -278,19 +278,70 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
     paint();
   }, [paint, probes]);
 
-  // Re-measure when the page moves under the lens, coalesced to a frame.
+  // When the page scrolls under the lens, everything on it moves by the same
+  // amount, so the boxes are shifted, not re-measured: one style write for
+  // the whole layer. A full measure (396 rectangles read back from layout)
+  // waits until the scroll has settled, and happens at most a few times a
+  // second while it has not.
   useEffect(() => {
     let frame = 0;
-    const schedule = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        measure();
-      });
+    let settle: ReturnType<typeof setTimeout> | undefined;
+    let last = performance.now();
+    let scrollAt = { x: window.scrollX, y: window.scrollY };
+    let measuredAt = { ...scrollAt };
+
+    const shift = () => {
+      frame = 0;
+      const dx = measuredAt.x - window.scrollX;
+      const dy = measuredAt.y - window.scrollY;
+      if (xrayRef.current) {
+        const plate = xrayRef.current.firstElementChild as SVGElement | null;
+        plate?.style.setProperty('transform', `translate(${dx}px, ${dy}px)`);
+      }
+      // The readout tracks the shifted boxes without a re-measure either.
+      const list = probeList.current;
+      const sx = window.scrollX - scrollAt.x;
+      const sy = window.scrollY - scrollAt.y;
+      for (const p of list) {
+        p.x -= sx;
+        p.y -= sy;
+      }
+      scrollAt = { x: window.scrollX, y: window.scrollY };
+      paint();
     };
 
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
+    const remeasure = () => {
+      measuredAt = { x: window.scrollX, y: window.scrollY };
+      scrollAt = { ...measuredAt };
+      if (xrayRef.current) {
+        (xrayRef.current.firstElementChild as SVGElement | null)?.style.removeProperty('transform');
+      }
+      measure();
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(shift);
+      if (settle) clearTimeout(settle);
+      // Sticky and fixed parts do not move with the page, so a real measure
+      // follows: once the scroll stops, or every 400 ms while it goes on.
+      if (performance.now() - last > 400) {
+        last = performance.now();
+        remeasure();
+      } else {
+        settle = setTimeout(() => {
+          last = performance.now();
+          remeasure();
+        }, 160);
+      }
+    };
+    const onResize = () => {
+      if (settle) clearTimeout(settle);
+      settle = setTimeout(remeasure, 120);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    const schedule = onResize;
     // The key plan moves under the lens without scrolling the page.
     const plane = document.querySelector('[data-plan-plane]');
     const camera = plane ? new MutationObserver(schedule) : null;
@@ -298,10 +349,11 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
     return () => {
       camera?.disconnect();
       if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
+      if (settle) clearTimeout(settle);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
     };
-  }, [measure]);
+  }, [measure, paint]);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {

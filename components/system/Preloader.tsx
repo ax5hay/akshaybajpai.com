@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { useSheetSet } from './SheetSet';
 import styles from './Preloader.module.css';
 
 /**
@@ -131,7 +132,8 @@ function Print({ total }: { total: number }) {
   );
 }
 
-export function Preloader({ sheets }: { sheets: CoverSheet[] }) {
+export function Preloader() {
+  const sheets = useSheetSet();
   const [done, setDone] = useState(false);
   /** The set is in the cache: the way in can be offered. */
   const [loaded, setLoaded] = useState(false);

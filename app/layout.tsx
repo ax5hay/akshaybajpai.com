@@ -10,6 +10,7 @@ import { InstrumentProvider } from '@/components/system/InstrumentProvider';
 import { ModeProvider } from '@/components/system/ModeProvider';
 import { ToastProvider } from '@/components/system/ToastProvider';
 import { SheetTransitionProvider } from '@/components/system/SheetTransition';
+import { SheetSetProvider } from '@/components/system/SheetSet';
 import { Preloader } from '@/components/system/Preloader';
 import { Hints } from '@/components/system/Hints';
 import { RouteTracker } from '@/components/system/Route';
@@ -29,9 +30,11 @@ const instrumentSerif = Instrument_Serif({
   display: 'swap',
 });
 
+// Only the regular weight is ever set in the sans; the headings and labels
+// take their weight from the mono and the serif.
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400'],
   variable: '--font-sans',
   display: 'swap',
 });
@@ -62,15 +65,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <ModeScript />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#ded2b8" />
         <JsonLd />
       </head>
       <body suppressHydrationWarning>
-        <Preloader
-          sheets={sheetIndex.map(({ sheet, title, href }) => ({ sheet, title, href }))}
-        />
+        <SheetSetProvider entries={sheetIndex}>
+        <Preloader />
         <ToastProvider>
           <ModeProvider>
             <InstrumentProvider>
@@ -80,18 +82,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <RevealObserver />
                 <SheetFrame />
                 <ZoneCursor />
-                <SheetRail entries={sheetIndex} />
+                <SheetRail />
                 <main id="main-content" className="plate-main">
                   {children}
                 </main>
-                <TitleBlock sheetCount={sheetIndex.length} />
+                <TitleBlock />
                 <Hints />
-                <RouteTracker hrefs={sheetIndex.map((entry) => entry.href)} />
+                <RouteTracker />
                 </SheetTransitionProvider>
               </PlateMetaProvider>
             </InstrumentProvider>
           </ModeProvider>
         </ToastProvider>
+        </SheetSetProvider>
       </body>
     </html>
   );

@@ -46,7 +46,7 @@
    under the figure, as if checked off with the markup pen. */
 .zone[data-on] {
   color: var(--accent);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .zone::after {

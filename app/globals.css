@@ -1008,6 +1008,24 @@ html[data-mode='raw'] [data-raw] {
 }
 
 /* =============================================================================
+   AT REST. A hidden tab animates nothing. An animation that runs forever
+   (the postmark on the Correspondence sheet) stops when its sheet is off the
+   screen; KeyPlan.tsx sets data-offscreen from an IntersectionObserver.
+   ========================================================================== */
+
+html[data-hidden] *,
+html[data-hidden] *::before,
+html[data-hidden] *::after {
+  animation-play-state: paused !important;
+}
+
+[data-offscreen] *,
+[data-offscreen] *::before,
+[data-offscreen] *::after {
+  animation-play-state: paused !important;
+}
+
+/* =============================================================================
    DARK SURFACES ON A PHONE. Mobile Safari renders a blended, fixed layer (the
    grain) over content that animates underneath by re-rasterising the whole
    stack every frame, and on a dark surface that shows as a flicker. Each dark

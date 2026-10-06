@@ -41,12 +41,17 @@ const lastPress = { x: 0, y: 0, at: 0 };
 function develop(apply: () => void) {
   const doc = document as WipeDocument;
   const root = document.documentElement;
-  if (
-    !doc.startViewTransition ||
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-    'wipe' in root.dataset
-  ) {
+  if ('wipe' in root.dataset) {
     apply();
+    return;
+  }
+  if (!doc.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // No exposure to hide behind: the palette just changes. Transitions are
+    // still held off for the change itself, because a few hundred elements
+    // each cross-fading three colours is the slowest part of a re-issue.
+    root.dataset.wipe = '';
+    apply();
+    requestAnimationFrame(() => requestAnimationFrame(() => delete root.dataset.wipe));
     return;
   }
 
