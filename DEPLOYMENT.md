@@ -44,8 +44,9 @@ Static files, built by GitHub Actions, served by GitHub Pages, for free.
 5. [Verifying a deploy](#5--verifying-a-deploy)
 6. [Rolling back](#6--rolling-back)
 7. [One-time setup](#7--one-time-setup)
-8. [Troubleshooting](#8--troubleshooting)
-9. [Known limits](#9--known-limits)
+8. [Filing with the search engines](#8--filing-with-the-search-engines)
+9. [Troubleshooting](#9--troubleshooting)
+10. [Known limits](#10--known-limits)
 
 ---
 
@@ -157,7 +158,7 @@ Linux x64 build the runner needs, so do not prune optional dependencies from it.
 **Search-engine verification is a build variable.** The build step passes
 `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` from the repository's Actions
 variables into `app/layout.tsx`, which issues the ownership `<meta>` tags when they are
-set and nothing when they are not. See [§7](#7--one-time-setup).
+set and nothing when they are not. See [§8](#8--filing-with-the-search-engines).
 
 ---
 
@@ -264,6 +265,7 @@ Then look at it:
 - [ ] Follow a link to a path that does not exist; the unissued sheet offers the nearest ones.
 - [ ] Open `/?q=rag`; the index opens on the query, with no cover sheet first.
 - [ ] Paste a sheet's URL into a chat or social app; its own card appears, not the home card.
+- [ ] If the verification variables are set, `curl -s https://www.akshaybajpai.com/ | grep -c 'site-verification\|msvalidate'` prints the number set.
 
 > [!TIP]
 > If the site looks unchanged after a successful run, it is almost always the cache. Pages
@@ -314,16 +316,9 @@ Already done for this repository. Recorded for a fork, or for rebuilding from no
 5. **Environment.** The `github-pages` environment is created by the first deploy. Its
    branch policy should allow `main` only.
 
-6. **Search engines.** Optional, and the only configuration that is not in the code.
-   Add the site in [Google Search Console](https://search.google.com/search-console)
-   (choose the *URL prefix* property, `https://www.akshaybajpai.com/`, and the *HTML tag*
-   method) and in [Bing Webmaster Tools](https://www.bing.com/webmasters) (the
-   *meta tag* method). Each gives a token; store them under Settings → Secrets and
-   variables → Actions → **Variables** as `GOOGLE_SITE_VERIFICATION` and
-   `BING_SITE_VERIFICATION`, then re-run the deploy. The next build issues the tags, and
-   the verification buttons will pass. Submit `https://www.akshaybajpai.com/sitemap.xml`
-   in both consoles once they do. Bing feeds DuckDuckGo and the model-backed engines
-   that use its index, so the second one matters more than it looks.
+6. **Search engines.** Optional, and the only configuration that is not in the code:
+   two ownership tokens stored as repository variables. The full procedure is
+   [§8](#8--filing-with-the-search-engines).
 
 No secrets are required. The workflow authenticates with the `id-token` permission GitHub
 grants it; the two verification variables above are optional and public by nature.
@@ -349,7 +344,124 @@ Then update the custom domain in the Pages settings and the DNS record.
 
 ---
 
-## 8 · Troubleshooting
+## 8 · Filing with the search engines
+
+The build does everything a static site can do to be found ([README, sheet
+C-703](README.md#c-703--visibility)). What it cannot do is prove to Google and Bing that
+the site has an owner; that needs a token from each console, and the owner's hand. Once,
+about fifteen minutes in all. Bing's index also feeds DuckDuckGo, Yahoo, Ecosia and the
+search layers of Copilot and ChatGPT, so the second console matters more than it looks.
+
+How the token reaches the page: the deploy workflow passes two repository variables into
+the build, and `app/layout.tsx` issues `<meta name="google-site-verification">` and
+`<meta name="msvalidate.01">` when they are set. Neither is a secret; a verification token
+is public by design, which is why they are **Variables** and not Secrets.
+
+### Google Search Console
+
+> [!NOTE]
+> **Already done for akshaybajpai.com.** A *Domain* property exists, verified through a
+> DNS record at Cloudflare; it covers `www`, the apex, `http` and `https` together, and
+> no `GOOGLE_SITE_VERIFICATION` variable is needed. Start at *Verify and submit*, step 10,
+> and give the sitemap as its full URL, which a Domain property requires. The steps
+> below are recorded for a fork, or for a property that has to be made again.
+
+**Create the property**
+
+1. Open [search.google.com/search-console](https://search.google.com/search-console) and
+   sign in with the Google account that should own the site.
+2. Property selector (top left) → **Add property**.
+3. Choose the **URL prefix** card, not *Domain*. Enter exactly
+   `https://www.akshaybajpai.com/` — scheme, `www`, trailing slash — and **Continue**.
+   *Domain* would need a DNS TXT record at Cloudflare; *URL prefix* lets the page verify
+   itself.
+4. In *Verify ownership*, under *Other verification methods*, expand **HTML tag**. It
+   shows `<meta name="google-site-verification" content="…" />`. Copy only the value
+   inside `content="…"` (about 43 characters). The dialog can be closed; nothing is lost.
+
+**Hand the token to the build**
+
+5. Open the repository's **Settings → Secrets and variables → Actions → Variables** tab.
+6. **New repository variable**: name `GOOGLE_SITE_VERIFICATION`, value the token.
+7. Run a deploy: **Actions → Deploy to GitHub Pages → Run workflow → `main`**, or push
+   any commit. Wait for the green tick.
+8. Confirm the tag is live:
+
+   ```bash
+   curl -s https://www.akshaybajpai.com/ | grep -o '<meta name="google-site-verification"[^>]*>'
+   ```
+
+   If it prints nothing, the CDN is still serving the previous build; wait ten minutes.
+
+**Verify and submit**
+
+9. Back in Search Console, **Verify**. *Ownership verified* → **Go to property**.
+10. **Sitemaps** (left menu) → *Add a new sitemap* →
+    `https://www.akshaybajpai.com/sitemap.xml` → **Submit**. Status should read
+    *Success*, 35 discovered URLs, within minutes to a day.
+11. **URL Inspection** (left menu, or the search bar at the top) → paste
+    `https://www.akshaybajpai.com/` → **Request indexing**. Repeat for `/about/`,
+    `/work/`, `/research/` and the newest essays. This is the one control that
+    genuinely shortens the first crawl; the quota is about ten a day.
+12. **Settings → Users and permissions** → add a second owner (another address of yours)
+    so the property cannot be lost with one account.
+13. **Pages** (under *Indexing*) → read the *Not indexed* reasons. *Discovered* or
+    *Crawled – currently not indexed* is queue time. *Alternate page with proper
+    canonical tag* on the apex or on `/set/` is correct. Anything else is worth a look.
+
+What to expect: a first crawl within one to three days; the name query ranking within one
+to three weeks; the **Performance** report filling after about 48 hours of data. Under
+**Enhancements**, *Breadcrumbs*, *Articles* and *Sitelinks searchbox* appear once the
+structured data has been read; green there means the graph parsed.
+
+### Bing Webmaster Tools
+
+**The short way, if Google is done**
+
+1. Open [bing.com/webmasters](https://www.bing.com/webmasters) and sign in — with the
+   same Google account used for Search Console, so the import can see it.
+2. Choose **Import your sites from GSC** → **Import** → authorise → tick
+   `akshaybajpai.com` → **Import**. Verification and the sitemap come over; a Domain
+   property imports like any other. Skip to *Then, either way*.
+
+**The long way**
+
+3. **Add your site manually** → `https://www.akshaybajpai.com/` → **Add**.
+4. Of the three verification methods choose **HTML Meta Tag**. Copy the value inside
+   `content="…"` of `<meta name="msvalidate.01" …>` (32 hexadecimal characters).
+5. Repository **Variables** → **New repository variable**: `BING_SITE_VERIFICATION`,
+   value the token.
+6. Run a deploy and wait for green. Confirm:
+
+   ```bash
+   curl -s https://www.akshaybajpai.com/ | grep -o '<meta name="msvalidate.01"[^>]*>'
+   ```
+
+7. Back in Bing, **Verify**.
+
+**Then, either way**
+
+8. **Sitemaps** → **Submit sitemap** → `https://www.akshaybajpai.com/sitemap.xml`.
+9. **URL Submission** → paste the key plan and the five most important sheets, one per
+   line → **Submit**. Bing allows ten a day and usually indexes them within hours.
+10. Optional: **Settings → IndexNow → Generate API key**. With a key, the deploy can
+    ping Bing on every push; not wired yet, and manual submission covers it meanwhile.
+
+### Leave alone
+
+In both consoles: *Removals*, *Change of address*, *Crawl rate* and any *disavow* tool.
+The defaults are right for a static site, and each of those can only make it less
+visible.
+
+### Rotating or removing a token
+
+Delete the repository variable and run a deploy; the tag is no longer issued. The
+consoles keep the property verified for a while and then ask again, at which point a
+new token goes in the same way.
+
+---
+
+## 9 · Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |:--------|:-------------|:----|
@@ -368,7 +480,7 @@ Then update the custom domain in the Pages settings and the DNS record.
 
 ---
 
-## 9 · Known limits
+## 10 · Known limits
 
 These come with the host, and are accepted trade-offs for a free static site.
 

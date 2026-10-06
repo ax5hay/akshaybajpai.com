@@ -1147,15 +1147,31 @@ sheet is skipped for anyone who arrives that way. An engine that honours the act
 offer a search box under the result, and a reader who lands on it is in the index, not
 behind the preloader.
 
+### Titles that carry the name
+
+The layout completes every title with `· Akshay Bajpai`, so the name is on every result.
+A title that already carries it, the key plan, About and Contact, is issued as written;
+the rule lives in `buildMetadata`, and no sheet repeats the name twice.
+
 ### Not in the build
 
 Two things need the owner's hand. **Ownership verification** for Google Search Console
 and Bing Webmaster Tools: the tokens are read from repository variables at build time,
-so adding them is a settings change and not a code change (see
-[DEPLOYMENT.md](DEPLOYMENT.md#7--one-time-setup)). And **links in**: the profiles the
-`Person` node points at should point back, and anything written elsewhere should link
-to the sheet it came from. Everything else on this page is an argument; those are
-the evidence.
+so adding them is a settings change and not a code change; the step-by-step is
+[DEPLOYMENT.md §8](DEPLOYMENT.md#8--filing-with-the-search-engines). And **links in**:
+the profiles the `Person` node points at should point back, and anything written
+elsewhere should link to the sheet it came from. Everything else on this page is an
+argument; those are the evidence.
+
+| Signal | Where it is set |
+|:-------|:----------------|
+| Person, WebSite, breadcrumbs, page types | `lib/metadata.ts` → `identityGraph`, `breadcrumbs`, `webPage`, `article` |
+| Titles, descriptions, keywords, cards, robots, canonical, feed link | `lib/metadata.ts` → `buildMetadata`; each page's `META` |
+| Share cards | `scripts/generate-og.mjs`, fonts under `scripts/fonts/` |
+| Feed and `llms.txt` | `scripts/generate-rss.mjs` |
+| Sitemap, robots | `app/sitemap.ts`, `app/robots.ts` |
+| Search endpoint | `InstrumentProvider` reads `?q=`; `ModeScript` skips the cover for it |
+| Verification tags | `app/layout.tsx`, from `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` |
 
 ---
 
