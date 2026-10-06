@@ -11,6 +11,7 @@ import { ModeProvider } from '@/components/system/ModeProvider';
 import { ToastProvider } from '@/components/system/ToastProvider';
 import { SheetTransitionProvider } from '@/components/system/SheetTransition';
 import { SheetSetProvider } from '@/components/system/SheetSet';
+import { Register } from '@/components/sheet/Register';
 import { Preloader } from '@/components/system/Preloader';
 import { Hints } from '@/components/system/Hints';
 import { RouteTracker } from '@/components/system/Route';
@@ -107,6 +108,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <TitleBlock />
                 <Hints />
                 <RouteTracker />
+                <Register entries={sheetIndex} />
                 </SheetTransitionProvider>
               </PlateMetaProvider>
             </InstrumentProvider>
