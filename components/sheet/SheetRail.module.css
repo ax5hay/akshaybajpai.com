@@ -66,25 +66,6 @@
   min-width: 0;
 }
 
-.monogram {
-  display: grid;
-  place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  flex-shrink: 0;
-  font-family: var(--font-label), monospace;
-  font-size: var(--t-mini);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--paper);
-  background: var(--ink);
-  transition: background-color var(--d-2) var(--ease-mech);
-}
-
-.mark:hover .monogram {
-  background: var(--accent);
-}
-
 .markText {
   display: flex;
   flex-direction: column;

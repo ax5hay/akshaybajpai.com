@@ -95,6 +95,7 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const xrayRef = useRef<HTMLDivElement>(null);
   const readoutRef = useRef<HTMLSpanElement>(null);
+  const sizeRef = useRef<HTMLSpanElement>(null);
 
   const [size, setSize] = useState(SIZE);
   const [probes, setProbes] = useState<Probe[]>([]);
@@ -222,7 +223,8 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
 
       const innermost = stack[stack.length - 1];
       if (!innermost) {
-        readoutRef.current.textContent = `⌀ ${Math.round(size)}`;
+        readoutRef.current.textContent = 'Nothing under the crosshair';
+        if (sizeRef.current) sizeRef.current.textContent = `⌀ ${Math.round(size)}`;
         return;
       }
 
@@ -238,9 +240,10 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
         return p.label;
       });
 
-      readoutRef.current.textContent = `${chain.join(' › ')}   ${Math.round(
-        innermost.w
-      )} × ${Math.round(innermost.h)}`;
+      readoutRef.current.textContent = `${chain.join(' › ')}`;
+      if (sizeRef.current) {
+        sizeRef.current.textContent = `${Math.round(innermost.w)} × ${Math.round(innermost.h)}`;
+      }
     }
   }, [size]);
 
@@ -406,8 +409,22 @@ export function Loupe({ onDismiss }: { onDismiss: () => void }) {
       >
         <span className={styles.field} aria-hidden="true" />
         <span className={styles.reticle} aria-hidden="true" />
+        {/* The rim: a graduated ring, as on a protractor, with an index at
+            the top and the diameter engraved beside it. */}
         <span className={styles.barrel} aria-hidden="true" />
-        <span ref={readoutRef} className={styles.readout} aria-hidden="true" />
+        <span className={styles.graduations} aria-hidden="true" />
+        <span className={styles.index} aria-hidden="true" />
+
+        {/* The tag: a detail callout hung off the barrel on a leader. It
+            names what is under the crosshair and gives its size. */}
+        <span className={styles.leader} aria-hidden="true" />
+        <span className={styles.tag} aria-hidden="true">
+          <span className={styles.tagHead}>
+            <span>Detail</span>
+            <span ref={sizeRef} className={styles.tagSize} />
+          </span>
+          <span ref={readoutRef} className={styles.readout} />
+        </span>
       </div>
     </>
   );

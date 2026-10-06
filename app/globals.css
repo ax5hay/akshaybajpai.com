@@ -1008,6 +1008,41 @@ html[data-mode='raw'] [data-raw] {
 }
 
 /* =============================================================================
+   DARK SURFACES ON A PHONE. Mobile Safari renders a blended, fixed layer (the
+   grain) over content that animates underneath by re-rasterising the whole
+   stack every frame, and on a dark surface that shows as a flicker. Each dark
+   surface is given a compositing layer of its own, and the grain is kept on
+   one too, so the blend is resolved once on the GPU and not per frame in
+   software. None of this changes what is drawn.
+   ========================================================================== */
+
+@media (hover: none), (pointer: coarse) {
+  body::before {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: opacity;
+  }
+
+  .reversed,
+  [class*='Preloader_layer'],
+  [class*='Preloader_name'],
+  [class*='Reel_card'],
+  [class*='KeyPlan_plate__'][data-id='contact'] {
+    isolation: isolate;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* The pulsing postmark gets its own layer, so its opacity animation does
+     not repaint the dark sheet it sits on. */
+  [class*='KeyPlan_plateSubtitle']::before {
+    will-change: opacity;
+    transform: translateZ(0);
+  }
+}
+
+/* =============================================================================
    REVERSED STOCK. One thing in the set is printed the other way round: the
    Correspondence sheet on the key plan, and the transmittal it leads to. It
    is the last stop and the one thing a reader is asked to do, so it is the

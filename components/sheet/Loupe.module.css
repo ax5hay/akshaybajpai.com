@@ -1,5 +1,7 @@
 /* Inspection lens. The optical element is a backdrop inversion, so the page
-   underneath is never re-rendered, only recomposited. */
+   underneath is never re-rendered, only recomposited. Around it, the barrel
+   of a drafting instrument: a graduated rim with an index at the top, and a
+   detail tag hung off it on a leader. */
 
 .loupe {
   position: fixed;
@@ -16,7 +18,18 @@
      backdrop root, which leaves .field with nothing behind it to invert and
      turns the lens into an empty circle. box-shadow follows border-radius and
      forms no backdrop root. */
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.25),
+    0 24px 50px -10px rgba(0, 0, 0, 0.6);
+  /* Deployed: the barrel closes down onto the sheet like an iris. */
+  animation: lens-deploy 520ms var(--ease-plate) both;
+}
+
+@keyframes lens-deploy {
+  from {
+    opacity: 0;
+    scale: 1.35;
+  }
 }
 
 .loupe[data-dragging] {
@@ -29,11 +42,12 @@
 
 .loupe:focus-visible .barrel {
   box-shadow:
-    0 0 0 2px var(--accent),
+    0 0 0 3px var(--accent),
     inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
-/* the optic */
+/* ---- The optic ------------------------------------------------------------------ */
+
 .field {
   position: absolute;
   inset: 0;
@@ -47,14 +61,12 @@
 
 /* The technical layer. Drawn across the whole viewport and revealed by the
    barrel's circular clip, so dragging costs one clip-path write instead of a
-   re-measure. Sits above the optic and below nothing: the barrel rim is left
-   uncovered because the clip radius stops short of the wall. */
+   re-measure. */
 .xray {
   position: fixed;
   inset: 0;
   z-index: calc(var(--z-loupe) + 1);
   pointer-events: none;
-  /* Until the lens paints, reveal nothing. */
   clip-path: circle(0 at 50% 50%);
 }
 
@@ -65,11 +77,6 @@
   overflow: visible;
 }
 
-/* The field behind is a dark inversion in all three modes, so the technical
-   layer sets its own light palette instead of following the mode accent. */
-/* Outline only. Boxes nest several deep under the barrel, and even a faint
-   fill stacks into a solid wash that hides the sheet the lens is meant to be
-   revealing. */
 .box {
   fill: none;
   stroke: rgba(127, 212, 255, 0.72);
@@ -82,8 +89,6 @@
   font-family: var(--font-label), monospace;
   font-size: 9.5px;
   letter-spacing: 0.04em;
-  /* The inverted field behind is dark in every mode, so the type is set light
-     and carries a dark backing to survive a busy sheet. */
   fill: #ffd479;
   paint-order: stroke;
   stroke: rgba(4, 10, 20, 0.85);
@@ -96,7 +101,8 @@
   font-size: 8.5px;
 }
 
-/* ground-glass reticle: crosshair plus graticule ticks */
+/* ---- The reticle: crosshair, graticule, and a centre ring ------------------- */
+
 .reticle {
   position: absolute;
   inset: 0;
@@ -104,69 +110,145 @@
   pointer-events: none;
   background:
     linear-gradient(currentColor, currentColor) center / 1px 100% no-repeat,
-    linear-gradient(currentColor, currentColor) center / 100% 1px no-repeat;
-  color: rgba(255, 255, 255, 0.16);
-  mask-image: radial-gradient(circle, #000 0 42%, transparent 46%);
-  -webkit-mask-image: radial-gradient(circle, #000 0 42%, transparent 46%);
+    linear-gradient(currentColor, currentColor) center / 100% 1px no-repeat,
+    radial-gradient(circle, transparent 0 7px, currentColor 7px 8px, transparent 8px);
+  color: rgba(255, 255, 255, 0.28);
+  mask-image: radial-gradient(circle, #000 0 40%, transparent 44%);
+  -webkit-mask-image: radial-gradient(circle, #000 0 40%, transparent 44%);
 }
 
-/* machined barrel */
+/* The lines of the crosshair are drawn in from the rim when it deploys. */
+.reticle {
+  animation: reticle-in 600ms var(--ease-plate) 200ms both;
+}
+
+@keyframes reticle-in {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+/* ---- The barrel ------------------------------------------------------------------ */
+
 .barrel {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
-    inset 0 0 0 7px rgba(20, 20, 20, 0.85),
-    inset 0 0 0 8px rgba(255, 255, 255, 0.18),
-    inset 0 0 24px rgba(0, 0, 0, 0.4);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 9px #16161a,
+    inset 0 0 0 10px rgba(255, 255, 255, 0.14),
+    inset 0 0 28px rgba(0, 0, 0, 0.45);
 }
 
-/* knurling on the rim */
-.barrel::after {
-  content: '';
+/* Graduations: a tick every 6°, a longer one every 30°, engraved on the rim
+   in two conic gradients masked to the ring. */
+.graduations {
   position: absolute;
   inset: 1px;
   border-radius: 50%;
-  background: repeating-conic-gradient(
-    rgba(255, 255, 255, 0.11) 0deg 1.4deg,
-    transparent 1.4deg 2.8deg
-  );
-  /* closest-side, so 100% is the rim. Left at the default the gradient is
-     sized to the corner and the knurling spreads a third of the way into
-     the glass. */
-  mask-image: radial-gradient(
-    circle closest-side,
-    transparent 0 calc(100% - 8px),
-    #000 calc(100% - 8px)
-  );
-  -webkit-mask-image: radial-gradient(
-    circle closest-side,
-    transparent 0 calc(100% - 8px),
-    #000 calc(100% - 8px)
-  );
+  pointer-events: none;
+  background:
+    repeating-conic-gradient(from -0.4deg, rgba(255, 255, 255, 0.55) 0deg 0.8deg, transparent 0.8deg 30deg),
+    repeating-conic-gradient(from -0.3deg, rgba(255, 255, 255, 0.28) 0deg 0.6deg, transparent 0.6deg 6deg);
+  mask-image:
+    radial-gradient(circle closest-side, transparent 0 calc(100% - 9px), #000 calc(100% - 9px)),
+    radial-gradient(circle closest-side, transparent 0 calc(100% - 5px), #000 calc(100% - 5px));
+  -webkit-mask-image:
+    radial-gradient(circle closest-side, transparent 0 calc(100% - 9px), #000 calc(100% - 9px)),
+    radial-gradient(circle closest-side, transparent 0 calc(100% - 5px), #000 calc(100% - 5px));
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* Index mark at twelve o'clock, in the accent. */
+.index {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 3px;
+  height: 11px;
+  translate: -50% 0;
+  background: var(--accent);
+}
+
+/* ---- The tag ---------------------------------------------------------------------- */
+
+.leader {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 9px);
+  width: 1px;
+  height: 1.5rem;
+  background: var(--accent);
+}
+
+.leader::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  translate: -50% -50%;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.tag {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 1rem);
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 11rem;
+  max-width: min(30rem, 88vw);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-lift);
+  animation: tag-in 420ms var(--ease-plate) 260ms both;
+}
+
+@keyframes tag-in {
+  from {
+    opacity: 0;
+    translate: -50% -0.4rem;
+  }
+}
+
+.tagHead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: 3px var(--s-2);
+  background: var(--ink);
+  color: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+}
+
+.tagSize {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
 }
 
 .readout {
-  position: absolute;
-  left: 50%;
-  bottom: -1.5rem;
-  transform: translateX(-50%);
+  padding: 4px var(--s-2) 5px;
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
-  letter-spacing: 0.1em;
-  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  color: var(--ink);
   white-space: nowrap;
-  max-width: min(30rem, 88vw);
   overflow: hidden;
   text-overflow: ellipsis;
-  font-variant-numeric: tabular-nums;
-  /* Names whatever is under the crosshair, so it has to stay legible against
-     the sheet rather than the inverted field. */
-  padding: 2px 6px;
-  background: var(--paper);
-  border: var(--lw-hair) solid var(--rule);
 }
 
 /* Safari and Firefox without backdrop-filter get a tinted lens rather than a
@@ -175,6 +257,14 @@
   .field {
     background: color-mix(in srgb, var(--paper) 18%, #0b2036 82%);
     mix-blend-mode: difference;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loupe,
+  .reticle,
+  .tag {
+    animation: none;
   }
 }
 

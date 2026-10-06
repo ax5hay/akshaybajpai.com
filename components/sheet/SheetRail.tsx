@@ -8,6 +8,7 @@ import { useInstruments } from '@/components/system/InstrumentProvider';
 import { ModeSelector } from '@/components/system/ModeSelector';
 import { usePlateMeta } from './PlateMetaProvider';
 import type { IndexEntry } from './SheetIndex';
+import { Mark } from './Mark';
 import styles from './SheetRail.module.css';
 
 // The lens is only ever needed on demand, so it stays out of the entry bundle.
@@ -42,9 +43,7 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
     <>
       <header className={styles.rail} data-condensed={condensed || undefined}>
         <Link href="/" className={styles.mark} title="Key plan, G-000">
-          <span className={styles.monogram} aria-hidden="true">
-            AB
-          </span>
+          <Mark />
           <span className={styles.markText}>
             <span className={styles.project}>Architecture of Intelligence</span>
             <span className={styles.set}>Drawing set · Akshay Bajpai</span>
