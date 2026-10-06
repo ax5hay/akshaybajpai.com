@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/kit/Controls';
 import { useToast } from '@/components/system/ToastProvider';
 import styles from './CorrespondenceForm.module.css';
 
 const ENDPOINT = 'https://formspree.io/f/xlgeqele';
+const DRAFT_KEY = 'plate.transmittal';
 
-/** The kinds of correspondence the sheet above this form invites. */
+/** The kinds of correspondence the sheet invites. */
 const SUBJECTS = [
   'Forward-deployed AI work',
   'Architecture review',
@@ -22,34 +23,86 @@ const today = () => {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 };
 
+const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
+
 /**
  * A transmittal: the cover slip a drawing office sends with anything it
- * issues. Who it is from, what it concerns, the message, and a stamp when it
- * has gone.
+ * issues. Printed on reversed stock, like the sheet on the key plan that
+ * leads here, because this is the one thing the set asks a reader to do.
+ *
+ * It keeps what has been typed. A draft is held for the visit, so reading
+ * another sheet and coming back, or reloading by accident, loses nothing; it
+ * is cleared the moment the transmittal goes. Nothing is stored beyond the
+ * tab, and nothing is sent until the reader sends it.
  */
 export function CorrespondenceForm() {
   const [status, setStatus] = useState<Status>('idle');
+  const [email, setEmail] = useState('');
   const [subject, setSubject] = useState<string>(SUBJECTS[0]);
-  const [words, setWords] = useState(0);
+  const [message, setMessage] = useState('');
+  const [restored, setRestored] = useState(false);
+  const [mac, setMac] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
+
+  // Pick the draft back up.
+  useEffect(() => {
+    setMac(/Mac|iPhone|iPad/.test(navigator.platform));
+    try {
+      const draft = JSON.parse(sessionStorage.getItem(DRAFT_KEY) ?? 'null') as {
+        email?: string;
+        subject?: string;
+        message?: string;
+      } | null;
+      if (!draft) return;
+      if (draft.email) setEmail(draft.email);
+      if (draft.subject && (SUBJECTS as readonly string[]).includes(draft.subject))
+        setSubject(draft.subject);
+      if (draft.message) {
+        setMessage(draft.message);
+        setRestored(true);
+      }
+    } catch {
+      /* no draft, or no storage */
+    }
+  }, []);
+
+  // Keep it. Written after a pause in typing, not on every key.
+  useEffect(() => {
+    if (status === 'sent') return;
+    const timer = setTimeout(() => {
+      try {
+        if (email || message) {
+          sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ email, subject, message }));
+        } else {
+          sessionStorage.removeItem(DRAFT_KEY);
+        }
+      } catch {
+        /* nothing to persist to */
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [email, subject, message, status]);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus('sending');
 
-    const form = event.currentTarget;
-
     try {
       const response = await fetch(ENDPOINT, {
         method: 'POST',
-        body: new FormData(form),
+        body: new FormData(event.currentTarget),
         headers: { Accept: 'application/json' },
       });
       if (!response.ok) throw new Error(String(response.status));
 
-      form.reset();
-      setWords(0);
+      try {
+        sessionStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* nothing to clear */
+      }
       setStatus('sent');
+      setRestored(false);
       toast({
         kind: 'Transmittal logged',
         message: 'Your message is on its way.',
@@ -68,9 +121,65 @@ export function CorrespondenceForm() {
   };
 
   const sending = status === 'sending';
+  const words = countWords(message);
+
+  if (status === 'sent') {
+    return (
+      <section className={`${styles.form} ${styles.receipt} reversed`} aria-label="Transmittal sent">
+        <div className={styles.head}>
+          <span className={styles.headTitle}>Transmittal</span>
+          <span className={styles.headNo}>C-700 / 01 · {today()}</span>
+        </div>
+        <div className={styles.receiptBody} role="status">
+          <span className={styles.stamp} aria-hidden="true">
+            <span>Transmitted</span>
+            <span>{today()}</span>
+          </span>
+          <p className={styles.receiptTitle}>It has gone.</p>
+          <dl className={styles.receiptFacts}>
+            <div>
+              <dt>From</dt>
+              <dd>{email}</dd>
+            </div>
+            <div>
+              <dt>Regarding</dt>
+              <dd>{subject}</dd>
+            </div>
+            <div>
+              <dt>Length</dt>
+              <dd>
+                {words} {words === 1 ? 'word' : 'words'}
+              </dd>
+            </div>
+          </dl>
+          <p className={styles.receiptNote}>I read everything and reply to most things.</p>
+          <Button
+            onClick={() => {
+              setMessage('');
+              setStatus('idle');
+            }}
+          >
+            Write another
+          </Button>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <form className={styles.form} onSubmit={onSubmit} aria-label="Correspondence" data-status={status}>
+    <form
+      ref={formRef}
+      className={`${styles.form} reversed`}
+      onSubmit={onSubmit}
+      aria-label="Correspondence"
+      onKeyDown={(event) => {
+        // The shortcut every writing tool has, so it is here too.
+        if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+          event.preventDefault();
+          formRef.current?.requestSubmit();
+        }
+      }}
+    >
       <div className={styles.head}>
         <span className={styles.headTitle}>Transmittal</span>
         <span className={styles.headNo} suppressHydrationWarning>
@@ -79,21 +188,28 @@ export function CorrespondenceForm() {
       </div>
 
       <div className={styles.field}>
-        <label htmlFor="email">From</label>
+        <label htmlFor="email">
+          <span>
+            <span className={styles.no}>01</span> From
+          </span>
+        </label>
         <input
           id="email"
           name="email"
           type="email"
           required
           autoComplete="email"
+          inputMode="email"
           placeholder="you@company.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           disabled={sending}
         />
       </div>
 
       <div className={styles.field}>
         <span className={styles.legend} id="regarding">
-          Regarding
+          <span className={styles.no}>02</span> Regarding
         </span>
         <div className={styles.subjects} role="radiogroup" aria-labelledby="regarding">
           {SUBJECTS.map((s) => (
@@ -115,19 +231,23 @@ export function CorrespondenceForm() {
 
       <div className={styles.field}>
         <label htmlFor="message">
-          Message
+          <span>
+            <span className={styles.no}>03</span> Message
+          </span>
           <span className={styles.count} aria-hidden="true">
+            {restored && words > 0 ? 'Draft kept · ' : ''}
             {words} {words === 1 ? 'word' : 'words'}
           </span>
         </label>
         <textarea
           id="message"
           name="message"
-          rows={7}
+          rows={8}
           required
           placeholder="What are you building, and where is it stuck?"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           disabled={sending}
-          onChange={(e) => setWords(e.target.value.trim().split(/\s+/).filter(Boolean).length)}
         />
       </div>
 
@@ -135,20 +255,16 @@ export function CorrespondenceForm() {
         <Button type="submit" variant="solid" disabled={sending}>
           {sending ? 'Sending…' : 'Send transmittal'}
         </Button>
+        <span className={styles.shortcut} aria-hidden="true">
+          <kbd>{mac ? '⌘' : 'Ctrl'}</kbd>
+          <kbd>↵</kbd> to send
+        </span>
 
         {/* Toasts carry the outcome, but status must also reach assistive
             technology and anyone who dismissed the slip. */}
         <p className={styles.status} role="status" aria-live="polite">
-          {status === 'sent' && 'Sent. I will come back to you.'}
-          {status === 'failed' && 'Failed. Email hello@akshaybajpai.com instead.'}
+          {status === 'failed' && 'Failed. Your message is still here. Email hello@akshaybajpai.com instead.'}
         </p>
-
-        {status === 'sent' && (
-          <span className={styles.stamp} aria-hidden="true">
-            <span>Transmitted</span>
-            <span suppressHydrationWarning>{today()}</span>
-          </span>
-        )}
       </div>
     </form>
   );

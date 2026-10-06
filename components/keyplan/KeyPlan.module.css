@@ -1017,6 +1017,74 @@ html[data-mode='raw'] .stamp {
   border-color: var(--accent);
 }
 
+/* ---- The Correspondence sheet ----------------------------------------------
+   Printed on reversed stock (see .reversed in globals.css): the one solid
+   block on the plan, because it is the one sheet that asks for something. Its
+   foot is a call to act, and it is never hidden, at any zoom. */
+
+.plate[data-id='contact'] {
+  box-shadow: var(--shadow-deep);
+}
+
+.plate[data-id='contact'] .plateFoot {
+  display: flex !important;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top-color: var(--rule-strong);
+  color: var(--ink-3);
+}
+
+.plate[data-id='contact'] .plateOpen {
+  opacity: 1;
+  transform: none;
+  padding: 3px 9px;
+  font-size: calc(9.5px * var(--inv, 1));
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--paper-raised);
+  background: var(--accent);
+  transition:
+    background-color var(--d-2) var(--ease-plate),
+    padding var(--d-2) var(--ease-plate);
+}
+
+.plate[data-id='contact']:hover .plateOpen,
+.plate[data-id='contact']:focus-visible .plateOpen {
+  padding-right: 15px;
+  background: var(--ink);
+}
+
+/* A slow pulse on the postmark: the one thing on the plan that moves at
+   rest, and it moves gently. */
+@keyframes line-open {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.plate[data-id='contact'] .plateSubtitle::before {
+  content: '';
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  margin-right: 0.6em;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: line-open 2400ms ease-in-out infinite;
+}
+
+.plate[data-id='contact'] .plateSubtitle {
+  color: var(--accent);
+}
+
+html[data-mode='annotated'] .plate[data-id='contact'] .plateAnnot {
+  display: none;
+}
+
 /* ---- Level of detail --------------------------------------------------
    Zoomed out the plan is a composition of labelled blocks; zoomed in it
    becomes a readable contents table. Rows fade rather than reflow so the
@@ -1668,6 +1736,15 @@ html[data-mode='raw'] .stamp {
     fill: var(--ink-2);
     pointer-events: none;
     transition: fill var(--d-2) var(--ease-plate);
+  }
+
+  /* The way to write is the one filled sheet on the small plan too. */
+  .miniSheet[data-cta] rect {
+    fill: var(--ink);
+  }
+
+  .miniSheet[data-cta] text {
+    fill: var(--paper-raised);
   }
 
   .miniSheet:active rect,

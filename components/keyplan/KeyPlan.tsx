@@ -868,6 +868,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                     key={plate.sheet}
                     className={styles.miniSheet}
                     data-on={current === plate.sheet || undefined}
+                    data-cta={plate.id === 'contact' || undefined}
                     onClick={() => jumpTo(plate.sheet)}
                   >
                     <rect
@@ -936,7 +937,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               // Seven sheets prefetched on load is most of the page weight
               // again; prefetch the one the reader is actually reaching for.
               prefetch={false}
-              className={styles.plate}
+              className={plate.id === 'contact' ? `${styles.plate} reversed` : styles.plate}
               data-discipline={plate.discipline}
               data-id={plate.id}
               data-sheet={plate.sheet}
@@ -1037,7 +1038,9 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               <span className={styles.plateFoot}>
                 <span>Rev {plate.revision}</span>
                 <span>{plate.scale}</span>
-                <span className={styles.plateOpen}>Open sheet →</span>
+                <span className={styles.plateOpen}>
+                  {plate.id === 'contact' ? 'Write to me →' : 'Open sheet →'}
+                </span>
               </span>
 
               <span className={styles.corner} aria-hidden="true" />

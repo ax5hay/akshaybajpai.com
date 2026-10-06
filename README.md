@@ -605,7 +605,7 @@ The frame is the same on every route. What is drawn inside it is not.
 | **`W-400` Works** | A **stack key** above the schedule. Choosing a tag strikes the other sheets back without removing them, so the schedule keeps its length and numbering. Each row carries its lead figure |
 | **Index sheets** (`W-400`, `B-500`, `E-600`) | Every row carries its article's **section profile at thumbnail size**, inked in left to right on hover |
 | **Articles that cite each other** | **Cross-references in the text**: the sheets this one links to and the sheets that link here, each named by a split-circle bubble. Read off the Markdown links at build time; a sheet with none shows none |
-| **`C-700` Correspondence** | The form is a **transmittal**: dated, with tick-box subjects, a live word count, and a stamp when it has gone. Each channel has a copy control |
+| **`C-700` Correspondence** | The last stop, and the one sheet printed on **reversed stock**: see below |
 | **`X-999` Sheet Not Issued** | Prints the reference that was followed, struck through, and offers the **nearest issued sheets** by shared words in the address |
 | **Every sheet** | A reading line along the foot of the rail, driven by a CSS scroll timeline |
 
@@ -648,6 +648,28 @@ The frame is the same on every route. What is drawn inside it is not.
 </div>
 
 <br/>
+
+### Correspondence, on reversed stock
+
+One thing in the set is printed the other way round. On the key plan, `C-700` is
+the single solid block among white sheets, with a live "open a line" mark and a
+call to write that is never hidden at any zoom. The transmittal it leads to is
+printed the same way. In each mode the block takes that mode's own hot colour,
+filled: ink on paper, amber on cyanotype, green on source. It is done with one
+class, `.reversed`, which redefines the palette tokens on the element so that
+everything drawn inside follows.
+
+| The transmittal | |
+|:--|:--|
+| **Fields** | Numbered and ruled like a printed slip: from, regarding (four tick boxes), message on ruled lines with a live word count |
+| **Keeps your draft** | Held for the visit in `sessionStorage`, so reading another sheet and coming back, or a stray reload, loses nothing. Cleared the moment it is sent |
+| **Sends from the keyboard** | <kbd>⌘</kbd> <kbd>↵</kbd> or <kbd>Ctrl</kbd> <kbd>↵</kbd> |
+| **A receipt** | When it has gone, the form is replaced by a stamped receipt: from, regarding, length |
+| **If it fails** | The message stays where it is, and the direct address is offered |
+
+Beside it: the email address at headline size with a copy control, the other
+lines, and the **local time in New Delhi** with how far that is from the reader's
+own clock.
 
 The section widths, counts and reading times come from the Markdown at build time
 (`readSections` in [`lib/content.ts`](lib/content.ts)), so the profile is a true drawing of
