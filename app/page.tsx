@@ -8,16 +8,13 @@ import { JsonLd } from '@/components/JsonLd';
 import { PERSON_ID, webPage } from '@/lib/metadata';
 import { keyPlanPlates } from '@/lib/plates';
 
-export const metadata = {
-  ...buildMetadata({
-    title: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
-    description:
-      'Akshay Bajpai (ax5hay): AI architect and forward-deployed AI engineer in New Delhi. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical and insurance document AI. Case studies, research, essays and field notes, issued as a drawing set.',
-    path: '/',
-    keywords: HOME_KEYWORDS,
-  }),
-  title: { absolute: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer' },
-};
+export const metadata = buildMetadata({
+  title: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
+  description:
+    'Akshay Bajpai (ax5hay): AI architect and forward-deployed AI engineer in New Delhi. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical and insurance document AI. Case studies, research, essays and field notes, issued as a drawing set.',
+  path: '/',
+  keywords: HOME_KEYWORDS,
+});
 
 /** Year and month, as stamped on a sheet. */
 function stamp(date: string): string {
