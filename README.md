@@ -267,6 +267,7 @@ thrust*, and lifts.
 | Way in | Offered the moment the set has loaded; <kbd>Enter</kbd> or the button |
 | Hold | Any other key, or a tap off the button, stops the count; again to resume |
 | Reduced motion | Never shown |
+| Arriving by search | Never shown: a reader who lands on `/?q=…` is owed the index, not the cover |
 | Slow or metered connection | Only the seven section sheets are prefetched |
 | A network that never answers | Loading is given up on after 12 s and the way in is offered anyway |
 | No JavaScript | The stylesheet runs the sequence on a fixed clock and removes the cover itself |
@@ -450,6 +451,7 @@ Press <kbd>/</kbd> or <kbd>⌘K</kbd> anywhere.
 | **Keyboard** | <kbd>↑</kbd> <kbd>↓</kbd> move, <kbd>↵</kbd> opens, <kbd>Esc</kbd> closes; focus is held inside the panel |
 | **On a phone** | The whole screen, rows a thumb can land on, a 20px field iOS will not zoom into, and no keyboard thrown up until the field is tapped |
 | **Cost** | Loaded on demand. It carries the drafted figures, so no page pays for it until the index is opened; the cover sheet fetches it while it plays, and hovering the button does too |
+| **From outside** | `/?q=rag` opens it with the query typed and the cover skipped. It is the search endpoint the site declares to engines (see [C-703](#c-703--visibility)) |
 
 ### The lens
 
@@ -801,7 +803,8 @@ series automatically.**
 
 `PlateShell` is the one wrapper every content route uses. It renders the header, figure,
 body, cross-references and raw record together, and lets CSS decide which the current mode
-shows.
+shows. Each route also hands it the sheet's structured data (`jsonLd`), which it issues as
+one `<script type="application/ld+json">` at the head of the article.
 
 ```mermaid
 flowchart LR
@@ -812,6 +815,7 @@ flowchart LR
   SHELL --> BODY["body"]
   SHELL --> REFS["cross-references"]
   SHELL --> RAW["raw record + source"]
+  SHELL --> LD["JSON-LD graph"]
 ```
 
 <details>
@@ -838,6 +842,8 @@ flowchart LR
 | `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
 | `sheet/TitleBlock` | Bottom-right title block, grid reference, copy and print |
 | `sheet/SheetIndex` | Full-set search with series tabs and a live preview; loaded on demand |
+| `sheet/Register` | The same list as a static, hidden `<nav>` on every page, for crawlers |
+| `JsonLd` | One `<script type="application/ld+json">`; the identity graph alone, or the things a page passes it |
 | `sheet/Loupe` | The inspection lens |
 | `sheet/ZoneCursor` | Lights the margin zone under the pointer |
 | `system/Preloader` | The cover sheet |
@@ -866,6 +872,7 @@ flowchart LR
 | Motion | CSS, SVG, View Transitions API |
 | Markdown | remark, remark-gfm, gray-matter |
 | Fonts | Instrument Serif, IBM Plex Sans (regular only) and Mono, via `next/font`; self-hosted |
+| Share cards | [satori](https://github.com/vercel/satori) and `@resvg/resvg-js`, at build time only |
 | Contact form | [Formspree](https://formspree.io/) (the only third-party runtime service) |
 | Hosting | GitHub Pages, deployed by GitHub Actions |
 
@@ -884,6 +891,10 @@ flowchart LR
   RS --> ROUTE
   ROUTE --> SHEET["numbered sheet"]
 ```
+
+The same frontmatter feeds everything issued about a sheet: its `<title>` and
+description, its share card, its entry in the feed and in `llms.txt`, its schema and its
+sitemap date. Write it once; nothing downstream is typed again.
 
 | Collection | Path | Frontmatter |
 |:-----------|:-----|:------------|
@@ -973,7 +984,8 @@ components/
 ├── figures/              # drafted figures, operable schematics
 ├── plate/                # PlateShell, ArticlePlate, schedules, forms
 ├── kit/                  # sliders, controls, callouts, dimensions
-├── sheet/                # frame, rail, title block, index, lens, zone cursor
+├── sheet/                # frame, rail, title block, index, register, lens, zone cursor
+├── JsonLd.tsx            # structured data, one script per page
 └── system/               # cover, modes, instruments, transitions, toasts
 
 lib/
@@ -981,7 +993,8 @@ lib/
 ├── sheet-index.ts        # detail sheet numbering and adjacency
 ├── mode.ts               # mode vocabulary; no 'use client', see A-102
 ├── content.ts            # Markdown pipeline
-└── metadata.ts · format.ts · constants.ts
+├── metadata.ts           # titles, cards, robots; the identity graph and page schema
+└── format.ts · constants.ts
 
 content/                  # blog, essays, work Markdown
 scripts/
@@ -991,7 +1004,7 @@ scripts/
 └── fonts/                # the three faces the cards are set in
 public/                   # favicon, logo, home share card, manifest, humans.txt
 docs/media/               # the screenshots on this page
-.github/workflows/        # deploy.yml
+.github/workflows/        # deploy.yml, with the two optional verification variables
 CNAME                     # www.akshaybajpai.com
 ```
 
@@ -1039,6 +1052,8 @@ compression, so its load figures are pessimistic.
 | Opening the index on a phone | 103 ms from tap; 16 ms thereafter |
 | Lighthouse accessibility | 100 on the key plan, an article, About, Works, Essays and Contact |
 | Lighthouse best practices · SEO | 100 · 100 |
+| Internal links in the HTML of any page | 36, one to every sheet, via the register |
+| Share cards | 34, drawn at build, about 75 kB each |
 | Lighthouse performance (mobile, uncompressed) | 73 to 81 |
 | Prefetched by the cover | 31 sheets on a desktop; the 7 section sheets on a phone or a metered link |
 | Requests on navigation after the cover | None for pages; the set is already cached |

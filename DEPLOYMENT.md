@@ -155,6 +155,10 @@ should equal the number of sheets minus one (the key plan keeps `public/og.jpg`)
 resvg binary is a platform-specific optional dependency; `package-lock.json` pins the
 Linux x64 build the runner needs, so do not prune optional dependencies from it.
 
+**Every page carries the sheet register.** `components/sheet/Register.tsx` is rendered by
+the layout as a hidden `<nav>` listing all thirty-six sheets, so a crawler finds the whole
+set from any page it lands on. It adds about 6 kB of HTML per page and nothing on screen.
+
 **Search-engine verification is a build variable.** The build step passes
 `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` from the repository's Actions
 variables into `app/layout.tsx`, which issues the ownership `<meta>` tags when they are
