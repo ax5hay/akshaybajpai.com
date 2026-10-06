@@ -22,6 +22,7 @@ import { MODE_INFO, MODES } from '@/lib/mode';
 import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
 import { lastSheetPath, useSheetTransition } from '@/components/system/SheetTransition';
 import { plateForPath } from '@/lib/plates';
+import { clearRoute, useRoute } from '@/components/system/Route';
 import styles from './KeyPlan.module.css';
 
 export interface PlateItem {
@@ -36,6 +37,9 @@ export type KeyPlanContents = Record<string, PlateItem[]>;
 const MIN_SCALE = 0.35;
 const MAX_SCALE = 2.6;
 const FLY_MS = 340;
+/** The tour: a slower flight to each sheet, and how long it is held there. */
+const TOUR_FLY_MS = 1100;
+const TOUR_HOLD_MS = 4200;
 /** Share of the stage the fitted plan takes. Mirrored by `--fit` in the CSS. */
 const FIT = 0.94;
 /** Plan that must stay on the stage, in px, so a pan can never lose the drawing. */
@@ -110,7 +114,14 @@ const revisionCloud = (r: KeyPlanRect, step = 22, bulge = 14) => {
   );
 };
 
-export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
+export function KeyPlan({
+  contents,
+  sheetCount,
+}: {
+  contents: KeyPlanContents;
+  /** Every sheet in the set, for the reader's "n of m read". */
+  sheetCount: number;
+}) {
   const plates = useMemo(() => keyPlanPlates(), []);
   const router = useRouter();
   const { toast } = useToast();
@@ -206,6 +217,49 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
       x: (width - KEY_PLAN_WIDTH * scale) / 2,
       y: (height - KEY_PLAN_HEIGHT * scale) / 2,
     };
+  }, []);
+
+  // ---- The reader's route ------------------------------------------------
+  // Which sheets they have read, plotted on the plan as a survey traverse:
+  // a station on each sheet in the order it was first reached, and a line
+  // between them. Empty until mounted, so the server render never has one.
+  const route = useRoute();
+  const read = useMemo(() => new Set(route), [route]);
+  /** Sheets on the plan the route has reached, in order, each once. */
+  const stations = useMemo(() => {
+    const seen: PlacedPlate[] = [];
+    for (const href of route) {
+      const sheet = plateForPath(href)?.sheet;
+      const plate = plates.find((p) => p.sheet === sheet);
+      if (plate && !seen.includes(plate)) seen.push(plate);
+    }
+    return seen;
+  }, [route, plates]);
+  /** Where a station is struck: the free corner of the sheet's title strip. */
+  const stationAt = (p: PlacedPlate) => ({ x: p.rect.x + p.rect.w - 20, y: p.rect.y + 20 });
+  const traverse = stations
+    .map(stationAt)
+    .map((pt, i) => `${i ? 'L' : 'M'}${pt.x} ${pt.y}`)
+    .join('');
+  /** How much of one section has been read: its own sheet and its details. */
+  const readIn = (plate: PlacedPlate) => {
+    const items = (contents[plate.id] ?? []).filter((i) => i.href);
+    return {
+      done: (read.has(plate.href) ? 1 : 0) + items.filter((i) => read.has(i.href!)).length,
+      of: 1 + items.length,
+    };
+  };
+
+  // ---- The tour -------------------------------------------------------------
+  // The camera visits each sheet in turn and holds on it. Anything the reader
+  // does to the plan ends it: it is an offer, not a ride.
+  const [tour, setTour] = useState<number | null>(null);
+  const touring = useRef(false);
+  touring.current = tour !== null;
+  const endTour = useCallback(() => {
+    if (!touring.current) return;
+    setTour(null);
+    setHovered(null);
   }, []);
 
   const fit = useCallback(() => {
@@ -315,6 +369,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
       stopFling();
+      endTour();
       const rect = stage.getBoundingClientRect();
       zoomAt(
         Math.exp(-event.deltaY * (event.ctrlKey ? 0.01 : 0.0016)),
@@ -324,9 +379,10 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
     return () => stage.removeEventListener('wheel', onWheel);
-  }, [interactive, zoomAt, stopFling]);
+  }, [interactive, zoomAt, stopFling, endTour]);
 
   const onPointerDown = (event: React.PointerEvent) => {
+    endTour();
     if (!interactive || event.button !== 0) return;
     drag.current = {
       active: true,
@@ -453,6 +509,40 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
     },
     []
   );
+
+  useEffect(() => {
+    if (tour === null) return;
+    const plate = plates[tour];
+    // Lights the sheet's cross-references for as long as it is held.
+    setHovered(plate.sheet);
+    if (interactive) flyTo(plate);
+    else jumpTo(plate.sheet);
+
+    const timer = setTimeout(
+      () => {
+        if (tour + 1 < plates.length) {
+          setTour(tour + 1);
+        } else {
+          setTour(null);
+          setHovered(null);
+          if (interactive) fit();
+        }
+      },
+      TOUR_HOLD_MS + (interactive ? TOUR_FLY_MS : 700)
+    );
+    return () => clearTimeout(timer);
+  }, [tour, plates, interactive, flyTo, jumpTo, fit]);
+
+  useEffect(() => {
+    if (tour === null) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') endTour();
+      if (event.key === 'ArrowRight') setTour((i) => (i === null ? i : Math.min(plates.length - 1, i + 1)));
+      if (event.key === 'ArrowLeft') setTour((i) => (i === null ? i : Math.max(0, i - 1)));
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tour, plates.length, endTour]);
 
   const onPlateClick = (
     event: React.MouseEvent,
@@ -660,7 +750,7 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             transform: interactive
               ? `translate3d(${camera.x}px, ${camera.y}px, 0) scale(${camera.scale})`
               : undefined,
-            transitionDuration: animating ? `${FLY_MS}ms` : '0ms',
+            transitionDuration: animating ? `${tour !== null ? TOUR_FLY_MS : FLY_MS}ms` : '0ms',
           }}
           onTransitionEnd={() => setAnimating(false)}
         >
@@ -792,6 +882,32 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             </g>
           </svg>
 
+          {/* The reader's route: a survey traverse over the sheets they have
+              read, in the order they reached them. Drawn over the drawing,
+              inert to the pointer, and absent until there are two stations
+              to join. */}
+          {stations.length > 0 && (
+            <svg
+              className={styles.route}
+              viewBox={`0 0 ${KEY_PLAN_WIDTH} ${KEY_PLAN_HEIGHT}`}
+              aria-hidden="true"
+              key={stations.length}
+            >
+              {stations.length > 1 && <path d={traverse} pathLength={1} className={styles.routeLine} />}
+              {stations.map((plate, i) => {
+                const pt = stationAt(plate);
+                return (
+                  <g key={plate.sheet} className={styles.station} style={{ '--n': i } as React.CSSProperties}>
+                    <circle cx={pt.x} cy={pt.y} r={11} />
+                    <text x={pt.x} y={pt.y + 3.5}>
+                      {i + 1}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+          )}
+
           {/* Title strip, down the right edge where a drawing carries it. */}
           <div
             className={styles.titleStrip}
@@ -842,14 +958,21 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             {/* The plan itself, small. On a narrow sheet there is no room to
                 pan the real one, so it is drawn at the size of a thumbnail and
                 does one job: tap a sheet and the pile below turns to it. */}
-            <div className={styles.mini} aria-hidden="true">
+            <div className={styles.mini}>
               <span className={styles.miniLabel}>
                 <span>Key plan</span>
-                <span>Tap a sheet</span>
+                <button
+                  type="button"
+                  className={styles.miniTour}
+                  onClick={() => setTour(tour === null ? 0 : null)}
+                >
+                  {tour === null ? '▶ Tour the set' : '■ Stop the tour'}
+                </button>
               </span>
               <svg
                 viewBox={`-6 -6 ${KEY_PLAN_SHEETS_WIDTH + 12} ${KEY_PLAN_HEIGHT + 12}`}
                 className={styles.miniPlan}
+                aria-hidden="true"
               >
                 {Object.entries(KEY_PLAN_FURNITURE)
                   .filter(([name]) => name !== 'title')
@@ -885,9 +1008,16 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                     </text>
                   </g>
                 ))}
+                {stations.length > 1 && <path d={traverse} className={styles.miniRoute} />}
+                {stations.map((plate) => {
+                  const pt = stationAt(plate);
+                  return <circle key={plate.sheet} cx={pt.x} cy={pt.y} r={16} className={styles.miniStation} />;
+                })}
               </svg>
               <span className={styles.miniCue}>
-                {plates.length} sheets, stacked below
+                {route.length > 0
+                  ? `${route.length} of ${sheetCount} sheets read`
+                  : `${plates.length} sheets, stacked below`}
                 <span className={styles.miniArrow} />
               </span>
             </div>
@@ -897,6 +1027,27 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
               <span>Issued for review</span>
               <span>{ISSUE_STAMP}</span>
             </div>
+
+            {/* The reader's own entry in the title block. */}
+            {route.length > 0 && (
+              <div className={styles.routeNote}>
+                <span className={styles.revTitle}>Your route</span>
+                <span className={styles.routeCount}>
+                  <b>{route.length}</b> of {sheetCount} sheets read
+                </span>
+                <span className={styles.routeStations} aria-hidden="true">
+                  {stations.map((p) => p.sheet).join(' → ')}
+                </span>
+                <span className={styles.routeActions}>
+                  <Link href="/contact/" className={styles.routeLink}>
+                    Enclose it in a message →
+                  </Link>
+                  <button type="button" className={styles.routeClear} onClick={clearRoute}>
+                    Clear
+                  </button>
+                </span>
+              </div>
+            )}
 
             {/* Revision schedule, read off the sheets rather than written
                 down twice. */}
@@ -968,6 +1119,13 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
             >
               <span className={styles.plateTag}>{plate.sheet}</span>
 
+              {/* How much of this section the reader has been through. */}
+              {readIn(plate).done > 0 && (
+                <span className={styles.plateRead}>
+                  {readIn(plate).done} of {readIn(plate).of} read
+                </span>
+              )}
+
               <span className={styles.plateHead}>
                 <span className={styles.plateTitle}>{plate.title}</span>
                 <span className={styles.plateSubtitle}>{plate.subtitle}</span>
@@ -995,7 +1153,11 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
                   data-numbered={(contents[plate.id] ?? []).some((i) => i.sheet) || undefined}
                 >
                   {(contents[plate.id] ?? []).map((item, i) => (
-                    <span key={i} className={styles.item}>
+                    <span
+                      key={i}
+                      className={styles.item}
+                      data-read={(item.href && read.has(item.href)) || undefined}
+                    >
                       {item.sheet && <span className={styles.itemSheet}>{item.sheet}</span>}
                       <span className={styles.itemTitle}>{item.title}</span>
                       {item.meta && <span className={styles.itemMeta}>{item.meta}</span>}
@@ -1182,6 +1344,14 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
         </button>
         <button
           type="button"
+          className={styles.controlTour}
+          onClick={() => setTour(tour === null ? 0 : null)}
+          aria-pressed={tour !== null}
+        >
+          {tour === null ? '▶ Tour' : '■ Stop'}
+        </button>
+        <button
+          type="button"
           className={styles.controlHelp}
           onClick={() =>
             toast({
@@ -1195,6 +1365,51 @@ export function KeyPlan({ contents }: { contents: KeyPlanContents }) {
           ?
         </button>
       </div>
+
+      {/* The tour's caption: where it is, what the sheet is, and the ways
+          out of it. The rule along its foot is the hold running down. */}
+      {tour !== null && (
+        <div className={styles.tour} role="status" data-lens-skip>
+          <span className={styles.tourCount}>
+            {String(tour + 1).padStart(2, '0')} / {String(plates.length).padStart(2, '0')}
+          </span>
+          <span className={styles.tourText}>
+            <span className={styles.tourTitle}>
+              <b>{plates[tour].sheet}</b> {plates[tour].title}
+            </span>
+            <span className={styles.tourSub}>{plates[tour].subtitle}</span>
+          </span>
+          <span className={styles.tourActions}>
+            <button
+              type="button"
+              onClick={() => setTour(Math.max(0, tour - 1))}
+              disabled={tour === 0}
+              aria-label="Previous sheet"
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              onClick={() => (tour + 1 < plates.length ? setTour(tour + 1) : endTour())}
+              aria-label="Next sheet"
+            >
+              →
+            </button>
+            <Link href={plates[tour].href} className={styles.tourOpen} onClick={endTour}>
+              Open sheet
+            </Link>
+            <button type="button" onClick={endTour}>
+              Stop
+            </button>
+          </span>
+          <span
+            key={tour}
+            className={styles.tourHold}
+            style={{ animationDuration: `${TOUR_HOLD_MS + (interactive ? TOUR_FLY_MS : 700)}ms` }}
+            aria-hidden="true"
+          />
+        </div>
+      )}
 
     </section>
   );

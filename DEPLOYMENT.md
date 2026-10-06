@@ -117,6 +117,7 @@ out/
 │   └── <slug>/
 │       ├── index.html          # the sheet
 │       └── index.txt           # its payload, fetched on client navigation
+├── set/index.html              # the whole set as one document, for print
 ├── 404.html                    # X-999, Sheet Not Issued
 ├── _next/static/               # hashed JS, CSS and self-hosted fonts
 ├── sitemap.xml                 # from app/sitemap.ts
@@ -237,6 +238,9 @@ Then look at it:
 - [ ] Press <kbd>/</kbd>; the index opens with a preview beside the list.
 - [ ] On a phone, or a narrow window: the pile scrolls, the dock is at the foot, and on an
       article the section strip rides under the rail.
+- [ ] Read two sheets for a few seconds each, then return to the key plan: a traverse joins them.
+- [ ] Press **▶ Tour** on the key plan; it visits each sheet and stops on <kbd>Esc</kbd>.
+- [ ] Open `/set/` and print to PDF; every sheet starts a new page.
 - [ ] Follow a link to a path that does not exist; the unissued sheet offers the nearest ones.
 
 > [!TIP]

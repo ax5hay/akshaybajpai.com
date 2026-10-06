@@ -1085,6 +1085,347 @@ html[data-mode='annotated'] .plate[data-id='contact'] .plateAnnot {
   display: none;
 }
 
+/* ---- The reader's route ----------------------------------------------------
+   A survey traverse over the sheets they have read: numbered stations in the
+   order reached, joined by a line. Over the drawing, inert to the pointer. */
+
+.route {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Plotted once, station to station, when the plan is laid out. */
+.routeLine {
+  fill: none;
+  stroke: var(--accent);
+  /* A fine line: it crosses the faces of the sheets, and has to read as a
+     trace laid over the drawing, not as something struck through it. */
+  stroke-width: calc(1px * var(--inv, 1));
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0.5;
+  animation: route-plot 1400ms var(--ease-mech) calc(var(--boot) + 1500ms) forwards;
+}
+
+@keyframes route-plot {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.station {
+  animation: station-strike 360ms var(--ease-snap) backwards;
+  animation-delay: calc(var(--boot) + 1500ms + var(--n, 0) * 160ms);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.station circle {
+  fill: var(--accent);
+  stroke: var(--paper-raised);
+  stroke-width: 2;
+}
+
+.station text {
+  fill: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+@keyframes station-strike {
+  from {
+    opacity: 0;
+    scale: 1.8;
+  }
+}
+
+:global(html[data-vt]) .routeLine {
+  animation: none;
+  stroke-dashoffset: 0;
+}
+
+:global(html[data-vt]) .station {
+  animation: none;
+}
+
+/* On the sheet: how much of the section has been read, beside its station. */
+.plateRead {
+  position: absolute;
+  top: 12px;
+  right: 40px;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: calc(8px * var(--inv, 1));
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* A row the reader has been to is ticked off in the schedule. */
+.item[data-read] .itemSheet::before {
+  content: '✓ ';
+}
+
+.item[data-read] .itemTitle {
+  color: var(--ink-3);
+}
+
+/* Their entry in the title strip. */
+.routeNote {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: auto;
+  padding: 14px 0;
+  border-top: var(--lw-med) solid var(--accent);
+  font-family: var(--font-label), monospace;
+  font-size: calc(9px * var(--inv-soft, 1));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  animation: plan-ink 600ms var(--ease-plate) backwards;
+}
+
+.routeNote + .revs {
+  margin-top: 0;
+}
+
+.routeNote .revTitle {
+  color: var(--accent);
+}
+
+.routeCount {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: calc(19px * var(--inv-soft, 1));
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.routeCount b {
+  font-weight: 400;
+  color: var(--accent);
+}
+
+.routeStations {
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.routeActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 3px;
+}
+
+.routeLink,
+.routeClear {
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--accent);
+  pointer-events: auto;
+}
+
+.routeClear {
+  color: var(--ink-3);
+}
+
+.routeLink:hover,
+.routeClear:hover {
+  color: var(--ink);
+}
+
+/* ---- The tour ------------------------------------------------------------------ */
+
+.controlTour {
+  display: grid;
+  place-items: center;
+  height: 2rem;
+  padding: 0 var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent);
+  border-right: var(--lw-hair) solid var(--rule);
+  transition:
+    color var(--d-1),
+    background-color var(--d-1);
+}
+
+.controlTour:hover,
+.controlTour[aria-pressed='true'] {
+  color: var(--paper-raised);
+  background: var(--accent);
+}
+
+.tour {
+  position: absolute;
+  /* Between the camera controls on the left and the title block on the
+     right, which is narrower below 86rem. */
+  left: calc(var(--sheet-margin) + 15.5rem);
+  right: calc(var(--sheet-margin) + 9.5rem);
+  bottom: calc(var(--sheet-margin) + var(--s-3));
+  z-index: 5;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  background: var(--paper-raised);
+  border: var(--lw-med) solid var(--rule-ink);
+  box-shadow: var(--shadow-deep);
+  animation: tour-in 420ms var(--ease-plate) both;
+}
+
+@keyframes tour-in {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+@media (min-width: 86rem) {
+  .tour {
+    right: calc(var(--sheet-margin) + 22.5rem);
+  }
+}
+
+.tourCount {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.tourText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tourTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-lg);
+  line-height: 1.15;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html[data-mode='annotated'] .tourTitle,
+html[data-mode='raw'] .tourTitle {
+  font-size: var(--t-base);
+  text-transform: uppercase;
+}
+
+.tourTitle b {
+  margin-right: 0.5em;
+  font-family: var(--font-label), monospace;
+  font-size: 0.62em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.tourSub {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tourActions {
+  display: flex;
+  gap: var(--lw-thin);
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.tourActions button,
+.tourOpen {
+  display: grid;
+  place-items: center;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0 var(--s-3);
+  background: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  transition:
+    color var(--d-1),
+    background-color var(--d-1);
+}
+
+.tourActions button:hover:not(:disabled),
+.tourOpen:hover {
+  color: var(--paper-raised);
+  background: var(--accent);
+}
+
+.tourActions button:disabled {
+  color: var(--ink-4);
+}
+
+.tourOpen {
+  color: var(--accent);
+}
+
+/* The hold, running down. */
+.tourHold {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: var(--lw-heavy);
+  background: var(--accent);
+  transform-origin: left center;
+  animation: tour-hold linear both;
+}
+
+@keyframes tour-hold {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* A tour is a journey, and a reader who has asked for none is not offered it. */
+@media (prefers-reduced-motion: reduce) {
+  .controlTour,
+  .miniTour,
+  .tour {
+    display: none !important;
+  }
+}
+
 /* ---- Level of detail --------------------------------------------------
    Zoomed out the plan is a composition of labelled blocks; zoomed in it
    becomes a readable contents table. Rows fade rather than reflow so the
@@ -1736,6 +2077,76 @@ html[data-mode='annotated'] .plate[data-id='contact'] .plateAnnot {
     fill: var(--ink-2);
     pointer-events: none;
     transition: fill var(--d-2) var(--ease-plate);
+  }
+
+  .route {
+    display: none;
+  }
+
+  .routeNote {
+    display: none;
+  }
+
+  .miniRoute {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .miniStation {
+    fill: var(--accent);
+    stroke: var(--paper-raised);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+
+  .miniTour {
+    min-height: 2rem;
+    padding: 0 var(--s-3);
+    border: var(--lw-thin) solid var(--accent);
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    color: var(--accent);
+  }
+
+  .miniTour:active {
+    color: var(--paper-raised);
+    background: var(--accent);
+  }
+
+  .plateRead {
+    top: 0.7rem;
+    right: 0.9rem;
+    font-size: var(--t-micro);
+  }
+
+  /* The caption rides just above the dock. */
+  .tour {
+    position: fixed;
+    left: var(--sheet-margin);
+    right: var(--sheet-margin);
+    bottom: calc(var(--sheet-margin) + var(--titleblock-h) + var(--s-2));
+    translate: none;
+    width: auto;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s-2) var(--s-3);
+    padding: var(--s-3);
+    animation-name: plan-ink;
+  }
+
+  .tourActions {
+    grid-column: 1 / -1;
+  }
+
+  .tourActions button,
+  .tourOpen {
+    flex: 1;
+    min-height: 2.75rem;
   }
 
   /* The way to write is the one filled sheet on the small plan too. */

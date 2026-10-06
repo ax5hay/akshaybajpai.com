@@ -41,6 +41,25 @@ interface Props {
    * otherwise it is set ahead of the prose.
    */
   figure?: React.ReactNode;
+  /**
+   * For the complete set, where thirty sheets share a page: no back link,
+   * section strip, citable headings or onward links, which are all ways of
+   * moving about a single sheet on screen.
+   */
+  compact?: boolean;
+}
+
+/** Citable headings on a sheet of its own; a plain wrapper in the set. */
+function Sections({
+  sheet,
+  plain,
+  children,
+}: {
+  sheet: string;
+  plain: boolean;
+  children: React.ReactNode;
+}) {
+  return plain ? <div>{children}</div> : <ProseTools sheet={sheet}>{children}</ProseTools>;
 }
 
 /** A detail sheet: one article, drawn at full size. */
@@ -62,6 +81,7 @@ export function ArticlePlate({
   adjacent = [],
   xrefs,
   figure,
+  compact = false,
 }: Props) {
   const issued = formatDate(date, 'short');
   const repo = parseGithubRepo(client);
@@ -81,7 +101,8 @@ export function ArticlePlate({
       revision="A"
       issued={issued}
       facts={facts}
-      source={source}
+      // The verbatim Markdown is for raw mode on screen; the set is for paper.
+      source={compact ? undefined : source}
       record={[
         { k: 'series', v: seriesLabel },
         { k: 'words', v: String(source.trim().split(/\s+/).length) },
@@ -89,6 +110,7 @@ export function ArticlePlate({
         ...(metrics?.length ? [{ k: 'metrics', v: metrics.join(' · ') }] : []),
       ]}
     >
+      {!compact && (
       <nav className={styles.back}>
         <Link href={seriesHref} className={styles.backLink}>
           <span aria-hidden="true">←</span> Back to {seriesLabel}
@@ -99,6 +121,7 @@ export function ArticlePlate({
           </a>
         )}
       </nav>
+      )}
 
       {stack && stack.length > 0 && (
         <ul className={styles.stack} aria-label="Stack">
@@ -118,9 +141,9 @@ export function ArticlePlate({
         <MetricSchedule metrics={metrics} />
       )}
 
-      <SheetProfile sections={sections} readingTime={readingTime} />
+      {!compact && <SheetProfile sections={sections} readingTime={readingTime} />}
 
-      <ProseTools sheet={sheet}>
+      <Sections sheet={sheet} plain={compact}>
       {(() => {
         // An unlabelled code block in a case study is a diagram in ASCII. The
         // verbatim source keeps it; the sheet draws it.
@@ -147,7 +170,7 @@ export function ArticlePlate({
           </>
         );
       })()}
-      </ProseTools>
+      </Sections>
 
       {xrefs && xrefs.out.length + xrefs.in.length > 0 && (
         <nav className={styles.xrefs} aria-label="Cross-references in the text">
@@ -182,7 +205,7 @@ export function ArticlePlate({
         </nav>
       )}
 
-      {adjacent.length > 0 && (
+      {!compact && adjacent.length > 0 && (
         <nav className={styles.adjacent} aria-label="Adjacent sheets">
           <span className={styles.adjacentLabel}>Continue through the set</span>
           <ul className={styles.adjacentList}>

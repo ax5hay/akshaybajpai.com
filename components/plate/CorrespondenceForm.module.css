@@ -206,6 +206,45 @@
   outline-offset: 2px;
 }
 
+/* ---- Enclosure: the reader's route, if they choose to send it ---------- */
+
+.route {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0;
+}
+
+/* Each sheet a station on the traverse, joined to the next. */
+.route span {
+  position: relative;
+  padding: 3px var(--s-2);
+  border: var(--lw-thin) solid var(--accent-line);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.route span + span::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: var(--s-2);
+  height: var(--lw-thin);
+  background: var(--accent-line);
+}
+
+.routeNote {
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
 /* ---- Actions ---------------------------------------------------------------- */
 
 .actions {

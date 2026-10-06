@@ -310,6 +310,16 @@ html[data-mode='raw'] .search {
   color: var(--accent);
 }
 
+/* Ticked off: a sheet the reader has already been through. */
+.row[data-read] .rowSheet::after {
+  content: ' ✓';
+}
+
+.row[data-read] .rowTitle {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
 /* What the query matched, underlined in the markup pen. */
 .hit {
   color: inherit;

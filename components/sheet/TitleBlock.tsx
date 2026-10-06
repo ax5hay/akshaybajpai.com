@@ -3,12 +3,15 @@
 import { useEffect, useState } from 'react';
 import { DISCIPLINES } from '@/lib/plates';
 import { useToast } from '@/components/system/ToastProvider';
-import { usePlateMeta, TOTAL_SHEETS } from './PlateMetaProvider';
+import Link from 'next/link';
+import { clearRoute, useRoute } from '@/components/system/Route';
+import { usePlateMeta } from './PlateMetaProvider';
 import styles from './TitleBlock.module.css';
 
 const ISSUE_STAMP = '2026.09';
 
-export function TitleBlock() {
+export function TitleBlock({ sheetCount }: { sheetCount: number }) {
+  const route = useRoute();
   const { meta } = usePlateMeta();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
@@ -89,7 +92,7 @@ export function TitleBlock() {
           </div>
           <div className={styles.field}>
             <dt>Set</dt>
-            <dd className="u-tnum">{TOTAL_SHEETS} sheets</dd>
+            <dd className="u-tnum">{sheetCount} sheets</dd>
           </div>
         </dl>
 
@@ -101,6 +104,20 @@ export function TitleBlock() {
         <button type="button" className={styles.copy} onClick={() => window.print()}>
           Issue this sheet as PDF
         </button>
+        <Link href="/set/" className={styles.copy} onClick={() => setExpanded(false)}>
+          Issue the whole set as PDF
+        </Link>
+
+        {route.length > 0 && (
+          <p className={styles.route}>
+            <span>
+              Your route · <b>{route.length}</b> of {sheetCount} read
+            </span>
+            <button type="button" onClick={clearRoute}>
+              Clear
+            </button>
+          </p>
+        )}
       </div>
     </aside>
   );

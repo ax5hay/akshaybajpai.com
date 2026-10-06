@@ -77,10 +77,24 @@ function notesFor(where: Where, phone: boolean, docked: boolean): Note[] {
           },
           {
             id: 'phone-mini',
-            text: <>Tap any sheet on the small key plan and the pile turns to it.</>,
+            text: (
+              <>
+                Tap any sheet on the small key plan and the pile turns to it, or tap{' '}
+                <b>▶ Tour the set</b> to be walked through.
+              </>
+            ),
           },
         ]
       : [
+          {
+            id: 'tour',
+            text: (
+              <>
+                New here? Press <b>▶ Tour</b>, bottom left, and the plan walks you through every
+                sheet. Touch anything to take over.
+              </>
+            ),
+          },
           {
             id: 'plan-camera',
             text: (

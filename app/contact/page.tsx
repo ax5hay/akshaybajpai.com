@@ -6,6 +6,7 @@ import { PlateFigure } from '@/components/figures/PlateFigure';
 import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata } from '@/lib/metadata';
 import { SOCIAL } from '@/lib/constants';
+import { buildSheetIndex } from '@/lib/sheet-index';
 import styles from './contact.module.css';
 
 const PLATE = getPlateByHref('/contact/')!;
@@ -23,7 +24,7 @@ const CHANNELS = [
   { label: 'Twitter / X', value: '@ax5hay', href: SOCIAL.twitter },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage() {
   const [primary, ...others] = CHANNELS;
 
   return (
@@ -41,7 +42,9 @@ export default function ContactPage() {
     >
       <div className={styles.layout}>
         <div className={styles.write}>
-          <CorrespondenceForm />
+          <CorrespondenceForm
+            sheets={(await buildSheetIndex()).map(({ sheet, title, href }) => ({ sheet, title, href }))}
+          />
         </div>
 
         <aside className={styles.lines} aria-label="Direct lines">
