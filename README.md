@@ -1013,12 +1013,54 @@ HTTPS, one-time setup, verifying a deploy, rolling back, and troubleshooting.
 
 ## C-702 · Measured
 
-Measured on the production build. Frame times are from headless Chromium on an Apple
-laptop; Lighthouse is its mobile preset against a local server with no compression, so its
-load figures are pessimistic.
+Measured on the production build in headless Chromium on an Apple laptop, with the CPU
+throttled 4× unless stated. Lighthouse is its mobile preset against a local server with no
+compression, so its load figures are pessimistic.
 
 | Metric | Value |
 |:-------|:------|
+| Sheets in the set | 35 |
+| Runtime dependencies | 8, none of them animation, state or 3D |
+| Shared JavaScript | 103 kB; no legacy polyfill bundle is shipped |
+| First-load JavaScript, key plan | 126 kB |
+| First-load JavaScript, a sheet | 109 to 115 kB |
+| Downloaded on a cold load, key plan | 718 kB desktop · 229 kB phone (fonts, CSS, JS, HTML) |
+| First paint, key plan | 0.54 s desktop · 0.29 s phone |
+| Cumulative layout shift | 0 |
+| Pan and zoom on the key plan (6×) | 60 fps, median frame 16.6 ms |
+| Scrolling the pile on a phone (6×) | 60 fps, median 16.7 ms, no frame over 33 ms |
+| Scrolling an article, strip tracking (6×) | 60 fps, median 16.7 ms |
+| Dragging the lens (6×) | 60 fps, worst frame 21 ms |
+| Opening the index on a phone | 103 ms from tap; 16 ms thereafter |
+| Lighthouse accessibility | 100 on the key plan, an article, About, Works, Essays and Contact |
+| Lighthouse best practices · SEO | 100 · 100 |
+| Lighthouse performance (mobile, uncompressed) | 73 to 81 |
+| Prefetched by the cover | 31 sheets on a desktop; the 7 section sheets on a phone or a metered link |
+| Requests on navigation after the cover | None for pages; the set is already cached |
+
+### What keeps it fast
+
+Everything that moves is a transform, an opacity or a clip, so the compositor does it.
+Beyond that, the decisions that cost the most to get wrong:
+
+| Decision | Why |
+|:---------|:----|
+| **No polyfill bundle** | Next emits a 112 kB `nomodule` script for browsers that cannot run modern JavaScript. None of them can show this site, so a build step strips it from every page |
+| **One sans weight** | Only the regular weight of IBM Plex Sans is ever set; headings and labels take their weight from the serif and the mono. Two unused font files are not downloaded |
+| **The drawing index is sent once** | Five client parts need it. Through context it is serialised into the page once, not five times |
+| **The lens shifts, then measures** | On scroll the x-ray boxes move with one transform; the page is measured again only once the scroll settles. Measuring on every frame was 396 rectangle reads and a visible stall |
+| **A mode change snaps, then develops** | Transitions are held off for the instant the palette changes, on every browser. The wipe (a view transition) carries the motion; a few hundred elements each cross-fading three colours were the slowest part |
+| **Nothing animates in a hidden tab**, and the postmark pulse pauses while its sheet is off-screen | |
+| **No `body:has()`** | Three rules once used it to hide notes behind the index or the title block. A `:has()` on the body restyles the whole document whenever its subject appears; flags on the root do the same job with one rule |
+| **A phone does not carry the wide plan** | The leaders, markup and route layers, legend, tray and camera controls are dropped from the DOM once the width is known: 1,097 nodes to 968. Every restyle on a phone is that much cheaper |
+| **A phone prefetches what it cannot hover** | The index, the lens and the tour are fetched when idle, and the index is mounted closed so its first open is already its second |
+| **The index renders only what shows** | The preview pane is not rendered where CSS hides it, and on a phone the body's overflow is left alone instead of relaying out the page behind |
+| **The cover waits its turn** | Prefetching starts after the page's own assets have loaded, and a narrow screen fetches the seven section sheets, not thirty-one |
+
+Not yet verified: Safari and Firefox. The view transitions degrade to plain navigation
+where they are unsupported.
+
+-------|:------|
 | Sheets in the set | 32 |
 | Runtime dependencies | 8, none of them animation, state or 3D |
 | Shared JavaScript | 103 kB; no legacy polyfill bundle is shipped |
