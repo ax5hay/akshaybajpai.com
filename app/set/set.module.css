@@ -1,0 +1,281 @@
+/* The complete set. Laid out for paper first: on screen it is a preview of
+   what will print, with one bar at the top that prints nothing. */
+
+.doc {
+  padding-top: calc(var(--sheet-margin) + var(--rail-h) + var(--s-6));
+  padding-bottom: var(--plate-bottom);
+}
+
+/* Thirty-odd sheets share this page, and a view transition needs the name it
+   morphs to be on one element only. */
+.doc :global(.plate) {
+  view-transition-name: none;
+  margin-top: var(--s-10);
+  margin-bottom: 0;
+}
+
+.bar {
+  position: sticky;
+  top: calc(var(--sheet-margin) + var(--rail-h) + var(--s-3));
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  width: min(100% - (var(--sheet-margin) + var(--s-3)) * 2, 46rem);
+  margin-inline: auto;
+  padding: var(--s-3) var(--s-3) var(--s-3) var(--s-4);
+  background: var(--ink);
+  color: var(--paper-raised);
+  box-shadow: var(--shadow-deep);
+}
+
+.barText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: var(--t-xs);
+  line-height: var(--lh-snug);
+}
+
+.barText b {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+}
+
+.barText span {
+  opacity: 0.75;
+}
+
+.barButton {
+  flex-shrink: 0;
+  min-height: 2.75rem;
+  padding: 0 var(--s-5);
+  background: var(--accent);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--paper-raised);
+  transition: background-color var(--d-1);
+}
+
+.barButton:hover,
+.barButton:focus-visible {
+  background: var(--paper-raised);
+  color: var(--ink);
+}
+
+/* ---- Cover and index: sheets of their own ---------------------------------- */
+
+.cover,
+.index {
+  width: calc(100% - (var(--sheet-margin) + var(--s-3)) * 2);
+  max-width: calc(var(--measure) + clamp(1.25rem, 5vw, 4.5rem) * 2);
+  margin: var(--s-10) auto 0;
+  padding: clamp(1.5rem, 5vw, 4rem) clamp(1.25rem, 5vw, 4.5rem);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-lift);
+}
+
+.cover {
+  display: flex;
+  flex-direction: column;
+  min-height: 46rem;
+}
+
+.coverKicker {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.coverKicker span {
+  padding: 4px var(--s-2);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.coverName {
+  margin-top: var(--s-12);
+  padding-top: var(--s-5);
+  border-top: 6px solid var(--accent);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(3.5rem, 13vw, 7rem);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+
+.coverRole {
+  margin-top: var(--s-4);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.coverFigures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-6);
+  flex: 1;
+  margin: var(--s-12) 0;
+  --fw: 1.1;
+}
+
+.coverFigures svg {
+  height: 9rem;
+}
+
+.coverCells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  margin: 0;
+  border-top: var(--lw-med) solid var(--rule-ink);
+}
+
+.coverCells > div {
+  padding: var(--s-3) var(--s-3) var(--s-3) 0;
+  border-bottom: var(--lw-thin) solid var(--rule-strong);
+}
+
+.coverCells dt,
+.lines dt {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.coverCells dd,
+.lines dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-sm);
+  color: var(--ink);
+}
+
+.indexTitle {
+  padding-bottom: var(--s-3);
+  border-bottom: var(--lw-heavy) solid var(--ink);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: var(--t-3xl);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.indexGroup {
+  margin-top: var(--s-6);
+  break-inside: avoid;
+}
+
+.indexGroup h3 {
+  margin-bottom: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.indexGroup li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  gap: var(--s-3);
+  padding: 5px 0;
+  border-bottom: var(--lw-hair) solid var(--rule);
+  font-size: var(--t-sm);
+}
+
+.indexSheet,
+.indexIssued {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+}
+
+.indexSheet {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.indexIssued {
+  color: var(--ink-3);
+}
+
+.lines {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--s-5);
+  margin: 0;
+}
+
+@media (max-width: 40rem) {
+  .bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ---- Paper ---------------------------------------------------------------- */
+
+@media print {
+  .doc {
+    padding: 0;
+  }
+
+  .bar {
+    display: none;
+  }
+
+  .cover,
+  .index {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: none;
+  }
+
+  .cover {
+    min-height: 250mm;
+    break-after: page;
+  }
+
+  .index {
+    break-after: page;
+  }
+
+  /* Every sheet starts a page of its own. */
+  .doc :global(.plate) {
+    margin: 0;
+    break-before: page;
+  }
+
+  .doc :global(.plate):first-of-type {
+    break-before: auto;
+  }
+}

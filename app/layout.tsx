@@ -12,6 +12,7 @@ import { ToastProvider } from '@/components/system/ToastProvider';
 import { SheetTransitionProvider } from '@/components/system/SheetTransition';
 import { Preloader } from '@/components/system/Preloader';
 import { Hints } from '@/components/system/Hints';
+import { RouteTracker } from '@/components/system/Route';
 import { PlateMetaProvider } from '@/components/sheet/PlateMetaProvider';
 import { SheetFrame } from '@/components/sheet/SheetFrame';
 import { ZoneCursor } from '@/components/sheet/ZoneCursor';
@@ -83,8 +84,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <main id="main-content" className="plate-main">
                   {children}
                 </main>
-                <TitleBlock />
+                <TitleBlock sheetCount={sheetIndex.length} />
                 <Hints />
+                <RouteTracker hrefs={sheetIndex.map((entry) => entry.href)} />
                 </SheetTransitionProvider>
               </PlateMetaProvider>
             </InstrumentProvider>

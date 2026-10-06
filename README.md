@@ -61,6 +61,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 | [`A-105`](#a-105--moving-between-sheets) | **Moving between sheets** | View transitions, keyboard, reduced motion |
 | [`A-106`](#a-106--on-a-phone) | **On a phone** | The title sheet, the pile, the dock |
 | [`A-107`](#a-107--margin-notes) | **Margin notes** | How a reader learns the set can be operated |
+| [`A-109`](#a-109--the-route-the-tour-the-set) | **The route, the tour, the set** | The site remembers what you read; walks you round; and issues itself as one PDF |
 | [`A-108`](#a-108--inside-a-sheet) | **Inside a sheet** | Section profile, citable headings, operable figures on every page |
 | [`S-201`](#s-201--how-it-is-built) | **How it is built** | Architecture, sheet registry, component kit |
 | [`S-202`](#s-202--content-pipeline) | **Content pipeline** | Markdown in, numbered sheets out |
@@ -678,6 +679,63 @@ figures and all six career roles, and script only adds the motion and the select
 
 ---
 
+## A-109 · The route, the tour, the set
+
+Three things that belong to the whole set and not to any one sheet.
+
+### Your route
+
+<img src="docs/media/route.jpg" alt="The key plan with a red traverse joining four numbered stations on the sheets that have been read" width="100%" />
+
+The set remembers what you have read. A sheet counts once you have stayed on it
+for three seconds, and from then on:
+
+| Where | What shows |
+|:------|:-----------|
+| **Key plan** | A survey traverse: a numbered station on each section you have reached, in order, joined by a fine line that plots itself. Each sheet says how much of its section is read, and read rows are ticked |
+| **Title strip and title block** | *4 of 32 sheets read*, the stations in order, and a way to clear it |
+| **Sheet index** | Read sheets are ticked |
+| **Phone** | The same traverse on the small key plan |
+| **Correspondence** | The transmittal lists the sheets you read and offers to **enclose** them |
+
+<div align="center">
+<img src="docs/media/enclosure.jpg" alt="The enclosure field on the transmittal, listing four sheets read with a ticked box" width="78%" />
+</div>
+
+> [!IMPORTANT]
+> The route is kept in the reader's browser (`localStorage`, key `plate.route`) and
+> nowhere else. Nothing sends it anywhere. It leaves the machine only if the reader
+> ticks the enclosure box on the transmittal, and then only as a line in their own
+> message.
+
+### The tour
+
+<img src="docs/media/tour.jpg" alt="The tour holding on the Architect sheet, with a caption bar giving its number, title and controls" width="100%" />
+
+**▶ Tour** on the key plan flies the camera to each sheet in turn and holds on it
+for a few seconds, lighting its cross-references while it does. A caption names
+the sheet and offers previous, next, *open sheet* and stop; the rule along its
+foot is the hold running down. <kbd>←</kbd> <kbd>→</kbd> step, <kbd>Esc</kbd>
+stops, and so does touching the plan: it is an offer, not a ride. On a phone it
+turns the pile sheet by sheet. It is not offered under reduced motion.
+
+### The complete set
+
+<div align="center">
+<img src="docs/media/set-cover.jpg" alt="The cover page of the complete set as a PDF" width="46%" />
+</div>
+
+[`/set/`](https://www.akshaybajpai.com/set/) is every sheet in one document: a
+cover, the drawing index, the section sheets, all twenty-four articles with their
+schematics, and the contact sheet as addresses. Each sheet starts a new page with
+its own title strip. *Issue the whole set as PDF* in any title block goes there;
+the browser's print dialog does the rest (88 A4 pages at the time of writing).
+
+It is laid out for paper first, kept out of the index, the sitemap and the cover's
+prefetching, and marked `noindex`.
+
+---
+
 ## S-201 · How it is built
 
 ```mermaid
@@ -764,6 +822,7 @@ flowchart LR
 | `sheet/Loupe` | The inspection lens |
 | `sheet/ZoneCursor` | Lights the margin zone under the pointer |
 | `system/Preloader` | The cover sheet |
+| `system/Route` | The reader's route: store, tracker and hook |
 | `system/Hints` | Margin notes: one thing to do, where you are, once |
 | `system/SheetTransition` | View-transition navigation |
 | `system/ModeProvider` · `ModeScript` | Mode state, and its pre-paint resolution |
@@ -885,6 +944,7 @@ app/
 ├── page.tsx              # G-000 key plan
 ├── about · research · architecture · contact/
 ├── work · blog · essays/ # index + [slug] detail sheets
+├── set/                  # the whole set as one printable document
 ├── sitemap.ts · robots.ts
 └── not-found.tsx         # X-999
 

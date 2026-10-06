@@ -1,7 +1,7 @@
 import { buildMetadata } from '@/lib/metadata';
 import { KeyPlan, type KeyPlanContents } from '@/components/keyplan/KeyPlan';
 import { getCollection, type WorkFrontmatter } from '@/lib/content';
-import { detailSheetNumber } from '@/lib/plates';
+import { detailSheetNumber, PLATES } from '@/lib/plates';
 import { parseContentDate } from '@/lib/format';
 import { SOCIAL } from '@/lib/constants';
 
@@ -81,7 +81,10 @@ export default async function Page() {
 
   return (
     <div className="plate plate-bleed">
-      <KeyPlan contents={contents} />
+      <KeyPlan
+        contents={contents}
+        sheetCount={PLATES.length + work.length + essays.length + blog.length}
+      />
     </div>
   );
 }

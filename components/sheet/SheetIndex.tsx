@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
 import { DISCIPLINES, getPlateByHref, type Discipline } from '@/lib/plates';
+import { useRoute } from '@/components/system/Route';
 import styles from './SheetIndex.module.css';
 
 export interface IndexEntry {
@@ -115,6 +116,7 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
   const [query, setQuery] = useState('');
   const [series, setSeries] = useState<string | null>(null);
   const [active, setActive] = useState(0);
+  const read = new Set(useRoute());
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const restoreFocus = useRef<HTMLElement | null>(null);
@@ -222,6 +224,7 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
           <span className={styles.headTitle}>Drawing Index</span>
           <span className={styles.headCount} aria-live="polite">
             {results.length} of {entries.length} sheets
+            {read.size > 0 ? ` · ${read.size} read` : ''}
           </span>
           <button type="button" className={styles.close} onClick={onClose} aria-label="Close index">
             <span className={styles.closeKey} aria-hidden="true">
@@ -318,6 +321,7 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
                     className={styles.row}
                     data-active={i === active || undefined}
                     data-current={entry.sheet === currentSheet || undefined}
+                    data-read={read.has(entry.href) || undefined}
                     onMouseEnter={() => setActive(i)}
                     onClick={onClose}
                   >
@@ -327,7 +331,11 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
                       <span className={styles.rowSubtitle}>{marked(entry.subtitle, query)}</span>
                     </span>
                     <span className={styles.rowMeta}>
-                      {entry.sheet === currentSheet ? 'You are here' : (entry.issued ?? '')}
+                      {entry.sheet === currentSheet
+                        ? 'You are here'
+                        : read.has(entry.href)
+                          ? 'Read'
+                          : (entry.issued ?? '')}
                     </span>
                     <span className={styles.rowLeader} aria-hidden="true" />
                   </Link>

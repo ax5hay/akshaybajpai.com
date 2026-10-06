@@ -141,6 +141,41 @@
   transition: color var(--d-1), border-color var(--d-1), background-color var(--d-1);
 }
 
+a.copy {
+  display: block;
+  text-align: center;
+}
+
+.route {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: var(--lw-thin) solid var(--accent-line);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.route b {
+  color: var(--accent);
+}
+
+.route button {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink-3);
+}
+
+.route button:hover {
+  color: var(--accent);
+}
+
 .copy:hover {
   color: var(--accent);
   border-color: var(--accent);

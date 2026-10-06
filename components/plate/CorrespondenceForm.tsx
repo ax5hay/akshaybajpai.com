@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/kit/Controls';
 import { useToast } from '@/components/system/ToastProvider';
+import { useRoute } from '@/components/system/Route';
+import type { CoverSheet } from '@/components/system/Preloader';
 import styles from './CorrespondenceForm.module.css';
 
 const ENDPOINT = 'https://formspree.io/f/xlgeqele';
@@ -35,8 +37,15 @@ const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).le
  * is cleared the moment the transmittal goes. Nothing is stored beyond the
  * tab, and nothing is sent until the reader sends it.
  */
-export function CorrespondenceForm() {
+export function CorrespondenceForm({ sheets }: { sheets: CoverSheet[] }) {
   const [status, setStatus] = useState<Status>('idle');
+  // The sheets this reader has been through, by number, in the order read.
+  // Enclosed only if they tick the box; otherwise it never leaves the tab.
+  const route = useRoute();
+  const readSheets = route
+    .map((href) => sheets.find((s) => s.href === href))
+    .filter((s): s is CoverSheet => Boolean(s));
+  const [enclose, setEnclose] = useState(false);
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState<string>(SUBJECTS[0]);
   const [message, setMessage] = useState('');
@@ -145,6 +154,12 @@ export function CorrespondenceForm() {
               <dt>Regarding</dt>
               <dd>{subject}</dd>
             </div>
+            {enclose && readSheets.length > 0 && (
+              <div>
+                <dt>Enclosed</dt>
+                <dd>{readSheets.map((s) => s.sheet).join(' → ')}</dd>
+              </div>
+            )}
             <div>
               <dt>Length</dt>
               <dd>
@@ -250,6 +265,45 @@ export function CorrespondenceForm() {
           disabled={sending}
         />
       </div>
+
+      {readSheets.length > 0 && (
+        <div className={styles.field} data-enclosure>
+          <span className={styles.legend}>
+            <span className={styles.no}>04</span> Enclosure
+          </span>
+          <div>
+          <label className={styles.subject} data-on={enclose || undefined}>
+            <input
+              type="checkbox"
+              checked={enclose}
+              onChange={(e) => setEnclose(e.target.checked)}
+              disabled={sending}
+            />
+            <span className={styles.tick} aria-hidden="true" />
+            Enclose the {readSheets.length === 1 ? 'sheet' : `${readSheets.length} sheets`} I have
+            read
+          </label>
+          </div>
+          <p className={styles.route}>
+            {readSheets.map((s) => (
+              <span key={s.href} title={s.title}>
+                {s.sheet}
+              </span>
+            ))}
+          </p>
+          <p className={styles.routeNote}>
+            Your route through the set, kept in this browser only. Tick the box and it goes with
+            the message, so I know what you were looking at.
+          </p>
+          {enclose && (
+            <input
+              type="hidden"
+              name="sheets_read"
+              value={readSheets.map((s) => `${s.sheet} ${s.title}`).join(' → ')}
+            />
+          )}
+        </div>
+      )}
 
       <div className={styles.actions}>
         <Button type="submit" variant="solid" disabled={sending}>
