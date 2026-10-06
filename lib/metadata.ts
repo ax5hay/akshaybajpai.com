@@ -59,7 +59,9 @@ export function buildMetadata({
   const image = cardUrl(card);
 
   return {
-    title,
+    // The layout's template completes a title with the name; one that already
+    // carries it (About, Contact, the key plan) is issued as written.
+    title: title.includes(NAME) ? { absolute: title } : title,
     description,
     keywords,
     authors: [{ name: NAME, url: SITE_URL }],
