@@ -1,7 +1,11 @@
+/* The transmittal. Printed on reversed stock (see .reversed in globals.css),
+   so every token below resolves to the reversed palette. */
+
 .form {
-  margin-top: var(--s-10);
-  border: var(--lw-med) solid var(--rule-strong);
+  position: relative;
   background: var(--paper-raised);
+  border: var(--lw-med) solid var(--rule-ink);
+  box-shadow: var(--shadow-deep);
 }
 
 .head {
@@ -9,49 +13,87 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  padding: var(--s-2) var(--s-3);
-  background: var(--ink);
-  color: var(--paper);
+  padding: var(--s-3) var(--s-5);
+  border-bottom: var(--lw-med) solid var(--accent);
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
   font-weight: 600;
   letter-spacing: var(--track-label-wide);
   text-transform: uppercase;
+  color: var(--ink);
 }
 
 .headNo {
   font-variant-numeric: tabular-nums;
-  opacity: 0.65;
+  font-weight: 400;
+  letter-spacing: var(--track-label);
+  color: var(--ink-3);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
-  padding: var(--s-4);
+  gap: var(--s-3);
+  padding: var(--s-5);
   border-bottom: var(--lw-thin) solid var(--rule);
 }
 
-.field label {
+.field > label,
+.legend {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
   font-weight: 600;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.legend {
+  justify-content: flex-start;
+}
+
+/* Field numbers, as on a printed form. */
+.no {
+  margin-right: var(--s-2);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.count {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
   color: var(--ink-3);
 }
 
+/* Fields are ruled lines to write on, not boxes to fill in. */
 .field input,
 .field textarea {
   width: 100%;
-  padding: var(--s-3);
-  background: var(--paper);
-  border: var(--lw-thin) solid var(--rule);
-  font-family: var(--font-mono), monospace;
-  font-size: var(--t-sm);
+  padding: var(--s-2) 0 var(--s-3);
+  background: none;
+  border: none;
+  border-bottom: var(--lw-thin) solid var(--rule-strong);
+  border-radius: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--t-lg);
+  line-height: 1.5;
   color: var(--ink);
   resize: vertical;
-  transition: border-color var(--d-1), background-color var(--d-1);
+  transition: border-color var(--d-2) var(--ease-plate);
+}
+
+.field textarea {
+  min-height: 11rem;
+  font-size: var(--t-md);
+  /* Ruled, like the paper a message is written on. */
+  background-image: linear-gradient(transparent calc(1.5em - 1px), var(--rule-faint) 0);
+  background-size: 100% 1.5em;
+  background-attachment: local;
+  border-bottom: none;
 }
 
 .field input::placeholder,
@@ -62,95 +104,45 @@
 .field input:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  background: var(--paper-raised);
+  border-bottom-color: var(--accent);
 }
 
-.field input:focus-visible,
-.field textarea:focus-visible {
-  outline: var(--lw-med) solid var(--accent);
-  outline-offset: 2px;
+.field:focus-within {
+  background: var(--accent-soft);
+}
+
+.field:focus-within > label,
+.field:focus-within > .legend {
+  color: var(--ink);
 }
 
 .field input:disabled,
 .field textarea:disabled {
-  color: var(--ink-4);
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-4);
-  padding: var(--s-4);
-}
-
-.status {
-  font-family: var(--font-label), monospace;
-  font-size: var(--t-micro);
-  letter-spacing: 0.06em;
   color: var(--ink-3);
 }
 
-.status:empty {
-  display: none;
-}
-
-/* ---- Transmittal: subject, count, stamp --------------------------------- */
-
-.form {
-  position: relative;
-}
-
-.legend {
-  font-family: var(--font-label), monospace;
-  font-size: var(--t-micro);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.field > label {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--s-4);
-}
-
-.count {
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.06em;
-  color: var(--ink-3);
-}
+/* ---- Subjects: tick boxes on a printed slip ------------------------------ */
 
 .subjects {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: var(--lw-thin);
-  background: var(--rule);
-  border: var(--lw-thin) solid var(--rule);
+  gap: var(--s-2);
 }
 
-/* A tick box on a printed slip: struck through when chosen. */
 .subject {
   display: flex;
   align-items: center;
   gap: var(--s-3);
   min-height: 2.75rem;
   padding: 0 var(--s-3);
-  background: var(--paper);
-  /* Set as running text, not as a field label. */
-  font-family: var(--font-body), system-ui, sans-serif !important;
-  font-size: var(--t-sm) !important;
-  font-weight: 400 !important;
-  letter-spacing: 0 !important;
-  text-transform: none !important;
-  color: var(--ink-2) !important;
+  border: var(--lw-thin) solid var(--rule);
+  font-size: var(--t-sm);
+  color: var(--ink-2);
   cursor: pointer;
   transition:
-    background-color var(--d-1),
-    color var(--d-1);
+    border-color var(--d-1),
+    color var(--d-1),
+    background-color var(--d-1);
 }
 
 .subject input {
@@ -190,13 +182,14 @@
 
 .subject:hover {
   color: var(--ink);
-  background: var(--paper-raised);
+  border-color: var(--rule-strong);
 }
 
 .subject[data-on] {
-  color: var(--ink) !important;
-  font-weight: 500 !important;
-  background: var(--paper-raised);
+  color: var(--ink);
+  font-weight: 500;
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .subject[data-on] .tick {
@@ -210,48 +203,184 @@
 
 .subject:focus-within {
   outline: var(--lw-med) solid var(--accent);
-  outline-offset: -2px;
+  outline-offset: 2px;
+}
+
+/* ---- Actions ---------------------------------------------------------------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-5);
+}
+
+.actions button {
+  min-height: 3rem;
+  padding-inline: var(--s-8);
+  font-size: var(--t-xs);
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.shortcut kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 4px;
+  font: inherit;
+  color: var(--ink-2);
+  border: var(--lw-thin) solid var(--rule-strong);
+}
+
+@media (hover: none) {
+  .shortcut {
+    display: none;
+  }
+}
+
+.status {
+  flex-basis: 100%;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.status:empty {
+  display: none;
+}
+
+/* ---- Receipt: what is left when it has gone ----------------------------- */
+
+.receiptBody {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-5);
+  padding: var(--s-10) var(--s-5) var(--s-8);
+  animation: receipt-in var(--d-4) var(--ease-plate) both;
+}
+
+.receiptTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-4xl);
+  line-height: 1;
+  color: var(--ink);
+}
+
+:global(html[data-mode='annotated']) .receiptTitle,
+:global(html[data-mode='raw']) .receiptTitle {
+  font-size: var(--t-2xl);
+  text-transform: uppercase;
+}
+
+.receiptFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--lw-thin);
+  width: 100%;
+  margin: 0;
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.receiptFacts > div {
+  padding: var(--s-3);
+  background: var(--paper-raised);
+}
+
+.receiptFacts dt {
+  margin-bottom: 2px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.receiptFacts dd {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.receiptNote {
+  font-size: var(--t-md);
+  color: var(--ink-2);
 }
 
 /* Struck when it has gone. */
 .stamp {
+  position: absolute;
+  top: var(--s-8);
+  right: var(--s-5);
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-left: auto;
-  padding: 0.45rem 0.8rem 0.4rem;
-  border: 2.5px solid var(--accent);
+  gap: 3px;
+  padding: 0.6rem 1rem 0.5rem;
+  border: 3px solid var(--accent);
   outline: 1px solid var(--accent);
-  outline-offset: 3px;
+  outline-offset: 4px;
   font-family: var(--font-label), monospace;
-  font-size: var(--t-xs);
+  font-size: var(--t-base);
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--accent);
-  rotate: -5deg;
-  animation: transmitted 420ms var(--ease-snap) both;
+  rotate: -7deg;
+  animation: transmitted 460ms var(--ease-snap) 220ms both;
 }
 
 .stamp span:last-child {
-  font-size: 0.75em;
+  font-size: 0.7em;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.28em;
 }
 
 @keyframes transmitted {
   from {
     opacity: 0;
-    scale: 1.6;
+    scale: 1.7;
+  }
+}
+
+@keyframes receipt-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
 }
 
 /* iOS zooms the page into any field set smaller than 16px and does not zoom
-   back out. On a phone the fields are set at exactly that. */
+   back out. Everything here is already larger; the rest is thumb room. */
 @media (max-width: 40rem) {
-  .field input,
-  .field textarea {
-    font-size: 1rem;
-    padding: var(--s-3) var(--s-3);
+  .head,
+  .field,
+  .actions {
+    padding-inline: var(--s-4);
+  }
+
+  .head {
+    letter-spacing: var(--track-label);
+  }
+
+  .headNo {
+    white-space: nowrap;
+    letter-spacing: 0.04em;
   }
 
   .subjects {
@@ -260,15 +389,27 @@
 
   .subject {
     min-height: 3rem;
-    font-size: var(--t-base) !important;
+    font-size: var(--t-base);
   }
 
-  .actions > :first-child {
-    flex: 1 1 100%;
-  }
-
-  .actions button {
+  .actions > button {
     width: 100%;
-    min-height: 3rem;
+    min-height: 3.25rem;
+  }
+
+  .stamp {
+    position: static;
+    align-self: flex-end;
+    font-size: var(--t-xs);
+  }
+
+  .receiptTitle {
+    font-size: var(--t-3xl);
+  }
+}
+
+@media print {
+  .form {
+    display: none;
   }
 }

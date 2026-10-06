@@ -1008,6 +1008,77 @@ html[data-mode='raw'] [data-raw] {
 }
 
 /* =============================================================================
+   REVERSED STOCK. One thing in the set is printed the other way round: the
+   Correspondence sheet on the key plan, and the transmittal it leads to. It
+   is the last stop and the one thing a reader is asked to do, so it is the
+   one block of solid colour on an otherwise white set. The tokens are
+   redefined on the element, so everything drawn inside it follows.
+   ========================================================================== */
+
+.reversed {
+  --paper-raised: #141417;
+  --paper: #1f1f24;
+  --paper-sunk: #0b0b0d;
+  --paper-deep: #0b0b0d;
+  --ink: #fcfaf4;
+  --ink-2: #ddd6c6;
+  --ink-3: #b5ac98;
+  --ink-4: #9a917d;
+  --rule-faint: rgba(252, 250, 244, 0.14);
+  --rule: rgba(252, 250, 244, 0.3);
+  --rule-strong: rgba(252, 250, 244, 0.6);
+  --rule-ink: rgba(252, 250, 244, 0.92);
+  --grid-minor: rgba(252, 250, 244, 0.05);
+  --accent: #f29384;
+  --accent-soft: rgba(242, 147, 132, 0.16);
+  --accent-line: rgba(242, 147, 132, 0.6);
+  --sheet-sheen: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+}
+
+/* On cyanotype the solid block is the markup pen's amber; on source, the
+   terminal's green. Always the mode's own hot colour, filled. */
+html[data-mode='annotated'] .reversed {
+  --paper-raised: #ffc75a;
+  --paper: #f7bb44;
+  --paper-sunk: #eeb035;
+  --paper-deep: #eeb035;
+  --ink: #05182a;
+  --ink-2: #0f2c48;
+  --ink-3: #213f5c;
+  --ink-4: #2f4c68;
+  --rule-faint: rgba(5, 24, 42, 0.16);
+  --rule: rgba(5, 24, 42, 0.34);
+  --rule-strong: rgba(5, 24, 42, 0.66);
+  --rule-ink: rgba(5, 24, 42, 0.94);
+  --grid-minor: rgba(5, 24, 42, 0.07);
+  --accent: #0a3fa8;
+  --accent-soft: rgba(10, 63, 168, 0.14);
+  --accent-line: rgba(10, 63, 168, 0.6);
+  --sheet-sheen: rgba(255, 255, 255, 0.18);
+}
+
+html[data-mode='raw'] .reversed {
+  --paper-raised: #8fe388;
+  --paper: #80d679;
+  --paper-sunk: #72c86b;
+  --paper-deep: #72c86b;
+  --ink: #050806;
+  --ink-2: #132417;
+  --ink-3: #213a25;
+  --ink-4: #2e4d32;
+  --rule-faint: rgba(5, 8, 6, 0.16);
+  --rule: rgba(5, 8, 6, 0.34);
+  --rule-strong: rgba(5, 8, 6, 0.66);
+  --rule-ink: rgba(5, 8, 6, 0.94);
+  --grid-minor: rgba(5, 8, 6, 0.07);
+  --accent: #0b4d16;
+  --accent-soft: rgba(11, 77, 22, 0.14);
+  --accent-line: rgba(11, 77, 22, 0.6);
+  --sheet-sheen: transparent;
+}
+
+/* =============================================================================
    UTILITIES
    ========================================================================== */
 
