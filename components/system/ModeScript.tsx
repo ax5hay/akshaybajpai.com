@@ -24,8 +24,9 @@ import { MODE_STORAGE_KEY } from '@/lib/mode';
  * it: those have already failed, silently, by the time this runs, so they are
  * checked directly. Anything later is caught by its error event.
  *
- * And it decides whether the cover sheet plays: once per visit, and never
- * for a reader who asks for reduced motion. When it will play, `data-cover`
+ * And it decides whether the cover sheet plays: once per visit, never for a
+ * reader who asks for reduced motion, and never for one who arrived through
+ * the search endpoint (`?q=`), who is owed the index at once. When it will play, `data-cover`
  * holds the set's own entrance animations until the cover reports the set
  * issued; the timer here releases them regardless, so a cover that never
  * hydrates cannot leave the page waiting behind it.
@@ -44,7 +45,7 @@ if(!(l.compareDocumentPosition(me)&4))continue;
 try{ok=l.sheet&&l.sheet.cssRules.length}catch(x){ok=1}
 if(!ok)again(l)}
 try{
-if(matchMedia('(prefers-reduced-motion: reduce)').matches||sessionStorage.getItem('plate.booted')){document.documentElement.dataset.preloaded=''}
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||sessionStorage.getItem('plate.booted')||/[?&]q=/.test(location.search)){document.documentElement.dataset.preloaded=''}
 else{sessionStorage.setItem('plate.booted','1');document.documentElement.dataset.cover='';setTimeout(function(){document.documentElement.dataset.issued=''},22000)}
 }catch(e){document.documentElement.dataset.preloaded=''}
 try{

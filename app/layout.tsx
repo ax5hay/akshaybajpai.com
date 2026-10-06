@@ -20,7 +20,8 @@ import { ZoneCursor } from '@/components/sheet/ZoneCursor';
 import { SheetRail } from '@/components/sheet/SheetRail';
 import { TitleBlock } from '@/components/sheet/TitleBlock';
 import { buildSheetIndex } from '@/lib/sheet-index';
-import { buildMetadata } from '@/lib/metadata';
+import { buildMetadata, HOME_KEYWORDS, ONE_LINE } from '@/lib/metadata';
+import { SITE_TAGLINE } from '@/lib/constants';
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
@@ -46,12 +47,29 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: 'swap',
 });
 
-export const metadata: Metadata = buildMetadata({
-  title: 'Akshay Bajpai | AI Architect & Technology Leader · LLMs, RAG, ML Systems',
-  description:
-    'Akshay Bajpai, forward-deployed AI engineer and architect. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical & insurance document AI. Springer author; MSc AI with distinction.',
-  path: '/',
-});
+export const metadata: Metadata = {
+  ...buildMetadata({
+    title: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
+    description: ONE_LINE,
+    path: '/',
+    keywords: HOME_KEYWORDS,
+  }),
+  title: {
+    default: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
+    template: '%s · Akshay Bajpai',
+  },
+  applicationName: SITE_TAGLINE,
+  // Ownership tokens arrive from the deploy workflow's variables; locally
+  // they are unset and the tags are not issued.
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION
+      ? { 'msvalidate.01': process.env.BING_SITE_VERIFICATION }
+      : undefined,
+  },
+  category: 'technology',
+  formatDetection: { email: false, address: false, telephone: false },
+};
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const sheetIndex = await buildSheetIndex();

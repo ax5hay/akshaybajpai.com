@@ -47,6 +47,8 @@ interface Props {
    * moving about a single sheet on screen.
    */
   compact?: boolean;
+  /** Structured data for the sheet. */
+  jsonLd?: Record<string, unknown>[];
 }
 
 /** Citable headings on a sheet of its own; a plain wrapper in the set. */
@@ -82,6 +84,7 @@ export function ArticlePlate({
   xrefs,
   figure,
   compact = false,
+  jsonLd,
 }: Props) {
   const issued = formatDate(date, 'short');
   const repo = parseGithubRepo(client);
@@ -103,6 +106,7 @@ export function ArticlePlate({
       facts={facts}
       // The verbatim Markdown is for raw mode on screen; the set is for paper.
       source={compact ? undefined : source}
+      jsonLd={jsonLd}
       record={[
         { k: 'series', v: seriesLabel },
         { k: 'words', v: String(source.trim().split(/\s+/).length) },

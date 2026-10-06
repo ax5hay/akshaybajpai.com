@@ -7,7 +7,7 @@ import {
   type WorkFrontmatter,
 } from '@/lib/content';
 import { adjacentSheets, crossReferences, detailSheetFor } from '@/lib/sheet-index';
-import { buildMetadata } from '@/lib/metadata';
+import { article, breadcrumbs, buildMetadata } from '@/lib/metadata';
 import { Schematic } from '@/components/figures/Schematic';
 import { SCHEMATICS } from '@/components/figures/schematics';
 
@@ -18,14 +18,16 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const study = await getEntry('work', slug);
+  const study = await getEntry<WorkFrontmatter>('work', slug);
   if (!study) return {};
 
   return buildMetadata({
-    title: `${study.frontmatter.title} · Akshay Bajpai`,
+    title: study.frontmatter.title,
     description: study.frontmatter.description,
     path: `/work/${slug}/`,
     type: 'article',
+    card: `work-${slug}`,
+    keywords: study.frontmatter.stack,
     publishedTime: new Date(study.frontmatter.pubDate).toISOString(),
   });
 }
@@ -58,6 +60,24 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
       client={fm.client}
       stack={fm.stack}
       metrics={fm.metrics}
+      jsonLd={[
+        article({
+          path: `/work/${slug}/`,
+          title: study.frontmatter.title,
+          description: study.frontmatter.description,
+          published: study.frontmatter.pubDate,
+          words: study.content.trim().split(/\s+/).length,
+          minutes: estimateReadingTime(study.content),
+          section: 'Works',
+          card: `work-${slug}`,
+          kind: 'TechArticle',
+          keywords: fm.stack,
+        }),
+        breadcrumbs([
+          { name: 'W-400 Works', path: '/work/' },
+          { name: `${sheet} ${study.frontmatter.title}`, path: `/work/${slug}/` },
+        ]),
+      ]}
       adjacent={adjacent}
       xrefs={xrefs}
       figure={SCHEMATICS[slug] ? <Schematic spec={SCHEMATICS[slug]} /> : undefined}

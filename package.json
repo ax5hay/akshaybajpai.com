@@ -5,7 +5,7 @@
   "description": "The Architecture of Intelligence · Akshay Bajpai",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/generate-rss.mjs && node scripts/strip-polyfills.mjs",
+    "build": "next build && node scripts/generate-rss.mjs && node scripts/generate-og.mjs && node scripts/strip-polyfills.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -19,10 +19,12 @@
     "remark-rehype": "^11.1.1"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "satori": "^0.35.0",
     "typescript": "^5.7.0"
   },
   "engines": {

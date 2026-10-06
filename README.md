@@ -69,6 +69,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 | [`W-402`](#w-402--project-structure) | **Project structure** | Where everything lives |
 | [`C-701`](#c-701--deployment) | **Deployment** | GitHub Pages, for free. Full runbook in [DEPLOYMENT.md](DEPLOYMENT.md) |
 | [`C-702`](#c-702--measured) | **Measured** | Weight, frame rate, accessibility |
+| [`C-703`](#c-703--visibility) | **Visibility** | How the set is found: structured data, share cards, feeds, the search endpoint |
 
 ---
 
@@ -886,7 +887,7 @@ flowchart LR
 
 | Collection | Path | Frontmatter |
 |:-----------|:-----|:------------|
-| `blog` | `content/blog/` | `title`, `description`, `pubDate`, `draft?` (included in RSS) |
+| `blog` | `content/blog/` | `title`, `description`, `pubDate`, `draft?` |
 | `essays` | `content/essays/` | same |
 | `work` | `content/work/` | plus `client?`, `stack?`, `metrics?` |
 
@@ -933,7 +934,7 @@ npm run dev          # http://localhost:3000
 | Script | What it does |
 |:-------|:-------------|
 | `npm run dev` | Dev server |
-| `npm run build` | Static export to `out/`, then `rss.xml` |
+| `npm run build` | Static export to `out/`, then the feed, `llms.txt`, the share cards, and the polyfill strip |
 | `npm run typecheck` | `tsc --noEmit` |
 
 To preview exactly what ships, serve the export and not the dev server:
@@ -983,8 +984,12 @@ lib/
 └── metadata.ts · format.ts · constants.ts
 
 content/                  # blog, essays, work Markdown
-scripts/generate-rss.mjs  # post-build RSS
-public/                   # favicon, logo, share card, web manifest
+scripts/
+├── generate-rss.mjs      # post-build feed and llms.txt
+├── generate-og.mjs       # one share card per sheet, drawn with satori
+├── strip-polyfills.mjs   # drops the nomodule bundle from every page
+└── fonts/                # the three faces the cards are set in
+public/                   # favicon, logo, home share card, manifest, humans.txt
 docs/media/               # the screenshots on this page
 .github/workflows/        # deploy.yml
 CNAME                     # www.akshaybajpai.com
@@ -1078,6 +1083,79 @@ where they are unsupported.
 
 Not yet verified: Safari and Firefox. The view transitions degrade to plain navigation
 where they are unsupported.
+
+---
+
+## C-703 · Visibility
+
+A drawing set that nobody can find is a drawer of paper. This sheet is how the set is
+filed with the engines, the social cards and the models that read the web, so that a
+search for the architect, or for the work, lands here. Nothing on it is paid for; all of
+it is in the build.
+
+<p align="center">
+  <img src="docs/media/share-card.png" alt="The share card for sheet W-405, drawn in the set's own style" width="600"/>
+  <img src="docs/media/share-card-about.png" alt="The share card for sheet A-101" width="600"/>
+  <br/>
+  <sub>Every sheet is issued with its own card, drawn at build time in the artifact palette. A link to any page looks like the page.</sub>
+</p>
+
+### One graph, stable identifiers
+
+Every page carries JSON-LD, and every page's JSON-LD is one `@graph` that includes the
+same two nodes: the **Person** at `/#person` and the **WebSite** at `/#website`. Articles
+point at the person as `author`; collection pages list their sheets; the About and Contact
+sheets name him as their `mainEntity`; the Research sheet describes the Springer chapter
+and the book it is part of. An engine that reads any two pages can tell they are about
+the same person, which is what a knowledge panel is built from.
+
+| Sheet | Schema |
+|:------|:-------|
+| Key plan | `WebPage` with the person as `mainEntity` and an `ItemList` of the plates |
+| A-101 · C-701 | `ProfilePage` · `ContactPage`, each with `mainEntity → #person` |
+| R-301 | `WebPage` whose `mainEntity` is the `Chapter`, inside the `Book`, from the publisher |
+| W-400 · B-500 · E-600 | `CollectionPage` with an `ItemList` of the sheets in the series |
+| A case study · a note · an essay | `TechArticle` · `BlogPosting`, with dates, word count, reading time, keywords and its card |
+| Every sheet | `BreadcrumbList` back to the key plan, and the `Person` and `WebSite` nodes |
+
+The `Person` node carries the names he is searched by (`alternateName`), the role, the
+city, both degrees, the credentials, the knowledge areas and the same profiles the rail
+links to, so the engine's picture of him matches the site's.
+
+### Titles, cards and feeds
+
+- **Titles** are short and front-loaded, and every sheet's is completed with `· Akshay
+  Bajpai` by a template, so the name is on every result and never typed twice.
+- **Share cards** are drawn by `scripts/generate-og.mjs` from the same frontmatter that
+  makes the page: sheet number, series, title, description, issue date, in the set's
+  three faces. Thirty-four cards, about 75 kB each, at `/og/<sheet>.png`.
+- **One feed** at `/rss.xml` carries the essays, the notes and the case studies, newest
+  first, each with its card as `media:content`. Feed readers and aggregators are the
+  slowest-decaying links on the web.
+- **`/llms.txt`** describes the set to the models that read sites on a reader's behalf:
+  who he is, what each sheet covers, where the feeds are. **`/humans.txt`** is the
+  older courtesy, for people.
+- **The sitemap** reports each sheet's real issue date, not the build date, so an engine
+  recrawls what changed and trusts the rest. `/set/` is excluded and marked `noindex`;
+  it is for printing, and would otherwise compete with every page it contains.
+
+### The search endpoint
+
+The `WebSite` node declares a `SearchAction` with `/?q={search_term_string}`. It is a
+real address: `?q=` opens the sheet index with the query already typed, and the cover
+sheet is skipped for anyone who arrives that way. An engine that honours the action can
+offer a search box under the result, and a reader who lands on it is in the index, not
+behind the preloader.
+
+### Not in the build
+
+Two things need the owner's hand. **Ownership verification** for Google Search Console
+and Bing Webmaster Tools: the tokens are read from repository variables at build time,
+so adding them is a settings change and not a code change (see
+[DEPLOYMENT.md](DEPLOYMENT.md#7--one-time-setup)). And **links in**: the profiles the
+`Person` node points at should point back, and anything written elsewhere should link
+to the sheet it came from. Everything else on this page is an argument; those are
+the evidence.
 
 ---
 

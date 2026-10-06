@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { DISCIPLINES, getPlateBySheet, type Discipline } from '@/lib/plates';
 import { SetPlateMeta } from '@/components/sheet/PlateMetaProvider';
 import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
+import { JsonLd } from '@/components/JsonLd';
 import styles from './PlateShell.module.css';
 
 export interface PlateFact {
@@ -30,6 +31,8 @@ export interface PlateShellProps {
   wide?: boolean;
   /** Id of the drafted figure this sheet carries, as on the key plan. */
   figure?: string;
+  /** Structured data for this sheet, rendered as one JSON-LD graph. */
+  jsonLd?: Record<string, unknown>[];
   children: ReactNode;
 }
 
@@ -53,6 +56,7 @@ export function PlateShell({
   record = [],
   wide = false,
   figure,
+  jsonLd,
   children,
 }: PlateShellProps) {
   const headFacts: PlateFact[] = [
@@ -64,6 +68,7 @@ export function PlateShell({
 
   return (
     <article className={`plate ${wide ? 'plate-wide' : ''} ${styles.plate}`}>
+      {jsonLd && <JsonLd things={jsonLd} />}
       <SetPlateMeta
         sheet={sheet}
         title={title}

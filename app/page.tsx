@@ -1,16 +1,23 @@
-import { buildMetadata } from '@/lib/metadata';
+import { buildMetadata, HOME_KEYWORDS } from '@/lib/metadata';
 import { KeyPlan, type KeyPlanContents } from '@/components/keyplan/KeyPlan';
 import { getCollection, type WorkFrontmatter } from '@/lib/content';
 import { detailSheetNumber, PLATES } from '@/lib/plates';
 import { parseContentDate } from '@/lib/format';
-import { SOCIAL } from '@/lib/constants';
+import { SITE_URL, SOCIAL } from '@/lib/constants';
+import { JsonLd } from '@/components/JsonLd';
+import { PERSON_ID, webPage } from '@/lib/metadata';
+import { keyPlanPlates } from '@/lib/plates';
 
-export const metadata = buildMetadata({
-  title: 'Akshay Bajpai · Architect of Systems, Builder of Intelligence',
-  description:
-    'The Architecture of Intelligence, issued as a drawing set. Forward-deployed AI engineering: LLM platforms, governed agents, hybrid RAG, and systems built to be operated.',
-  path: '/',
-});
+export const metadata = {
+  ...buildMetadata({
+    title: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
+    description:
+      'Akshay Bajpai (ax5hay): AI architect and forward-deployed AI engineer in New Delhi. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical and insurance document AI. Case studies, research, essays and field notes, issued as a drawing set.',
+    path: '/',
+    keywords: HOME_KEYWORDS,
+  }),
+  title: { absolute: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer' },
+};
 
 /** Year and month, as stamped on a sheet. */
 function stamp(date: string): string {
@@ -81,6 +88,28 @@ export default async function Page() {
 
   return (
     <div className="plate plate-bleed">
+      <JsonLd
+        things={[
+          webPage({
+            path: '/',
+            name: 'Akshay Bajpai · Key plan',
+            description:
+              'The general arrangement of the set: every section and sheet of akshaybajpai.com, drawn in place.',
+            extra: {
+              mainEntity: { '@id': PERSON_ID },
+              hasPart: {
+                '@type': 'ItemList',
+                itemListElement: keyPlanPlates().map((plate, i) => ({
+                  '@type': 'ListItem',
+                  position: i + 1,
+                  name: `${plate.sheet} ${plate.title}`,
+                  url: `${SITE_URL}${plate.href}`,
+                })),
+              },
+            },
+          }),
+        ]}
+      />
       <KeyPlan
         contents={contents}
         sheetCount={PLATES.length + work.length + essays.length + blog.length}

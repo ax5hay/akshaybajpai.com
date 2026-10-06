@@ -21,7 +21,8 @@ export function SheetRail() {
   const entries = useSheetSet();
   const { meta } = usePlateMeta();
   const pathname = usePathname();
-  const { lensOn, toggleLens, indexOpen, openIndex, closeIndex } = useInstruments();
+  const { lensOn, toggleLens, indexOpen, openIndex, closeIndex, queryPreset, clearQueryPreset } =
+    useInstruments();
 
   const [condensed, setCondensed] = useState(false);
 
@@ -124,7 +125,14 @@ export function SheetRail() {
       </header>
 
       {(indexOpen || warm) && (
-        <SheetIndex entries={entries} open={indexOpen} onClose={closeIndex} currentSheet={meta.sheet} />
+        <SheetIndex
+          entries={entries}
+          open={indexOpen}
+          onClose={closeIndex}
+          currentSheet={meta.sheet}
+          initialQuery={queryPreset ?? undefined}
+          onQueryConsumed={clearQueryPreset}
+        />
       )}
 
       {lensOn && <Loupe onDismiss={toggleLens} />}

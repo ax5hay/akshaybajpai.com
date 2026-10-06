@@ -1,0 +1,17 @@
+/* TEAM */
+  Architect, author, draughtsman: Akshay Bajpai
+  Handle: ax5hay
+  Site: https://www.akshaybajpai.com
+  Location: New Delhi, India
+
+/* THE SET */
+  Issued as an architectural drawing set. Every route is a numbered sheet;
+  the homepage is the key plan they sit on. Three drawing modes, one lens.
+  Standards: HTML, CSS, SVG, the View Transitions API.
+  Stack: Next.js 15, React 19, TypeScript. Static export on GitHub Pages.
+  Type: Instrument Serif, IBM Plex Sans, IBM Plex Mono.
+  No animation library, no state library, no 3D runtime.
+
+/* THANKS */
+  The drawing offices whose conventions this borrows.
+  In thrust we trust.

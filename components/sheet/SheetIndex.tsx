@@ -27,6 +27,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
   currentSheet: string;
+  initialQuery?: string;
+  onQueryConsumed?: () => void;
 }
 
 /** Position of `q` at the start of a word in `text`, or -1. */
@@ -111,7 +113,14 @@ const seriesName = (group: string) => group.replace(' · details', '').replace('
  * preview is the reason this module is loaded on demand: it carries the
  * drafted figures, and no page needs them until the index is opened.
  */
-export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
+export function SheetIndex({
+  entries,
+  open,
+  onClose,
+  currentSheet,
+  initialQuery,
+  onQueryConsumed,
+}: Props) {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [series, setSeries] = useState<string | null>(null);
@@ -153,6 +162,12 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
   useEffect(() => {
     setActive(0);
   }, [query, series]);
+
+  useEffect(() => {
+    if (!open || !initialQuery) return;
+    setQuery(initialQuery);
+    onQueryConsumed?.();
+  }, [open, initialQuery, onQueryConsumed]);
 
   useEffect(() => {
     if (!open) return;
