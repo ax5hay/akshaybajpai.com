@@ -139,6 +139,12 @@ the fonts.
 **Fonts are self-hosted.** `next/font` downloads Instrument Serif and IBM Plex at build
 time and ships them from `_next/static/media/`. The live site makes no request to Google.
 
+**The polyfill bundle is not shipped.** `next build` emits `polyfills-*.js` for browsers
+without module support and marks it `nomodule`. `scripts/strip-polyfills.mjs` removes the
+tag from every page and deletes the file, since no browser that needs it can show the site.
+If a page ever appears with the tag, that step did not run: check the build log for
+*Stripped the polyfill script from N of N pages*.
+
 ---
 
 ## 3 · Domain, DNS and HTTPS
