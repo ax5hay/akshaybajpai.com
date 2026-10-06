@@ -7,11 +7,14 @@ import { usePathname } from 'next/navigation';
 import { useInstruments } from '@/components/system/InstrumentProvider';
 import { ModeSelector } from '@/components/system/ModeSelector';
 import { usePlateMeta } from './PlateMetaProvider';
-import { SheetIndex, type IndexEntry } from './SheetIndex';
+import type { IndexEntry } from './SheetIndex';
 import styles from './SheetRail.module.css';
 
 // The lens is only ever needed on demand, so it stays out of the entry bundle.
 const Loupe = dynamic(() => import('./Loupe').then((m) => m.Loupe), { ssr: false });
+// Nor is the index, which carries the drafted figures for its preview. The
+// cover sheet fetches both while it plays; hovering the button does too.
+const SheetIndex = dynamic(() => import('./SheetIndex').then((m) => m.SheetIndex), { ssr: false });
 
 export function SheetRail({ entries }: { entries: IndexEntry[] }) {
   const { meta } = usePlateMeta();
@@ -67,6 +70,8 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
             type="button"
             className={styles.control}
             onClick={openIndex}
+            onPointerEnter={() => void import('./SheetIndex')}
+            onFocus={() => void import('./SheetIndex')}
             aria-haspopup="dialog"
             aria-label="Index"
           >
@@ -102,12 +107,9 @@ export function SheetRail({ entries }: { entries: IndexEntry[] }) {
         </div>
       </header>
 
-      <SheetIndex
-        entries={entries}
-        open={indexOpen}
-        onClose={closeIndex}
-        currentSheet={meta.sheet}
-      />
+      {indexOpen && (
+        <SheetIndex entries={entries} open onClose={closeIndex} currentSheet={meta.sheet} />
+      )}
 
       {lensOn && <Loupe onDismiss={toggleLens} />}
     </>

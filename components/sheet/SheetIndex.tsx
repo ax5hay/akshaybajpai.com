@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
+import { DISCIPLINES, getPlateByHref, type Discipline } from '@/lib/plates';
 import styles from './SheetIndex.module.css';
-import type { Discipline } from '@/lib/plates';
 
 export interface IndexEntry {
   sheet: string;
@@ -14,6 +15,10 @@ export interface IndexEntry {
   discipline: Discipline;
   /** Heading this row files under, e.g. "Works". */
   group: string;
+  /** Year and month of issue, for detail sheets. */
+  issued?: string;
+  /** Words in each section of the article, in order. */
+  profile?: number[];
 }
 
 interface Props {
@@ -79,43 +84,76 @@ function score(entry: IndexEntry, query: string): number {
   return 0;
 }
 
+/** The text with the part that matched the query marked, where there is one. */
+function marked(text: string, query: string): ReactNode {
+  const q = query.trim().toLowerCase();
+  if (!q) return text;
+  const at = wordStart(text.toLowerCase(), q);
+  if (at < 0) return text;
+  return (
+    <>
+      {text.slice(0, at)}
+      <mark className={styles.hit}>{text.slice(at, at + q.length)}</mark>
+      {text.slice(at + q.length)}
+    </>
+  );
+}
+
+const seriesName = (group: string) => group.replace(' · details', '').replace(' arrangement', '');
+
+/**
+ * The drawing index: the contents table of the set, made navigable.
+ *
+ * A list on the left; on the right, on a wide screen, the sheet under the
+ * cursor drawn in small: its number, its title in the display face, and its
+ * figure (for a section sheet) or its section profile (for an article). The
+ * preview is the reason this module is loaded on demand: it carries the
+ * drafted figures, and no page needs them until the index is opened.
+ */
 export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [series, setSeries] = useState<string | null>(null);
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const restoreFocus = useRef<HTMLElement | null>(null);
 
+  const groups = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const entry of entries) counts.set(entry.group, (counts.get(entry.group) ?? 0) + 1);
+    return [...counts.entries()];
+  }, [entries]);
+
   const results = useMemo(() => {
+    const pool = series ? entries.filter((e) => e.group === series) : entries;
     const q = query.trim();
-    if (!q) return entries;
-    return entries
+    if (!q) return pool;
+    return pool
       .map((entry) => ({ entry, rank: score(entry, q) }))
       .filter((r) => r.rank > 0)
       .sort((a, b) => b.rank - a.rank || a.entry.sheet.localeCompare(b.entry.sheet))
       .map((r) => r.entry);
-  }, [entries, query]);
+  }, [entries, query, series]);
 
   // Rows shift under the cursor as the query narrows; keep the cursor in range.
   useEffect(() => {
     setActive(0);
-  }, [query]);
+  }, [query, series]);
 
   useEffect(() => {
-    if (!open) {
-      setQuery('');
-      restoreFocus.current?.focus();
-      return;
-    }
+    if (!open) return;
     restoreFocus.current = document.activeElement as HTMLElement | null;
-    inputRef.current?.focus();
+    // Not on a touch screen: focusing the field there throws the keyboard up
+    // over the very list the reader opened the index to look at.
+    if (!window.matchMedia('(hover: none)').matches) inputRef.current?.focus();
 
     // The index is a modal surface; the sheet behind it must not scroll.
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = previous;
+      restoreFocus.current?.focus();
     };
   }, [open]);
 
@@ -141,12 +179,12 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
       const first = stops[0];
       const last = stops[stops.length - 1];
       if (!first || !last) return;
-      const active = document.activeElement;
-      const inside = Array.from(stops).includes(active as HTMLElement);
-      if (event.shiftKey && (active === first || !inside)) {
+      const focused = document.activeElement;
+      const inside = Array.from(stops).includes(focused as HTMLElement);
+      if (event.shiftKey && (focused === first || !inside)) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && (active === last || !inside)) {
+      } else if (!event.shiftKey && (focused === last || !inside)) {
         event.preventDefault();
         first.focus();
       }
@@ -158,17 +196,20 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
       setActive((i) => (results.length ? (i + delta + results.length) % results.length : 0));
       return;
     }
-    if (event.key === 'Enter' && results[active]) {
+    if (event.key === 'Enter' && results[active] && event.target === inputRef.current) {
       event.preventDefault();
       router.push(results[active].href);
       onClose();
     }
   };
 
+  const shown = results[active];
+  const plate = shown ? getPlateByHref(shown.href) : undefined;
+  const words = shown?.profile?.reduce((sum, n) => sum + n, 0) ?? 0;
   let lastGroup = '';
 
   return (
-    <div className={styles.scrim} onClick={onClose} role="presentation">
+    <div className={styles.scrim} onClick={onClose} role="presentation" data-lens-skip>
       <div
         className={styles.panel}
         role="dialog"
@@ -183,70 +224,158 @@ export function SheetIndex({ entries, open, onClose, currentSheet }: Props) {
             {results.length} of {entries.length} sheets
           </span>
           <button type="button" className={styles.close} onClick={onClose} aria-label="Close index">
-            <span aria-hidden="true">Esc</span>
+            <span className={styles.closeKey} aria-hidden="true">
+              Esc
+            </span>
+            <span className={styles.closeX} aria-hidden="true">
+              Close ×
+            </span>
           </button>
         </div>
 
         <div className={styles.searchRow}>
-          <span className={styles.searchLabel} aria-hidden="true">
-            Find
-          </span>
+          <svg className={styles.searchGlyph} viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="6.5" cy="6.5" r="4.6" />
+            <path d="M10 10l4.4 4.4" />
+          </svg>
           <input
             ref={inputRef}
             type="text"
+            inputMode="search"
+            enterKeyHint="go"
             className={styles.search}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Sheet number, title, or subject"
             aria-label="Search the drawing index"
             autoComplete="off"
+            autoCapitalize="off"
             spellCheck={false}
           />
-        </div>
-
-        <div className={styles.columns} aria-hidden="true">
-          <span>Sheet</span>
-          <span>Title</span>
-          <span>Description</span>
-        </div>
-
-        <div className={styles.list} ref={listRef}>
-          {results.length === 0 && (
-            <p className={styles.empty}>
-              No sheet matches <strong>{query}</strong>. The set holds {entries.length} drawings.
-            </p>
+          {query && (
+            <button
+              type="button"
+              className={styles.clear}
+              onClick={() => {
+                setQuery('');
+                inputRef.current?.focus();
+              }}
+            >
+              Clear
+            </button>
           )}
+        </div>
 
-          {results.map((entry, i) => {
-            const showGroup = entry.group !== lastGroup;
-            lastGroup = entry.group;
+        <div className={styles.series} role="group" aria-label="Series">
+          <button
+            type="button"
+            className={styles.seriesTab}
+            aria-pressed={series === null}
+            onClick={() => setSeries(null)}
+          >
+            All <span>{entries.length}</span>
+          </button>
+          {groups.map(([group, count]) => (
+            <button
+              key={group}
+              type="button"
+              className={styles.seriesTab}
+              aria-pressed={series === group}
+              onClick={() => setSeries((s) => (s === group ? null : group))}
+            >
+              {seriesName(group)} <span>{count}</span>
+            </button>
+          ))}
+        </div>
 
-            return (
-              <div key={entry.sheet + entry.href}>
-                {showGroup && !query.trim() && (
-                  <div className={styles.group}>
-                    <span>{entry.group}</span>
-                  </div>
-                )}
-                <Link
-                  href={entry.href}
-                  prefetch={false}
-                  tabIndex={-1}
-                  data-row={i}
-                  className={styles.row}
-                  data-active={i === active || undefined}
-                  data-current={entry.sheet === currentSheet || undefined}
-                  onMouseEnter={() => setActive(i)}
-                  onClick={onClose}
-                >
-                  <span className={styles.rowSheet}>{entry.sheet}</span>
-                  <span className={styles.rowTitle}>{entry.title}</span>
-                  <span className={styles.rowSubtitle}>{entry.subtitle}</span>
-                  <span className={styles.rowLeader} aria-hidden="true" />
-                </Link>
-              </div>
-            );
-          })}
+        <div className={styles.body}>
+          <div className={styles.list} ref={listRef}>
+            {results.length === 0 && (
+              <p className={styles.empty}>
+                No sheet matches <strong>{query}</strong>.
+                <span>
+                  Try a sheet number such as <kbd>W-405</kbd>, or a subject such as <kbd>RAG</kbd>.
+                </span>
+              </p>
+            )}
+
+            {results.map((entry, i) => {
+              const showGroup = entry.group !== lastGroup;
+              lastGroup = entry.group;
+
+              return (
+                <div key={entry.sheet + entry.href}>
+                  {showGroup && !query.trim() && !series && (
+                    <div className={styles.group}>
+                      <span>{entry.group}</span>
+                    </div>
+                  )}
+                  <Link
+                    href={entry.href}
+                    prefetch={false}
+                    tabIndex={-1}
+                    data-row={i}
+                    className={styles.row}
+                    data-active={i === active || undefined}
+                    data-current={entry.sheet === currentSheet || undefined}
+                    onMouseEnter={() => setActive(i)}
+                    onClick={onClose}
+                  >
+                    <span className={styles.rowSheet}>{marked(entry.sheet, query)}</span>
+                    <span className={styles.rowMain}>
+                      <span className={styles.rowTitle}>{marked(entry.title, query)}</span>
+                      <span className={styles.rowSubtitle}>{marked(entry.subtitle, query)}</span>
+                    </span>
+                    <span className={styles.rowMeta}>
+                      {entry.sheet === currentSheet ? 'You are here' : (entry.issued ?? '')}
+                    </span>
+                    <span className={styles.rowLeader} aria-hidden="true" />
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* The sheet under the cursor, drawn in small. Decorative: every
+              word of it is already in the row it previews. */}
+          {shown && (
+            <aside className={styles.preview} aria-hidden="true" key={shown.href}>
+              <span className={styles.previewTag}>{shown.sheet}</span>
+              <span className={styles.previewSeries}>
+                {DISCIPLINES[shown.discipline].name}
+                {shown.issued ? ` · ${shown.issued}` : ''}
+              </span>
+
+              <span className={styles.previewTitle}>{shown.title}</span>
+              <span className={styles.previewText}>{shown.subtitle}</span>
+
+              {plate && hasFigure(plate.id) && (
+                <span className={styles.previewFigure}>
+                  <PlateFigure id={plate.id} />
+                  <span className={styles.previewCaption}>{figureCaption(plate.id)}</span>
+                </span>
+              )}
+
+              {shown.profile && shown.profile.length > 1 && (
+                <span className={styles.previewProfile}>
+                  <span className={styles.previewCaption}>
+                    Section through this sheet · {shown.profile.length} sections · {words} words
+                  </span>
+                  <span className={styles.previewStrip}>
+                    {shown.profile.map((n, i) => (
+                      <span key={i} style={{ flexGrow: Math.max(n, 1) }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              )}
+
+              <span className={styles.previewOpen}>
+                <kbd>↵</kbd> Open {shown.sheet}
+              </span>
+            </aside>
+          )}
         </div>
 
         <div className={styles.foot}>

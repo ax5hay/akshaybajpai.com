@@ -181,8 +181,26 @@ traced through the pipeline the study describes.
 
 <img src="docs/media/index.jpg" alt="The sheet index, searching for rag" />
 
-**The sheet index.** Press <kbd>/</kbd>. Ranked search across all 32 sheets, anchored to
-word starts so `rag` finds RAG and not “leverage”.
+**The sheet index.** Press <kbd>/</kbd>. Every sheet in the set, with the one under the
+cursor drawn in small beside the list: its figure, or its section profile.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+<img src="docs/media/article.jpg" alt="An article with its numbered sections keyed down the left margin" />
+
+**Inside an article.** Numbered, citable sections, keyed down the margin and followed as
+you read.
+
+</td>
+<td valign="top">
+
+<img src="docs/media/works-filter.jpg" alt="The Works schedule filtered by the Python tag" />
+
+**A schedule that filters.** Choose a tag on Works and the other sheets fall back without
+leaving the page.
 
 </td>
 </tr>
@@ -416,6 +434,21 @@ tools are **printed on the first sheet you land on**, named, with their keys.
 | **Issue as PDF** | title block | Prints the sheet with its own title strip |
 | **Comparison slider** | <kbd>←</kbd> <kbd>→</kbd> | A native range input, so keyboard and screen readers work unmodified |
 
+### The sheet index
+
+<img src="docs/media/index-search.jpg" alt="The sheet index searching for rag: four results on the left, the first drawn in small on the right with its section profile" width="100%" />
+
+Press <kbd>/</kbd> or <kbd>⌘K</kbd> anywhere.
+
+| | |
+|:--|:--|
+| **Ranked search** | Sheet number first, then title, then description. Matches are anchored to the start of a word, so `rag` finds RAG and not “leverage”; `fdai` finds *Forward-Deployed AI*. What matched is underlined |
+| **Series tabs** | All, General, Works, Essays, Field notes, each with its count |
+| **Preview** | On a wide screen the sheet under the cursor is drawn in small: number, title in the display face, and its drafted figure (section sheets) or its section profile with word count (articles) |
+| **Keyboard** | <kbd>↑</kbd> <kbd>↓</kbd> move, <kbd>↵</kbd> opens, <kbd>Esc</kbd> closes; focus is held inside the panel |
+| **On a phone** | The whole screen, rows a thumb can land on, a 20px field iOS will not zoom into, and no keyboard thrown up until the field is tapped |
+| **Cost** | Loaded on demand. It carries the drafted figures, so no page pays for it until the index is opened; the cover sheet fetches it while it plays, and hovering the button does too |
+
 ### The lens
 
 Inside the barrel the sheet is a cyanotype, and the annotation layer (dimensions, the
@@ -576,6 +609,46 @@ The frame is the same on every route. What is drawn inside it is not.
 | **`X-999` Sheet Not Issued** | Prints the reference that was followed, struck through, and offers the **nearest issued sheets** by shared words in the address |
 | **Every sheet** | A reading line along the foot of the rail, driven by a CSS scroll timeline |
 
+<table>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/media/article-profile.jpg" alt="The section strip at the head of an article" />
+<sub><b>Section through the sheet.</b> One segment per section, as wide as its words.</sub>
+</td>
+<td width="50%" valign="top">
+<img src="docs/media/article-foot.jpg" alt="Cross-references and the next sheet at the foot of an article" />
+<sub><b>The foot of an article.</b> Cross-references read off its links, then the next sheet.</sub>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<img src="docs/media/elevation.jpg" alt="The career elevation with one role selected" />
+<sub><b>A-101.</b> The career as an operable elevation.</sub>
+</td>
+<td valign="top">
+<img src="docs/media/record.jpg" alt="The schedule of record on the Research sheet" />
+<sub><b>R-301.</b> A ruled schedule of record.</sub>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<img src="docs/media/transmittal.jpg" alt="The contact form as a transmittal slip" />
+<sub><b>C-700.</b> The form is a transmittal: dated, with tick-box subjects and a word count.</sub>
+</td>
+<td valign="top">
+<img src="docs/media/nearest.jpg" alt="The unissued sheet offering the nearest issued sheets" />
+<sub><b>X-999.</b> The reference that failed, struck through, and the nearest sheets.</sub>
+</td>
+</tr>
+</table>
+
+<div align="center">
+<img src="docs/media/phone-inside.jpg" alt="Four phone screens: an article with the section strip riding under the rail, the career elevation, the filtered Works schedule, and the index" width="100%" />
+<sub>The same, on a phone: the strip rides under the rail, the stack key swipes, the index takes the screen.</sub>
+</div>
+
+<br/>
+
 The section widths, counts and reading times come from the Markdown at build time
 (`readSections` in [`lib/content.ts`](lib/content.ts)), so the profile is a true drawing of
 the article. Everything here degrades to static content: the server renders the real
@@ -665,7 +738,7 @@ flowchart LR
 | `sheet/SheetFrame` | Drawing border, zone rulers, trim |
 | `sheet/SheetRail` | Top rail: breadcrumb, index, lens, mode switch |
 | `sheet/TitleBlock` | Bottom-right title block, grid reference, copy and print |
-| `sheet/SheetIndex` | Full-set search |
+| `sheet/SheetIndex` | Full-set search with series tabs and a live preview; loaded on demand |
 | `sheet/Loupe` | The inspection lens |
 | `sheet/ZoneCursor` | Lights the margin zone under the pointer |
 | `system/Preloader` | The cover sheet |
@@ -853,9 +926,11 @@ load figures are pessimistic.
 | Pan and zoom on the key plan | 60 fps (median frame 16.7 ms, worst 19.7 ms) |
 | Scrolling the pile on a phone | 60 fps (median frame 16.7 ms, worst 21.8 ms) |
 | Cumulative layout shift | 0 |
-| Lighthouse accessibility | 100 on the key plan and on a case study |
+| Scrolling an article, with the section strip tracking | 60 fps (median frame 16.7 ms, worst 18.7 ms) |
+| Lighthouse accessibility | 100 on the key plan, an article, About, Works, Essays and Contact |
 | Lighthouse best practices · SEO | 100 · 100 |
-| Lighthouse performance (mobile, uncompressed) | 75 to 81 |
+| Lighthouse performance (mobile, uncompressed) | 73 to 81 |
+| Prefetched by the cover | 31 sheets on a desktop; the 7 section sheets on a phone or a metered link |
 | Requests on navigation after the cover | None for pages; the set is already cached |
 
 Not yet verified: Safari and Firefox. The view transitions degrade to plain navigation
