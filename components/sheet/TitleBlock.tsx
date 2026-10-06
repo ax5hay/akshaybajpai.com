@@ -16,6 +16,9 @@ export function TitleBlock({ sheetCount }: { sheetCount: number }) {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [compact, setCompact] = useState(false);
+  // The system share sheet, where there is one. Known only after mounting.
+  const [canShare, setCanShare] = useState(false);
+  useEffect(() => setCanShare(typeof navigator.share === 'function'), []);
 
   useEffect(() => {
     const onScroll = () => setCompact(window.scrollY > 64);
@@ -101,6 +104,23 @@ export function TitleBlock({ sheetCount }: { sheetCount: number }) {
         <button type="button" className={styles.copy} onClick={copyReference}>
           Copy sheet reference
         </button>
+        {canShare && (
+          <button
+            type="button"
+            className={styles.copy}
+            onClick={() => {
+              void navigator
+                .share({
+                  title: `${meta.sheet} · ${meta.title}`,
+                  text: meta.subtitle,
+                  url: window.location.href,
+                })
+                .catch(() => {});
+            }}
+          >
+            Share this sheet
+          </button>
+        )}
         <button type="button" className={styles.copy} onClick={() => window.print()}>
           Issue this sheet as PDF
         </button>

@@ -716,8 +716,26 @@ for three seconds, and from then on:
 for a few seconds, lighting its cross-references while it does. A caption names
 the sheet and offers previous, next, *open sheet* and stop; the rule along its
 foot is the hold running down. <kbd>←</kbd> <kbd>→</kbd> step, <kbd>Esc</kbd>
-stops, and so does touching the plan: it is an offer, not a ride. On a phone it
-turns the pile sheet by sheet. It is not offered under reduced motion.
+stops, and so does touching the plan: it is an offer, not a ride. It is not
+offered under reduced motion.
+
+### On a phone: the reel, and the route as a card
+
+<img src="docs/media/phone-tour.jpg" alt="Four phone screens: the route card with named stops, and three sheets of the tour, the last on reversed stock" width="100%" />
+
+A phone has no plan to fly a camera over, so both are told the way a phone tells
+things.
+
+| | |
+|:--|:--|
+| **The tour is a reel** | One sheet to a screen, its figure plotted as it lands. A row of segments along the top fills as each is held. **Tap right** to go on, **left** to go back, **hold** to pause, **swipe down** to leave. The last sheet is Correspondence, on its reversed stock, and its button says *Write to me* |
+| **The route is a card** | On the title sheet, under the small plan: the last five stops by name on a vertical traverse, each a link back; **next unread**, the first sheet in reading order you have not been to; and the way to enclose it |
+| **Share** | The title block offers the system share sheet for the sheet you are on, where the browser has one |
+
+The reel's timing is the segment's own CSS animation, and it advances on
+`animationend`, so a held finger pauses the fill and the tour together with no
+timer to keep in step. It is its own chunk, fetched when the tour is started; a
+desktop never downloads it.
 
 ### The complete set
 
@@ -822,6 +840,7 @@ flowchart LR
 | `sheet/Loupe` | The inspection lens |
 | `sheet/ZoneCursor` | Lights the margin zone under the pointer |
 | `system/Preloader` | The cover sheet |
+| `keyplan/Reel` | The phone's tour: one sheet to a screen |
 | `system/Route` | The reader's route: store, tracker and hook |
 | `system/Hints` | Margin notes: one thing to do, where you are, once |
 | `system/SheetTransition` | View-transition navigation |

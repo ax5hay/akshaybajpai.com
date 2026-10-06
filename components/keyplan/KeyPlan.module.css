@@ -1222,6 +1222,51 @@ html[data-mode='annotated'] .plate[data-id='contact'] .plateAnnot {
   font-variant-numeric: tabular-nums;
 }
 
+/* The named stops belong to the narrow sheet; the strip has no room. */
+.routeList {
+  display: none;
+}
+
+.routeNext {
+  display: block;
+  margin-top: 4px;
+  padding: 6px 8px;
+  border: var(--lw-thin) solid var(--accent-line);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: calc(10.5px * var(--inv-soft, 1));
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  pointer-events: auto;
+  transition:
+    background-color var(--d-1),
+    border-color var(--d-1);
+}
+
+.routeNext span {
+  display: block;
+  font-family: var(--font-label), monospace;
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.routeNext b {
+  font-family: var(--font-label), monospace;
+  font-size: 0.86em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+a.routeNext:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
 .routeActions {
   display: flex;
   justify-content: space-between;
@@ -2083,8 +2128,103 @@ html[data-mode='raw'] .tourTitle {
     display: none;
   }
 
+  /* The reader's route, as a card of its own on the title sheet: the stops
+     by name on a vertical traverse, where to go next, and what to do with it. */
   .routeNote {
+    order: 3;
+    margin-top: var(--s-5);
+    padding: var(--s-4);
+    gap: var(--s-3);
+    background: var(--paper-raised);
+    border: var(--lw-thin) solid var(--rule-ink);
+    border-top: var(--lw-heavy) solid var(--accent);
+    box-shadow: var(--shadow-lift);
+    font-size: var(--t-micro);
+  }
+
+  .routeCount {
+    font-size: var(--t-xl);
+  }
+
+  .routeStations {
     display: none;
+  }
+
+  .routeList {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The line the stations sit on. */
+  .routeList::before {
+    content: '';
+    position: absolute;
+    left: calc(0.8rem - 0.5px);
+    top: 1rem;
+    bottom: 1rem;
+    width: 1px;
+    background: var(--accent-line);
+  }
+
+  .routeStop {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.6rem 3.6rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 2.75rem;
+  }
+
+  .routeDot {
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--accent);
+    font-family: var(--font-label), monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--t-micro);
+    font-weight: 600;
+    color: var(--paper-raised);
+  }
+
+  .routeSheet {
+    font-family: var(--font-label), monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+
+  .routeTitle {
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-size: var(--t-sm);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .routeNext {
+    margin-top: 0;
+    padding: var(--s-3);
+    font-size: var(--t-sm);
+  }
+
+  .routeActions {
+    margin-top: 0;
+  }
+
+  .routeLink,
+  .routeClear {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--t-mini);
   }
 
   .miniRoute {
