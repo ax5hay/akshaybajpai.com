@@ -1,0 +1,267 @@
+/* The tour on a phone: one sheet to a screen. */
+
+.reel {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: max(var(--s-3), env(safe-area-inset-top)) var(--s-4)
+    max(var(--s-4), env(safe-area-inset-bottom));
+  background: var(--paper-deep);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  animation: reel-in 320ms var(--ease-plate) both;
+}
+
+@keyframes reel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 2rem, 0);
+  }
+}
+
+/* ---- Segments: one per sheet, filling as it is held ---------------------- */
+
+.segments {
+  display: flex;
+  gap: 4px;
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.segment[data-state='done'] {
+  background: var(--accent);
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: left center;
+  animation: reel-fill 5200ms linear both;
+}
+
+/* A finger held down stops the fill, and so stops the tour. */
+.reel[data-held] .fill {
+  animation-play-state: paused;
+}
+
+@keyframes reel-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+}
+
+.close {
+  min-height: 2.75rem;
+  padding: 0 var(--s-3);
+  border: var(--lw-thin) solid var(--rule-strong);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink);
+}
+
+/* ---- The sheet ---------------------------------------------------------------- */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: var(--s-12) var(--s-5) var(--s-5);
+  background: linear-gradient(177deg, var(--sheet-sheen) 0%, transparent 40%), var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-deep);
+  color: var(--ink);
+  will-change: transform;
+  animation: card-in 420ms var(--ease-plate) both;
+  /* The figure waits for the sheet to land before it is plotted. */
+  --fig-delay: 260ms;
+  --fw: 1.1;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translate3d(1.5rem, 0, 0) rotate(1.2deg);
+  }
+}
+
+.tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 7px 14px;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.25rem, 11vw, 3.25rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+:global(html[data-mode='annotated']) .title,
+:global(html[data-mode='raw']) .title {
+  font-size: clamp(1.6rem, 7.5vw, 2.25rem);
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin-top: var(--s-3);
+  padding-bottom: var(--s-4);
+  border-bottom: var(--lw-thin) solid var(--rule-strong);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  flex: 1;
+  min-height: 0;
+  padding: var(--s-4) 0;
+}
+
+.figure svg {
+  flex: 1;
+  min-height: 0;
+}
+
+.caption {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  border-top: var(--lw-thin) solid var(--rule);
+}
+
+.rows li {
+  display: flex;
+  gap: var(--s-3);
+  padding: 6px 0;
+  border-bottom: var(--lw-hair) solid var(--rule);
+  font-size: var(--t-sm);
+  line-height: 1.35;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rows span {
+  flex-shrink: 0;
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  line-height: 1.9;
+  color: var(--accent);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+
+.read {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.open {
+  display: grid;
+  place-items: center;
+  min-height: 3rem;
+  padding: 0 var(--s-5);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--paper-raised);
+  background: var(--accent);
+}
+
+.open:active {
+  background: var(--ink);
+}
+
+.help {
+  margin: 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+/* On a short phone the schedule gives way to the figure. */
+@media (max-height: 40rem) {
+  .rows li:nth-child(n + 3) {
+    display: none;
+  }
+
+  .card {
+    padding-top: var(--s-10);
+  }
+}

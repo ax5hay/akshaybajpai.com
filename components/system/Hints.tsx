@@ -80,7 +80,7 @@ function notesFor(where: Where, phone: boolean, docked: boolean): Note[] {
             text: (
               <>
                 Tap any sheet on the small key plan and the pile turns to it, or tap{' '}
-                <b>▶ Tour the set</b> to be walked through.
+                <b>▶ Tour the set</b> for the whole set, one sheet to a screen.
               </>
             ),
           },

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import {
   DISCIPLINES,
@@ -33,6 +34,9 @@ export interface PlateItem {
 }
 
 export type KeyPlanContents = Record<string, PlateItem[]>;
+
+// The phone's tour. Its own chunk, so a desktop never downloads it.
+const Reel = dynamic(() => import('./Reel').then((m) => m.Reel), { ssr: false });
 
 const MIN_SCALE = 0.35;
 const MAX_SCALE = 2.6;
@@ -241,6 +245,23 @@ export function KeyPlan({
     .map(stationAt)
     .map((pt, i) => `${i ? 'L' : 'M'}${pt.x} ${pt.y}`)
     .join('');
+  /** Every sheet the plan knows by address, for naming the stops on a route. */
+  const named = useMemo(() => {
+    const byHref = new Map<string, { sheet: string; title: string }>();
+    for (const plate of plates) {
+      byHref.set(plate.href, { sheet: plate.sheet, title: plate.title });
+      for (const item of contents[plate.id] ?? []) {
+        if (item.href && item.sheet) byHref.set(item.href, { sheet: item.sheet, title: item.title });
+      }
+    }
+    return byHref;
+  }, [plates, contents]);
+  /** Where to go next: the first sheet, in reading order, not yet read. */
+  const nextUnread = useMemo(() => {
+    for (const [href, sheet] of named) if (!read.has(href)) return { href, ...sheet };
+    return null;
+  }, [named, read]);
+
   /** How much of one section has been read: its own sheet and its details. */
   const readIn = (plate: PlacedPlate) => {
     const items = (contents[plate.id] ?? []).filter((i) => i.href);
@@ -511,12 +532,12 @@ export function KeyPlan({
   );
 
   useEffect(() => {
-    if (tour === null) return;
+    // On a narrow sheet the tour is the reel, which keeps its own time.
+    if (tour === null || !interactive) return;
     const plate = plates[tour];
     // Lights the sheet's cross-references for as long as it is held.
     setHovered(plate.sheet);
-    if (interactive) flyTo(plate);
-    else jumpTo(plate.sheet);
+    flyTo(plate);
 
     const timer = setTimeout(
       () => {
@@ -525,16 +546,16 @@ export function KeyPlan({
         } else {
           setTour(null);
           setHovered(null);
-          if (interactive) fit();
+          fit();
         }
       },
-      TOUR_HOLD_MS + (interactive ? TOUR_FLY_MS : 700)
+      TOUR_HOLD_MS + TOUR_FLY_MS
     );
     return () => clearTimeout(timer);
-  }, [tour, plates, interactive, flyTo, jumpTo, fit]);
+  }, [tour, plates, interactive, flyTo, fit]);
 
   useEffect(() => {
-    if (tour === null) return;
+    if (tour === null || !interactive) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') endTour();
       if (event.key === 'ArrowRight') setTour((i) => (i === null ? i : Math.min(plates.length - 1, i + 1)));
@@ -542,7 +563,7 @@ export function KeyPlan({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [tour, plates.length, endTour]);
+  }, [tour, plates.length, endTour, interactive]);
 
   const onPlateClick = (
     event: React.MouseEvent,
@@ -1038,6 +1059,37 @@ export function KeyPlan({
                 <span className={styles.routeStations} aria-hidden="true">
                   {stations.map((p) => p.sheet).join(' → ')}
                 </span>
+
+                {/* On a narrow sheet, the stops by name: a traverse read
+                    downwards, most recent last. */}
+                <ol className={styles.routeList}>
+                  {route.slice(-5).map((href, i, shown) => {
+                    const stop = named.get(href);
+                    if (!stop) return null;
+                    return (
+                      <li key={href}>
+                        <Link href={href} className={styles.routeStop}>
+                          <span className={styles.routeDot}>
+                            {route.length - shown.length + i + 1}
+                          </span>
+                          <span className={styles.routeSheet}>{stop.sheet}</span>
+                          <span className={styles.routeTitle}>{stop.title}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ol>
+
+                {nextUnread ? (
+                  <Link href={nextUnread.href} className={styles.routeNext}>
+                    <span>Next unread</span>
+                    <b>{nextUnread.sheet}</b> {nextUnread.title} →
+                  </Link>
+                ) : (
+                  <span className={styles.routeNext} data-done>
+                    <span>Set complete</span> Every sheet read.
+                  </span>
+                )}
                 <span className={styles.routeActions}>
                   <Link href="/contact/" className={styles.routeLink}>
                     Enclose it in a message →
@@ -1368,7 +1420,11 @@ export function KeyPlan({
 
       {/* The tour's caption: where it is, what the sheet is, and the ways
           out of it. The rule along its foot is the hold running down. */}
-      {tour !== null && (
+      {tour !== null && !interactive && (
+        <Reel plates={plates} contents={contents} read={read} onClose={endTour} />
+      )}
+
+      {tour !== null && interactive && (
         <div className={styles.tour} role="status" data-lens-skip>
           <span className={styles.tourCount}>
             {String(tour + 1).padStart(2, '0')} / {String(plates.length).padStart(2, '0')}
@@ -1405,7 +1461,7 @@ export function KeyPlan({
           <span
             key={tour}
             className={styles.tourHold}
-            style={{ animationDuration: `${TOUR_HOLD_MS + (interactive ? TOUR_FLY_MS : 700)}ms` }}
+            style={{ animationDuration: `${TOUR_HOLD_MS + TOUR_FLY_MS}ms` }}
             aria-hidden="true"
           />
         </div>
