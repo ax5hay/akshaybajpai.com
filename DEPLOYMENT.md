@@ -86,7 +86,7 @@ The workflow is [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). 
 | `build` | Checkout | `actions/checkout@v4` | |
 | | Setup Node | Node 20 with the npm cache | Keeps installs to a few seconds |
 | | Install | `npm ci` | Exact versions from `package-lock.json` |
-| | Build | `npm run build` | `next build` exports to `out/`, then `scripts/generate-rss.mjs` writes `out/rss.xml` |
+| | Build | `npm run build` | `next build` exports to `out/`, then `scripts/generate-rss.mjs` writes `out/rss.xml`, then `scripts/strip-polyfills.mjs` removes the `nomodule` polyfill bundle from every page |
 | | Preserve CNAME | Writes `www.akshaybajpai.com` to `out/CNAME` | Pages reads the custom domain from the artifact. Without this file a deploy would drop the domain |
 | | Verify artifact | Fails unless `out/index.html` and `out/CNAME` exist | Stops an empty or domainless site from going live |
 | | Upload | `actions/upload-pages-artifact@v4` | Hands `out/` to the deploy job |

@@ -32,6 +32,7 @@ import { MODE_STORAGE_KEY } from '@/lib/mode';
  */
 const script = `(function(){
 document.documentElement.dataset.js='';
+document.addEventListener('visibilitychange',function(){if(document.hidden){document.documentElement.dataset.hidden=''}else{delete document.documentElement.dataset.hidden}});
 function again(l){
 var n=+(l.dataset.retry||0);if(n>=4)return;
 setTimeout(function(){var c=l.cloneNode();c.dataset.retry=n+1;c.href=l.href.split('?')[0]+'?retry='+Date.now();l.parentNode.insertBefore(c,l.nextSibling)},n?500*n:0)

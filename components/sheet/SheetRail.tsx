@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useInstruments } from '@/components/system/InstrumentProvider';
 import { ModeSelector } from '@/components/system/ModeSelector';
 import { usePlateMeta } from './PlateMetaProvider';
-import type { IndexEntry } from './SheetIndex';
+import { useSheetSet } from '@/components/system/SheetSet';
 import { Mark } from './Mark';
 import styles from './SheetRail.module.css';
 
@@ -17,7 +17,8 @@ const Loupe = dynamic(() => import('./Loupe').then((m) => m.Loupe), { ssr: false
 // cover sheet fetches both while it plays; hovering the button does too.
 const SheetIndex = dynamic(() => import('./SheetIndex').then((m) => m.SheetIndex), { ssr: false });
 
-export function SheetRail({ entries }: { entries: IndexEntry[] }) {
+export function SheetRail() {
+  const entries = useSheetSet();
   const { meta } = usePlateMeta();
   const pathname = usePathname();
   const { lensOn, toggleLens, indexOpen, openIndex, closeIndex } = useInstruments();

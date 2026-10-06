@@ -309,6 +309,17 @@ export function KeyPlan({
     if (flyTimer.current) clearTimeout(flyTimer.current);
   }, []);
 
+  // The postmark pulses forever. Not while its sheet is off the screen.
+  useEffect(() => {
+    const sheet = stageRef.current?.querySelector('[data-id="contact"]');
+    if (!sheet) return;
+    const io = new IntersectionObserver(([entry]) => {
+      sheet.toggleAttribute('data-offscreen', !entry.isIntersecting);
+    });
+    io.observe(sheet);
+    return () => io.disconnect();
+  }, []);
+
   // The stacked deck, on a narrow sheet. Two jobs: plot each card's figure as
   // it comes into view instead of all at once off-screen, and keep the
   // miniature plan pointing at the card being read.

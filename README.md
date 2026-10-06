@@ -864,7 +864,7 @@ flowchart LR
 | Styling | CSS Modules and custom properties |
 | Motion | CSS, SVG, View Transitions API |
 | Markdown | remark, remark-gfm, gray-matter |
-| Fonts | Instrument Serif, IBM Plex Sans and Mono, via `next/font` |
+| Fonts | Instrument Serif, IBM Plex Sans (regular only) and Mono, via `next/font`; self-hosted |
 | Contact form | [Formspree](https://formspree.io/) (the only third-party runtime service) |
 | Hosting | GitHub Pages, deployed by GitHub Actions |
 
@@ -1021,7 +1021,7 @@ load figures are pessimistic.
 |:-------|:------|
 | Sheets in the set | 32 |
 | Runtime dependencies | 8, none of them animation, state or 3D |
-| Shared JavaScript | 103 kB |
+| Shared JavaScript | 103 kB; no legacy polyfill bundle is shipped |
 | First-load JavaScript, key plan | 122 kB |
 | First-load JavaScript, a sheet | 109 to 113 kB |
 | Pan and zoom on the key plan | 60 fps (median frame 16.7 ms, worst 19.7 ms) |

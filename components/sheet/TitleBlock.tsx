@@ -5,12 +5,14 @@ import { DISCIPLINES } from '@/lib/plates';
 import { useToast } from '@/components/system/ToastProvider';
 import Link from 'next/link';
 import { clearRoute, useRoute } from '@/components/system/Route';
+import { useSheetSet } from '@/components/system/SheetSet';
 import { usePlateMeta } from './PlateMetaProvider';
 import styles from './TitleBlock.module.css';
 
 const ISSUE_STAMP = '2026.09';
 
-export function TitleBlock({ sheetCount }: { sheetCount: number }) {
+export function TitleBlock() {
+  const sheetCount = useSheetSet().length;
   const route = useRoute();
   const { meta } = usePlateMeta();
   const { toast } = useToast();

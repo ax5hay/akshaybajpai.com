@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSheetSet } from './SheetSet';
 
 /**
  * The reader's route through the set.
@@ -64,13 +65,14 @@ export function useRoute(): string[] {
  * Notes a sheet as read once the reader has stayed on it. Rendered once, in
  * the layout. `hrefs` is every sheet in the set, so nothing else is recorded.
  */
-export function RouteTracker({ hrefs }: { hrefs: string[] }) {
+export function RouteTracker() {
   const pathname = usePathname();
+  const hrefs = useSheetSet().map((entry) => entry.href).join('\n');
 
   useEffect(() => {
     const href = pathname.endsWith('/') ? pathname : `${pathname}/`;
     // The key plan is where the route is drawn, not a stop on it.
-    if (href === '/' || !hrefs.includes(href)) return;
+    if (href === '/' || !hrefs.split('\n').includes(href)) return;
 
     const timer = setTimeout(() => {
       const route = readRoute();

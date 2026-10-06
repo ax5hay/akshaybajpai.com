@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/kit/Controls';
 import { useToast } from '@/components/system/ToastProvider';
 import { useRoute } from '@/components/system/Route';
-import type { CoverSheet } from '@/components/system/Preloader';
+import { useSheetSet } from '@/components/system/SheetSet';
+import type { IndexEntry } from '@/components/sheet/SheetIndex';
 import styles from './CorrespondenceForm.module.css';
 
 const ENDPOINT = 'https://formspree.io/f/xlgeqele';
@@ -37,14 +38,15 @@ const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).le
  * is cleared the moment the transmittal goes. Nothing is stored beyond the
  * tab, and nothing is sent until the reader sends it.
  */
-export function CorrespondenceForm({ sheets }: { sheets: CoverSheet[] }) {
+export function CorrespondenceForm() {
+  const sheets = useSheetSet();
   const [status, setStatus] = useState<Status>('idle');
   // The sheets this reader has been through, by number, in the order read.
   // Enclosed only if they tick the box; otherwise it never leaves the tab.
   const route = useRoute();
   const readSheets = route
     .map((href) => sheets.find((s) => s.href === href))
-    .filter((s): s is CoverSheet => Boolean(s));
+    .filter((s): s is IndexEntry => Boolean(s));
   const [enclose, setEnclose] = useState(false);
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState<string>(SUBJECTS[0]);
