@@ -41,6 +41,15 @@ jobs:
       - name: Preserve CNAME
         run: echo "www.akshaybajpai.com" > out/CNAME
 
+      # IndexNow proves the key by fetching /<key>.txt from the site, so the
+      # key file ships with the set. The key is a repository variable; it is
+      # public by design (the file is), which is why it is not a secret.
+      - name: Issue the IndexNow key file
+        if: vars.INDEXNOW_KEY != ''
+        run: echo "$INDEXNOW_KEY" > "out/$INDEXNOW_KEY.txt"
+        env:
+          INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+
       - name: Verify artifact
         run: |
           ls -la out/
@@ -88,3 +97,45 @@ jobs:
         run: |
           echo "::error::Deployment failed after 3 attempts."
           exit 1
+
+  # Tell the engines that share IndexNow (Bing, Yandex, Naver, Seznam, and
+  # through Bing's index DuckDuckGo and the Copilot/ChatGPT search layers)
+  # that the set was reissued. Google does not take IndexNow; it reads the
+  # sitemap. Every sheet in the sitemap is submitted: the set is small, the
+  # protocol allows ten thousand per call, and a changed sheet is usually
+  # many sheets (its neighbours' adjacency, the index, the feed). The job
+  # cannot fail the deploy; a missed ping costs a crawl, not the site.
+  notify:
+    name: Notify IndexNow
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: vars.INDEXNOW_KEY != ''
+    steps:
+      - name: Submit the sitemap's URLs
+        env:
+          INDEXNOW_KEY: ${{ vars.INDEXNOW_KEY }}
+          HOST: www.akshaybajpai.com
+        run: |
+          # The CDN may serve the previous build for up to ten minutes, so
+          # the key file is awaited before the ping, which checks it.
+          for i in $(seq 1 20); do
+            if [ "$(curl -s "https://$HOST/$INDEXNOW_KEY.txt")" = "$INDEXNOW_KEY" ]; then break; fi
+            sleep 30
+          done
+
+          urls=$(curl -sf "https://$HOST/sitemap.xml" | grep -o '<loc>[^<]*' | sed 's/<loc>//')
+          count=$(printf '%s\n' "$urls" | grep -c .)
+          list=$(printf '%s\n' "$urls" | sed 's/.*/"&"/' | paste -sd, -)
+
+          body=$(printf '{"host":"%s","key":"%s","keyLocation":"https://%s/%s.txt","urlList":[%s]}' \
+            "$HOST" "$INDEXNOW_KEY" "$HOST" "$INDEXNOW_KEY" "$list")
+          status=$(curl -s -o /tmp/indexnow.txt -w '%{http_code}' \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            -d "$body" https://api.indexnow.org/indexnow)
+
+          case "$status" in
+            200|202) echo "IndexNow accepted $count URLs (HTTP $status)";
+                     echo "**IndexNow** · $count URLs submitted · HTTP $status" >> "$GITHUB_STEP_SUMMARY" ;;
+            *)       echo "::warning::IndexNow answered HTTP $status: $(cat /tmp/indexnow.txt)";
+                     echo "**IndexNow** · not accepted · HTTP $status" >> "$GITHUB_STEP_SUMMARY" ;;
+          esac

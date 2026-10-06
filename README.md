@@ -1153,6 +1153,10 @@ links to, so the engine's picture of him matches the site's.
 - **The sitemap** reports each sheet's real issue date, not the build date, so an engine
   recrawls what changed and trusts the rest. `/set/` is excluded and marked `noindex`;
   it is for printing, and would otherwise compete with every page it contains.
+- **Every deploy tells IndexNow.** Bing, Yandex, Naver and Seznam, and through Bing's
+  index DuckDuckGo and the Copilot and ChatGPT search layers, are sent the sitemap's
+  URLs the moment a deploy lands, so a new sheet is crawled in minutes rather than
+  whenever the engine next comes round. Google reads the sitemap instead.
 
 ### Every sheet, from every page
 
@@ -1196,6 +1200,7 @@ argument; those are the evidence.
 | Sheet register: every sheet linked from every page | `components/sheet/Register.tsx`, a hidden `<nav>` in the layout; the index is its screen form |
 | Search endpoint | `InstrumentProvider` reads `?q=`; `ModeScript` skips the cover for it |
 | Verification tags | `app/layout.tsx`, from `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` |
+| IndexNow ping on every deploy | `.github/workflows/deploy.yml`, job `notify`, from `INDEXNOW_KEY` |
 
 ---
 

@@ -31,7 +31,7 @@ Static files, built by GitHub Actions, served by GitHub Pages, for free.
 | **Trigger** | Any push to `main`, which in practice means merging a pull request |
 | **Time to live** | About one minute; the last six deploys took 55 to 90 seconds |
 | **What is deployed** | The `out/` directory from `npm run build`: static HTML, CSS, JS, fonts |
-| **Server-side code** | None. No functions, no database, no secrets; two optional build variables for search-engine verification |
+| **Server-side code** | None. No functions, no database, no secrets; three optional build variables for search-engine verification and IndexNow |
 | **Cost** | Nothing for hosting, CI or the certificate. The domain registration is the only bill |
 | **Third-party runtime service** | Formspree, for the contact form |
 
@@ -89,9 +89,11 @@ The workflow is [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). 
 | | Install | `npm ci` | Exact versions from `package-lock.json` |
 | | Build | `npm run build` | `next build` exports to `out/`; then `scripts/generate-rss.mjs` writes `out/rss.xml` and `out/llms.txt`, `scripts/generate-og.mjs` draws a share card per sheet into `out/og/`, and `scripts/strip-polyfills.mjs` removes the `nomodule` polyfill bundle from every page |
 | | Preserve CNAME | Writes `www.akshaybajpai.com` to `out/CNAME` | Pages reads the custom domain from the artifact. Without this file a deploy would drop the domain |
+| | Issue the IndexNow key file | Writes `out/<key>.txt` when `INDEXNOW_KEY` is set | IndexNow fetches it to prove the key belongs to the host |
 | | Verify artifact | Fails unless `out/index.html` and `out/CNAME` exist | Stops an empty or domainless site from going live |
 | | Upload | `actions/upload-pages-artifact@v4` | Hands `out/` to the deploy job |
 | `deploy` | Deploy | `actions/deploy-pages@v4`, up to three attempts 60 s apart | Pages deploys occasionally fail transiently; retrying is cheaper than re-running the build |
+| `notify` | Submit the sitemap's URLs | After a successful deploy, when `INDEXNOW_KEY` is set: waits for the key file to be live, then POSTs every sitemap URL to `api.indexnow.org` | Bing and the engines that share IndexNow learn of the change in minutes instead of waiting to recrawl. Warns, never fails ([§8](#8--filing-with-the-search-engines)) |
 
 **Permissions.** The workflow asks for `contents: read`, `pages: write` and
 `id-token: write`, and nothing else. The deploy job runs in the `github-pages` environment,
@@ -325,7 +327,8 @@ Already done for this repository. Recorded for a fork, or for rebuilding from no
    [§8](#8--filing-with-the-search-engines).
 
 No secrets are required. The workflow authenticates with the `id-token` permission GitHub
-grants it; the two verification variables above are optional and public by nature.
+grants it; the verification variables above and `INDEXNOW_KEY` are optional and public by
+nature.
 
 <details>
 <summary><b>Changing the domain</b></summary>
@@ -448,8 +451,34 @@ structured data has been read; green there means the graph parsed.
 8. **Sitemaps** → **Submit sitemap** → `https://www.akshaybajpai.com/sitemap.xml`.
 9. **URL Submission** → paste the key plan and the five most important sheets, one per
    line → **Submit**. Bing allows ten a day and usually indexes them within hours.
-10. Optional: **Settings → IndexNow → Generate API key**. With a key, the deploy can
-    ping Bing on every push; not wired yet, and manual submission covers it meanwhile.
+10. IndexNow is wired into the deploy (next section), so after the first ping the
+    **IndexNow** report in the left menu shows every submission; manual URL submission
+    is only for a page that needs to jump the queue.
+
+### IndexNow, on every deploy
+
+[IndexNow](https://www.indexnow.org/) is the protocol Bing, Yandex, Naver and Seznam
+share for being told about a change rather than finding it; Bing's index then carries it
+to DuckDuckGo and the Copilot and ChatGPT search layers. Google does not take it and
+reads the sitemap instead.
+
+The deploy workflow has a third job, **Notify IndexNow**, which runs after a successful
+deploy when the repository variable `INDEXNOW_KEY` is set, and is skipped otherwise:
+
+1. The build writes the key to `out/<key>.txt`; IndexNow fetches that file to prove the
+   key belongs to the host, which is why the key is a *Variable* and not a *Secret*: the
+   file is public by design.
+2. After the deploy, the job waits for the CDN to serve the key file (up to ten
+   minutes, the Pages cache), reads the live `sitemap.xml`, and POSTs every URL in it to
+   `api.indexnow.org`. The set is small and the protocol allows ten thousand URLs a
+   call; a changed sheet is usually several (its neighbours, the index, the feed).
+3. `200` or `202` is success and is written to the run's summary. Anything else is a
+   warning on the run, never a failure: a missed ping costs a crawl, not the site.
+
+The key is any 8–128 character string of `a–z`, `A–Z`, `0–9` and `-`; it was generated
+with `openssl rand -hex 16`. To rotate it, set the variable to a new value and deploy;
+the old file stops being issued and the new one is checked on the next ping. Bing
+Webmaster Tools → **IndexNow** shows what has been received.
 
 ### Leave alone
 
