@@ -165,8 +165,9 @@ page the printed card's QR code resolves to, and `app/akshay-bajpai.vcf/route.ts
 static route handler that writes the contact as a vCard, both from `lib/card.ts`;
 `app/card/rosette.svg/route.ts` writes the card's engraving the same way. Pages
 serves `.vcf` as `text/x-vcard`, which iOS and Android open into the address book. The
-QR code itself is a dynamic one on vqr.vc: its destination is set there, to
-`https://www.akshaybajpai.com/card/`, and is not part of this repository.
+QR code itself is a Vistaprint dynamic code on vqr.vc that forwards to the bare address;
+the site recognises a scan on arrival and sends it to the card (see README C-704), so
+nothing has to change on vqr.vc or on the printed cards.
 
 **The set's voice is static too.** `lib/voice.ts` holds every phrase at three levels;
 server components emit all three and `html[data-mode]` shows one, so a change of level

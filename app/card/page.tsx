@@ -4,7 +4,7 @@ import { LocalTime } from '@/components/plate/LocalTime';
 import { buildMetadata } from '@/lib/metadata';
 import { CARD, VCARD_PATH, telHref, whatsappHref, phoneDigits } from '@/lib/card';
 import { cardCode } from '@/lib/card-art';
-import { CardFlag, CardObject, CopyLine, Reissue, SaveContact, ShareCard, ShowCode } from './CardActions';
+import { CardFlag, CardIntro, CardObject, CopyLine, Reissue, SaveContact, ShareCard, ShowCode } from './CardActions';
 import { Voice } from '@/components/system/Voice';
 import { SetPile } from './SetPile';
 import styles from './card.module.css';
@@ -193,6 +193,7 @@ export default function CardPage() {
       />
       <CardFlag />
 
+      <CardIntro>
       <p className={styles.strip}>
         <span className={styles.stripTag}>{SHEET}</span>
         <span className={styles.stripName}>
@@ -250,6 +251,7 @@ export default function CardPage() {
           </a>
         )}
       </nav>
+      </CardIntro>
 
       {/* ---- The way into the set: the cover, in miniature -------------------
           The set opens on three states of one drawing laid side by side:

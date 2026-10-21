@@ -1261,6 +1261,7 @@ meeting. The errand is short: keep the number, or use it. The code resolves to
 
 | Part | What it is |
 |:-----|:-----------|
+| **The arrival** | On a phone held upright the card arrives the way it is held: on its side, filling the screen, long edge down. The first scroll stands it up, brings it to the width of the column and lets the page rise under it, one continuous turn driven by the scroll (`CardIntro`, three custom properties and transforms). Turn the phone sideways and the card reads as it lies |
 | **The card** | The printed card again, drawn as an object at 85 × 55 mm: the name, the role, the mark at the heart of a guilloché rosette, microprint along its foot. It leans toward the pointer, toward the tilt of an Android phone, and drifts on its own elsewhere; the engraving carries a foil that catches the light as it moves |
 | **Its back** | Press the card and it turns over to this page's own QR code, with the monogram in the middle, so whoever is holding the phone can pass the card to the next phone in the room |
 | **Save contact** | The one thing most people came for, first and full width: `/akshay-bajpai.vcf`, a vCard 3.0 issued at build time with the mark as the contact's picture |
@@ -1314,7 +1315,8 @@ in the room. A scan line passes over it as it comes round.
 <img src="docs/media/card-pile.jpg" alt="Under the card, the site's seven sheets stacking as the page scrolls" />
 
 **The site, under the card.** Scroll past the door and the seven sheets pile up, as they do
-on the phone's own home; each is the page it names.
+on the phone's own home; each is the page it names. On a desk the same seven are the plan
+itself in miniature, every sheet where it is on the home page.
 
 </td>
 <td width="50%" valign="top">
@@ -1349,9 +1351,19 @@ by scanning the card, not by searching for it.
 from `lib/card.ts`. The number goes there, once, with its country code, and is shown as
 written and dialled as digits.
 
-**Pointing the code at it.** The QR code on the card is a dynamic one (`vqr.vc`), so the
-printed cards never change: set its destination to `https://www.akshaybajpai.com/card/`
-in the vqr.vc dashboard and every card already printed lands on the sheet.
+**A scan lands on the card.** The printed cards' code is a Vistaprint dynamic code
+(`vqr.vc`) that forwards to the bare address, `302` with nothing to mark it, and the 500
+cards already printed cannot change. So the scan is recognised on arrival, by its shape:
+a phone, on the bare home address, in a fresh tab, with no referrer, and nothing seen yet
+this session. `ModeScript` sends that visit to `/card/` before anything is painted, so
+there is no cover and no flash of the set. A phone that arrives from a search, a post or a
+link carries a referrer and gets the set as usual, with the card offered on its first
+sheet; anyone who has seen the card this session is never sent back. If the code's
+destination is ever pointed at `/card/` directly, the check simply never fires.
+
+<div align="center">
+<img src="docs/media/card-turn.jpg" alt="Four phone frames: the card on its side filling the screen, turning upright as the page scrolls, and settling at the head of the column with the page under it" width="100%" />
+</div>
 
 <div align="center">
 

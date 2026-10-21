@@ -18,6 +18,12 @@ import styles from './card.module.css';
 export function CardFlag() {
   useEffect(() => {
     document.documentElement.dataset.card = '';
+    // Seen once, the card is never forced on this session again.
+    try {
+      sessionStorage.setItem('card.seen', '1');
+    } catch {
+      // Private mode: the scan check needs storage too, so it cannot loop.
+    }
     return () => {
       delete document.documentElement.dataset.card;
     };
@@ -150,7 +156,7 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
   }, []);
 
   return (
-    <div className={styles.stage}>
+    <div className={styles.stage} data-card-stage>
       <div
         ref={ref}
         className={styles.object}
@@ -224,6 +230,91 @@ export function SaveContact({
     >
       {children}
     </a>
+  );
+}
+
+/**
+ * The card arrives the way it is held: on its side, filling the phone, the
+ * long edge down the screen. The page under it is portrait, so the first
+ * scroll stands the card up, brings it down to the width of the column and
+ * lets the page rise under it: one continuous turn, driven by the scroll and
+ * by nothing else. Turning the phone sideways reads the card as it lies.
+ *
+ * Only on a phone held upright, and never for a reader who asks for less
+ * motion; everywhere else the card simply sits at the head of the column.
+ * The turn is written as three numbers on the intro (--p, --dy, --s) and the
+ * stylesheet does the rest, as transforms, so it costs the compositor alone.
+ */
+export function CardIntro({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const intro = ref.current;
+    if (!intro) return;
+    const when = matchMedia('(max-width: 40rem) and (orientation: portrait) and (prefers-reduced-motion: no-preference)');
+    let frame = 0;
+    let run = 1;
+
+    // Where the card sits once upright, and so how far and how large it
+    // has to start to lie on its side across the middle of the screen.
+    const measure = () => {
+      if (!when.matches) return;
+      const stage = intro.querySelector<HTMLElement>('[data-card-stage]');
+      const object = stage?.firstElementChild as HTMLElement | null;
+      if (!stage || !object) return;
+      intro.style.setProperty('--p', '1');
+      const box = object.getBoundingClientRect();
+      // Turn about the card's own centre, not the stage's, which runs on
+      // below the card to hold its caption.
+      intro.style.setProperty('--oy', `${(box.top + box.height / 2 - stage.getBoundingClientRect().top).toFixed(1)}px`);
+      const introTop = intro.getBoundingClientRect().top + window.scrollY;
+      const center = box.top + window.scrollY + box.height / 2 - introTop;
+      const w = box.width;
+      const h = box.height;
+      const s = Math.min((window.innerHeight * 0.8) / w, (window.innerWidth - 28) / h);
+      intro.style.setProperty('--dy', `${(window.innerHeight / 2 - introTop - center).toFixed(1)}px`);
+      intro.style.setProperty('--s', s.toFixed(3));
+      run = Math.max(1, intro.offsetHeight - (intro.firstElementChild as HTMLElement).offsetHeight);
+      update();
+    };
+
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const top = intro.getBoundingClientRect().top;
+        const raw = Math.min(1, Math.max(0, -top / run));
+        // Ease out: the card answers the first touch of the scroll at once.
+        const p = 1 - Math.pow(1 - raw, 1.7);
+        intro.style.setProperty('--p', p.toFixed(4));
+        intro.toggleAttribute('data-upright', p > 0.98);
+      });
+    };
+
+    const onScroll = () => when.matches && update();
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measure);
+    when.addEventListener('change', measure);
+    document.fonts?.ready.then(measure);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', measure);
+      when.removeEventListener('change', measure);
+    };
+  }, []);
+
+  return (
+    <div ref={ref} className={styles.intro}>
+      <div className={styles.pin}>
+        <span className={styles.light} aria-hidden="true" />
+        {children}
+        <p className={styles.introHint} aria-hidden="true">
+          <span>Scroll</span>
+          <span className={styles.introArrow} />
+        </p>
+      </div>
+    </div>
   );
 }
 

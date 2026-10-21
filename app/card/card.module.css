@@ -148,7 +148,6 @@ html[data-mode='raw'] .sheet {
   transform: rotateX(var(--rx)) rotateY(var(--ry));
   transform-style: preserve-3d;
   transition: transform 900ms var(--ease-plate);
-  will-change: transform;
 }
 
 .object[data-live] {
@@ -1461,6 +1460,160 @@ html[data-mode='raw'] .stampMark {
    once it has risen, or sticky would stop working. */
 .set {
   animation-fill-mode: forwards;
+}
+
+/* ---- The card, on its side: the arrival on a phone held upright -----------------
+   Everywhere but a phone held upright the intro is not there at all: its
+   children sit in the column like any others. */
+
+.intro,
+.pin {
+  display: contents;
+}
+
+.light,
+.introHint {
+  display: none;
+}
+
+@media (max-width: 40rem) and (orientation: portrait) and (prefers-reduced-motion: no-preference) {
+  .sheet {
+    padding-top: 0;
+  }
+
+  .intro {
+    --p: 0;
+    --dy: 30svh;
+    --s: 1.5;
+    /* How far the reader scrolls to stand the card up. */
+    --run: 65svh;
+    /* 0 until the card is most of the way up, then 1: the page under it. */
+    --rise: clamp(0, calc((var(--p) - 0.55) * 2.2222), 1);
+    display: block;
+    position: relative;
+  }
+
+  /* The run the card turns over. A spacer, not padding: a sticky element
+     travels only within its parent's content box, and padding is not in it. */
+  .intro::after {
+    content: '';
+    display: block;
+    height: var(--run);
+  }
+
+  .pin {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    padding-top: calc(var(--sheet-margin) + var(--s-6));
+  }
+
+  /* The card itself: on its side, large, in the middle of the screen, and
+     stood up by the scroll into its place at the head of the column. */
+  .pin .stage {
+    position: relative;
+    z-index: 2;
+    transform: translateY(calc((1 - var(--p)) * var(--dy)))
+      rotate(calc((1 - var(--p)) * 90deg))
+      scale(calc(1 + (1 - var(--p)) * (var(--s) - 1)));
+    transform-origin: 50% var(--oy, 45%);
+  }
+
+  /* Light from above the board, strongest while the card is the only thing
+     on it, and gone once the page is up. */
+  .light {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 70% 55% at 50% 50%,
+      color-mix(in srgb, var(--paper-raised) 85%, transparent) 0%,
+      transparent 70%
+    );
+    opacity: calc(1 - var(--p));
+  }
+
+  html[data-mode='raw'] .light {
+    display: none;
+  }
+
+  /* The page rises under the card: the strip, the time and the save, once the
+     card is most of the way up. */
+  .pin > .strip,
+  .pin > .when,
+  .pin > .save,
+  .pin > .ways {
+    opacity: var(--rise);
+    transform: translateY(calc((1 - var(--rise)) * 1.5rem));
+  }
+
+  /* The caption turns with the card, so it waits until the card is upright. */
+  .pin .caption {
+    opacity: clamp(0, calc((var(--p) - 0.92) * 12.5), 1);
+  }
+
+  .pin > .strip,
+  .pin > .when,
+  .pin > .save,
+  .pin > .ways {
+    position: relative;
+    z-index: 3;
+  }
+
+  .introHint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-2);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--s-8) + env(safe-area-inset-bottom));
+    z-index: 3;
+    font-family: var(--font-label), monospace;
+    font-size: var(--t-micro);
+    font-weight: 600;
+    letter-spacing: var(--track-label-wide);
+    text-transform: uppercase;
+    color: var(--ink-3);
+    opacity: clamp(0, calc(1 - var(--p) * 4), 1);
+    pointer-events: none;
+    animation: rise 900ms var(--ease-plate) 1300ms backwards;
+  }
+
+  .introArrow {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-right: var(--lw-thick) solid var(--accent);
+    border-bottom: var(--lw-thick) solid var(--accent);
+    rotate: 45deg;
+    animation: nudge 1.8s var(--ease-plate) 2s infinite;
+  }
+
+  @keyframes nudge {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    40% {
+      translate: 0 0.35rem;
+    }
+  }
+
+  .intro[data-upright] .introHint {
+    display: none;
+  }
+}
+
+/* A phone on its side reads the card as it lies: large, alone, upright. */
+@media (max-height: 30rem) and (orientation: landscape) {
+  .sheet {
+    --col: min(88vw, calc((100svh - 6rem) * 85 / 55));
+  }
 }
 
 /* ---- A wide screen: the card on the left, held still, the lines beside it -- */
