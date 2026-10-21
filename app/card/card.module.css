@@ -5,12 +5,6 @@
    defined here per mode, because an engraved document is coloured the way
    a document is and not the way a drawing is. */
 
-@property --sweep {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
 .sheet {
   /* The face of the card, per mode. */
   --face: var(--paper-raised);
@@ -94,7 +88,16 @@ html[data-mode='raw'] .sheet {
   display: inline-flex;
   align-items: center;
   gap: var(--s-2);
+  min-height: 2.25rem;
   color: var(--ink-2);
+  text-transform: none;
+  letter-spacing: 0.06em;
+  transition: color var(--d-1);
+}
+
+.stripLive:hover,
+.stripLive:focus-visible {
+  color: var(--accent);
 }
 
 .pulse {
@@ -145,6 +148,7 @@ html[data-mode='raw'] .sheet {
   transform: rotateX(var(--rx)) rotateY(var(--ry));
   transform-style: preserve-3d;
   transition: transform 900ms var(--ease-plate);
+  will-change: transform;
 }
 
 .object[data-live] {
@@ -158,7 +162,6 @@ html[data-mode='raw'] .sheet {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  transform: rotateX(calc(var(--sweep) * -2.5deg)) rotateY(calc(var(--sweep) * 5deg));
   animation:
     arrive 1200ms var(--ease-plate) backwards,
     drift 16s ease-in-out 1200ms infinite;
@@ -171,16 +174,17 @@ html[data-mode='raw'] .sheet {
   }
 }
 
+/* Transform only, so the drift costs the compositor and nothing else. */
 @keyframes drift {
   0%,
   100% {
-    --sweep: 0;
+    transform: rotateX(0deg) rotateY(0deg);
   }
   25% {
-    --sweep: 1;
+    transform: rotateX(-2.5deg) rotateY(5deg);
   }
   75% {
-    --sweep: -1;
+    transform: rotateX(2.5deg) rotateY(-5deg);
   }
 }
 
@@ -262,37 +266,49 @@ html[data-mode='raw'] .face {
 }
 
 /* Foil catches the light only where the light is: the rosette, intersected
-   with a pool that follows the lean of the card. */
+   with a pool that follows the lean of the card. The mask is still; the
+   colour moves under it, as a transform, so nothing is repainted. */
 .foil {
-  background: linear-gradient(
-      115deg,
-      #ff7ad9 0%,
-      #b48cff 14%,
-      #78b8ff 28%,
-      #6ff0d0 42%,
-      #f5f59a 56%,
-      #ffb07a 70%,
-      #ff7ad9 84%,
-      #b48cff 100%
-    )
-    calc(50% + var(--tx) * 40% + var(--sweep) * 25%) 50% / 320% 100%;
+  overflow: hidden;
   opacity: var(--foil-o);
   -webkit-mask:
     var(--rosette) center / contain no-repeat,
-    radial-gradient(
-      circle at calc(var(--gx) + var(--sweep) * 22%) calc(var(--gy) + var(--sweep) * 10%),
-      #000 0,
-      transparent 58%
-    );
+    radial-gradient(circle at var(--gx) var(--gy), #000 0, transparent 58%);
   -webkit-mask-composite: source-in;
   mask:
     var(--rosette) center / contain no-repeat,
-    radial-gradient(
-      circle at calc(var(--gx) + var(--sweep) * 22%) calc(var(--gy) + var(--sweep) * 10%),
-      #000 0,
-      transparent 58%
-    );
+    radial-gradient(circle at var(--gx) var(--gy), #000 0, transparent 58%);
   mask-composite: intersect;
+}
+
+.foilSheen {
+  position: absolute;
+  inset: 0 -100%;
+  background: linear-gradient(
+    115deg,
+    #ff7ad9 0%,
+    #b48cff 14%,
+    #78b8ff 28%,
+    #6ff0d0 42%,
+    #f5f59a 56%,
+    #ffb07a 70%,
+    #ff7ad9 84%,
+    #b48cff 100%
+  );
+  transform: translateX(calc(var(--tx) * -20%));
+  transition: transform 140ms linear;
+  animation: sheen 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes sheen {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: -12% 0;
+  }
 }
 
 @keyframes strike {
@@ -307,7 +323,7 @@ html[data-mode='raw'] .face {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    circle at calc(var(--gx) + var(--sweep) * 18%) calc(var(--gy) + var(--sweep) * 8%),
+    circle at var(--gx) var(--gy),
     rgba(255, 255, 255, 0.85) 0%,
     rgba(255, 255, 255, 0) 55%
   );
@@ -370,10 +386,10 @@ html[data-mode='raw'] .mark {
 .frontBody {
   position: absolute;
   left: 6.5cqw;
-  bottom: 10.5cqw;
+  bottom: 9.5cqw;
   display: flex;
   flex-direction: column;
-  gap: 3.4cqw;
+  gap: 2.6cqw;
 }
 
 .name {
@@ -404,7 +420,7 @@ html[data-mode='artifact'] .name {
       #5c4a2c 50%,
       var(--face-ink) 65%
     )
-    calc(50% + var(--tx) * -60% + var(--sweep) * -30%) 0 / 300% 100%;
+    calc(50% + var(--tx) * -60%) 0 / 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -438,6 +454,16 @@ html[data-mode='raw'] .name {
   text-transform: uppercase;
   color: var(--accent);
   animation: rise 900ms var(--ease-plate) 420ms backwards;
+}
+
+/* The address, under the role: the site is on the card as it is on the printed one. */
+.site {
+  font-family: var(--font-label), monospace;
+  font-size: max(0.625rem, 2.5cqw);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--face-ink-2);
+  animation: rise 900ms var(--ease-plate) 480ms backwards;
 }
 
 /* Microprint along the foot of the card. */
@@ -1427,6 +1453,15 @@ html[data-mode='raw'] .stampMark {
 .sheet [data-rise='6'] {
   animation-delay: 1000ms;
 }
+.sheet [data-rise='7'] {
+  animation-delay: 1070ms;
+}
+
+/* The pile is sticky inside; the wrapper must not clip or transform it
+   once it has risen, or sticky would stop working. */
+.set {
+  animation-fill-mode: forwards;
+}
 
 /* ---- A wide screen: the card on the left, held still, the lines beside it -- */
 
@@ -1439,10 +1474,11 @@ html[data-mode='raw'] .stampMark {
       'card when'
       'card save'
       'card ways'
-      'card record'
       'card enter'
+      'card set'
+      'card record'
       'card foot';
-    grid-template-rows: auto auto auto auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto auto auto auto 1fr;
     column-gap: clamp(3rem, 6vw, 6rem);
     align-content: center;
     min-height: 100svh;
@@ -1472,6 +1508,9 @@ html[data-mode='raw'] .stampMark {
   .record {
     grid-area: record;
   }
+  .set {
+    grid-area: set;
+  }
   .enter {
     grid-area: enter;
   }
@@ -1482,6 +1521,7 @@ html[data-mode='raw'] .stampMark {
 
 @media (prefers-reduced-motion: reduce) {
   .drift,
+  .foilSheen,
   .ink,
   .foil,
   .mark,

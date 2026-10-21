@@ -53,6 +53,11 @@ export interface Plate {
   refs: string[];
   /** Omitted for detail sheets, which do not appear on the key plan. */
   rect?: KeyPlanRect;
+  /**
+   * The title and subtitle at the plain (a) and fully technical (c) levels.
+   * The authored title is the drawing set's own, which is level b.
+   */
+  voice?: Partial<Record<'a' | 'c', { title: string; subtitle: string }>>;
 }
 
 export type PlacedPlate = Plate & { rect: KeyPlanRect };
@@ -68,6 +73,10 @@ export const PLATES: Plate[] = [
     scale: 'NTS',
     revision: 'C',
     refs: [],
+    voice: {
+      a: { title: 'Home', subtitle: 'Every page on this site, in one view' },
+      c: { title: 'Route map', subtitle: 'Every exported route, placed on one plane' },
+    },
   },
   {
     id: 'about',
@@ -79,6 +88,10 @@ export const PLATES: Plate[] = [
     scale: '1:1',
     revision: 'C',
     refs: ['R-301', 'W-400', 'C-700'],
+    voice: {
+      a: { title: 'About me', subtitle: 'Who I am, what I have done, and how I work' },
+      c: { title: 'Profile', subtitle: 'ProfilePage · biography, chronology, principles' },
+    },
     rect: { x: 0, y: 0, w: 420, h: 290 },
   },
   {
@@ -91,6 +104,10 @@ export const PLATES: Plate[] = [
     scale: '1:1',
     revision: 'B',
     refs: ['A-101', 'W-400'],
+    voice: {
+      a: { title: 'Research', subtitle: 'Published work and what I am exploring' },
+      c: { title: 'Research', subtitle: 'Publications, thesis, current directions' },
+    },
     rect: { x: 0, y: 310, w: 420, h: 270 },
   },
   {
@@ -103,6 +120,10 @@ export const PLATES: Plate[] = [
     scale: '1:20',
     revision: 'C',
     refs: ['W-400', 'B-500', 'E-600'],
+    voice: {
+      a: { title: 'How I build', subtitle: 'The principles behind the systems I design' },
+      c: { title: 'Structural principles', subtitle: 'Invariants, patterns and rules the systems hold to' },
+    },
     rect: { x: 0, y: 600, w: 420, h: 290 },
   },
   {
@@ -115,6 +136,10 @@ export const PLATES: Plate[] = [
     scale: '1:50',
     revision: 'D',
     refs: ['S-201', 'R-301', 'C-700'],
+    voice: {
+      a: { title: 'Case studies', subtitle: 'Real projects, and what they achieved' },
+      c: { title: 'Works', subtitle: 'Case studies: W-401 onward, as built' },
+    },
     rect: { x: 460, y: 0, w: 740, h: 400 },
   },
   {
@@ -127,6 +152,10 @@ export const PLATES: Plate[] = [
     scale: '1:1',
     revision: 'B',
     refs: ['B-500', 'S-201'],
+    voice: {
+      a: { title: 'Essays', subtitle: 'Longer pieces on systems, cost and trust' },
+      c: { title: 'Essays', subtitle: 'Long-form arguments: E-601 onward' },
+    },
     rect: { x: 460, y: 420, w: 740, h: 225 },
   },
   {
@@ -139,6 +168,10 @@ export const PLATES: Plate[] = [
     scale: '1:1',
     revision: 'C',
     refs: ['E-600', 'S-201'],
+    voice: {
+      a: { title: 'Blog', subtitle: 'Short notes from the work, written while fresh' },
+      c: { title: 'Field notes', subtitle: 'Short posts: B-501 onward' },
+    },
     rect: { x: 1240, y: 0, w: 460, h: 400 },
   },
   {
@@ -151,6 +184,10 @@ export const PLATES: Plate[] = [
     scale: 'NTS',
     revision: 'B',
     refs: ['A-101', 'W-400'],
+    voice: {
+      a: { title: 'Contact', subtitle: 'Send me a message' },
+      c: { title: 'Correspondence', subtitle: 'Form POST, plus the direct lines' },
+    },
     rect: { x: 1240, y: 420, w: 460, h: 225 },
   },
 ];
@@ -220,10 +257,26 @@ export const KEY_PLAN_FURNITURE = {
  * of the set is read under.
  */
 export const GENERAL_NOTES = [
-  'Organisation names are generalised throughout. The engineering is specific.',
-  'Metrics are measured in production unless annotated otherwise.',
-  'This set is issued as a static export. No server is in the loop.',
-  'Drawings are live: switch Artifact / Annotated / Raw with the selector, or press D.',
+  {
+    a: 'Company names are left out on purpose. The technical detail is real.',
+    b: 'Organisation names are generalised throughout. The engineering is specific.',
+    c: 'Organisation names generalised; metrics, stacks and failure modes are as recorded.',
+  },
+  {
+    a: 'Numbers quoted are from real, running systems unless it says otherwise.',
+    b: 'Metrics are measured in production unless annotated otherwise.',
+    c: 'Metrics are production measurements unless annotated; no synthetic benchmarks.',
+  },
+  {
+    a: 'This site is plain files on a server. Nothing is tracked.',
+    b: 'This set is issued as a static export. No server is in the loop.',
+    c: 'Static export (next build, output: export). No runtime, no analytics, no cookies.',
+  },
+  {
+    a: 'The site can be read at three levels: plain, technical, source. Switch with the control at the top, or press D.',
+    b: 'Drawings are live: switch Artifact / Annotated / Raw with the selector, or press D.',
+    c: 'html[data-mode] selects artifact | annotated | raw; the D key cycles it.',
+  },
 ] as const;
 
 /**

@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DISCIPLINES } from '@/lib/plates';
+import { getPlateBySheet } from '@/lib/plates';
+import { useVoice } from '@/components/system/useVoice';
+import { disciplineName, plateTitle } from '@/lib/voice';
 import { useToast } from '@/components/system/ToastProvider';
 import Link from 'next/link';
 import { clearRoute, useRoute } from '@/components/system/Route';
@@ -16,6 +18,9 @@ export function TitleBlock() {
   const route = useRoute();
   const { meta } = usePlateMeta();
   const { toast } = useToast();
+  const t = useVoice();
+  const plate = getPlateBySheet(meta.sheet);
+  const title = plate ? plateTitle(plate, t.level) : meta.title;
   const [expanded, setExpanded] = useState(false);
   const [compact, setCompact] = useState(false);
   useEffect(() => {
@@ -68,7 +73,7 @@ export function TitleBlock() {
         aria-controls="title-block-detail"
       >
         <span className={styles.sheetNo}>{meta.sheet}</span>
-        <span className={styles.title}>{meta.title}</span>
+        <span className={styles.title}>{title}</span>
         {/* Zone under the pointer, written by ZoneCursor. */}
         <span className={styles.gridRef} data-grid-ref aria-hidden="true" />
         <span className={styles.chevron} aria-hidden="true" />
@@ -80,35 +85,35 @@ export function TitleBlock() {
       <div className={styles.detail} id="title-block-detail" hidden={!expanded}>
         <dl className={styles.grid}>
           <div className={styles.field}>
-            <dt>Discipline</dt>
-            <dd>{DISCIPLINES[meta.discipline].name}</dd>
+            <dt>{t('type')}</dt>
+            <dd>{disciplineName(meta.discipline, t.level)}</dd>
           </div>
           <div className={styles.field}>
-            <dt>Scale</dt>
+            <dt>{t('scale')}</dt>
             <dd className="u-tnum">{meta.scale}</dd>
           </div>
           <div className={styles.field}>
-            <dt>Rev</dt>
+            <dt>{t('rev')}</dt>
             <dd>{meta.revision}</dd>
           </div>
           <div className={styles.field}>
-            <dt>Issued</dt>
+            <dt>{t('issued')}</dt>
             <dd className="u-tnum">{meta.date ?? ISSUE_STAMP}</dd>
           </div>
           <div className={styles.field}>
-            <dt>Drawn</dt>
+            <dt>{t('drawn')}</dt>
             <dd>A. Bajpai</dd>
           </div>
           <div className={styles.field}>
-            <dt>Set</dt>
-            <dd className="u-tnum">{sheetCount} sheets</dd>
+            <dt>{t('setCount')}</dt>
+            <dd className="u-tnum">{sheetCount} {t('pages')}</dd>
           </div>
         </dl>
 
         {meta.subtitle && <p className={styles.subtitle}>{meta.subtitle}</p>}
 
         <button type="button" className={styles.copy} onClick={copyReference}>
-          Copy sheet reference
+          {t('copyRef')}
         </button>
         {canShare && (
           <button
@@ -124,23 +129,23 @@ export function TitleBlock() {
                 .catch(() => {});
             }}
           >
-            Share this sheet
+            {t('shareSheet')}
           </button>
         )}
         <button type="button" className={styles.copy} onClick={() => window.print()}>
-          Issue this sheet as PDF
+          {t('pdfSheet')}
         </button>
         <Link href="/set/" className={styles.copy} onClick={() => setExpanded(false)}>
-          Issue the whole set as PDF
+          {t('pdfSet')}
         </Link>
         <Link href="/card/" className={styles.copy} onClick={() => setExpanded(false)}>
-          The calling card · C-701
+          {t('cardLink')}
         </Link>
 
         {route.length > 0 && (
           <p className={styles.route}>
             <span>
-              Your route · <b>{route.length}</b> of {sheetCount} read
+              {t('yourRoute')} · <b>{route.length}</b> of {sheetCount} {t('read')}
             </span>
             <button type="button" onClick={clearRoute}>
               Clear

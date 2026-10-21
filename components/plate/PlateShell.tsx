@@ -4,6 +4,8 @@ import { DISCIPLINES, getPlateBySheet, type Discipline } from '@/lib/plates';
 import { SetPlateMeta } from '@/components/sheet/PlateMetaProvider';
 import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
 import { JsonLd } from '@/components/JsonLd';
+import { Levels, Voice } from '@/components/system/Voice';
+import { disciplineName, plateSubtitle, plateTitle, type Said } from '@/lib/voice';
 import styles from './PlateShell.module.css';
 
 export interface PlateFact {
@@ -33,6 +35,8 @@ export interface PlateShellProps {
   figure?: string;
   /** Structured data for this sheet, rendered as one JSON-LD graph. */
   jsonLd?: Record<string, unknown>[];
+  /** The title and subtitle at all three levels, for a sheet with no plate. */
+  voice?: { title: Said; subtitle: Said };
   children: ReactNode;
 }
 
@@ -57,6 +61,7 @@ export function PlateShell({
   wide = false,
   figure,
   jsonLd,
+  voice,
   children,
 }: PlateShellProps) {
   const headFacts: PlateFact[] = [
@@ -65,6 +70,14 @@ export function PlateShell({
     { k: 'Issued', v: issued },
     ...facts,
   ];
+  const plate = getPlateBySheet(sheet);
+  const said = voice ?? (plate?.voice
+    ? {
+        title: { a: plateTitle(plate, 'a'), b: plate.title, c: plateTitle(plate, 'c') },
+        subtitle: { a: plateSubtitle(plate, 'a'), b: plate.subtitle, c: plateSubtitle(plate, 'c') },
+      }
+    : undefined);
+  const FACT_LABEL: Record<string, 'scale' | 'rev' | 'issued'> = { Scale: 'scale', Rev: 'rev', Issued: 'issued' };
 
   return (
     <article className={`plate ${wide ? 'plate-wide' : ''} ${styles.plate}`}>
@@ -87,16 +100,18 @@ export function PlateShell({
         <p className={styles.eyebrow}>
           <span className={styles.sheetTag}>{sheet}</span>
           <span className={styles.hairline} aria-hidden="true" />
-          <span className={styles.disciplineName}>{DISCIPLINES[discipline].name}</span>
+          <span className={styles.disciplineName}>
+            <Levels a={disciplineName(discipline, 'a')} b={disciplineName(discipline, 'b')} c={disciplineName(discipline, 'c')} />
+          </span>
         </p>
 
         {/* Annotated mode labels the sheet's anatomy in the left margin the
             way a drawing keys its parts; raw mode names the element and the
             prop it was built from. */}
         <h1 className={styles.title} data-annotate="Sheet title" data-raw="h1.title ← props.title">
-          {title}
+          {said ? <Voice s={said.title} /> : title}
         </h1>
-        <p className={styles.subtitle}>{subtitle}</p>
+        <p className={styles.subtitle}>{said ? <Voice s={said.subtitle} /> : subtitle}</p>
 
         {lead && (
           <div className={styles.lead} data-annotate="Lead" data-raw="div.lead ← props.lead">
@@ -112,7 +127,7 @@ export function PlateShell({
         >
           {headFacts.map((f) => (
             <div key={f.k} className={styles.fact}>
-              <dt>{f.k}</dt>
+              <dt>{FACT_LABEL[f.k] ? <Voice k={FACT_LABEL[f.k]} /> : f.k}</dt>
               <dd>{f.v}</dd>
             </div>
           ))}
@@ -154,7 +169,9 @@ export function PlateShell({
           data-annotate="Refs"
           data-raw="nav.refs ← props.refs[]"
         >
-          <span className={styles.refsLabel}>Refer to</span>
+          <span className={styles.refsLabel}>
+            <Voice k="referTo" />
+          </span>
           <ul className={styles.refsList}>
             {refs.map((ref) => {
               const plate = getPlateBySheet(ref);
@@ -163,7 +180,9 @@ export function PlateShell({
                 <li key={ref}>
                   <Link href={plate.href} className={styles.ref}>
                     <span className={styles.refSheet}>{plate.sheet}</span>
-                    <span className={styles.refTitle}>{plate.title}</span>
+                    <span className={styles.refTitle}>
+                      <Levels a={plateTitle(plate, 'a')} b={plate.title} c={plateTitle(plate, 'c')} />
+                    </span>
                   </Link>
                 </li>
               );

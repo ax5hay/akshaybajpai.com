@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useToast } from '@/components/system/ToastProvider';
 import { useMode } from '@/components/system/ModeProvider';
 import { MODES, MODE_INFO } from '@/lib/mode';
+import { useVoice } from '@/components/system/useVoice';
+import { LEVEL_INFO, LEVEL } from '@/lib/voice';
 import styles from './card.module.css';
 
 /**
@@ -341,8 +343,9 @@ export function ShareCard({
  */
 export function Reissue() {
   const { mode, setMode } = useMode();
+  const t = useVoice();
   return (
-    <div className={styles.reissue} role="radiogroup" aria-label="Re-issue the card">
+    <div className={styles.reissue} role="radiogroup" aria-label={t('reissueCard')}>
       {MODES.map((m) => (
         <button
           key={m}
@@ -352,11 +355,11 @@ export function Reissue() {
           className={styles.rev}
           data-rev={m}
           onClick={() => setMode(m)}
-          title={`${MODE_INFO[m].label}: ${MODE_INFO[m].blurb}`}
+          title={LEVEL_INFO[LEVEL[m]].about}
         >
           <span className={styles.revSwatch} aria-hidden="true" />
           <span className={styles.revLetter}>{MODE_INFO[m].rev}</span>
-          <span className={styles.revName}>{MODE_INFO[m].label}</span>
+          <span className={styles.revName}>{t.level === 'a' ? LEVEL_INFO[LEVEL[m]].name : MODE_INFO[m].label}</span>
         </button>
       ))}
     </div>

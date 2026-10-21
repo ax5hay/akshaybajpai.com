@@ -168,6 +168,10 @@ serves `.vcf` as `text/x-vcard`, which iOS and Android open into the address boo
 QR code itself is a dynamic one on vqr.vc: its destination is set there, to
 `https://www.akshaybajpai.com/card/`, and is not part of this repository.
 
+**The set's voice is static too.** `lib/voice.ts` holds every phrase at three levels;
+server components emit all three and `html[data-mode]` shows one, so a change of level
+is a CSS change and the export carries no per-level pages.
+
 **Every page carries the sheet register.** `components/sheet/Register.tsx` is rendered by
 the layout as a hidden `<nav>` listing all thirty-six sheets, so a crawler finds the whole
 set from any page it lands on. It adds about 6 kB of HTML per page and nothing on screen.

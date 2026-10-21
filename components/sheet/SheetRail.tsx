@@ -9,6 +9,7 @@ import { ModeSelector } from '@/components/system/ModeSelector';
 import { usePlateMeta } from './PlateMetaProvider';
 import { useSheetSet } from '@/components/system/SheetSet';
 import { Mark } from './Mark';
+import { useVoice } from '@/components/system/useVoice';
 import styles from './SheetRail.module.css';
 
 // The lens is only ever needed on demand, so it stays out of the entry bundle.
@@ -23,6 +24,7 @@ export function SheetRail() {
   const pathname = usePathname();
   const { lensOn, toggleLens, indexOpen, openIndex, closeIndex, queryPreset, clearQueryPreset } =
     useInstruments();
+  const t = useVoice();
 
   const [condensed, setCondensed] = useState(false);
 
@@ -64,7 +66,7 @@ export function SheetRail() {
           <Mark />
           <span className={styles.markText}>
             <span className={styles.project}>Architecture of Intelligence</span>
-            <span className={styles.set}>Drawing set · Akshay Bajpai</span>
+            <span className={styles.set}>{t('setLine')}</span>
           </span>
         </Link>
 
@@ -97,7 +99,7 @@ export function SheetRail() {
               <span />
               <span />
             </span>
-            <span className={styles.controlLabel}>Index</span>
+            <span className={styles.controlLabel}>{t('railIndex')}</span>
             <kbd className={styles.kbd}>/</kbd>
           </button>
 
@@ -116,7 +118,7 @@ export function SheetRail() {
               <circle cx="5" cy="5" r="3.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
               <path d="M7.8 7.8l3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="square" />
             </svg>
-            <span className={styles.controlLabel}>Lens</span>
+            <span className={styles.controlLabel}>{t('railLens')}</span>
             <kbd className={styles.kbd}>L</kbd>
           </button>
 

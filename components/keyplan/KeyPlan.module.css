@@ -2555,3 +2555,83 @@ html[data-mode='raw'] .tourTitle {
     display: none;
   }
 }
+
+/* ---- The calling card, offered on the first sheet ---------------------------
+   The one sheet not drawn on the plan: the card is for keeping, not for
+   reading, so it sits in the title strip under the name, at the size of a
+   stamp, and leans a little toward whoever hovers it. */
+
+.cardEntry {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--s-3);
+  align-items: center;
+  margin-top: var(--s-4);
+  padding: var(--s-3);
+  border: var(--lw-thin) solid var(--rule);
+  background: var(--paper-raised);
+  color: var(--ink);
+  perspective: 500px;
+  transition: border-color var(--d-2);
+}
+
+.cardEntry:hover,
+.cardEntry:focus-visible {
+  border-color: var(--accent);
+}
+
+.cardEntryFace {
+  transform: rotateY(-16deg) rotateX(6deg);
+  transition: transform var(--d-4) var(--ease-plate);
+}
+
+.cardEntry:hover .cardEntryFace {
+  transform: rotateY(-5deg) rotateX(2deg);
+}
+
+.cardEntryText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cardEntryKicker {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cardEntryTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-md);
+  line-height: 1.15;
+}
+
+html[data-mode='annotated'] .cardEntryTitle,
+html[data-mode='raw'] .cardEntryTitle {
+  font-size: var(--t-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cardEntryCta {
+  margin-top: 2px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.cardEntry:hover .cardEntryCta {
+  color: var(--accent);
+}
+
+.plane[data-lod='far'] .cardEntry {
+  display: none;
+}

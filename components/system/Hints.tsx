@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useVoice } from './useVoice';
+import type { Level } from '@/lib/voice';
 import { usePathname } from 'next/navigation';
 import styles from './Hints.module.css';
 
@@ -31,27 +33,36 @@ type Where = 'plan' | 'study' | 'article' | 'about' | 'works' | 'architecture' |
  * shows the first three it has not shown before, so the things only this
  * sheet can do are said ahead of the things every sheet can.
  */
-function notesFor(where: Where, phone: boolean, docked: boolean): Note[] {
+function notesFor(where: Where, phone: boolean, docked: boolean, level: Level): Note[] {
   const tap = phone ? 'Tap' : 'Click';
+  /** One note, said at the level the set is being read at. */
+  const L = (a: ReactNode, b: ReactNode, c: ReactNode) => (level === 'a' ? a : level === 'b' ? b : c);
+  const page = level === 'a' ? 'page' : level === 'b' ? 'sheet' : 'route';
 
   // ---- Particular to the sheet -------------------------------------------
   const profile: Note = {
     id: phone ? 'phone-profile' : 'profile',
     text: phone ? (
-      <>
-        The strip under the title is a <b>section through this sheet</b>. It follows you down the
-        page; tap a segment to jump to that section.
-      </>
+      L(
+        <>The strip under the title is a <b>map of this page</b>. It follows you down; tap a part of it to jump there.</>,
+        <>The strip under the title is a <b>section through this sheet</b>. It follows you down the page; tap a segment to jump to that section.</>,
+        <>The strip under the title is the <b>section profile</b>: one segment per h2, width by word count. Tap to scroll to it.</>
+      )
     ) : (
-      <>
-        The strip under the title is a <b>section through this sheet</b>, one segment per section.
-        Click a segment to jump; the margin key on the left does the same.
-      </>
+      L(
+        <>The strip under the title is a <b>map of this page</b>, one part per section. Click a part to jump; the key down the left does the same.</>,
+        <>The strip under the title is a <b>section through this sheet</b>, one segment per section. Click a segment to jump; the margin key on the left does the same.</>,
+        <>The strip under the title is the <b>section profile</b>: one segment per h2, width by word count. Click to scroll; the margin key mirrors it.</>
+      )
     ),
   };
   const cite: Note = {
     id: phone ? 'phone-cite' : 'cite',
-    text: <>{tap} any numbered heading to copy a reference to that section: sheet, number and link.</>,
+    text: L(
+      <>{tap} any numbered heading to copy a link straight to that part.</>,
+      <>{tap} any numbered heading to copy a reference to that section: sheet, number and link.</>,
+      <>{tap} any numbered heading to copy its reference: route id, section number, URL with fragment.</>
+    ),
   };
   const schematic: Note = {
     id: phone ? 'phone-schematic' : 'schematic',
@@ -73,35 +84,36 @@ function notesFor(where: Where, phone: boolean, docked: boolean): Note[] {
       ? [
           {
             id: 'phone-pile',
-            text: <>Scroll. The seven sheets are a pile: each one slides up and rests on the last.</>,
+            text: L(
+              <>Scroll. The seven pages are stacked: each one slides up over the last.</>,
+              <>Scroll. The seven sheets are a pile: each one slides up and rests on the last.</>,
+              <>Scroll. Seven section routes, position: sticky, each stacking over the last.</>
+            ),
           },
           {
             id: 'phone-mini',
-            text: (
-              <>
-                Tap any sheet on the small key plan and the pile turns to it, or tap{' '}
-                <b>▶ Tour the set</b> for the whole set, one sheet to a screen.
-              </>
+            text: L(
+              <>Tap any page on the small map and the stack turns to it, or tap <b>▶ Show me around</b> for a quick tour.</>,
+              <>Tap any sheet on the small key plan and the pile turns to it, or tap <b>▶ Tour the set</b> for the whole set, one sheet to a screen.</>,
+              <>Tap a rect on the thumbnail plan to scroll to that route, or <b>▶ Walk the routes</b> for one per screen.</>
             ),
           },
         ]
       : [
           {
             id: 'tour',
-            text: (
-              <>
-                New here? Press <b>▶ Tour</b>, bottom left, and the plan walks you through every
-                sheet. Touch anything to take over.
-              </>
+            text: L(
+              <>New here? Press <b>▶ Show me around</b>, bottom left, and the map walks you through every page. Touch anything to take over.</>,
+              <>New here? Press <b>▶ Tour</b>, bottom left, and the plan walks you through every sheet. Touch anything to take over.</>,
+              <>Press <b>▶ Walk</b>, bottom left, to fly the camera to each route in turn. Any input cancels.</>
             ),
           },
           {
             id: 'plan-camera',
-            text: (
-              <>
-                Drag to pan, scroll to zoom, or walk the plan with <K>←</K> <K>→</K> <K>↑</K>{' '}
-                <K>↓</K>. Click a sheet and it grows into its page.
-              </>
+            text: L(
+              <>Drag to move around, scroll to zoom, or use <K>←</K> <K>→</K> <K>↑</K> <K>↓</K>. Click a page and it opens.</>,
+              <>Drag to pan, scroll to zoom, or walk the plan with <K>←</K> <K>→</K> <K>↑</K> <K>↓</K>. Click a sheet and it grows into its page.</>,
+              <>Drag: pan. Wheel: zoom. Arrows: step between routes. Click: navigate, with a view transition from the rect.</>
             ),
           },
         ],
@@ -159,17 +171,18 @@ function notesFor(where: Where, phone: boolean, docked: boolean): Note[] {
       ? [
           {
             id: 'phone-dock',
-            text: (
-              <>
-                The bar at the foot is the instrument dock: the index, the lens, and{' '}
-                <b>A · B · C</b> to re-issue the whole set in another mode.
-              </>
+            text: L(
+              <>The bar at the bottom has search, a magnifier, and <b>A · B · C</b>, which sets how technical the whole site reads.</>,
+              <>The bar at the foot is the instrument dock: the index, the lens, and <b>A · B · C</b> to re-issue the whole set in another mode.</>,
+              <>The dock: index, inspector, and <b>A · B · C</b> for html[data-mode]: artifact, annotated, raw.</>
             ),
           },
           {
             id: 'phone-titleblock',
-            text: (
-              <>Tap the sheet number in the dock for its title block, and to issue it as a PDF.</>
+            text: L(
+              <>Tap the {page} number in the bar for its details, and to save it as a PDF.</>,
+              <>Tap the sheet number in the dock for its title block, and to issue it as a PDF.</>,
+              <>Tap the route id in the dock for its metadata, and to print to PDF.</>
             ),
           },
         ]
@@ -177,27 +190,26 @@ function notesFor(where: Where, phone: boolean, docked: boolean): Note[] {
     : [
         {
           id: 'modes',
-          text: (
-            <>
-              Press <K>D</K> to re-issue the whole set: as issued, with the markup pen on, or
-              stripped to its source.
-            </>
+          text: L(
+            <>Press <K>D</K> to change how technical the site reads: plain, technical, or source.</>,
+            <>Press <K>D</K> to re-issue the whole set: as issued, with the markup pen on, or stripped to its source.</>,
+            <>Press <K>D</K> to cycle html[data-mode]: artifact, annotated, raw. Each is a full token swap.</>
           ),
         },
         {
           id: 'lens',
-          text: (
-            <>
-              Press <K>L</K> for the lens. Drag it over anything to look through to the blueprint.
-            </>
+          text: L(
+            <>Press <K>L</K> for the magnifier. Drag it over anything to see how that part is built.</>,
+            <>Press <K>L</K> for the lens. Drag it over anything to look through to the blueprint.</>,
+            <>Press <K>L</K> for the inspector: element names, bounds and sizes under the glass.</>
           ),
         },
         {
           id: 'index',
-          text: (
-            <>
-              Press <K>/</K> to find any of the sheets by number, title or subject.
-            </>
+          text: L(
+            <>Press <K>/</K> to search the site: any page, by name or subject.</>,
+            <>Press <K>/</K> to find any of the sheets by number, title or subject.</>,
+            <>Press <K>/</K> for the index: fuzzy match on route id, title, description.</>
           ),
         },
       ];
@@ -221,6 +233,7 @@ function readSeen(): Set<string> {
 
 export function Hints() {
   const pathname = usePathname();
+  const { level } = useVoice();
   const [queue, setQueue] = useState<Note[]>([]);
   const [at, setAt] = useState(-1);
   const [leaving, setLeaving] = useState(false);
@@ -267,7 +280,7 @@ export function Hints() {
     const phone = window.matchMedia('(max-width: 59.999rem), (hover: none)').matches;
     const docked = window.matchMedia('(max-width: 40rem)').matches;
     const seen = readSeen();
-    const fresh = notesFor(where, phone, docked)
+    const fresh = notesFor(where, phone, docked, level)
       .filter((n) => !seen.has(n.id))
       .slice(0, PER_PAGE);
     setQueue(fresh);

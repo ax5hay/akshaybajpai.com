@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
 import { DISCIPLINES, getPlateByHref, type Discipline } from '@/lib/plates';
 import { useRoute } from '@/components/system/Route';
+import { useVoice } from '@/components/system/useVoice';
+import { disciplineName, groupName, plateTitle, plateSubtitle } from '@/lib/voice';
+import { getPlateBySheet } from '@/lib/plates';
 import styles from './SheetIndex.module.css';
 
 export interface IndexEntry {
@@ -121,6 +124,16 @@ export function SheetIndex({
   initialQuery,
   onQueryConsumed,
 }: Props) {
+  const t = useVoice();
+  // Section sheets carry their plain and technical names on the plate.
+  const titled = (e: IndexEntry) => {
+    const p = e.group === 'General arrangement' ? getPlateBySheet(e.sheet) : undefined;
+    return p ? plateTitle(p, t.level) : e.title;
+  };
+  const subtitled = (e: IndexEntry) => {
+    const p = e.group === 'General arrangement' ? getPlateBySheet(e.sheet) : undefined;
+    return p ? plateSubtitle(p, t.level) : e.subtitle;
+  };
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [series, setSeries] = useState<string | null>(null);
@@ -251,15 +264,15 @@ export function SheetIndex({
         className={styles.panel}
         role="dialog"
         aria-modal="true"
-        aria-label="Drawing index"
+        aria-label={t('indexTitle')}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={onKeyDown}
       >
         <div className={styles.head}>
-          <span className={styles.headTitle}>Drawing Index</span>
+          <span className={styles.headTitle}>{t('indexTitle')}</span>
           <span className={styles.headCount} aria-live="polite">
-            {results.length} of {entries.length} sheets
-            {read.size > 0 ? ` · ${read.size} read` : ''}
+            {results.length} of {entries.length} {t('pages')}
+            {read.size > 0 ? ` · ${read.size} ${t('read')}` : ''}
           </span>
           <button type="button" className={styles.close} onClick={onClose} aria-label="Close index">
             <span className={styles.closeKey} aria-hidden="true">
@@ -284,8 +297,8 @@ export function SheetIndex({
             className={styles.search}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Sheet number, title, or subject"
-            aria-label="Search the drawing index"
+            placeholder={t('indexPlaceholder')}
+            aria-label={t('indexTitle')}
             autoComplete="off"
             autoCapitalize="off"
             spellCheck={false}
@@ -321,7 +334,7 @@ export function SheetIndex({
               aria-pressed={series === group}
               onClick={() => setSeries((s) => (s === group ? null : group))}
             >
-              {seriesName(group)} <span>{count}</span>
+              {seriesName(groupName(group, t.level))} <span>{count}</span>
             </button>
           ))}
         </div>
@@ -330,9 +343,9 @@ export function SheetIndex({
           <div className={styles.list} ref={listRef}>
             {results.length === 0 && (
               <p className={styles.empty}>
-                No sheet matches <strong>{query}</strong>.
+                {t('indexEmpty')} <strong>{query}</strong>.
                 <span>
-                  Try a sheet number such as <kbd>W-405</kbd>, or a subject such as <kbd>RAG</kbd>.
+                  {t('indexTry')} <kbd>RAG</kbd>.
                 </span>
               </p>
             )}
@@ -345,7 +358,7 @@ export function SheetIndex({
                 <div key={entry.sheet + entry.href}>
                   {showGroup && !query.trim() && !series && (
                     <div className={styles.group}>
-                      <span>{entry.group}</span>
+                      <span>{groupName(entry.group, t.level)}</span>
                     </div>
                   )}
                   <Link
@@ -362,14 +375,14 @@ export function SheetIndex({
                   >
                     <span className={styles.rowSheet}>{marked(entry.sheet, query)}</span>
                     <span className={styles.rowMain}>
-                      <span className={styles.rowTitle}>{marked(entry.title, query)}</span>
-                      <span className={styles.rowSubtitle}>{marked(entry.subtitle, query)}</span>
+                      <span className={styles.rowTitle}>{marked(titled(entry), query)}</span>
+                      <span className={styles.rowSubtitle}>{marked(subtitled(entry), query)}</span>
                     </span>
                     <span className={styles.rowMeta}>
                       {entry.sheet === currentSheet
-                        ? 'You are here'
+                        ? t('youAreHere')
                         : read.has(entry.href)
-                          ? 'Read'
+                          ? t('read')
                           : (entry.issued ?? '')}
                     </span>
                     <span className={styles.rowLeader} aria-hidden="true" />
@@ -385,12 +398,12 @@ export function SheetIndex({
             <aside className={styles.preview} aria-hidden="true" key={shown.href}>
               <span className={styles.previewTag}>{shown.sheet}</span>
               <span className={styles.previewSeries}>
-                {DISCIPLINES[shown.discipline].name}
+                {disciplineName(shown.discipline, t.level)}
                 {shown.issued ? ` · ${shown.issued}` : ''}
               </span>
 
-              <span className={styles.previewTitle}>{shown.title}</span>
-              <span className={styles.previewText}>{shown.subtitle}</span>
+              <span className={styles.previewTitle}>{titled(shown)}</span>
+              <span className={styles.previewText}>{subtitled(shown)}</span>
 
               {plate && hasFigure(plate.id) && (
                 <span className={styles.previewFigure}>

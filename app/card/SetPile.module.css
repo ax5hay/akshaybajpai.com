@@ -1,0 +1,223 @@
+/* The site under the card: seven sheets that pile as the reader scrolls.
+   Sticky, each a little lower than the last, so the one in hand always
+   shows the tags of the ones already laid down, as the phone's home does. */
+
+.pile {
+  --sheet-h: 11.5rem;
+  --lip: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding-top: var(--s-2);
+}
+
+.headKicker {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.headTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+html[data-mode='annotated'] .headTitle,
+html[data-mode='raw'] .headTitle {
+  font-size: var(--t-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.headNote {
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.sheets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  /* Room at the foot so the last sheet can be scrolled clear of the pile. */
+  padding-bottom: var(--s-4);
+}
+
+.slot {
+  position: sticky;
+  top: calc(var(--sheet-margin) + var(--s-3) + var(--i) * var(--lip));
+}
+
+.sheet {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7.5rem;
+  grid-template-areas:
+    'tag figure'
+    'title figure'
+    'sub figure'
+    'open figure';
+  grid-template-rows: auto auto 1fr auto;
+  column-gap: var(--s-3);
+  height: var(--sheet-h);
+  padding: var(--s-4) var(--s-4) var(--s-3);
+  background: linear-gradient(177deg, var(--sheet-sheen) 0%, transparent 60%), var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-lift);
+  color: var(--ink);
+  transition:
+    border-color var(--d-2),
+    transform var(--d-2) var(--ease-plate);
+}
+
+.sheet[data-id='contact'] {
+  --paper-raised: #141417;
+  --ink: #fcfaf4;
+  --ink-2: #ddd6c6;
+  --ink-3: #b5ac98;
+  --rule-ink: rgba(252, 250, 244, 0.9);
+  --accent: #f29384;
+  --sheet-sheen: rgba(255, 255, 255, 0.06);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .sheet[data-id='contact'] {
+    --paper-raised: #000;
+    --sheet-sheen: transparent;
+  }
+}
+
+html[data-mode='annotated'] .sheet[data-id='contact'] {
+  --paper-raised: #ffc75a;
+  --ink: #05182a;
+  --ink-2: #0f2c48;
+  --ink-3: #213f5c;
+  --rule-ink: rgba(5, 24, 42, 0.94);
+  --accent: #05182a;
+}
+
+html[data-mode='raw'] .sheet[data-id='contact'] {
+  --paper-raised: #8fe388;
+  --ink: #05120a;
+  --ink-2: #0f2a18;
+  --ink-3: #1d4a2c;
+  --rule-ink: rgba(5, 18, 10, 0.9);
+  --accent: #05120a;
+}
+
+.sheet:hover,
+.sheet:focus-visible {
+  border-color: var(--accent);
+}
+
+.sheet:active {
+  transform: scale(0.985);
+}
+
+.tag {
+  grid-area: tag;
+  justify-self: start;
+  padding: 3px var(--s-2);
+  margin-bottom: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.series {
+  position: absolute;
+  top: var(--s-4);
+  right: var(--s-4);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.title {
+  grid-area: title;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.45rem;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+html[data-mode='annotated'] .title,
+html[data-mode='raw'] .title {
+  font-size: var(--t-md);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sub {
+  grid-area: sub;
+  margin-top: var(--s-1);
+  font-size: var(--t-xs);
+  line-height: 1.4;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
+.figure {
+  grid-area: figure;
+  align-self: end;
+  width: 7.5rem;
+  height: 5.5rem;
+  margin-bottom: var(--s-2);
+  opacity: 0.9;
+  --fw: 1.1;
+  --fig-delay: 0ms;
+}
+
+.open {
+  grid-area: open;
+  align-self: end;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* The folded corner every sheet on the plan carries. */
+.corner {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 0.7rem;
+  height: 0.7rem;
+  background: linear-gradient(135deg, transparent 50%, var(--rule-ink) 50%);
+}
+
+@media (min-width: 60rem) {
+  /* Beside the card there is no scroll to stack against: a plain list. */
+  .slot {
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    transition: none;
+  }
+}
