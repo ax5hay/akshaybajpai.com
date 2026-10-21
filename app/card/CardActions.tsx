@@ -65,7 +65,7 @@ function today(): string {
  * a target; one animation frame eases toward it and stops when it arrives,
  * so a noisy gyroscope reads as a hand, not a tremor.
  */
-export function CardObject({ front, back, hits }: { front: ReactNode; back: ReactNode; hits?: ReactNode }) {
+export function CardObject({ front, back }: { front: ReactNode; back: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const dragged = useRef(false);
   const [turned, setTurned] = useState(false);
@@ -186,6 +186,8 @@ export function CardObject({ front, back, hits }: { front: ReactNode; back: Reac
 
   return (
     <div className={styles.stage} data-card-stage>
+      {/* Its own layer for the peek, a plain transform the compositor runs. */}
+      <div className={styles.peek}>
       <div
         ref={ref}
         className={styles.object}
@@ -208,7 +210,11 @@ export function CardObject({ front, back, hits }: { front: ReactNode; back: Reac
             </div>
           </div>
         </div>
-        {/* Over the whole card, so a press anywhere on it turns it. */}
+        {/* Under the faces, which let every press through to it except on
+            the lines that can be pressed themselves: the number, the seal,
+            the address. So a press on the card turns it, and a press on a
+            line does what the line says, and nothing is pressable that
+            cannot be seen. */}
         <button
           type="button"
           className={styles.turnButton}
@@ -223,7 +229,7 @@ export function CardObject({ front, back, hits }: { front: ReactNode; back: Reac
             setTurned((t) => !t);
           }}
         />
-        {hits}
+      </div>
       </div>
       <p className={styles.caption} aria-hidden="true">
         <span className={styles.captionTurn}>
@@ -313,7 +319,14 @@ export function CardIntro({ children }: { children: ReactNode }) {
       const vh = probe.offsetHeight;
       const center = stage.offsetTop + object.offsetTop + object.offsetHeight / 2;
       const top = intro.getBoundingClientRect().top + window.scrollY;
-      const s = Math.min((vh * 0.8) / object.offsetWidth, (window.innerWidth - 28) / object.offsetHeight);
+      // As large as it will go on its side, with the nudge kept clear below.
+      const room = 132;
+      const s = Math.min(
+        (vh * 0.78) / object.offsetWidth,
+        (window.innerWidth - 28) / object.offsetHeight,
+        (vh - 2 * room) / object.offsetWidth
+      );
+      intro.style.setProperty('--hint-top', `${(vh / 2 + (object.offsetWidth * s) / 2 + 22).toFixed(0)}px`);
       dy = vh / 2 - top - center;
       scale = s;
       intro.style.setProperty('--dy', `${dy.toFixed(1)}px`);
@@ -327,7 +340,13 @@ export function CardIntro({ children }: { children: ReactNode }) {
     // the threshold it is transparent, and a tap on the card would otherwise
     // land on the Call and WhatsApp tiles lying invisible over it.
     let up = false;
+    let moved = false;
     const settle = (raw: number) => {
+      // Once the reader has scrolled at all, the card stops peeking.
+      if (!moved && raw > 0.01) {
+        moved = true;
+        intro.setAttribute('data-moved', '');
+      }
       const next = raw > 0.62;
       if (next !== up) {
         up = next;
@@ -378,11 +397,25 @@ export function CardIntro({ children }: { children: ReactNode }) {
       <div className={styles.pin}>
         <span className={styles.light} data-intro-light aria-hidden="true" />
         {children}
-        <p className={styles.introHint} data-intro-hint aria-hidden="true">
-          <span className={styles.introHintLead}>{t('introLead')}</span>
+        {/* The nudge, and a way to do it without scrolling: press it and the
+            page scrolls the card upright. */}
+        <button
+          type="button"
+          className={styles.introHint}
+          data-intro-hint
+          onClick={() => {
+            const intro = ref.current;
+            if (!intro) return;
+            const run = intro.offsetHeight - (intro.firstElementChild as HTMLElement).offsetHeight;
+            window.scrollTo({ top: run, behavior: 'smooth' });
+          }}
+        >
+          <span className={styles.introPill}>
+            <span className={styles.introArrow} aria-hidden="true" />
+            <span className={styles.introHintLead}>{t('introLead')}</span>
+          </span>
           <span className={styles.introHintLine}>{t('introLine')}</span>
-          <span className={styles.introArrow} />
-        </p>
+        </button>
       </div>
       <span className={styles.probe} data-probe aria-hidden="true" />
     </div>

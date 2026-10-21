@@ -390,72 +390,148 @@ html[data-mode='raw'] .mark {
   gap: 2cqw;
 }
 
-.lines {
-  --line: 3.2cqw;
+.reach {
   position: absolute;
   left: 6.5cqw;
-  bottom: 8.8cqw;
+  bottom: 9.4cqw;
   display: flex;
   flex-direction: column;
-  padding-top: 1cqw;
-  border-top: 1px solid var(--edge);
-  font-family: var(--font-mono), monospace;
-  font-size: max(0.625rem, 2.45cqw);
-  letter-spacing: 0.02em;
-  color: var(--face-ink);
+  align-items: flex-start;
+  gap: 0.9cqw;
   animation: rise 900ms var(--ease-plate) 540ms backwards;
 }
 
-.faceLine {
+/* A short rule in the accent, as a seal's ribbon: it says the type below is
+   a different kind of line from the name above. */
+.reachRule {
+  width: 7cqw;
+  height: 1px;
+  margin-bottom: 1.1cqw;
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+.reachRow {
   display: flex;
   align-items: center;
-  gap: 1.8cqw;
-  height: var(--line);
+  gap: 2cqw;
+}
+
+/* The number is the line that matters, set in the display face, its groups
+   held apart a little more than a word space. */
+.reachPhone {
+  position: relative;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 4.6cqw;
+  line-height: 1;
+  letter-spacing: 0.035em;
+  word-spacing: 0.18em;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--face-ink);
   white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.faceLine b {
-  width: 3.4cqw;
-  font-family: var(--font-label), monospace;
-  font-size: max(0.5rem, 2cqw);
-  font-weight: 600;
-  letter-spacing: 0;
+html[data-mode='annotated'] .reachPhone,
+html[data-mode='raw'] .reachPhone {
+  font-size: 3.4cqw;
+  letter-spacing: 0.06em;
+}
+
+/* WhatsApp, struck beside the number as a seal: a ring in the accent with
+   the mark inside, pressed slightly into the stock. */
+.seal {
+  display: grid;
+  place-items: center;
+  width: 5.6cqw;
+  height: 5.6cqw;
+  border-radius: 50%;
   color: var(--accent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 65%, transparent),
+    inset 0 0.25cqw 0.5cqw rgba(0, 0, 0, 0.08);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--d-2),
+    color var(--d-2);
 }
 
-/* Over the printed lines exactly, row by row from the foot. */
-.hits {
+.seal svg {
+  width: 3.4cqw;
+  height: 3.4cqw;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.seal .sealFill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.reachMail {
+  position: relative;
+  font-family: var(--font-label), monospace;
+  font-size: 2.35cqw;
+  letter-spacing: 0.06em;
+  color: var(--face-ink-2);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Pressable, and quietly said so: a hairline draws under the line on hover
+   or press; the seal fills. */
+.reachPhone::after,
+.reachMail::after {
+  content: '';
   position: absolute;
-  inset: 0;
-  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: -0.5cqw;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--d-3) var(--ease-plate);
+}
+
+.reachPhone:hover::after,
+.reachPhone:focus-visible::after,
+.reachPhone:active::after,
+.reachMail:hover::after,
+.reachMail:focus-visible::after,
+.reachMail:active::after {
+  transform: scaleX(1);
+}
+
+.seal:hover,
+.seal:focus-visible,
+.seal:active {
+  color: var(--face);
+  background: var(--accent);
+}
+
+.reachPhone:focus-visible,
+.reachMail:focus-visible,
+.seal:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 0.6cqw;
+}
+
+/* The faces let presses through to the turn button beneath them, except on
+   the lines that are links themselves. */
+.drift {
+  z-index: 1;
   pointer-events: none;
 }
 
-.hit {
-  position: absolute;
-  left: 5cqw;
-  width: 52cqw;
-  height: 3.2cqw;
-  bottom: calc(8.8cqw + var(--row) * 3.2cqw);
-  border-radius: 0.8cqw;
+.reach a {
   pointer-events: auto;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color var(--d-1);
 }
 
-.hit:hover,
-.hit:focus-visible,
-.hit:active {
-  background: var(--accent-soft);
-}
-
-.hit:focus-visible {
-  outline: var(--lw-thin) solid var(--accent);
-}
-
-/* Only while the face is up: a turned card shows the code, not the lines. */
-.object[data-turned] .hits {
-  display: none;
+.object[data-turned] .reach a {
+  pointer-events: none;
 }
 
 .name {
@@ -613,7 +689,7 @@ html[data-mode='raw'] .backTitle {
 .turnButton {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 0;
   /* A tap is a tap at once: no double-tap zoom to wait out. */
   touch-action: manipulation;
   border-radius: 1.6cqw;
@@ -1534,6 +1610,11 @@ html[data-mode='raw'] .enterTitle {
 @media (max-width: 40rem) and (orientation: portrait) and (prefers-reduced-motion: no-preference) {
   .sheet {
     padding-top: 0;
+    /* The card on its side reaches the screen's edges, and as it peeks or
+       leans a corner passes them: clipped at the sheet, the full width of
+       the screen, or the page grows wider by a pixel or two every frame and
+       the whole of it is repainted. Clip, not hidden, so the pin still sticks. */
+    overflow-x: clip;
   }
 
   .intro {
@@ -1629,29 +1710,70 @@ html[data-mode='raw'] .enterTitle {
     pointer-events: none;
   }
 
+  .intro[data-moved] .introHint {
+    pointer-events: none;
+  }
+
   .introHint {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--s-2);
     position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(100svh - 7.5rem - env(safe-area-inset-bottom));
-    z-index: 3;
+    left: 50%;
+    top: var(--hint-top, calc(100svh - 8rem));
+    z-index: 4;
+    padding: var(--s-1);
+    translate: -50% 0;
     font-family: var(--font-label), monospace;
-    font-size: var(--t-micro);
-    font-weight: 600;
-    letter-spacing: var(--track-label-wide);
     text-transform: uppercase;
-    color: var(--ink-3);
-    pointer-events: none;
+    color: var(--ink);
+    -webkit-tap-highlight-color: transparent;
     will-change: opacity;
+  }
+
+  /* A capsule the thumb can find, with a ring that breathes out of it. */
+  .introPill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-2) var(--s-4) var(--s-2) var(--s-3);
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper-raised);
+    box-shadow: var(--shadow-lift);
+    font-size: var(--t-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+  }
+
+  .introPill::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    border: 1px solid var(--ink);
+    animation: halo 2.2s var(--ease-plate) 1.8s infinite;
+  }
+
+  @keyframes halo {
+    from {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(1.35, 1.8);
+      opacity: 0;
+    }
+  }
+
+  .introHint:active .introPill {
+    transform: scale(0.97);
   }
 
   .introHintLead {
     font-size: var(--t-xs);
-    color: var(--ink);
   }
 
   .introHintLine {
@@ -1662,11 +1784,12 @@ html[data-mode='raw'] .enterTitle {
   }
 
   .introArrow {
-    margin-top: var(--s-1);
-    width: 0.6rem;
-    height: 0.6rem;
-    border-right: var(--lw-thick) solid var(--accent);
-    border-bottom: var(--lw-thick) solid var(--accent);
+    flex: 0 0 auto;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-top: -0.3rem;
+    border-right: var(--lw-thick) solid currentColor;
+    border-bottom: var(--lw-thick) solid currentColor;
     rotate: 45deg;
     animation: nudge 1.8s var(--ease-plate) 2s infinite;
   }
@@ -1698,12 +1821,30 @@ html[data-mode='raw'] .enterTitle {
       animation-timeline: scroll(root block);
       animation-fill-mode: both;
       animation-duration: 1ms;
+      /* The entrance delays these had would otherwise apply to the scroll,
+         and they would blink in and out as the reader scrolls past. */
+      animation-delay: 0s;
+      animation-iteration-count: 1;
     }
 
+    /* Until the reader scrolls, the card peeks: it tips a few degrees toward
+       upright and settles back, to show which way the scroll will take it.
+       The peek is the rotate property, which composes with the lean. */
     .intro .pin .stage {
       animation-name: stand;
       animation-timing-function: cubic-bezier(0.25, 0.6, 0.35, 1);
       animation-range: 0 var(--run);
+    }
+
+    /* The peek runs on a wrapper of its own, as a transform: on the stage it
+       would share an element with the scroll-driven turn, and as the rotate
+       property Chrome repaints it rather than compositing it. */
+    .intro .pin .peek {
+      animation: peek 3.4s var(--ease-plate) 2.2s infinite;
+    }
+
+    .intro[data-moved] .pin .peek {
+      animation: none;
     }
 
     .intro .light {
@@ -1725,7 +1866,7 @@ html[data-mode='raw'] .enterTitle {
     .intro .pin > .ways {
       animation-name: rise-in;
       animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
-      animation-range: calc(var(--run) * 0.45) var(--run);
+      animation-range: calc(var(--run) * 0.5) calc(var(--run) * 0.94);
     }
 
     /* The caption turns with the card, so it waits until the card is upright. */
@@ -1750,6 +1891,25 @@ html[data-mode='raw'] .enterTitle {
   to {
     opacity: 0;
   }
+}
+
+@keyframes peek {
+  0%,
+  62%,
+  100% {
+    transform: rotate(0deg);
+  }
+  74% {
+    transform: rotate(-9deg);
+  }
+  86% {
+    transform: rotate(1.5deg);
+  }
+}
+
+.peek {
+  position: relative;
+  will-change: transform;
 }
 
 @keyframes fade-in {
