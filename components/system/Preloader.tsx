@@ -1,5 +1,7 @@
 'use client';
 
+import { Voice } from './Voice';
+
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSheetSet } from './SheetSet';
@@ -402,9 +404,9 @@ export function Preloader() {
 
       {(
         [
-          ['a', 'A', 'Artifact', 'The drawing as issued'],
-          ['b', 'B', 'Annotated', 'Engineering markup exposed'],
-          ['c', 'C', 'Raw', 'Source, stripped of presentation'],
+          ['a', 'A', 'Artifact', 'Plain language'],
+          ['b', 'B', 'Annotated', 'Technical: the engineering shown'],
+          ['c', 'C', 'Raw', 'Fully technical: source and structure'],
         ] as const
       ).map(([band, rev, name, blurb]) => (
         <span key={band} className={styles.band} data-band={band} aria-hidden="true">
@@ -445,18 +447,22 @@ export function Preloader() {
           >
             {loaded ? (
               <>
-                <span>Skip intro · Enter the set</span>
+                <span>
+                  <Voice k="enter" />
+                </span>
                 <kbd aria-hidden="true">Enter ↵</kbd>
               </>
             ) : (
-              <span>Loading the set…</span>
+              <span>
+                <Voice k="loading" />
+              </span>
             )}
           </button>
         </div>
 
         <p className={styles.wayHint} role="status">
           {!loaded ? (
-            <>The way in opens the moment the set has loaded.</>
+            <Voice k="wayWaits" />
           ) : held ? (
             <>
               <b>Holding here.</b> Enter when you are ready, or{' '}

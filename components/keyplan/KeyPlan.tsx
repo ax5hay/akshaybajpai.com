@@ -20,6 +20,9 @@ import { useInstruments } from '@/components/system/InstrumentProvider';
 import { useMode } from '@/components/system/ModeProvider';
 import { useToast } from '@/components/system/ToastProvider';
 import { MODE_INFO, MODES } from '@/lib/mode';
+import { useVoice } from '@/components/system/useVoice';
+import { LEVEL, LEVEL_INFO, plateSubtitle, plateTitle } from '@/lib/voice';
+import { CardFace } from '@/components/plate/CardTicket';
 import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
 import { lastSheetPath, useSheetTransition } from '@/components/system/SheetTransition';
 import { plateForPath } from '@/lib/plates';
@@ -131,6 +134,7 @@ export function KeyPlan({
   const { toast } = useToast();
   const { toggleLens, openIndex, lensOn, inviting } = useInstruments();
   const { mode, cycleMode } = useMode();
+  const t = useVoice();
   const nextMode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
 
   const stageRef = useRef<HTMLDivElement>(null);
@@ -975,9 +979,9 @@ export function KeyPlan({
                 <path d="M7 26h34" className={styles.northFaint} />
               </svg>
               <span className={styles.northText}>
-                <span>Key plan</span>
-                <span>General arrangement</span>
-                <span>Sheet 1 of {PLATES.length}</span>
+                <span>{t('home')}</span>
+                <span>{t('homeSub')}</span>
+                <span>{t('sheetOf')} {PLATES.length}</span>
               </span>
             </div>
             )}
@@ -990,12 +994,24 @@ export function KeyPlan({
                 </span>
               </h1>
               <p className={styles.headlineNote}>
-                This site is a drawing set. Every section is a numbered sheet on the plan.{' '}
+                {t('planNote')}{' '}
                 <span className={styles.hintKeys}>
                   Open one, or press <kbd>/</kbd> for the index.
                 </span>
-                <span className={styles.hintTouch}>Open one, or use the sheet index.</span>
+                <span className={styles.hintTouch}>Open one, or use the search.</span>
               </p>
+
+              {/* The calling card: the one sheet that is not on the plan, so
+                  it is offered here, on the first sheet, to anyone who wants
+                  the contact rather than the reading. */}
+              <Link href="/card/" className={styles.cardEntry} data-plan-card>
+                <CardFace className={styles.cardEntryFace} />
+                <span className={styles.cardEntryText}>
+                  <span className={styles.cardEntryKicker}>C-701 · {t('callingCard')}</span>
+                  <span className={styles.cardEntryTitle}>{t('cardTicketTitle')}</span>
+                  <span className={styles.cardEntryCta}>{t('openCard')} →</span>
+                </span>
+              </Link>
 
               {/* Raw: what the plan is generated from. */}
               <p className={styles.provenance}>
@@ -1015,13 +1031,13 @@ export function KeyPlan({
                 does one job: tap a sheet and the pile below turns to it. */}
             <div className={styles.mini}>
               <span className={styles.miniLabel}>
-                <span>Key plan</span>
+                <span>{t('home')}</span>
                 <button
                   type="button"
                   className={styles.miniTour}
                   onClick={() => setTour(tour === null ? 0 : null)}
                 >
-                  {tour === null ? '▶ Tour the set' : '■ Stop the tour'}
+                  {tour === null ? t('tour') : t('tourStop')}
                 </button>
               </span>
               <svg
@@ -1071,24 +1087,24 @@ export function KeyPlan({
               </svg>
               <span className={styles.miniCue}>
                 {route.length > 0
-                  ? `${route.length} of ${sheetCount} sheets read`
-                  : `${plates.length} sheets, stacked below`}
+                  ? `${route.length} of ${sheetCount} ${t('pages')} ${t('read')}`
+                  : `${plates.length} ${t('stacked')}`}
                 <span className={styles.miniArrow} />
               </span>
             </div>
 
             {/* Struck by hand, so a degree or two off square. */}
             <div className={styles.stamp} aria-hidden="true">
-              <span>Issued for review</span>
+              <span>{t('issuedForReview')}</span>
               <span>{ISSUE_STAMP}</span>
             </div>
 
             {/* The reader's own entry in the title block. */}
             {route.length > 0 && (
               <div className={styles.routeNote}>
-                <span className={styles.revTitle}>Your route</span>
+                <span className={styles.revTitle}>{t('yourRoute')}</span>
                 <span className={styles.routeCount}>
-                  <b>{route.length}</b> of {sheetCount} sheets read
+                  <b>{route.length}</b> of {sheetCount} {t('pages')} {t('read')}
                 </span>
                 <span className={styles.routeStations} aria-hidden="true">
                   {stations.map((p) => p.sheet).join(' → ')}
@@ -1116,17 +1132,17 @@ export function KeyPlan({
 
                 {nextUnread ? (
                   <Link href={nextUnread.href} className={styles.routeNext}>
-                    <span>Next unread</span>
-                    <b>{nextUnread.sheet}</b> {nextUnread.title} →
+                    <span>{t('nextUnread')}</span>
+                    <b>{nextUnread.sheet}</b> {plateTitle(nextUnread, t.level)} →
                   </Link>
                 ) : (
                   <span className={styles.routeNext} data-done>
-                    <span>Set complete</span> Every sheet read.
+                    <span>{t('allRead')}</span>
                   </span>
                 )}
                 <span className={styles.routeActions}>
                   <Link href="/contact/" className={styles.routeLink}>
-                    Enclose it in a message →
+                    {t('encloseIt')}
                   </Link>
                   <button type="button" className={styles.routeClear} onClick={clearRoute}>
                     Clear
@@ -1204,7 +1220,7 @@ export function KeyPlan({
                 router.prefetch(plate.href);
                 onPlateFocus(plate);
               }}
-              aria-label={`${plate.sheet}. ${plate.title}. ${plate.subtitle}`}
+              aria-label={`${plate.sheet}. ${plateTitle(plate, t.level)}. ${plateSubtitle(plate, t.level)}`}
             >
               <span className={styles.plateTag}>{plate.sheet}</span>
 
@@ -1216,7 +1232,7 @@ export function KeyPlan({
               )}
 
               <span className={styles.plateHead}>
-                <span className={styles.plateTitle}>{plate.title}</span>
+                <span className={styles.plateTitle}>{plateTitle(plate, t.level)}</span>
                 <span
                   className={
                     plate.id === 'contact'
@@ -1224,7 +1240,7 @@ export function KeyPlan({
                       : styles.plateSubtitle
                   }
                 >
-                  {plate.subtitle}
+                  {plateSubtitle(plate, t.level)}
                 </span>
               </span>
 
@@ -1298,7 +1314,7 @@ export function KeyPlan({
                 <span>Rev {plate.revision}</span>
                 <span>{plate.scale}</span>
                 <span className={styles.plateOpen}>
-                  {plate.id === 'contact' ? 'Write to me →' : 'Open sheet →'}
+                  {plate.id === 'contact' ? t('write') : t('open')}
                 </span>
               </span>
 
@@ -1307,14 +1323,14 @@ export function KeyPlan({
           ))}
 
           <div className={styles.notes} style={place(KEY_PLAN_FURNITURE.notes)}>
-            <span className={styles.furnitureTitle}>General Notes</span>
+            <span className={styles.furnitureTitle}>{t('notes')}</span>
             <ol className={styles.notesList}>
               {GENERAL_NOTES.map((note, i) => (
                 <li key={i} className={styles.note}>
                   <span className={styles.noteNo} aria-hidden="true">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  {note}
+                  {note[t.level]}
                 </li>
               ))}
             </ol>
@@ -1329,7 +1345,7 @@ export function KeyPlan({
             style={place(KEY_PLAN_FURNITURE.instruments)}
             data-inviting={inviting || undefined}
           >
-            <span className={styles.furnitureTitle}>Instruments</span>
+            <span className={styles.furnitureTitle}>{t('instruments')}</span>
 
             <button
               type="button"
@@ -1343,10 +1359,8 @@ export function KeyPlan({
                 <path d="M4.2 6.5h4.6M6.5 4.2v4.6" stroke="currentColor" strokeWidth="0.8" />
               </svg>
               <span className={styles.instrText}>
-                <span className={styles.instrName}>Inspection lens</span>
-                <span className={styles.instrNote}>
-                  {lensOn ? 'Deployed. Drag it over the sheet.' : 'X-ray anything it covers'}
-                </span>
+                <span className={styles.instrName}>{t('lensTitle')}</span>
+                <span className={styles.instrNote}>{lensOn ? t('lensOn') : t('lensNote')}</span>
               </span>
               <kbd className={styles.instrKey}>L</kbd>
             </button>
@@ -1360,8 +1374,8 @@ export function KeyPlan({
                 />
               </svg>
               <span className={styles.instrText}>
-                <span className={styles.instrName}>Sheet index</span>
-                <span className={styles.instrNote}>Jump to any sheet in the set</span>
+                <span className={styles.instrName}>{t('indexTitle')}</span>
+                <span className={styles.instrNote}>{t('indexNote')}</span>
               </span>
               <kbd className={styles.instrKey}>/</kbd>
             </button>
@@ -1372,47 +1386,48 @@ export function KeyPlan({
                 <path d="M8 1.8a6.2 6.2 0 0 0 0 12.4z" fill="currentColor" />
               </svg>
               <span className={styles.instrText}>
-                <span className={styles.instrName}>Drawing mode</span>
+                <span className={styles.instrName}>{t('modeTitle')}</span>
                 <span className={styles.instrNote}>
-                  Rev {MODE_INFO[mode].rev}, {MODE_INFO[mode].label.toLowerCase()}. Next is{' '}
-                  {MODE_INFO[nextMode].label.toLowerCase()}.
+                  {t.level === 'a'
+                    ? `Now: ${LEVEL_INFO[LEVEL[mode]].name.toLowerCase()}. Next: ${LEVEL_INFO[LEVEL[nextMode]].name.toLowerCase()}.`
+                    : `Rev ${MODE_INFO[mode].rev}, ${MODE_INFO[mode].label.toLowerCase()}. Next is ${MODE_INFO[nextMode].label.toLowerCase()}.`}
                 </span>
               </span>
               <kbd className={styles.instrKey}>D</kbd>
             </button>
 
             <span className={styles.instrFoot}>
-              Drag to pan · Scroll to zoom · Click any sheet to open it
+              {t('planFoot')}
             </span>
           </div>
           )}
 
           {wide && (
           <div className={styles.legend} style={place(KEY_PLAN_FURNITURE.legend)} aria-hidden="true">
-            <span className={styles.furnitureTitle}>Legend</span>
+            <span className={styles.furnitureTitle}>{t('legend')}</span>
             <span className={styles.legendRow}>
               <span className={styles.legendSwatch} data-kind="sheet" />
-              Sheet boundary
+              {t('legendSheet')}
             </span>
             <span className={styles.legendRow}>
               <span className={styles.legendSwatch} data-kind="leader" />
-              Cross-reference
+              {t('legendLeader')}
             </span>
             <span className={styles.legendRow}>
               <span className={styles.legendSwatch} data-kind="rev" />
-              Current revision
+              {t('legendRev')}
             </span>
             <span className={styles.legendRow} data-layer="markup">
               <span className={styles.legendSwatch} data-kind="dim" />
-              Dimension, plan units
+              {t('legendDim')}
             </span>
             <span className={styles.legendRow} data-layer="markup">
               <span className={styles.legendSwatch} data-kind="cloud" />
-              Revision cloud
+              {t('legendCloud')}
             </span>
             <span className={styles.legendRow} data-layer="record">
               <span className={styles.legendSwatch} data-kind="record" />
-              Sheet record, as authored
+              {t('legendRecord')}
             </span>
             <span className={styles.legendScale}>
               <span className={styles.scaleBar} />
@@ -1457,8 +1472,8 @@ export function KeyPlan({
           className={styles.controlHelp}
           onClick={() =>
             toast({
-              kind: 'Reading the plan',
-              message: 'Drag to pan, scroll to zoom, click any sheet to open it.',
+              kind: t('readingPlan'),
+              message: t('readingPlanMsg'),
               detail: '/ opens the index · D changes drawing mode',
               tone: 'note',
             })
@@ -1482,7 +1497,7 @@ export function KeyPlan({
           </span>
           <span className={styles.tourText}>
             <span className={styles.tourTitle}>
-              <b>{plates[tour].sheet}</b> {plates[tour].title}
+              <b>{plates[tour].sheet}</b> {plateTitle(plates[tour], t.level)}
             </span>
             <span className={styles.tourSub}>{plates[tour].subtitle}</span>
           </span>

@@ -1,5 +1,7 @@
 'use client';
 
+import { useVoice } from '@/components/system/useVoice';
+
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/kit/Controls';
 import { useToast } from '@/components/system/ToastProvider';
@@ -39,6 +41,7 @@ const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).le
  * tab, and nothing is sent until the reader sends it.
  */
 export function CorrespondenceForm() {
+  const t = useVoice();
   const sheets = useSheetSet();
   const [status, setStatus] = useState<Status>('idle');
   // The sheets this reader has been through, by number, in the order read.
@@ -115,7 +118,7 @@ export function CorrespondenceForm() {
       setStatus('sent');
       setRestored(false);
       toast({
-        kind: 'Transmittal logged',
+        kind: t('logged'),
         message: 'Your message is on its way.',
         detail: 'I read everything and reply to most things',
         tone: 'revision',
@@ -123,7 +126,7 @@ export function CorrespondenceForm() {
     } catch {
       setStatus('failed');
       toast({
-        kind: 'Transmittal failed',
+        kind: t('failed'),
         message: 'The form could not reach the server.',
         detail: 'Email hello@akshaybajpai.com directly',
         tone: 'issue',
@@ -138,27 +141,27 @@ export function CorrespondenceForm() {
     return (
       <section className={`${styles.form} ${styles.receipt} reversed`} aria-label="Transmittal sent">
         <div className={styles.head}>
-          <span className={styles.headTitle}>Transmittal</span>
+          <span className={styles.headTitle}>{t('transmittal')}</span>
           <span className={styles.headNo}>C-700 / 01 · {today()}</span>
         </div>
         <div className={styles.receiptBody} role="status">
           <span className={styles.stamp} aria-hidden="true">
-            <span>Transmitted</span>
+            <span>{t('sent')}</span>
             <span>{today()}</span>
           </span>
-          <p className={styles.receiptTitle}>It has gone.</p>
+          <p className={styles.receiptTitle}>{t('itHasGone')}</p>
           <dl className={styles.receiptFacts}>
             <div>
-              <dt>From</dt>
+              <dt>{t('from')}</dt>
               <dd>{email}</dd>
             </div>
             <div>
-              <dt>Regarding</dt>
+              <dt>{t('regarding')}</dt>
               <dd>{subject}</dd>
             </div>
             {enclose && readSheets.length > 0 && (
               <div>
-                <dt>Enclosed</dt>
+                <dt>{t('enclosed')}</dt>
                 <dd>{readSheets.map((s) => s.sheet).join(' → ')}</dd>
               </div>
             )}
@@ -198,7 +201,7 @@ export function CorrespondenceForm() {
       }}
     >
       <div className={styles.head}>
-        <span className={styles.headTitle}>Transmittal</span>
+        <span className={styles.headTitle}>{t('transmittal')}</span>
         <span className={styles.headNo} suppressHydrationWarning>
           C-700 / 01 · {today()}
         </span>
@@ -207,7 +210,7 @@ export function CorrespondenceForm() {
       <div className={styles.field}>
         <label htmlFor="email">
           <span>
-            <span className={styles.no}>01</span> From
+            <span className={styles.no}>01</span> {t('from')}
           </span>
         </label>
         <input
@@ -226,7 +229,7 @@ export function CorrespondenceForm() {
 
       <div className={styles.field}>
         <span className={styles.legend} id="regarding">
-          <span className={styles.no}>02</span> Regarding
+          <span className={styles.no}>02</span> {t('regarding')}
         </span>
         <div className={styles.subjects} role="radiogroup" aria-labelledby="regarding">
           {SUBJECTS.map((s) => (
@@ -249,7 +252,7 @@ export function CorrespondenceForm() {
       <div className={styles.field}>
         <label htmlFor="message">
           <span>
-            <span className={styles.no}>03</span> Message
+            <span className={styles.no}>03</span> {t('message')}
           </span>
           <span className={styles.count} aria-hidden="true">
             {restored && words > 0 ? 'Draft kept · ' : ''}
@@ -271,7 +274,7 @@ export function CorrespondenceForm() {
       {readSheets.length > 0 && (
         <div className={styles.field} data-enclosure>
           <span className={styles.legend}>
-            <span className={styles.no}>04</span> Enclosure
+            <span className={styles.no}>04</span> {t('enclosure')}
           </span>
           <div>
           <label className={styles.subject} data-on={enclose || undefined}>
@@ -282,8 +285,7 @@ export function CorrespondenceForm() {
               disabled={sending}
             />
             <span className={styles.tick} aria-hidden="true" />
-            Enclose the {readSheets.length === 1 ? 'sheet' : `${readSheets.length} sheets`} I have
-            read
+            {t('enclose')} ({readSheets.length})
           </label>
           </div>
           <p className={styles.route}>
@@ -294,8 +296,11 @@ export function CorrespondenceForm() {
             ))}
           </p>
           <p className={styles.routeNote}>
-            Your route through the set, kept in this browser only. Tick the box and it goes with
-            the message, so I know what you were looking at.
+            {t({
+              a: 'The pages you opened, remembered in this browser only. Tick the box and the list goes with your message, so I know what you were looking at.',
+              b: 'Your route through the set, kept in this browser only. Tick the box and it goes with the message, so I know what you were looking at.',
+              c: 'sessionStorage route, never sent unless ticked. Goes as a hidden field: sheet id and title, in order.',
+            })}
           </p>
           {enclose && (
             <input
@@ -309,7 +314,7 @@ export function CorrespondenceForm() {
 
       <div className={styles.actions}>
         <Button type="submit" variant="solid" disabled={sending}>
-          {sending ? 'Sending…' : 'Send transmittal'}
+          {sending ? 'Sending…' : t('send')}
         </Button>
         <span className={styles.shortcut} aria-hidden="true">
           <kbd>{mac ? '⌘' : 'Ctrl'}</kbd>

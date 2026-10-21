@@ -5,6 +5,8 @@ import { buildMetadata } from '@/lib/metadata';
 import { CARD, VCARD_PATH, telHref, whatsappHref, phoneDigits } from '@/lib/card';
 import { cardCode } from '@/lib/card-art';
 import { CardFlag, CardObject, CopyLine, Reissue, SaveContact, ShareCard, ShowCode } from './CardActions';
+import { Voice } from '@/components/system/Voice';
+import { SetPile } from './SetPile';
 import styles from './card.module.css';
 
 const SHEET = 'C-701';
@@ -81,7 +83,9 @@ function Front() {
   return (
     <>
       <span className={styles.ink} aria-hidden="true" />
-      <span className={styles.foil} aria-hidden="true" />
+      <span className={styles.foil} aria-hidden="true">
+        <span className={styles.foilSheen} />
+      </span>
       <span className={styles.glare} aria-hidden="true" />
 
       {/* The same mark that is on the card in their hand, at the heart of the rosette. */}
@@ -105,6 +109,7 @@ function Front() {
             <span key={part}>{part}</span>
           ))}
         </span>
+        <span className={styles.site}>{c.site.replace('https://', '')}</span>
       </span>
 
       {/* Microprint, as on any document worth forging: legible under a loupe. */}
@@ -190,12 +195,14 @@ export default function CardPage() {
 
       <p className={styles.strip}>
         <span className={styles.stripTag}>{SHEET}</span>
-        <span className={styles.stripName}>Calling card</span>
-        <span className={styles.stripRule} aria-hidden="true" />
-        <span className={styles.stripLive}>
-          <span className={styles.pulse} aria-hidden="true" />
-          {c.city}
+        <span className={styles.stripName}>
+          <Voice k="callingCard" />
         </span>
+        <span className={styles.stripRule} aria-hidden="true" />
+        <a href="/" className={styles.stripLive}>
+          <span className={styles.pulse} aria-hidden="true" />
+          {c.site.replace('https://www.', '')}
+        </a>
       </p>
 
       <CardObject front={<Front />} back={<Back url={url} />} />
@@ -211,7 +218,9 @@ export default function CardPage() {
         </span>
         <span className={styles.saveText}>
           <span className={styles.saveLabel}>Save contact</span>
-          <span className={styles.saveNote}>Saves straight to your contacts</span>
+          <span className={styles.saveNote}>
+            <Voice k="saveNote" />
+          </span>
         </span>
         <span className={styles.saveArrow} aria-hidden="true" />
       </SaveContact>
@@ -242,10 +251,53 @@ export default function CardPage() {
         )}
       </nav>
 
+      {/* ---- The way into the set: the cover, in miniature -------------------
+          The set opens on three states of one drawing laid side by side:
+          paper, cyanotype, source. Here they are again, as the door. */}
+      <a href="/" className={styles.enter} data-rise="4">
+        <span className={styles.bands} aria-hidden="true">
+          {(['a', 'b', 'c'] as const).map((band) => (
+            <span key={band} className={styles.band} data-band={band}>
+              <span className={styles.bandTitle}>
+                Architecture
+                <br />
+                of Intelligence
+              </span>
+            </span>
+          ))}
+          <span className={styles.bandRevs}>
+            <span>Rev A</span>
+            <span>Rev B</span>
+            <span>Rev C</span>
+          </span>
+        </span>
+        <span className={styles.enterFoot}>
+          <span className={styles.enterText}>
+            <span className={styles.enterKicker}>
+              <Voice k="enterKicker" />
+            </span>
+            <span className={styles.enterTitle}>
+              <Voice k="enterTitle" />
+            </span>
+            <span className={styles.enterNote}>
+              <Voice k="enterNote" />
+            </span>
+          </span>
+          <span className={styles.enterArrow} aria-hidden="true" />
+        </span>
+      </a>
+
+      {/* ---- The site, rising under the card ------------------------------- */}
+      <div className={styles.set} data-rise="5">
+        <SetPile />
+      </div>
+
       {/* ---- The record ---------------------------------------------------- */}
-      <section className={styles.record} aria-labelledby="card-record" data-rise="4">
+      <section className={styles.record} aria-labelledby="card-record" data-rise="6">
         <h2 id="card-record" className={styles.recordHead}>
-          <span>Schedule of lines</span>
+          <span>
+            <Voice k="linesTitle" />
+          </span>
           <span className={styles.recordCount}>{String(lines.length).padStart(2, '0')}</span>
         </h2>
         <ul>
@@ -282,44 +334,14 @@ export default function CardPage() {
         </ul>
       </section>
 
-      {/* ---- The way into the set: the cover, in miniature -------------------
-          The set opens on three states of one drawing laid side by side:
-          paper, cyanotype, source. Here they are again, as the door. */}
-      <a href="/" className={styles.enter} data-rise="5">
-        <span className={styles.bands} aria-hidden="true">
-          {(['a', 'b', 'c'] as const).map((band) => (
-            <span key={band} className={styles.band} data-band={band}>
-              <span className={styles.bandTitle}>
-                Architecture
-                <br />
-                of Intelligence
-              </span>
-            </span>
-          ))}
-          <span className={styles.bandRevs}>
-            <span>Rev A</span>
-            <span>Rev B</span>
-            <span>Rev C</span>
-          </span>
-        </span>
-        <span className={styles.enterFoot}>
-          <span className={styles.enterText}>
-            <span className={styles.enterKicker}>G-000 · The drawing set</span>
-            <span className={styles.enterTitle}>Open the full set</span>
-            <span className={styles.enterNote}>Case studies, research and essays, issued as drawings.</span>
-          </span>
-          <span className={styles.enterArrow} aria-hidden="true" />
-        </span>
-      </a>
-
-      <footer className={styles.foot} data-rise="6">
+      <footer className={styles.foot} data-rise="7">
         <div className={styles.footActions}>
           <ShareCard url={url} title={c.name} text={`${c.name} · ${c.role}`} className={styles.footButton} />
           <ShowCode className={styles.footButton}>
             <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
               <path d="M2.5 2.5h4v4h-4zM9.5 2.5h4v4h-4zM2.5 9.5h4v4h-4zM9.5 9.5h1.5v1.5M12.5 12.5h1M9.5 13.5h1" fill="none" stroke="currentColor" strokeWidth="1.3" />
             </svg>
-            Show code
+            <Voice k="showCode" />
           </ShowCode>
         </div>
         <Reissue />

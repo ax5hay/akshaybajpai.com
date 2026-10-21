@@ -337,6 +337,7 @@ what colour they say it in.**
 | | `REV A` · Artifact | `REV B` · Annotated | `REV C` · Raw |
 |:--|:--|:--|:--|
 | **Reads as** | The drawing as issued | The same drawing with the markup pen on | The drawing stripped to its source |
+| **Speaks in** | Plain language: a page is a page, search is search | The set's own terms: sheets, revisions, the index | Fully technical: routes, records, the DOM under the glass |
 | **Stock** | Warm paper on a kraft board | Cyanotype | Unlit black |
 | **Display face** | Instrument Serif | IBM Plex Mono | IBM Plex Mono |
 | **On the key plan** | Figures and contents | Chain dimensions, revision cloud, placement notes | The record each sheet was drawn from |
@@ -348,6 +349,29 @@ what colour they say it in.**
 <td width="50%"><img src="docs/media/sheet-raw.jpg" alt="A sheet in raw mode with its record and source" /></td>
 </tr>
 </table>
+
+### Three levels of language
+
+The modes also differ in what they *say*. Everything the set says of itself, its labels,
+its notes, its instruments, the names of its sections, is written at three levels in
+`lib/voice.ts`: plain for anyone who was handed the address, the drawing set's own terms
+for a reader comfortable with them, and fully technical on the source. None of the three
+is a joke; each is meant to be read. The content itself, the case studies and essays, is
+written once.
+
+<table>
+<tr>
+<td width="33%"><img src="docs/media/voice-a.jpg" alt="The key plan at Rev A: About me, Case studies, Contact, in plain language" /></td>
+<td width="33%"><img src="docs/media/voice-b.jpg" alt="The key plan at Rev B: The Architect, Works, Correspondence, in the set's terms" /></td>
+<td width="33%"><img src="docs/media/voice-c.jpg" alt="The key plan at Rev C: Profile, Works, Correspondence, with each route's record" /></td>
+</tr>
+</table>
+
+Server components render all three (`<Voice k="…" />` emits three spans; a rule on
+`html[data-mode]` shows one), so the level resolves before first paint with nothing to
+hydrate. Client components ask `useVoice()` for the phrase at the current level. A plate
+carries its plain and technical title on the registry (`voice: { a, c }`); the authored
+title is Rev B.
 
 ### Why it is CSS-only
 
@@ -527,6 +551,9 @@ same registry is drawn as something else.
 | **The dock** | Below `40rem` the instruments leave the rail for a bar at the foot, where a thumb is: sheet number and title block, index, lens, and the `A · B · C` mode switch |
 | **Reading line** | Along the top of the dock a dimension line fills as the sheet is read, driven by a CSS scroll timeline |
 
+On a phone the title sheet also carries the invitation to the calling card (C-704): a
+stamp-sized card under the name, for anyone who opened the site and wants the contact.
+
 Inside the sheets, the phone gets its own handling too:
 
 - **The section strip follows the reader.** With no margin to key sections in,
@@ -553,6 +580,12 @@ cover's source print are printed on `#000` with no texture, and the name on the 
 print is set solid instead of as scanlines clipped to the glyphs. Wide screens keep the
 near-black, where it reads as ink and never moves. See *True black on a phone* in
 `app/globals.css` and the matching block in `Preloader.module.css`.
+
+**And no grain on a phone.** The paper grain is a fixed layer with a blend mode, and a
+fixed, blended layer over content that scrolls is the one thing Mobile Safari cannot
+composite: it re-resolves the blend as the page moves, and on a dark surface that shows as
+a flicker. Forcing compositing layers under it only moved the flicker to the tiles. So on
+a touch screen there is no grain at all; the grid and the paper tone carry the texture.
 
 > [!WARNING]
 > Nothing may overhang the side of the screen, even for one frame of an animation. On a
@@ -1234,9 +1267,10 @@ meeting. The errand is short: keep the number, or use it. The code resolves to
 | **The other ways in** | Call, WhatsApp and Email as tiles a thumb can find; with no number set, Email and LinkedIn |
 | **Schedule of lines** | Phone, email, LinkedIn, GitHub, X and the site, each a full-width row with its own copy or open control. A copy is confirmed on the control itself |
 | **The way in** | The cover in miniature: paper, cyanotype and source cut on the same slant, with the vermilion and amber edges. It opens the set as a full navigation, so it arrives on its cover |
+| **The site, rising** | The card is landscape and the site is portrait, so the join is made the way the phone's home makes it: the seven section sheets as a pile under the door. Scroll and they stack, each a little lower than the last; tap any to open it. On a desk they list beside the card |
 | **The foot** | Share (the system share sheet, or a copied link), Show code, and the A · B · C switch that re-issues the card in any of the three states |
 | **Received** | Saving the contact stamps the card received, with the date, and the card gives under the stamp; turning it and saving each tick through the hand where the phone has haptics |
-| **Ways to it** | `components/plate/CardTicket.tsx`, the card in miniature, sits among the direct lines on the Correspondence sheet; every sheet's title block carries *The calling card · C-701* |
+| **Ways to it** | On the home sheet, a stamp-sized card under the name, on a phone and a desk alike; `components/plate/CardTicket.tsx`, the card in miniature, among the direct lines on the Correspondence sheet; and a line in every sheet's title block |
 
 <table>
 <tr>
@@ -1277,22 +1311,27 @@ in the room. A scan line passes over it as it comes round.
 <tr>
 <td width="50%" valign="top">
 
-<img src="docs/media/card-desktop.jpg" alt="The card on a wide screen: the card held still on the left, the lines beside it" />
+<img src="docs/media/card-pile.jpg" alt="Under the card, the site's seven sheets stacking as the page scrolls" />
 
-**On a desk.** The card sits on the left and leans toward the pointer; the lines are set
-beside it.
+**The site, under the card.** Scroll past the door and the seven sheets pile up, as they do
+on the phone's own home; each is the page it names.
 
 </td>
 <td width="50%" valign="top">
 
-<img src="docs/media/card-ticket.jpg" alt="The Correspondence sheet with the calling card in miniature among the direct lines" />
+<img src="docs/media/card-invite.jpg" alt="The home sheet on a phone with the card offered under the name" />
 
-**From inside the set.** The card in miniature on the Correspondence sheet, and a line in
-every sheet's title block, for a reader who is already in the set and wants the card.
+**The invitation.** Someone who opens the site rather than scanning the card gets the
+normal site, with the card offered under the name on the first sheet.
 
 </td>
 </tr>
 </table>
+
+**Cost.** The card's only continuous motion is on the compositor: the drift and the foil's
+sheen are transforms, the masks and gradients are still until a pointer or a tilt moves
+them. On a throttled phone profile the sheet idles at about a fifth of the CPU its first
+draft did, and the home sheet is unchanged.
 
 The rosette is drawn in `lib/card-art.ts` and issued at build time as `/card/rosette.svg`,
 which the card uses as a mask twice: once in the mode's ink, once in foil. The QR code is

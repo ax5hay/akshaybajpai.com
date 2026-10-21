@@ -1,5 +1,7 @@
 'use client';
 
+import { useVoice } from '@/components/system/useVoice';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { IndexEntry } from '@/components/sheet/SheetIndex';
@@ -17,6 +19,7 @@ const words = (text: string) =>
  * mistyped or renamed link usually still names what it was after.
  */
 export function NearestSheets({ entries }: { entries: IndexEntry[] }) {
+  const t = useVoice();
   const [path, setPath] = useState('');
   const [near, setNear] = useState<IndexEntry[]>([]);
 
@@ -47,13 +50,13 @@ export function NearestSheets({ entries }: { entries: IndexEntry[] }) {
   return (
     <section className={styles.near} aria-label="Nearest issued sheets">
       <p className={styles.asked}>
-        <span>Reference followed</span>
+        <span>{t('refFollowed')}</span>
         <code>{path}</code>
       </p>
 
       {near.length > 0 ? (
         <>
-          <p className={styles.label}>Nearest issued sheets</p>
+          <p className={styles.label}>{t('nearest')}</p>
           <ul className={styles.list}>
             {near.map((entry) => (
               <li key={entry.href}>

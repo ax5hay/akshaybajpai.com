@@ -5,6 +5,8 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { PlateFigure, figureCaption, hasFigure } from '@/components/figures/PlateFigure';
 import type { PlacedPlate } from '@/lib/plates';
+import { useVoice } from '@/components/system/useVoice';
+import { plateSubtitle, plateTitle } from '@/lib/voice';
 import type { KeyPlanContents } from './KeyPlan';
 import styles from './Reel.module.css';
 
@@ -33,6 +35,7 @@ export function Reel({
   read: Set<string>;
   onClose: () => void;
 }) {
+  const t = useVoice();
   const [at, setAt] = useState(0);
   const [held, setHeld] = useState(false);
   const press = useRef({ x: 0, y: 0, t: 0, moved: false });
@@ -118,7 +121,7 @@ export function Reel({
       className={styles.reel}
       role="dialog"
       aria-modal="true"
-      aria-label={`Tour, sheet ${at + 1} of ${plates.length}: ${plate.title}`}
+      aria-label={`Tour, ${t('page')} ${at + 1} of ${plates.length}: ${plateTitle(plate, t.level)}`}
       data-held={held || undefined}
       data-lens-skip
       onPointerDown={onPointerDown}
@@ -150,8 +153,8 @@ export function Reel({
         className={`${styles.card} composited ${plate.id === 'contact' ? 'reversed' : ''}`}
       >
         <span className={styles.tag}>{plate.sheet}</span>
-        <h2 className={styles.title}>{plate.title}</h2>
-        <p className={styles.subtitle}>{plate.subtitle}</p>
+        <h2 className={styles.title}>{plateTitle(plate, t.level)}</h2>
+        <p className={styles.subtitle}>{plateSubtitle(plate, t.level)}</p>
 
         {hasFigure(plate.id) && (
           <div className={styles.figure}>
@@ -171,16 +174,16 @@ export function Reel({
 
         <div className={styles.foot}>
           <span className={styles.read}>
-            {done > 0 ? `${done} of ${items.filter((i) => i.href).length + 1} read` : `Rev ${plate.revision} · ${plate.scale}`}
+            {done > 0 ? `${done} of ${items.filter((i) => i.href).length + 1} ${t('read')}` : `Rev ${plate.revision} · ${plate.scale}`}
           </span>
           <Link href={plate.href} className={styles.open} onClick={onClose}>
-            {last ? 'Write to me →' : 'Open sheet →'}
+            {last ? t('write') : t('open')}
           </Link>
         </div>
       </div>
 
       <p className={styles.help} aria-hidden="true">
-        {held ? 'Holding' : 'Tap to turn · hold to pause · swipe down to leave'}
+        {held ? 'Holding' : t('reelHelp')}
       </p>
     </div>,
     document.body

@@ -4,9 +4,11 @@ import { useRef } from 'react';
 import { useMode } from './ModeProvider';
 import { MODES, MODE_INFO, type Mode } from '@/lib/mode';
 import styles from './ModeSelector.module.css';
+import { useVoice } from './useVoice';
 
 export function ModeSelector() {
   const { mode, setMode } = useMode();
+  const t = useVoice();
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const index = Math.max(0, MODES.indexOf(mode));
 
@@ -33,13 +35,13 @@ export function ModeSelector() {
   return (
     <div className={styles.housing}>
       <span className={styles.caption} aria-hidden="true">
-        Mode
+        {t('modeCaption')}
       </span>
 
       <div
         className={styles.track}
         role="radiogroup"
-        aria-label="Drawing mode"
+        aria-label={t('modeGroup')}
         onKeyDown={onKeyDown}
         data-position={index}
       >

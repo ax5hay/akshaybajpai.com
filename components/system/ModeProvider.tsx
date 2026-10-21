@@ -1,5 +1,7 @@
 'use client';
 
+import { LEVEL, V, say } from '@/lib/voice';
+
 import {
   createContext,
   useCallback,
@@ -107,7 +109,7 @@ export function ModeProvider({ children }: { children: ReactNode }) {
 
       setModeState(next);
       toast({
-        kind: `Re-issued · Rev ${MODE_INFO[next].rev}`,
+        kind: `${say(LEVEL[next], V.reissued)} · Rev ${MODE_INFO[next].rev}`,
         message: MODE_INFO[next].label,
         detail: MODE_INFO[next].blurb,
         tone: 'issue',

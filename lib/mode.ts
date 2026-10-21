@@ -11,9 +11,9 @@ export type Mode = 'artifact' | 'annotated' | 'raw';
 export const MODES: Mode[] = ['artifact', 'annotated', 'raw'];
 
 export const MODE_INFO: Record<Mode, { label: string; rev: string; blurb: string }> = {
-  artifact: { label: 'Artifact', rev: 'A', blurb: 'The drawing as issued' },
-  annotated: { label: 'Annotated', rev: 'B', blurb: 'Engineering markup exposed' },
-  raw: { label: 'Raw', rev: 'C', blurb: 'Source, stripped of presentation' },
+  artifact: { label: 'Artifact', rev: 'A', blurb: 'Plain language, the finished page' },
+  annotated: { label: 'Annotated', rev: 'B', blurb: 'Technical: the engineering shown' },
+  raw: { label: 'Raw', rev: 'C', blurb: 'Fully technical: source and structure' },
 };
 
 export const MODE_STORAGE_KEY = 'plate.mode';

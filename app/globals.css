@@ -376,6 +376,24 @@ html[data-grain='off'] body::before {
 }
 
 /* =============================================================================
+   VOICE. Every phrase the set says of itself is written at three levels, one
+   per mode, and rendered three times; the mode on the root shows one. Plain
+   language on the artifact, the set's own terms when annotated, the fully
+   technical form on the source. See lib/voice.ts.
+   ========================================================================== */
+
+[data-v] {
+  display: none;
+}
+
+html:not([data-mode]) [data-v='a'],
+html[data-mode='artifact'] [data-v='a'],
+html[data-mode='annotated'] [data-v='b'],
+html[data-mode='raw'] [data-v='c'] {
+  display: contents;
+}
+
+/* =============================================================================
    TYPOGRAPHY PRIMITIVES
    ========================================================================== */
 
@@ -1026,34 +1044,17 @@ html[data-hidden] *::after {
 }
 
 /* =============================================================================
-   DARK SURFACES ON A PHONE. Mobile Safari renders a blended, fixed layer (the
-   grain) over content that animates underneath by re-rasterising the whole
-   stack every frame, and on a dark surface that shows as a flicker. Each dark
-   surface is given a compositing layer of its own, and the grain is kept on
-   one too, so the blend is resolved once on the GPU and not per frame in
-   software. None of this changes what is drawn.
+   NO GRAIN ON A PHONE. A fixed layer with a blend mode, over content that
+   scrolls, is the one thing Mobile Safari cannot composite: it re-resolves
+   the blend as the page moves, and on a dark surface that shows as a
+   flicker. Forcing layers under it only moved the flicker to the tiles. So
+   on a touch screen there is no grain at all; the grid and the paper tone
+   carry the texture, and the dark surfaces are true black (below).
    ========================================================================== */
 
 @media (hover: none), (pointer: coarse) {
   body::before {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    will-change: opacity;
-  }
-
-  .reversed,
-  .composited {
-    isolation: isolate;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-
-  /* The pulsing postmark gets its own layer, so its opacity animation does
-     not repaint the dark sheet it sits on. */
-  .composited-pulse::before {
-    will-change: opacity;
-    transform: translateZ(0);
+    display: none;
   }
 }
 
