@@ -701,6 +701,67 @@ html[data-mode='raw'] .backTitle {
   outline-offset: 4px;
 }
 
+/* ---- Showing that the card turns ---------------------------------------------
+   Until the reader has turned it once, the card begins to turn over every
+   few seconds and springs back, and the line under it says so, its arrow
+   turning with the card. A transform on the peek wrapper, already a layer of
+   its own, so it costs the compositor alone; paused off the screen with the
+   rest of the card, and gone for good once the card has been turned. */
+
+.stage:not([data-taught]) .peek {
+  animation: flip-peek 6.5s cubic-bezier(0.3, 0.7, 0.3, 1) 3.2s infinite;
+}
+
+@keyframes flip-peek {
+  0%,
+  78%,
+  100% {
+    transform: perspective(1200px) rotateY(0deg);
+  }
+  86% {
+    transform: perspective(1200px) rotateY(-26deg);
+  }
+  92% {
+    transform: perspective(1200px) rotateY(7deg);
+  }
+  96% {
+    transform: perspective(1200px) rotateY(-2deg);
+  }
+}
+
+/* The arrow under the card turns in step with it. */
+.stage:not([data-taught]) .captionTurn svg {
+  animation: flip-cue 6.5s cubic-bezier(0.3, 0.7, 0.3, 1) 3.2s infinite;
+  /* Kept on a layer between turns, not promoted and dropped each time. */
+  will-change: transform;
+}
+
+@keyframes flip-cue {
+  0%,
+  78% {
+    transform: rotate(0deg);
+  }
+  92%,
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.stage:not([data-taught]) .captionTurn {
+  color: var(--ink);
+}
+
+.captionMore {
+  color: var(--ink-3);
+}
+
+/* On a phone the helper takes the whole line until the card has been turned. */
+@media (max-width: 40rem) {
+  .stage:not([data-taught]) .captionDim {
+    display: none;
+  }
+}
+
 /* ---- Under the card: how to turn it, and its size ------------------------- */
 
 .caption {
@@ -1847,6 +1908,11 @@ html[data-mode='raw'] .enterTitle {
       animation: none;
     }
 
+    /* Upright, the card shows it turns over, until it has been turned. */
+    .intro[data-up] .pin .stage:not([data-taught]) .peek {
+      animation: flip-peek 6.5s cubic-bezier(0.3, 0.7, 0.3, 1) 1.6s infinite;
+    }
+
     .intro .light {
       animation-name: fade-out;
       animation-timing-function: linear;
@@ -1897,18 +1963,21 @@ html[data-mode='raw'] .enterTitle {
   0%,
   62%,
   100% {
-    transform: rotate(0deg);
+    transform: perspective(1200px) rotateY(0deg) rotate(0deg);
   }
   74% {
-    transform: rotate(-9deg);
+    transform: perspective(1200px) rotateY(0deg) rotate(-9deg);
   }
   86% {
-    transform: rotate(1.5deg);
+    transform: perspective(1200px) rotateY(0deg) rotate(1.5deg);
   }
 }
 
 .peek {
   position: relative;
+  /* At rest in the same form the peeks use, so starting or ending one never
+     changes what kind of layer this is, which would repaint the page. */
+  transform: perspective(1200px) rotateY(0deg);
   will-change: transform;
 }
 
@@ -1990,6 +2059,8 @@ html[data-mode='raw'] .enterTitle {
 @media (prefers-reduced-motion: reduce) {
   .drift,
   .foilBreath,
+  .peek,
+  .captionTurn svg,
   .ink,
   .foil,
   .mark,

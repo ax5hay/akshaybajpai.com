@@ -69,6 +69,25 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
   const ref = useRef<HTMLDivElement>(null);
   const dragged = useRef(false);
   const [turned, setTurned] = useState(false);
+  // Whether this reader has turned the card before. Until they have, the
+  // card shows them it turns; once they have, it never does again.
+  const [taught, setTaught] = useState(true);
+  useEffect(() => {
+    try {
+      setTaught(localStorage.getItem('card.taught') === '1');
+    } catch {
+      setTaught(false);
+    }
+  }, []);
+  useEffect(() => {
+    if (!turned || taught) return;
+    setTaught(true);
+    try {
+      localStorage.setItem('card.taught', '1');
+    } catch {
+      // Not remembered; the hint returns on the next visit, which is harmless.
+    }
+  }, [turned, taught]);
   const [stamped, setStamped] = useState<string | null>(null);
 
   useEffect(() => {
@@ -138,8 +157,10 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
 
     // Off the screen, the card's own motion stops: nothing is composited for
     // a card nobody can see.
+    // Marked on the stage, so the peeks around the card pause with it.
+    const stage = el.closest<HTMLElement>('[data-card-stage]') ?? el;
     const seen = new IntersectionObserver(([entry]) => {
-      el.toggleAttribute('data-offscreen', !entry.isIntersecting);
+      stage.toggleAttribute('data-offscreen', !entry.isIntersecting);
     });
     seen.observe(el);
 
@@ -185,7 +206,7 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
   }, []);
 
   return (
-    <div className={styles.stage} data-card-stage>
+    <div className={styles.stage} data-card-stage data-taught={taught ? '' : undefined}>
       {/* Its own layer for the peek, a plain transform the compositor runs. */}
       <div className={styles.peek}>
       <div
@@ -236,7 +257,16 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
           <svg viewBox="0 0 16 16" width="14" height="14">
             <path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" strokeWidth="1.3" />
           </svg>
-          {turned ? 'Tap to turn it back' : 'Tap the card for its QR code'}
+          {turned ? (
+            'Tap to turn it back'
+          ) : taught ? (
+            'Tap the card for its QR code'
+          ) : (
+            <span>
+              Tap the card to turn it over
+              <span className={styles.captionMore}> · QR code on the back</span>
+            </span>
+          )}
         </span>
         <span className={styles.captionDim}>
           <i />
