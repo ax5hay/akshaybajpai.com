@@ -391,7 +391,7 @@ html[data-mode='raw'] .mark {
 }
 
 .lines {
-  --line: 3.5cqw;
+  --line: 3.2cqw;
   position: absolute;
   left: 6.5cqw;
   bottom: 8.8cqw;
@@ -415,7 +415,7 @@ html[data-mode='raw'] .mark {
 }
 
 .faceLine b {
-  width: 2.2cqw;
+  width: 3.4cqw;
   font-family: var(--font-label), monospace;
   font-size: max(0.5rem, 2cqw);
   font-weight: 600;
@@ -435,8 +435,8 @@ html[data-mode='raw'] .mark {
   position: absolute;
   left: 5cqw;
   width: 52cqw;
-  height: 3.5cqw;
-  bottom: calc(8.8cqw + var(--row) * 3.5cqw);
+  height: 3.2cqw;
+  bottom: calc(8.8cqw + var(--row) * 3.2cqw);
   border-radius: 0.8cqw;
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
