@@ -25,8 +25,12 @@ import { MODE_STORAGE_KEY } from '@/lib/mode';
  * checked directly. Anything later is caught by its error event.
  *
  * And it decides whether the cover sheet plays: once per visit, never for a
- * reader who asks for reduced motion, and never for one who arrived through
- * the search endpoint (`?q=`), who is owed the index at once. When it will play, `data-cover`
+ * reader who asks for reduced motion, never for one who arrived through
+ * the search endpoint (`?q=`), who is owed the index at once, and never on
+ * the calling card (`/card/`), which is reached by scanning the printed card
+ * and owes its reader a phone number, not a show. The card is also marked on
+ * the root (`data-card`) before first paint, which is what strikes the rail
+ * and the title block from it without a flash. When it will play, `data-cover`
  * holds the set's own entrance animations until the cover reports the set
  * issued; the timer here releases them regardless, so a cover that never
  * hydrates cannot leave the page waiting behind it.
@@ -44,8 +48,10 @@ for(var i=0;i<ls.length;i++){var l=ls[i],ok=0;
 if(!(l.compareDocumentPosition(me)&4))continue;
 try{ok=l.sheet&&l.sheet.cssRules.length}catch(x){ok=1}
 if(!ok)again(l)}
+var card=/^\\/card(\\/|$)/.test(location.pathname);
+if(card){document.documentElement.dataset.card=''}
 try{
-if(matchMedia('(prefers-reduced-motion: reduce)').matches||sessionStorage.getItem('plate.booted')||/[?&]q=/.test(location.search)){document.documentElement.dataset.preloaded=''}
+if(card||matchMedia('(prefers-reduced-motion: reduce)').matches||sessionStorage.getItem('plate.booted')||/[?&]q=/.test(location.search)){document.documentElement.dataset.preloaded=''}
 else{sessionStorage.setItem('plate.booted','1');document.documentElement.dataset.cover='';setTimeout(function(){document.documentElement.dataset.issued=''},22000)}
 }catch(e){document.documentElement.dataset.preloaded=''}
 try{

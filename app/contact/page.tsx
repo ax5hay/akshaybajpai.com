@@ -2,6 +2,7 @@ import { PlateShell } from '@/components/plate/PlateShell';
 import { CorrespondenceForm } from '@/components/plate/CorrespondenceForm';
 import { CopyValue } from '@/components/kit/CopyValue';
 import { LocalTime } from '@/components/plate/LocalTime';
+import { CardTicket } from '@/components/plate/CardTicket';
 import { PlateFigure } from '@/components/figures/PlateFigure';
 import { getPlateByHref } from '@/lib/plates';
 import { buildMetadata, breadcrumbs, webPage, PERSON_ID } from '@/lib/metadata';
@@ -97,6 +98,9 @@ export default function ContactPage() {
               </li>
             ))}
           </ul>
+
+          {/* The calling card: the same lines, as a thing to keep or pass on. */}
+          <CardTicket />
 
           <dl className={styles.facts}>
             <div>
