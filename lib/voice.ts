@@ -125,6 +125,12 @@ export const V = {
   enterNote: { a: 'What I do, the work, and the writing.', b: 'Case studies, research and essays, issued as drawings.', c: '35 static routes: work, research, essays, notes.' },
   reissueCard: { a: 'Reading level', b: 'Re-issue the card', c: 'Render mode' },
   showCode: { a: 'Show QR code', b: 'Show the code', c: 'Show QR' },
+  introLead: { a: 'Scroll', b: 'Scroll', c: 'Scroll' },
+  introLine: {
+    a: 'to stand the card up and save my number',
+    b: 'to stand the card up, and keep the contact',
+    c: 'stand up → vCard, WhatsApp, links',
+  },
   saveNote: { a: 'Saves straight to your contacts', b: 'A vCard, into your address book', c: 'vCard 3.0, text/x-vcard, with PHOTO' },
   cardTicketTitle: { a: 'My contact card', b: 'The card, as scanned', c: 'C-701 · /card/' },
   cardTicketNote: {

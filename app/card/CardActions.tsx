@@ -65,7 +65,7 @@ function today(): string {
  * a target; one animation frame eases toward it and stops when it arrives,
  * so a noisy gyroscope reads as a hand, not a tremor.
  */
-export function CardObject({ front, back }: { front: ReactNode; back: ReactNode }) {
+export function CardObject({ front, back, hits }: { front: ReactNode; back: ReactNode; hits?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const dragged = useRef(false);
   const [turned, setTurned] = useState(false);
@@ -223,13 +223,14 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
             setTurned((t) => !t);
           }}
         />
+        {hits}
       </div>
       <p className={styles.caption} aria-hidden="true">
         <span className={styles.captionTurn}>
           <svg viewBox="0 0 16 16" width="14" height="14">
             <path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" strokeWidth="1.3" />
           </svg>
-          {turned ? 'Tap to turn back' : 'Tap to turn over'}
+          {turned ? 'Tap to turn it back' : 'Tap the card for its QR code'}
         </span>
         <span className={styles.captionDim}>
           <i />
@@ -284,6 +285,7 @@ export function SaveContact({
  */
 export function CardIntro({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const t = useVoice();
 
   useEffect(() => {
     const intro = ref.current;
@@ -377,7 +379,8 @@ export function CardIntro({ children }: { children: ReactNode }) {
         <span className={styles.light} data-intro-light aria-hidden="true" />
         {children}
         <p className={styles.introHint} data-intro-hint aria-hidden="true">
-          <span>Scroll</span>
+          <span className={styles.introHintLead}>{t('introLead')}</span>
+          <span className={styles.introHintLine}>{t('introLine')}</span>
           <span className={styles.introArrow} />
         </p>
       </div>
