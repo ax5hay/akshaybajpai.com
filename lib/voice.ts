@@ -126,6 +126,7 @@ export const V = {
   reissueCard: { a: 'Reading level', b: 'Re-issue the card', c: 'Render mode' },
   showCode: { a: 'Show QR code', b: 'Show the code', c: 'Show QR' },
   introLead: { a: 'Scroll', b: 'Scroll', c: 'Scroll' },
+  introFlip: { a: 'Tap the card to turn it over', b: 'Tap the card to turn it over', c: 'Tap: flip → QR' },
   introLine: {
     a: 'to stand the card up and save my number',
     b: 'to stand the card up, and keep the contact',

@@ -231,7 +231,7 @@ export default function CardPage() {
     ...(c.phone
       ? [
           { label: 'Phone', value: c.phone, href: telHref(c.phone), copy: `+${phoneDigits(c.phone)}` },
-          { label: 'WhatsApp', value: whatsappHref(c.phone).replace('https://', ''), href: whatsappHref(c.phone), copy: undefined },
+          { label: 'WhatsApp', value: 'Chat on WhatsApp', href: whatsappHref(c.phone), copy: undefined },
         ]
       : []),
     { label: 'Email', value: c.email, href: `mailto:${c.email}`, copy: c.email },
@@ -317,7 +317,9 @@ export default function CardPage() {
       {/* ---- The way into the set: the cover, in miniature -------------------
           The set opens on three states of one drawing laid side by side:
           paper, cyanotype, source. Here they are again, as the door. */}
-      <a href="/" className={styles.enter} data-rise="4">
+      {/* On reversed stock, the set's one solid block: this is the door out
+          of the card and into the set, and should not read as another line. */}
+      <a href="/" className={`${styles.enter} reversed`} data-rise="4">
         <span className={styles.bands} aria-hidden="true">
           {(['a', 'b', 'c'] as const).map((band) => (
             <span key={band} className={styles.band} data-band={band}>

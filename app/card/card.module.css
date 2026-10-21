@@ -6,6 +6,9 @@
    a document is and not the way a drawing is. */
 
 .sheet {
+  /* The board's own colour, resolved here so the reversed door can cut its
+     notches in it from inside. */
+  --board: var(--paper);
   /* The face of the card, per mode. */
   --face: var(--paper-raised);
   --face-ink: var(--ink);
@@ -709,39 +712,44 @@ html[data-mode='raw'] .backTitle {
    rest of the card, and gone for good once the card has been turned. */
 
 .stage:not([data-taught]) .peek {
-  animation: flip-peek 6.5s cubic-bezier(0.3, 0.7, 0.3, 1) 3.2s infinite;
+  animation: flip-peek 7s linear 2.6s infinite;
 }
 
+/* Eased segment by segment, unhurried: about 0.8s to lift, 0.8s to settle.
+   A slow move asks less of each frame than a quick one, so it stays smooth
+   on a phone that is doing other work. */
 @keyframes flip-peek {
   0%,
-  78%,
+  72% {
+    transform: perspective(1200px) rotateY(0deg);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  83% {
+    transform: perspective(1200px) rotateY(-24deg);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  94% {
+    transform: perspective(1200px) rotateY(3deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
   100% {
     transform: perspective(1200px) rotateY(0deg);
-  }
-  86% {
-    transform: perspective(1200px) rotateY(-26deg);
-  }
-  92% {
-    transform: perspective(1200px) rotateY(7deg);
-  }
-  96% {
-    transform: perspective(1200px) rotateY(-2deg);
   }
 }
 
 /* The arrow under the card turns in step with it. */
 .stage:not([data-taught]) .captionTurn svg {
-  animation: flip-cue 6.5s cubic-bezier(0.3, 0.7, 0.3, 1) 3.2s infinite;
+  animation: flip-cue 7s cubic-bezier(0.45, 0, 0.25, 1) 2.6s infinite;
   /* Kept on a layer between turns, not promoted and dropped each time. */
   will-change: transform;
 }
 
 @keyframes flip-cue {
   0%,
-  78% {
+  72% {
     transform: rotate(0deg);
   }
-  92%,
+  94%,
   100% {
     transform: rotate(-360deg);
   }
@@ -1150,13 +1158,44 @@ html[data-mode='raw'] .backTitle {
    and joined by the same two coloured edges. They are not the mode tokens:
    this is a picture of all three at once, whatever the card is printed in. */
 
+/* The door out of the card and into the set, on reversed stock (.reversed in
+   globals.css): solid ink on paper, amber on cyanotype, green on source, true
+   black on a phone. The one block on the page that is not a sheet. */
 .enter {
+  position: relative;
   display: block;
-  border: var(--lw-thin) solid var(--rule-ink);
+  overflow: hidden;
   background: var(--paper-raised);
-  box-shadow: var(--shadow-lift);
+  box-shadow: var(--shadow-deep);
   color: var(--ink);
   -webkit-tap-highlight-color: transparent;
+  transition: transform var(--d-2) var(--ease-plate);
+}
+
+.enter:active {
+  transform: scale(0.985);
+}
+
+/* A notch in each side at the join, as a ticket is torn along. */
+.enter::before,
+.enter::after {
+  content: '';
+  position: absolute;
+  top: calc(9.5rem - 0.6rem);
+  z-index: 2;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  /* The board, as it is outside the reversed block. */
+  background: var(--board);
+}
+
+.enter::before {
+  left: -0.6rem;
+}
+
+.enter::after {
+  right: -0.6rem;
 }
 
 .enter:focus-visible {
@@ -1299,7 +1338,8 @@ html[data-mode='raw'] .backTitle {
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  padding: var(--s-4) var(--pad);
+  padding: var(--s-5) var(--pad) var(--s-5);
+  border-top: 1px dashed var(--rule);
 }
 
 .enterText {
@@ -1319,7 +1359,7 @@ html[data-mode='raw'] .backTitle {
 
 .enterTitle {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 1.6rem;
+  font-size: 1.85rem;
   line-height: 1.1;
   letter-spacing: -0.01em;
 }
@@ -1340,10 +1380,11 @@ html[data-mode='raw'] .enterTitle {
 .enterArrow {
   position: relative;
   flex: 0 0 auto;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: var(--lw-thin) solid var(--ink);
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
+  color: var(--paper-raised);
+  background: var(--accent);
   transition:
     background-color var(--d-2) var(--ease-plate),
     color var(--d-2) var(--ease-plate),
@@ -1366,9 +1407,7 @@ html[data-mode='raw'] .enterTitle {
 .enter:hover .enterArrow,
 .enter:focus-visible .enterArrow,
 .enter:active .enterArrow {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--paper-raised);
+  background: var(--ink);
 }
 
 /* ---- Foot ----------------------------------------------------------------------- */
@@ -1664,7 +1703,8 @@ html[data-mode='raw'] .enterTitle {
 }
 
 .light,
-.introHint {
+.introHint,
+.introFlip {
   display: none;
 }
 
@@ -1844,6 +1884,38 @@ html[data-mode='raw'] .enterTitle {
     color: var(--ink-3);
   }
 
+  /* Above the card on its side: what a press on it does. Shown until the
+     card has been turned once, and faded out by the scroll like the nudge. */
+  .introFlip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--flip-top, 4rem);
+    z-index: 4;
+    font-family: var(--font-label), monospace;
+    font-size: var(--t-micro);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .introFlip svg {
+    color: var(--accent);
+    animation: flip-cue 7s cubic-bezier(0.45, 0, 0.25, 1) 2.6s infinite;
+    will-change: transform;
+  }
+
+  .intro:has([data-taught]) .introFlip {
+    display: none;
+  }
+
   .introArrow {
     flex: 0 0 auto;
     width: 0.45rem;
@@ -1874,6 +1946,7 @@ html[data-mode='raw'] .enterTitle {
     .intro .pin .stage,
     .intro .light,
     .intro .introHint,
+    .intro .introFlip,
     .intro .pin > .strip,
     .intro .pin > .when,
     .intro .pin > .save,
@@ -1890,7 +1963,7 @@ html[data-mode='raw'] .enterTitle {
 
     /* Until the reader scrolls, the card peeks: it tips a few degrees toward
        upright and settles back, to show which way the scroll will take it.
-       The peek is the rotate property, which composes with the lean. */
+       */
     .intro .pin .stage {
       animation-name: stand;
       animation-timing-function: cubic-bezier(0.25, 0.6, 0.35, 1);
@@ -1900,17 +1973,16 @@ html[data-mode='raw'] .enterTitle {
     /* The peek runs on a wrapper of its own, as a transform: on the stage it
        would share an element with the scroll-driven turn, and as the rotate
        property Chrome repaints it rather than compositing it. */
-    .intro .pin .peek {
-      animation: peek 3.4s var(--ease-plate) 2.2s infinite;
-    }
-
-    .intro[data-moved] .pin .peek {
+    /* On its side or upright, the card shows it turns over, as it does on a
+       desk; while the scroll is turning it, it keeps still. */
+    .intro[data-moved]:not([data-up]) .pin .peek {
       animation: none;
     }
 
-    /* Upright, the card shows it turns over, until it has been turned. */
-    .intro[data-up] .pin .stage:not([data-taught]) .peek {
-      animation: flip-peek 6.5s cubic-bezier(0.3, 0.7, 0.3, 1) 1.6s infinite;
+    .intro .introFlip {
+      animation-name: fade-out;
+      animation-timing-function: linear;
+      animation-range: 0 calc(var(--run) * 0.2);
     }
 
     .intro .light {
@@ -1959,19 +2031,7 @@ html[data-mode='raw'] .enterTitle {
   }
 }
 
-@keyframes peek {
-  0%,
-  62%,
-  100% {
-    transform: perspective(1200px) rotateY(0deg) rotate(0deg);
-  }
-  74% {
-    transform: perspective(1200px) rotateY(0deg) rotate(-9deg);
-  }
-  86% {
-    transform: perspective(1200px) rotateY(0deg) rotate(1.5deg);
-  }
-}
+
 
 .peek {
   position: relative;
