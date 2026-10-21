@@ -1261,8 +1261,8 @@ meeting. The errand is short: keep the number, or use it. The code resolves to
 
 | Part | What it is |
 |:-----|:-----------|
-| **The arrival** | On a phone held upright the card arrives the way it is held: on its side, filling the screen, long edge down, with a nudge under it that says what scrolling is for ("Scroll to stand the card up and save my number"). The first scroll stands it up, brings it to the width of the column and lets the page rise under it, one continuous turn driven by the scroll (`CardIntro`, three custom properties and transforms). Turn the phone sideways and the card reads as it lies |
-| **The card** | The printed card again, drawn as an object at 85 × 55 mm: the name, the role, and under a hairline the lines a printed card carries (T, E, W), each of which can be pressed to call, write or open the site; the mark at the heart of a guilloché rosette; microprint along its foot. It leans toward the pointer, toward the tilt of an Android phone, and drifts on its own elsewhere; the engraving carries a foil that catches the light as it moves |
+| **The arrival** | On a phone held upright the card arrives the way it is held: on its side, filling the screen, long edge down, with a nudge under it, kept clear of the card: a capsule that says what scrolling is for, and stands the card up when pressed. Until the reader scrolls, the card peeks, tipping a few degrees toward upright to show the way. The first scroll stands it up, brings it to the width of the column and lets the page rise under it, one continuous turn driven by the scroll (`CardIntro`, three custom properties and transforms). Turn the phone sideways and the card reads as it lies |
+| **The card** | The printed card again, drawn as an object at 85 × 55 mm: the name, the role, and under a short accent rule how to reach the person: the number set in the display face with a WhatsApp seal struck beside it, the address quietly under. Each can be pressed, to call, to message or to write; a press anywhere else turns the card; the mark at the heart of a guilloché rosette; microprint along its foot. It leans toward the pointer, toward the tilt of an Android phone, and drifts on its own elsewhere; the engraving carries a foil that catches the light as it moves |
 | **Its back** | Press the card and it turns over to this page's own QR code, with the monogram in the middle, so whoever is holding the phone can pass the card to the next phone in the room |
 | **Save contact** | The one thing most people came for, first and full width: `/akshay-bajpai.vcf`, a vCard 3.0 issued at build time with the mark as the contact's picture |
 | **The other ways in** | Call, WhatsApp and Email as tiles a thumb can find; with no number set, Email and LinkedIn |
@@ -1346,6 +1346,11 @@ compositor runs it and nothing is painted again:
   the rainbow. The foil's colour moves by cross-fading those phases, which is opacity, and
   costs the compositor nothing. Pixel for pixel the face is the same as the masked one.
 - **Off the screen, the card's own motion stops.**
+- **One compositor animation per element.** The peek has a wrapper of its own: on the
+  stage it would share an element with the scroll-driven turn, and Chrome falls back to
+  the main thread for that. The arrival is clipped at the sheet (`overflow-x: clip`), or a
+  corner of the leaning card widens the page by a pixel and the whole page is repainted.
+  Measured idle and through a scroll with the phone tilting: no repaints at all.
 - **No `preserve-3d`, no `backface-visibility`.** Each layer is flattened into the card's
   plane, and the faces trade places at the half-turn. Layers sorted in depth were what
   made the mark flicker out of the rosette as the card leaned.

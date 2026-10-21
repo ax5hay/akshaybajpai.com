@@ -116,15 +116,33 @@ function Front() {
         </span>
       </span>
 
-      {/* The lines, as a printed card sets them: a letter for each, in the
-          margin, and the line itself in the face that dials it. */}
-      <span className={styles.lines}>
-        {faceLines(c).map((l) => (
-          <span key={l.key} className={styles.faceLine}>
-            <b>{l.key}</b>
-            {l.value}
+      {/* How to reach the person on the card, engraved rather than listed:
+          the number set as the line that matters, a WhatsApp seal struck
+          beside it, and the address quietly under. Each can be pressed. */}
+      <span className={styles.reach}>
+        <span className={styles.reachRule} aria-hidden="true" />
+        {c.phone && (
+          <span className={styles.reachRow}>
+            <a href={telHref(c.phone)} className={styles.reachPhone} aria-label={`Call ${c.phone}`}>
+              {c.phone}
+            </a>
+            <a
+              href={whatsappHref(c.phone)}
+              className={styles.seal}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Message on WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3.6a8.4 8.4 0 0 0-7.2 12.7L3.6 20.4l4.2-1.1A8.4 8.4 0 1 0 12 3.6z" />
+                <path d="M9.1 8.4c.3-.3.7-.3.9 0l.8 1.4c.1.3 0 .6-.2.8l-.4.4c.5 1.1 1.4 2 2.5 2.5l.4-.4c.2-.2.5-.3.8-.2l1.4.8c.3.2.3.6 0 .9l-.5.6c-.5.5-1.2.6-1.8.3a8.7 8.7 0 0 1-4.6-4.6c-.3-.6-.2-1.3.3-1.8z" className={styles.sealFill} />
+              </svg>
+            </a>
           </span>
-        ))}
+        )}
+        <a href={`mailto:${c.email}`} className={styles.reachMail} aria-label={`Email ${c.email}`}>
+          {c.email}
+        </a>
       </span>
 
       {/* Microprint, as on any document worth forging: legible under a loupe. */}
@@ -132,48 +150,6 @@ function Front() {
         {Array.from({ length: 4 }, () => `${c.name} · ${c.site.replace('https://', '')} · ${c.city} · ${SHEET} · `).join('')}
       </span>
     </>
-  );
-}
-
-/** The lines printed on the face, in the order a card sets them. */
-function faceLines(c: typeof CARD) {
-  return [
-    ...(c.phone
-      ? [
-          { key: 'T', value: c.phone, href: telHref(c.phone), label: `Call ${c.phone}` },
-          {
-            key: 'WA',
-            value: whatsappHref(c.phone).replace('https://', ''),
-            href: whatsappHref(c.phone),
-            label: 'Message on WhatsApp',
-          },
-        ]
-      : []),
-    { key: 'E', value: c.email, href: `mailto:${c.email}`, label: `Email ${c.email}` },
-    { key: 'W', value: c.site.replace('https://', ''), href: '/', label: 'Open the website' },
-  ];
-}
-
-/**
- * The lines on the face can be pressed: a call, a message, the site. The
- * whole card turns over when pressed, so these sit above it, over the
- * printed lines exactly, and only while the face is up.
- */
-function FaceHits() {
-  const lines = faceLines(CARD);
-  return (
-    <span className={styles.hits}>
-      {lines.map((l, i) => (
-        <a
-          key={l.key}
-          href={l.href}
-          {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className={styles.hit}
-          style={{ '--row': lines.length - 1 - i } as CSSProperties}
-          aria-label={l.label}
-        />
-      ))}
-    </span>
   );
 }
 
@@ -291,7 +267,7 @@ export default function CardPage() {
         </a>
       </p>
 
-      <CardObject front={<Front />} back={<Back url={url} />} hits={<FaceHits />} />
+      <CardObject front={<Front />} back={<Back url={url} />} />
 
       <p className={styles.when} data-rise="1">
         <LocalTime className={styles.clock} />
