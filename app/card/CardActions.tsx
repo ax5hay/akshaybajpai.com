@@ -107,7 +107,9 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
       el.style.transform = `rotateX(${(-now.y * 9).toFixed(2)}deg) rotateY(${(now.x * 13).toFixed(2)}deg)`;
       for (const s of sheens) s.style.opacity = Math.min(1, Math.abs(now.x) * 1.3 + Math.abs(now.y) * 0.4).toFixed(3);
       for (const l of lights) l.style.transform = `translate3d(${(now.x * 30).toFixed(2)}%, ${(now.y * 30).toFixed(2)}%, 0)`;
-      if (Math.abs(want.x - now.x) + Math.abs(want.y - now.y) > 0.002) frame = requestAnimationFrame(draw);
+      // Stop as soon as it is close enough to see no difference, so a card at
+      // rest costs nothing between movements.
+      if (Math.abs(want.x - now.x) + Math.abs(want.y - now.y) > 0.01) frame = requestAnimationFrame(draw);
       else frame = 0;
     };
     const aim = (x: number, y: number) => {
@@ -149,10 +151,18 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
     // The phone's tilt, measured from however it was held when the page
     // opened, so holding it at any angle reads as level.
     let base: { beta: number; gamma: number } | null = null;
+    // A phone in the hand is never still: it trembles by a degree or so all
+    // the time. Below that the card is told nothing, or it would be redrawn
+    // on every frame for a movement nobody can see.
+    let last = { x: 0, y: 0 };
     const onTilt = (event: DeviceOrientationEvent) => {
       if (start || event.beta == null || event.gamma == null) return;
       base ??= { beta: event.beta, gamma: event.gamma };
-      aim((event.gamma - base.gamma) / 20, (event.beta - base.beta) / 20);
+      const x = (event.gamma - base.gamma) / 20;
+      const y = (event.beta - base.beta) / 20;
+      if (Math.abs(x - last.x) + Math.abs(y - last.y) < 0.06) return;
+      last = { x, y };
+      aim(x, y);
     };
 
     // Off the screen, the card's own motion stops: nothing is composited for
@@ -357,6 +367,8 @@ export function CardIntro({ children }: { children: ReactNode }) {
         (vh - 2 * room) / object.offsetWidth
       );
       intro.style.setProperty('--hint-top', `${(vh / 2 + (object.offsetWidth * s) / 2 + 22).toFixed(0)}px`);
+      // And the turn helper, as far above the card as the nudge is below.
+      intro.style.setProperty('--flip-top', `${(vh / 2 - (object.offsetWidth * s) / 2 - 46).toFixed(0)}px`);
       dy = vh / 2 - top - center;
       scale = s;
       intro.style.setProperty('--dy', `${dy.toFixed(1)}px`);
@@ -372,10 +384,12 @@ export function CardIntro({ children }: { children: ReactNode }) {
     let up = false;
     let moved = false;
     const settle = (raw: number) => {
-      // Once the reader has scrolled at all, the card stops peeking.
-      if (!moved && raw > 0.01) {
-        moved = true;
-        intro.setAttribute('data-moved', '');
+      // While the card is turning under the scroll, it does not peek; back at
+      // the top it does again.
+      const nowMoved = raw > 0.01;
+      if (nowMoved !== moved) {
+        moved = nowMoved;
+        intro.toggleAttribute('data-moved', moved);
       }
       const next = raw > 0.62;
       if (next !== up) {
@@ -427,6 +441,13 @@ export function CardIntro({ children }: { children: ReactNode }) {
       <div className={styles.pin}>
         <span className={styles.light} data-intro-light aria-hidden="true" />
         {children}
+        {/* While the card lies on its side, what a press on it does. */}
+        <p className={styles.introFlip} data-intro-flip aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="14" height="14">
+            <path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.8h-2.8" fill="none" stroke="currentColor" strokeWidth="1.3" />
+          </svg>
+          {t('introFlip')}
+        </p>
         {/* The nudge, and a way to do it without scrolling: press it and the
             page scrolls the card upright. */}
         <button
