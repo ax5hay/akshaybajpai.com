@@ -712,44 +712,45 @@ html[data-mode='raw'] .backTitle {
    rest of the card, and gone for good once the card has been turned. */
 
 .stage:not([data-taught]) .peek {
-  animation: flip-peek 7s linear 2.6s infinite;
+  animation: flip-peek 18s linear 1.4s infinite;
 }
 
-/* Eased segment by segment, unhurried: about 0.8s to lift, 0.8s to settle.
-   A slow move asks less of each frame than a quick one, so it stays smooth
-   on a phone that is doing other work. */
+/* A real half-turn, once soon after the card lands and then only every
+   eighteen seconds, so the card is still while it is being read: about
+   0.75s to open to sixty degrees, its edge plainly showing, and 0.85s to
+   settle back past true and home. The rest of the cycle it does not move. */
 @keyframes flip-peek {
-  0%,
-  72% {
-    transform: perspective(1200px) rotateY(0deg);
+  0% {
+    transform: perspective(1800px) rotateY(0deg);
+    animation-timing-function: cubic-bezier(0.32, 0, 0.18, 1);
+  }
+  4.2% {
+    transform: perspective(1800px) rotateY(-60deg);
     animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
   }
-  83% {
-    transform: perspective(1200px) rotateY(-24deg);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
-  }
-  94% {
-    transform: perspective(1200px) rotateY(3deg);
+  8.2% {
+    transform: perspective(1800px) rotateY(5deg);
     animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
   }
+  9.2%,
   100% {
-    transform: perspective(1200px) rotateY(0deg);
+    transform: perspective(1800px) rotateY(0deg);
   }
 }
 
 /* The arrow under the card turns in step with it. */
 .stage:not([data-taught]) .captionTurn svg {
-  animation: flip-cue 7s cubic-bezier(0.45, 0, 0.25, 1) 2.6s infinite;
+  animation: flip-cue 18s linear 1.4s infinite;
   /* Kept on a layer between turns, not promoted and dropped each time. */
   will-change: transform;
 }
 
 @keyframes flip-cue {
-  0%,
-  72% {
+  0% {
     transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.32, 0, 0.18, 1);
   }
-  94%,
+  8.2%,
   100% {
     transform: rotate(-360deg);
   }
@@ -1908,7 +1909,7 @@ html[data-mode='raw'] .enterTitle {
 
   .introFlip svg {
     color: var(--accent);
-    animation: flip-cue 7s cubic-bezier(0.45, 0, 0.25, 1) 2.6s infinite;
+    animation: flip-cue 18s linear 1.4s infinite;
     will-change: transform;
   }
 
@@ -2037,7 +2038,7 @@ html[data-mode='raw'] .enterTitle {
   position: relative;
   /* At rest in the same form the peeks use, so starting or ending one never
      changes what kind of layer this is, which would repaint the page. */
-  transform: perspective(1200px) rotateY(0deg);
+  transform: perspective(1800px) rotateY(0deg);
   will-change: transform;
 }
 

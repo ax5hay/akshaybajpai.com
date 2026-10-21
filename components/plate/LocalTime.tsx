@@ -16,7 +16,14 @@ export function LocalTime({ className }: { className?: string }) {
 
   useEffect(() => {
     setNow(new Date());
-    const timer = setInterval(() => setNow(new Date()), 20_000);
+    // Checked every twenty seconds, changed only when the minute has: the
+    // clock shows minutes, and an unchanged minute need not be redrawn.
+    const timer = setInterval(() => {
+      setNow((prev) => {
+        const next = new Date();
+        return prev && prev.getMinutes() === next.getMinutes() ? prev : next;
+      });
+    }, 20_000);
     return () => clearInterval(timer);
   }, []);
 
