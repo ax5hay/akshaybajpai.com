@@ -114,7 +114,17 @@ function Front() {
             <span key={part}>{part}</span>
           ))}
         </span>
-        <span className={styles.site}>{c.site.replace('https://', '')}</span>
+      </span>
+
+      {/* The lines, as a printed card sets them: a letter for each, in the
+          margin, and the line itself in the face that dials it. */}
+      <span className={styles.lines}>
+        {faceLines(c).map((l) => (
+          <span key={l.key} className={styles.faceLine}>
+            <b>{l.key}</b>
+            {l.value}
+          </span>
+        ))}
       </span>
 
       {/* Microprint, as on any document worth forging: legible under a loupe. */}
@@ -122,6 +132,37 @@ function Front() {
         {Array.from({ length: 4 }, () => `${c.name} · ${c.site.replace('https://', '')} · ${c.city} · ${SHEET} · `).join('')}
       </span>
     </>
+  );
+}
+
+/** The lines printed on the face, in the order a card sets them. */
+function faceLines(c: typeof CARD) {
+  return [
+    ...(c.phone ? [{ key: 'T', value: c.phone, href: telHref(c.phone), label: `Call ${c.phone}` }] : []),
+    { key: 'E', value: c.email, href: `mailto:${c.email}`, label: `Email ${c.email}` },
+    { key: 'W', value: c.site.replace('https://', ''), href: '/', label: 'Open the website' },
+  ];
+}
+
+/**
+ * The lines on the face can be pressed: a call, a message, the site. The
+ * whole card turns over when pressed, so these sit above it, over the
+ * printed lines exactly, and only while the face is up.
+ */
+function FaceHits() {
+  const lines = faceLines(CARD);
+  return (
+    <span className={styles.hits}>
+      {lines.map((l, i) => (
+        <a
+          key={l.key}
+          href={l.href}
+          className={styles.hit}
+          style={{ '--row': lines.length - 1 - i } as CSSProperties}
+          aria-label={l.label}
+        />
+      ))}
+    </span>
   );
 }
 
@@ -234,7 +275,7 @@ export default function CardPage() {
         </a>
       </p>
 
-      <CardObject front={<Front />} back={<Back url={url} />} />
+      <CardObject front={<Front />} back={<Back url={url} />} hits={<FaceHits />} />
 
       <p className={styles.when} data-rise="1">
         <LocalTime className={styles.clock} />

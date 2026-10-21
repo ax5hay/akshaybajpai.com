@@ -380,20 +380,89 @@ html[data-mode='raw'] .mark {
   border-left: 1px solid currentColor;
 }
 
+/* Name and role from the top; the lines from the foot, above the microprint. */
 .frontBody {
   position: absolute;
   left: 6.5cqw;
-  bottom: 9.5cqw;
+  top: 11cqw;
   display: flex;
   flex-direction: column;
-  gap: 2.6cqw;
+  gap: 2cqw;
+}
+
+.lines {
+  --line: 3.5cqw;
+  position: absolute;
+  left: 6.5cqw;
+  bottom: 8.8cqw;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1cqw;
+  border-top: 1px solid var(--edge);
+  font-family: var(--font-mono), monospace;
+  font-size: max(0.625rem, 2.45cqw);
+  letter-spacing: 0.02em;
+  color: var(--face-ink);
+  animation: rise 900ms var(--ease-plate) 540ms backwards;
+}
+
+.faceLine {
+  display: flex;
+  align-items: center;
+  gap: 1.8cqw;
+  height: var(--line);
+  white-space: nowrap;
+}
+
+.faceLine b {
+  width: 2.2cqw;
+  font-family: var(--font-label), monospace;
+  font-size: max(0.5rem, 2cqw);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--accent);
+}
+
+/* Over the printed lines exactly, row by row from the foot. */
+.hits {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hit {
+  position: absolute;
+  left: 5cqw;
+  width: 52cqw;
+  height: 3.5cqw;
+  bottom: calc(8.8cqw + var(--row) * 3.5cqw);
+  border-radius: 0.8cqw;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--d-1);
+}
+
+.hit:hover,
+.hit:focus-visible,
+.hit:active {
+  background: var(--accent-soft);
+}
+
+.hit:focus-visible {
+  outline: var(--lw-thin) solid var(--accent);
+}
+
+/* Only while the face is up: a turned card shows the code, not the lines. */
+.object[data-turned] .hits {
+  display: none;
 }
 
 .name {
   display: flex;
   flex-direction: column;
   font-family: var(--font-display), Georgia, serif;
-  font-size: 13.2cqw;
+  font-size: 10.4cqw;
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.02em;
@@ -443,23 +512,13 @@ html[data-mode='raw'] .name {
   flex-direction: column;
   gap: 0.2em;
   font-family: var(--font-label), monospace;
-  font-size: max(0.6875rem, 2.95cqw);
+  font-size: max(0.6875rem, 2.55cqw);
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
   animation: rise 900ms var(--ease-plate) 420ms backwards;
-}
-
-/* The address, under the role: the site is on the card as it is on the printed one. */
-.site {
-  font-family: var(--font-label), monospace;
-  font-size: max(0.625rem, 2.5cqw);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: var(--face-ink-2);
-  animation: rise 900ms var(--ease-plate) 480ms backwards;
 }
 
 /* Microprint along the foot of the card. */
@@ -1529,10 +1588,16 @@ html[data-mode='raw'] .enterTitle {
 
   /* Light from above the board, strongest while the card is the only thing
      on it, and gone once the page is up. */
+  /* Pinned to the screen through the sticky pin, not position: fixed: the
+     page's wrapper carries a transform, and a fixed element inside one
+     measures from it, not from the screen. */
   .light {
     display: block;
-    position: fixed;
-    inset: 0;
+    position: absolute;
+    top: 0;
+    left: calc(-1 * (var(--sheet-margin) + var(--s-3)));
+    right: calc(-1 * (var(--sheet-margin) + var(--s-3)));
+    height: 100svh;
     z-index: 1;
     pointer-events: none;
     background: radial-gradient(
@@ -1569,10 +1634,10 @@ html[data-mode='raw'] .enterTitle {
     flex-direction: column;
     align-items: center;
     gap: var(--s-2);
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
-    bottom: calc(var(--s-8) + env(safe-area-inset-bottom));
+    top: calc(100svh - 7.5rem - env(safe-area-inset-bottom));
     z-index: 3;
     font-family: var(--font-label), monospace;
     font-size: var(--t-micro);
@@ -1584,7 +1649,20 @@ html[data-mode='raw'] .enterTitle {
     will-change: opacity;
   }
 
+  .introHintLead {
+    font-size: var(--t-xs);
+    color: var(--ink);
+  }
+
+  .introHintLine {
+    font-size: var(--t-micro);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+  }
+
   .introArrow {
+    margin-top: var(--s-1);
     width: 0.6rem;
     height: 0.6rem;
     border-right: var(--lw-thick) solid var(--accent);
