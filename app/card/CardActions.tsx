@@ -86,7 +86,7 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
       now.x += (want.x - now.x) * 0.14;
       now.y += (want.y - now.y) * 0.14;
       el.style.transform = `rotateX(${(-now.y * 9).toFixed(2)}deg) rotateY(${(now.x * 13).toFixed(2)}deg)`;
-      for (const s of sheens) s.style.transform = `translate3d(${(now.x * -18).toFixed(2)}%, 0, 0)`;
+      for (const s of sheens) s.style.opacity = Math.min(1, Math.abs(now.x) * 1.3 + Math.abs(now.y) * 0.4).toFixed(3);
       for (const l of lights) l.style.transform = `translate3d(${(now.x * 30).toFixed(2)}%, ${(now.y * 30).toFixed(2)}%, 0)`;
       if (Math.abs(want.x - now.x) + Math.abs(want.y - now.y) > 0.002) frame = requestAnimationFrame(draw);
       else frame = 0;
@@ -136,6 +136,13 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
       aim((event.gamma - base.gamma) / 20, (event.beta - base.beta) / 20);
     };
 
+    // Off the screen, the card's own motion stops: nothing is composited for
+    // a card nobody can see.
+    const seen = new IntersectionObserver(([entry]) => {
+      el.toggleAttribute('data-offscreen', !entry.isIntersecting);
+    });
+    seen.observe(el);
+
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerleave', onLeave);
     el.addEventListener('pointerdown', onDown);
@@ -146,6 +153,7 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
     if (!asks) window.addEventListener('deviceorientation', onTilt);
     return () => {
       cancelAnimationFrame(frame);
+      seen.disconnect();
       el.removeEventListener('pointermove', onMove);
       el.removeEventListener('pointerleave', onLeave);
       el.removeEventListener('pointerdown', onDown);

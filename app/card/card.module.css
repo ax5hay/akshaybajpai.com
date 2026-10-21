@@ -243,8 +243,10 @@ html[data-mode='raw'] .face {
   transform: scaleX(-1);
 }
 
-/* The engraving and its foil: the same rosette, used as a mask twice. Laid
-   on the right of the face and run off its edge, the way a seal is struck. */
+/* The engraving and its foil, laid on the right of the face and run off its
+   edge, the way a seal is struck. Both are plain images drawn once at build
+   time (lib/card-art.ts): no mask is applied here, because a masked layer
+   is redrawn through its mask on every frame that it moves. */
 .ink,
 .foil {
   position: absolute;
@@ -252,72 +254,49 @@ html[data-mode='raw'] .face {
   top: -9.6cqw;
   width: 84cqw;
   aspect-ratio: 1;
-  -webkit-mask: var(--rosette) center / contain no-repeat;
-  mask: var(--rosette) center / contain no-repeat;
   pointer-events: none;
   will-change: transform;
   animation: strike 1600ms var(--ease-plate) 150ms backwards;
 }
 
-.ink {
-  background: var(--engrave);
-  opacity: var(--engrave-o);
-}
-
-/* The engraving gives way under the name and the role, as a banknote's does
-   under its lettering, so the type is read on clean stock. */
-.front .ink {
-  -webkit-mask:
-    var(--rosette) center / contain no-repeat,
-    linear-gradient(90deg, transparent 4%, #000 50%);
-  -webkit-mask-composite: source-in;
-  mask:
-    var(--rosette) center / contain no-repeat,
-    linear-gradient(90deg, transparent 4%, #000 50%);
-  mask-composite: intersect;
-}
-
-/* Foil: the rosette, intersected with a pool of light high on the right.
-   The mask never moves (a moving mask is re-rasterised on every frame); the
-   colour slides under it, as a transform, and the card's lean drives it. */
-.foil {
-  overflow: hidden;
-  opacity: var(--foil-o);
-  -webkit-mask:
-    var(--rosette) center / contain no-repeat,
-    radial-gradient(circle at 62% 34%, #000 0, transparent 62%);
-  -webkit-mask-composite: source-in;
-  mask:
-    var(--rosette) center / contain no-repeat,
-    radial-gradient(circle at 62% 34%, #000 0, transparent 62%);
-  mask-composite: intersect;
-}
-
-.foilSheen {
+.art {
   position: absolute;
-  inset: 0 -100%;
-  background: linear-gradient(
-    115deg,
-    #ff7ad9 0%,
-    #b48cff 14%,
-    #78b8ff 28%,
-    #6ff0d0 42%,
-    #f5f59a 56%,
-    #ffb07a 70%,
-    #ff7ad9 84%,
-    #b48cff 100%
-  );
-  animation: sheen 14s ease-in-out infinite;
-  will-change: transform;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
 }
 
-@keyframes sheen {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: -12% 0;
+/* The ink for the mode in hand. */
+.ink [data-art-mode] {
+  display: none;
+}
+
+html:not([data-mode]) .ink [data-art-mode='artifact'],
+html[data-mode='artifact'] .ink [data-art-mode='artifact'],
+html[data-mode='annotated'] .ink [data-art-mode='annotated'],
+html[data-mode='raw'] .ink [data-art-mode='raw'] {
+  display: block;
+}
+
+.foil {
+  opacity: var(--foil-o);
+}
+
+/* The foil's colour moves by cross-fade: opacity only, its own layer. */
+.foilBreath,
+.foilLean {
+  opacity: 0;
+  will-change: opacity;
+}
+
+.foilBreath {
+  animation: breathe 7s ease-in-out 1.6s infinite alternate;
+}
+
+@keyframes breathe {
+  to {
+    opacity: 1;
   }
 }
 
@@ -507,7 +486,6 @@ html[data-mode='raw'] .name {
   left: -20cqw;
   top: -40cqw;
   width: 140cqw;
-  opacity: calc(var(--engrave-o) * 0.45);
   animation: none;
 }
 
@@ -1351,14 +1329,9 @@ html[data-mode='raw'] .enterTitle {
   transform-origin: 50% 50%;
   rotate: -12deg;
   opacity: 0.88;
-  mix-blend-mode: multiply;
   pointer-events: none;
   animation: strike-stamp 420ms var(--ease-snap) both;
-}
-
-html[data-mode='annotated'] .stampMark,
-html[data-mode='raw'] .stampMark {
-  mix-blend-mode: normal;
+  will-change: transform;
 }
 
 .stampMark span:first-child {
@@ -1778,7 +1751,7 @@ html[data-mode='raw'] .stampMark {
 
 @media (prefers-reduced-motion: reduce) {
   .drift,
-  .foilSheen,
+  .foilBreath,
   .ink,
   .foil,
   .mark,

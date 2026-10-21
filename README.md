@@ -1340,8 +1340,12 @@ compositor runs it and nothing is painted again:
   frame eases toward it and stops, writing a transform straight onto the card, the foil's
   sheen and the light. Nothing is written to a custom property, which would restyle the
   whole card.
-- **The masks never move.** The rosette is a mask twice over, and Chrome re-rasterises a
-  mask that changes. The foil's colour slides under a still mask instead.
+- **Nothing on the card is masked.** A masked layer is redrawn through its mask, offscreen,
+  on every frame it moves. So the engraving is drawn once at build time into plain images
+  (`/card/art/`): in each mode's ink, faded under the name, and in foil in three phases of
+  the rainbow. The foil's colour moves by cross-fading those phases, which is opacity, and
+  costs the compositor nothing. Pixel for pixel the face is the same as the masked one.
+- **Off the screen, the card's own motion stops.**
 - **No `preserve-3d`, no `backface-visibility`.** Each layer is flattened into the card's
   plane, and the faces trade places at the half-turn. Layers sorted in depth were what
   made the mark flicker out of the rosette as the card leaned.
