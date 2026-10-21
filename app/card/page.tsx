@@ -138,7 +138,17 @@ function Front() {
 /** The lines printed on the face, in the order a card sets them. */
 function faceLines(c: typeof CARD) {
   return [
-    ...(c.phone ? [{ key: 'T', value: c.phone, href: telHref(c.phone), label: `Call ${c.phone}` }] : []),
+    ...(c.phone
+      ? [
+          { key: 'T', value: c.phone, href: telHref(c.phone), label: `Call ${c.phone}` },
+          {
+            key: 'WA',
+            value: whatsappHref(c.phone).replace('https://', ''),
+            href: whatsappHref(c.phone),
+            label: 'Message on WhatsApp',
+          },
+        ]
+      : []),
     { key: 'E', value: c.email, href: `mailto:${c.email}`, label: `Email ${c.email}` },
     { key: 'W', value: c.site.replace('https://', ''), href: '/', label: 'Open the website' },
   ];
@@ -157,6 +167,7 @@ function FaceHits() {
         <a
           key={l.key}
           href={l.href}
+          {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
           className={styles.hit}
           style={{ '--row': lines.length - 1 - i } as CSSProperties}
           aria-label={l.label}
@@ -241,7 +252,12 @@ export default function CardPage() {
   const c = CARD;
   const url = `${c.site}${c.path}`;
   const lines = [
-    ...(c.phone ? [{ label: 'Phone', value: c.phone, href: telHref(c.phone), copy: `+${phoneDigits(c.phone)}` }] : []),
+    ...(c.phone
+      ? [
+          { label: 'Phone', value: c.phone, href: telHref(c.phone), copy: `+${phoneDigits(c.phone)}` },
+          { label: 'WhatsApp', value: whatsappHref(c.phone).replace('https://', ''), href: whatsappHref(c.phone), copy: undefined },
+        ]
+      : []),
     { label: 'Email', value: c.email, href: `mailto:${c.email}`, copy: c.email },
     ...c.links.map((l) => ({ label: l.label, value: l.value, href: l.href, copy: undefined })),
     { label: 'Site', value: c.site.replace('https://', ''), href: '/', copy: c.site },
