@@ -121,6 +121,9 @@ out/
 │       ├── index.html          # the sheet
 │       └── index.txt           # its payload, fetched on client navigation
 ├── set/index.html              # the whole set as one document, for print
+├── card/index.html             # C-701, the calling card behind the printed card's QR code
+├── card/rosette.svg            # the card's guilloché engraving, from lib/card-art.ts
+├── akshay-bajpai.vcf           # the contact as a vCard, from lib/card.ts; what "Save contact" hands a phone
 ├── 404.html                    # X-999, Sheet Not Issued
 ├── _next/static/               # hashed JS, CSS and self-hosted fonts
 ├── sitemap.xml                 # from app/sitemap.ts, with each sheet's real issue date
@@ -156,6 +159,14 @@ vendored under `scripts/fonts/`. The build log says *Drew N share cards into out
 should equal the number of sheets minus one (the key plan keeps `public/og.jpg`). The
 resvg binary is a platform-specific optional dependency; `package-lock.json` pins the
 Linux x64 build the runner needs, so do not prune optional dependencies from it.
+
+**The calling card and its vCard are built like any sheet.** `app/card/page.tsx` is the
+page the printed card's QR code resolves to, and `app/akshay-bajpai.vcf/route.ts` is a
+static route handler that writes the contact as a vCard, both from `lib/card.ts`;
+`app/card/rosette.svg/route.ts` writes the card's engraving the same way. Pages
+serves `.vcf` as `text/x-vcard`, which iOS and Android open into the address book. The
+QR code itself is a dynamic one on vqr.vc: its destination is set there, to
+`https://www.akshaybajpai.com/card/`, and is not part of this repository.
 
 **Every page carries the sheet register.** `components/sheet/Register.tsx` is rendered by
 the layout as a hidden `<nav>` listing all thirty-six sheets, so a crawler finds the whole

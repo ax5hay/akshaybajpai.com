@@ -1006,6 +1006,32 @@
   }
 }
 
+/* On a touch screen the cover is drawn for an OLED: see "true black on a
+   phone" in globals.css. The ground and the source print go to true black
+   with no grid, and the name on the source print is set solid instead of as
+   scanlines clipped to the glyphs, which is both a faint texture an OLED
+   smears and a background clip WebKit composites badly on a moving layer.
+   The cyanotype and the paper are not near black and are left alone. */
+@media (hover: none), (pointer: coarse) {
+  .pre {
+    background: #000;
+  }
+
+  .raw {
+    background: #000;
+  }
+
+  .raw .name {
+    color: #8fe388;
+    background: none;
+    -webkit-text-stroke: 0;
+  }
+
+  .wayHint {
+    background: rgba(0, 0, 0, 0.78);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pre {
     display: none;

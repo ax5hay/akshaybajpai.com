@@ -70,6 +70,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 | [`C-701`](#c-701--deployment) | **Deployment** | GitHub Pages, for free. Full runbook in [DEPLOYMENT.md](DEPLOYMENT.md) |
 | [`C-702`](#c-702--measured) | **Measured** | Weight, frame rate, accessibility |
 | [`C-703`](#c-703--visibility) | **Visibility** | How the set is found: structured data, share cards, feeds, the search endpoint |
+| [`C-704`](#c-704--the-calling-card) | **The calling card** | The sheet behind the QR code on the printed card, and the vCard it hands over |
 
 ---
 
@@ -543,6 +544,16 @@ Inside the sheets, the phone gets its own handling too:
 Scrolling the pile holds 60 fps (median frame 16.7 ms, worst 21.8 ms, headless Chromium at
 390 × 844). Nothing on a phone uses `backdrop-filter`.
 
+**Dark surfaces are true black on a phone.** Nearly every phone has an OLED screen, and on
+an OLED the slowest pixel is one that is almost off: a surface drawn in near-black smears
+when it moves, and anything faint on it, a three-per-cent grid line, the grain multiplied
+in, trails behind as a ghost. A pixel that is fully off has nothing to smear. So on a
+touch screen the reversed stock (the Correspondence sheet and the transmittal) and the
+cover's source print are printed on `#000` with no texture, and the name on the source
+print is set solid instead of as scanlines clipped to the glyphs. Wide screens keep the
+near-black, where it reads as ink and never moves. See *True black on a phone* in
+`app/globals.css` and the matching block in `Preloader.module.css`.
+
 > [!WARNING]
 > Nothing may overhang the side of the screen, even for one frame of an animation. On a
 > phone a single overhanging element widens the whole layout viewport, and everything fixed
@@ -976,6 +987,8 @@ app/
 ├── about · research · architecture · contact/
 ├── work · blog · essays/ # index + [slug] detail sheets
 ├── set/                  # the whole set as one printable document
+├── card/                 # C-704: the sheet behind the printed card's QR code
+├── akshay-bajpai.vcf/    # the contact as a file, issued at build time from lib/card.ts
 ├── sitemap.ts · robots.ts
 └── not-found.tsx         # X-999
 
@@ -994,6 +1007,8 @@ lib/
 ├── mode.ts               # mode vocabulary; no 'use client', see A-102
 ├── content.ts            # Markdown pipeline
 ├── metadata.ts           # titles, cards, robots; the identity graph and page schema
+├── card.ts               # the calling card's record, and the vCard written from it
+├── card-art.ts           # the card's guilloché rosette and its QR code, drawn at build time
 └── format.ts · constants.ts
 
 content/                  # blog, essays, work Markdown
@@ -1127,7 +1142,7 @@ the same person, which is what a knowledge panel is built from.
 | Sheet | Schema |
 |:------|:-------|
 | Key plan | `WebPage` with the person as `mainEntity` and an `ItemList` of the plates |
-| A-101 · C-701 | `ProfilePage` · `ContactPage`, each with `mainEntity → #person` |
+| A-101 · C-700 | `ProfilePage` · `ContactPage`, each with `mainEntity → #person` |
 | R-301 | `WebPage` whose `mainEntity` is the `Chapter`, inside the `Book`, from the publisher |
 | W-400 · B-500 · E-600 | `CollectionPage` with an `ItemList` of the sheets in the series |
 | A case study · a note · an essay | `TechArticle` · `BlogPosting`, with dates, word count, reading time, keywords and its card |
@@ -1203,6 +1218,101 @@ argument; those are the evidence.
 | IndexNow ping on every deploy | `.github/workflows/deploy.yml`, job `notify`, from `INDEXNOW_KEY` |
 
 ---
+
+## C-704 · The calling card
+
+The printed card carries a QR code. Somebody has just been handed it, pointed a camera at
+it and followed the link; they are on a phone, probably standing up, and it is a first
+meeting. The errand is short: keep the number, or use it. The code resolves to
+**`/card/`**, which opens on the card itself and puts that errand directly under it.
+
+| Part | What it is |
+|:-----|:-----------|
+| **The card** | The printed card again, drawn as an object at 85 × 55 mm: the name, the role, the mark at the heart of a guilloché rosette, microprint along its foot. It leans toward the pointer, toward the tilt of an Android phone, and drifts on its own elsewhere; the engraving carries a foil that catches the light as it moves |
+| **Its back** | Press the card and it turns over to this page's own QR code, with the monogram in the middle, so whoever is holding the phone can pass the card to the next phone in the room |
+| **Save contact** | The one thing most people came for, first and full width: `/akshay-bajpai.vcf`, a vCard 3.0 issued at build time with the mark as the contact's picture |
+| **The other ways in** | Call, WhatsApp and Email as tiles a thumb can find; with no number set, Email and LinkedIn |
+| **Schedule of lines** | Phone, email, LinkedIn, GitHub, X and the site, each a full-width row with its own copy or open control. A copy is confirmed on the control itself |
+| **The way in** | The cover in miniature: paper, cyanotype and source cut on the same slant, with the vermilion and amber edges. It opens the set as a full navigation, so it arrives on its cover |
+| **The foot** | Share (the system share sheet, or a copied link), Show code, and the A · B · C switch that re-issues the card in any of the three states |
+| **Received** | Saving the contact stamps the card received, with the date, and the card gives under the stamp; turning it and saving each tick through the hand where the phone has haptics |
+| **Ways to it** | `components/plate/CardTicket.tsx`, the card in miniature, sits among the direct lines on the Correspondence sheet; every sheet's title block carries *The calling card · C-701* |
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+<img src="docs/media/card.jpg" alt="The calling card on a phone: the card as an object with the rosette and foil, Save contact under it, then the ways in" />
+
+**The card, on a phone.** Drawn at its printed size, with the mark at the heart of the
+engraving and the foil catching the light. Save contact comes first.
+
+</td>
+<td width="50%" valign="top">
+
+<img src="docs/media/card-stamped.jpg" alt="The card stamped Received, with the date, after the contact is saved" />
+
+**Saved.** The contact goes to the phone and the card takes a received stamp, dated,
+struck a little off square.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+<img src="docs/media/card-back.jpg" alt="The back of the card: a QR code for the page with the monogram in the middle" />
+
+**Its back.** Tap the card and it turns over to this page's own code, for the next phone
+in the room. A scan line passes over it as it comes round.
+
+</td>
+<td width="50%" valign="top">
+
+<img src="docs/media/card-annotated.jpg" alt="The card re-issued on cyanotype" />
+
+**Re-issued.** The card in cyanotype; the switch at the foot has all three states.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+<img src="docs/media/card-desktop.jpg" alt="The card on a wide screen: the card held still on the left, the lines beside it" />
+
+**On a desk.** The card sits on the left and leans toward the pointer; the lines are set
+beside it.
+
+</td>
+<td width="50%" valign="top">
+
+<img src="docs/media/card-ticket.jpg" alt="The Correspondence sheet with the calling card in miniature among the direct lines" />
+
+**From inside the set.** The card in miniature on the Correspondence sheet, and a line in
+every sheet's title block, for a reader who is already in the set and wants the card.
+
+</td>
+</tr>
+</table>
+
+The rosette is drawn in `lib/card-art.ts` and issued at build time as `/card/rosette.svg`,
+which the card uses as a mask twice: once in the mode's ink, once in foil. The QR code is
+computed there too, from the `qrcode` package, and lands in the HTML as one path; neither
+ships any code to the browser. On a touch screen the source print's card face is true
+black, for the reason in *True black on a phone*.
+
+It does not open on the cover: `ModeScript` reads the address before first paint, skips
+the cover and marks the root `data-card`, which strikes the rail and the title block.
+The margin notes stay silent on it. It is `noindex`, out of the sitemap, out of the
+register and out of the cover's prefetching: it carries a phone number, and it is reached
+by scanning the card, not by searching for it.
+
+**One record.** Everything on the sheet, in the vCard, and on the printed card is issued
+from `lib/card.ts`. The number goes there, once, with its country code, and is shown as
+written and dialled as digits.
+
+**Pointing the code at it.** The QR code on the card is a dynamic one (`vqr.vc`), so the
+printed cards never change: set its destination to `https://www.akshaybajpai.com/card/`
+in the vqr.vc dashboard and every card already printed lands on the sheet.
 
 <div align="center">
 

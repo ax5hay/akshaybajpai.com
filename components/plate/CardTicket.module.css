@@ -1,0 +1,211 @@
+/* The calling card in miniature: the same face, at a third of the size,
+   leaning a little toward whoever hovers it. */
+
+.ticket {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: var(--s-4);
+  align-items: center;
+  padding: var(--s-4);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-lift);
+  color: var(--ink);
+  perspective: 700px;
+  transition: border-color var(--d-2);
+}
+
+.ticket:hover,
+.ticket:focus-visible {
+  border-color: var(--accent);
+}
+
+.face {
+  --face-ink: var(--ink);
+  position: relative;
+  display: block;
+  aspect-ratio: 85 / 55;
+  overflow: hidden;
+  border-radius: 3px;
+  background: linear-gradient(165deg, var(--sheet-sheen) 0%, transparent 55%), var(--paper-raised);
+  box-shadow:
+    inset 0 0 0 1px rgba(20, 20, 23, 0.2),
+    0 8px 18px -10px rgba(0, 0, 0, 0.45);
+  container-type: inline-size;
+  transform: rotateY(-14deg) rotateX(6deg);
+  transition: transform var(--d-4) var(--ease-plate);
+}
+
+html[data-mode='raw'] .face {
+  background: #0b0b0e;
+}
+
+.ticket:hover .face,
+.ticket:focus-visible .face {
+  transform: rotateY(-4deg) rotateX(2deg);
+}
+
+.ink,
+.foil {
+  position: absolute;
+  left: 34cqw;
+  top: -9.6cqw;
+  width: 84cqw;
+  aspect-ratio: 1;
+  -webkit-mask: var(--rosette) center / contain no-repeat;
+  mask: var(--rosette) center / contain no-repeat;
+}
+
+.ink {
+  background: var(--accent-2);
+  opacity: 0.45;
+}
+
+html[data-mode='annotated'] .ink {
+  background: #9dcfff;
+  opacity: 0.4;
+}
+
+html[data-mode='raw'] .ink {
+  background: var(--accent);
+  opacity: 0.3;
+}
+
+.foil {
+  background: linear-gradient(115deg, #ff7ad9, #b48cff 20%, #78b8ff 40%, #6ff0d0 60%, #f5f59a 80%, #ffb07a) 100% 50% /
+    220% 100%;
+  opacity: 0.8;
+  -webkit-mask:
+    var(--rosette) center / contain no-repeat,
+    radial-gradient(circle at 70% 30%, #000 0, transparent 55%);
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--rosette) center / contain no-repeat,
+    radial-gradient(circle at 70% 30%, #000 0, transparent 55%);
+  mask-composite: intersect;
+  transition: background-position var(--d-5) var(--ease-plate);
+}
+
+.ticket:hover .foil {
+  background-position: 0 50%;
+}
+
+.mark {
+  position: absolute;
+  left: 65cqw;
+  top: 21.35cqw;
+  width: 22cqw;
+  height: 22cqw;
+}
+
+html[data-mode='annotated'] .mark {
+  filter: grayscale(1) invert(1) brightness(1.6);
+}
+
+html[data-mode='raw'] .mark {
+  filter: grayscale(1) invert(1) sepia(1) hue-rotate(60deg) saturate(2.5) brightness(1.1);
+}
+
+.name {
+  position: absolute;
+  left: 6.5cqw;
+  bottom: 18cqw;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 13.2cqw;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--face-ink);
+}
+
+html[data-mode='annotated'] .name,
+html[data-mode='raw'] .name {
+  font-size: 9cqw;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.role {
+  position: absolute;
+  left: 6.5cqw;
+  bottom: 9cqw;
+  font-family: var(--font-label), monospace;
+  font-size: 3.2cqw;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+.kicker {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--t-lg);
+  line-height: 1.1;
+}
+
+html[data-mode='annotated'] .title,
+html[data-mode='raw'] .title {
+  font-size: var(--t-base);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.note {
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.arrow {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-top: var(--lw-thick) solid var(--accent);
+  border-right: var(--lw-thick) solid var(--accent);
+  rotate: 45deg;
+  transition: translate var(--d-2) var(--ease-plate);
+}
+
+.ticket:hover .arrow {
+  translate: 0.2rem 0;
+}
+
+@media (max-width: 40rem) {
+  .ticket {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .face {
+    max-width: 16rem;
+  }
+}

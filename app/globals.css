@@ -1058,6 +1058,43 @@ html[data-hidden] *::after {
 }
 
 /* =============================================================================
+   TRUE BLACK ON A PHONE. Nearly every phone now has an OLED screen, and on an
+   OLED the slowest pixel there is, is one that is almost off. A surface drawn
+   in near-black (#141417, #08080a) smears when it moves, and anything faint
+   printed on it, a grid line at three per cent, the grain multiplied in, is
+   left behind as a ghost while the surface catches up. A pixel that is fully
+   off has nothing to smear. So on a touch screen the reversed stock is
+   printed on true black with no texture, and the cover's source print is
+   treated the same (Preloader.module.css). Wide screens keep the near-black,
+   where it reads as ink and never moves.
+   ========================================================================== */
+
+@media (hover: none), (pointer: coarse) {
+  .reversed {
+    --paper-raised: #000;
+    --paper: #000;
+    --paper-sunk: #000;
+    --paper-deep: #000;
+    --grid-minor: transparent;
+    --sheet-sheen: transparent;
+    /* The ruled lines a message is written on, lifted clear of the band. */
+    --rule-faint: rgba(252, 250, 244, 0.22);
+  }
+}
+
+/* =============================================================================
+   C-701, THE CALLING CARD. The sheet behind the QR code on the printed card.
+   ModeScript marks the root from the address before first paint, and the
+   instruments are struck: a reader who has just scanned a card wants the
+   number, and the sheet offers its own way into the set.
+   ========================================================================== */
+
+html[data-card] body > header,
+html[data-card] body > aside[aria-label='Title block'] {
+  display: none !important;
+}
+
+/* =============================================================================
    REVERSED STOCK. One thing in the set is printed the other way round: the
    Correspondence sheet on the key plan, and the transmittal it leads to. It
    is the last stop and the one thing a reader is asked to do, so it is the

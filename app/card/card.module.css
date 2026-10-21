@@ -1,0 +1,1531 @@
+/* C-701, the calling card. The card itself, drawn at its printed size and
+   laid on the board as an object, with everything it leads to set out under
+   it. Everything reads the mode tokens, so the card is paper, cyanotype or
+   source like any other sheet; the face of the card has a few of its own,
+   defined here per mode, because an engraved document is coloured the way
+   a document is and not the way a drawing is. */
+
+@property --sweep {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.sheet {
+  /* The face of the card, per mode. */
+  --face: var(--paper-raised);
+  --face-ink: var(--ink);
+  --face-ink-2: var(--ink-3);
+  --engrave: var(--accent-2);
+  --engrave-o: 0.5;
+  --foil-o: 0.95;
+  --glare-o: 0.7;
+  --edge: rgba(20, 20, 23, 0.22);
+
+  --col: 26.5rem;
+  --pad: clamp(1rem, 4.5vw, 1.5rem);
+  /* Nothing here waits for the cover: the cover does not play. */
+  --boot: 0ms;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, var(--col));
+  justify-content: center;
+  row-gap: var(--s-4);
+  padding: calc(var(--sheet-margin) + var(--s-6)) calc(var(--sheet-margin) + var(--s-3))
+    calc(var(--sheet-margin) + var(--s-10));
+}
+
+html[data-mode='annotated'] .sheet {
+  --engrave: #9dcfff;
+  --engrave-o: 0.42;
+  --foil-o: 0.8;
+  --glare-o: 0.35;
+  --edge: rgba(157, 207, 255, 0.35);
+}
+
+html[data-mode='raw'] .sheet {
+  --face: #0b0b0e;
+  --engrave: var(--accent);
+  --engrave-o: 0.34;
+  --foil-o: 0.55;
+  --glare-o: 0.18;
+  --edge: rgba(143, 227, 136, 0.3);
+}
+
+/* On a phone the source print is true black: see "true black on a phone"
+   in globals.css. A face that tilts is the worst case for an OLED's smear. */
+@media (hover: none), (pointer: coarse) {
+  html[data-mode='raw'] .sheet {
+    --face: #000;
+  }
+}
+
+/* ---- The strip over the card ----------------------------------------------- */
+
+.strip {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  animation: rise 600ms var(--ease-plate) backwards;
+}
+
+.stripTag {
+  padding: 3px var(--s-2);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.stripRule {
+  flex: 1;
+  height: var(--lw-thin);
+  background: var(--rule);
+}
+
+.stripLive {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--ink-2);
+}
+
+.pulse {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  animation: ping 2.4s var(--ease-plate) infinite;
+}
+
+@keyframes ping {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+/* ---- The card as an object ------------------------------------------------- */
+
+.stage {
+  perspective: 1100px;
+  /* Room for the card to lean without its corner touching the strip. */
+  padding-block: var(--s-2) 0;
+}
+
+.object {
+  --rx: 0deg;
+  --ry: 0deg;
+  --gx: 50%;
+  --gy: 30%;
+  --tx: 0;
+  position: relative;
+  aspect-ratio: 85 / 55;
+  container-type: inline-size;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  transition: transform 900ms var(--ease-plate);
+}
+
+.object[data-live] {
+  transition: transform 140ms linear;
+}
+
+/* The slow drift a card has when it is held, never still. It runs on every
+   screen, and it is the only movement a phone gives the card when the phone
+   does not report its own tilt. */
+.drift {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--sweep) * -2.5deg)) rotateY(calc(var(--sweep) * 5deg));
+  animation:
+    arrive 1200ms var(--ease-plate) backwards,
+    drift 16s ease-in-out 1200ms infinite;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem) rotateX(52deg) rotateZ(-4deg) scale(0.9);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    --sweep: 0;
+  }
+  25% {
+    --sweep: 1;
+  }
+  75% {
+    --sweep: -1;
+  }
+}
+
+.turn {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 1000ms var(--ease-plate);
+}
+
+.object[data-turned] .turn {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 1.6cqw;
+  background:
+    linear-gradient(165deg, var(--sheet-sheen) 0%, transparent 55%),
+    var(--face);
+  color: var(--face-ink);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow:
+    inset 0 0 0 1px var(--edge),
+    0 1px 0 rgba(46, 35, 18, 0.12),
+    0 3px 6px rgba(46, 35, 18, 0.12),
+    0 30px 60px -22px rgba(46, 35, 18, 0.6);
+  transition: background-color var(--d-3) var(--ease-mech);
+}
+
+html[data-mode='annotated'] .face {
+  box-shadow:
+    inset 0 0 0 1px var(--edge),
+    0 30px 60px -22px rgba(0, 0, 0, 0.8);
+}
+
+html[data-mode='raw'] .face {
+  box-shadow: inset 0 0 0 1px var(--edge);
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+/* The engraving and its foil: the same rosette, used as a mask twice. Laid
+   on the right of the face and run off its edge, the way a seal is struck. */
+.ink,
+.foil {
+  position: absolute;
+  left: 34cqw;
+  top: -9.6cqw;
+  width: 84cqw;
+  aspect-ratio: 1;
+  -webkit-mask: var(--rosette) center / contain no-repeat;
+  mask: var(--rosette) center / contain no-repeat;
+  pointer-events: none;
+  animation: strike 1600ms var(--ease-plate) 150ms backwards;
+}
+
+.ink {
+  background: var(--engrave);
+  opacity: var(--engrave-o);
+}
+
+/* The engraving gives way under the name and the role, as a banknote's does
+   under its lettering, so the type is read on clean stock. */
+.front .ink {
+  -webkit-mask:
+    var(--rosette) center / contain no-repeat,
+    linear-gradient(90deg, transparent 4%, #000 50%);
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--rosette) center / contain no-repeat,
+    linear-gradient(90deg, transparent 4%, #000 50%);
+  mask-composite: intersect;
+}
+
+/* Foil catches the light only where the light is: the rosette, intersected
+   with a pool that follows the lean of the card. */
+.foil {
+  background: linear-gradient(
+      115deg,
+      #ff7ad9 0%,
+      #b48cff 14%,
+      #78b8ff 28%,
+      #6ff0d0 42%,
+      #f5f59a 56%,
+      #ffb07a 70%,
+      #ff7ad9 84%,
+      #b48cff 100%
+    )
+    calc(50% + var(--tx) * 40% + var(--sweep) * 25%) 50% / 320% 100%;
+  opacity: var(--foil-o);
+  -webkit-mask:
+    var(--rosette) center / contain no-repeat,
+    radial-gradient(
+      circle at calc(var(--gx) + var(--sweep) * 22%) calc(var(--gy) + var(--sweep) * 10%),
+      #000 0,
+      transparent 58%
+    );
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--rosette) center / contain no-repeat,
+    radial-gradient(
+      circle at calc(var(--gx) + var(--sweep) * 22%) calc(var(--gy) + var(--sweep) * 10%),
+      #000 0,
+      transparent 58%
+    );
+  mask-composite: intersect;
+}
+
+@keyframes strike {
+  from {
+    opacity: 0;
+    transform: rotate(-70deg) scale(0.55);
+  }
+}
+
+/* Light across the whole card, following the lean. */
+.glare {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at calc(var(--gx) + var(--sweep) * 18%) calc(var(--gy) + var(--sweep) * 8%),
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0) 55%
+  );
+  mix-blend-mode: soft-light;
+  opacity: var(--glare-o);
+  pointer-events: none;
+}
+
+.mark {
+  position: absolute;
+  left: calc(76cqw - 11cqw);
+  top: calc(32.35cqw - 11cqw);
+  width: 22cqw;
+  height: 22cqw;
+  animation: rise 900ms var(--ease-plate) 500ms backwards;
+}
+
+/* Cyanotype and source are line work; the mark is printed in their ink. */
+html[data-mode='annotated'] .mark,
+html[data-mode='raw'] .mark {
+  filter: grayscale(1) invert(1) brightness(1.6);
+}
+
+html[data-mode='raw'] .mark {
+  filter: grayscale(1) invert(1) sepia(1) hue-rotate(60deg) saturate(2.5) brightness(1.1);
+}
+
+.frontTop {
+  position: absolute;
+  top: 6cqw;
+  left: 6.5cqw;
+  right: 6.5cqw;
+  display: flex;
+  align-items: center;
+  gap: 2cqw;
+  font-family: var(--font-label), monospace;
+  font-size: max(0.5625rem, 2.3cqw);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--face-ink-2);
+  animation: rise 700ms var(--ease-plate) 300ms backwards;
+}
+
+.frontTopRule {
+  width: 9cqw;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+/* A crop mark in the corner, as on any sheet sent to press. */
+.crop {
+  width: 2.4cqw;
+  height: 2.4cqw;
+  border-top: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+}
+
+.frontBody {
+  position: absolute;
+  left: 6.5cqw;
+  bottom: 10.5cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 3.4cqw;
+}
+
+.name {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 13.2cqw;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--face-ink);
+}
+
+.name span {
+  animation: rise 900ms var(--ease-plate) backwards;
+}
+
+/* On paper the name is pressed in and the ink has a gloss: a highlight slides
+   across the letterforms as the card leans, and nowhere else. */
+html[data-mode='artifact'] .name {
+  /* The gloss is clipped to the glyphs, and the box it is clipped from has
+     to hold the descenders, or the tail of the y goes with it. */
+  padding: 0.12em 0.06em 0.18em;
+  margin: -0.12em -0.06em -0.18em;
+  background: linear-gradient(
+      100deg,
+      var(--face-ink) 35%,
+      #5c4a2c 50%,
+      var(--face-ink) 65%
+    )
+    calc(50% + var(--tx) * -60% + var(--sweep) * -30%) 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.name span:first-child {
+  animation-delay: 200ms;
+}
+
+.name span:last-child {
+  animation-delay: 300ms;
+}
+
+html[data-mode='annotated'] .name,
+html[data-mode='raw'] .name {
+  font-size: 9cqw;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.role {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  font-family: var(--font-label), monospace;
+  font-size: max(0.6875rem, 2.95cqw);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  animation: rise 900ms var(--ease-plate) 420ms backwards;
+}
+
+/* Microprint along the foot of the card. */
+.micro {
+  position: absolute;
+  left: 6.5cqw;
+  right: 0;
+  bottom: 4.6cqw;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-label), monospace;
+  font-size: 1.75cqw;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--face-ink-2);
+  opacity: 0.75;
+  border-top: 1px solid var(--edge);
+  padding-top: 1cqw;
+}
+
+/* ---- The back of the card -------------------------------------------------- */
+
+.back .ink {
+  left: -20cqw;
+  top: -40cqw;
+  width: 140cqw;
+  opacity: calc(var(--engrave-o) * 0.45);
+  animation: none;
+}
+
+.backBody {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 5cqw;
+  padding: 6cqw;
+}
+
+.plate {
+  display: block;
+  padding: 1.4cqw;
+  background: #fcfaf4;
+  border-radius: 1cqw;
+  box-shadow: 0 0 0 1px rgba(20, 20, 23, 0.18), 0 6px 14px -8px rgba(0, 0, 0, 0.4);
+}
+
+.qr {
+  display: block;
+  width: 46cqw;
+  height: 46cqw;
+}
+
+.backText {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4cqw;
+}
+
+.backKicker {
+  font-family: var(--font-label), monospace;
+  font-size: max(0.5625rem, 2.3cqw);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.backTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 6.4cqw;
+  line-height: 1.05;
+  color: var(--face-ink);
+  text-wrap: balance;
+}
+
+html[data-mode='annotated'] .backTitle,
+html[data-mode='raw'] .backTitle {
+  font-size: 4.2cqw;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.backUrl {
+  font-family: var(--font-label), monospace;
+  font-size: max(0.5625rem, 2.2cqw);
+  color: var(--face-ink-2);
+  overflow-wrap: anywhere;
+}
+
+/* The whole card is the button that turns it. */
+.turnButton {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 1.6cqw;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.turnButton:focus-visible {
+  outline: var(--lw-thick) solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* ---- Under the card: how to turn it, and its size ------------------------- */
+
+.caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: var(--s-5);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  animation: rise 700ms var(--ease-plate) 700ms backwards;
+}
+
+.captionTurn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.captionTurn svg {
+  color: var(--accent);
+}
+
+/* A dimension line: a leader each side, closed with a tick. */
+.captionDim {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.captionDim i {
+  position: relative;
+  width: var(--s-4);
+  height: var(--lw-thin);
+  background: var(--rule-strong);
+}
+
+.captionDim i:first-child::before,
+.captionDim i:last-child::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  width: var(--lw-thin);
+  height: 9px;
+  background: var(--rule-strong);
+}
+
+.captionDim i:first-child::before {
+  left: 0;
+}
+
+.captionDim i:last-child::after {
+  right: 0;
+}
+
+/* ---- The local time --------------------------------------------------------- */
+
+.when {
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.clock time {
+  font-family: var(--font-label), monospace;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---- Save the contact: the one thing most people came for ----------------- */
+
+.save {
+  animation: rise 800ms var(--ease-plate) 720ms backwards;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s-4);
+  min-height: 4.5rem;
+  padding: var(--s-3) var(--s-5) var(--s-3) var(--s-3);
+  overflow: hidden;
+  color: var(--paper-raised);
+  background: var(--ink);
+  box-shadow: var(--shadow-lift);
+  transition:
+    background-color var(--d-2) var(--ease-plate),
+    transform var(--d-1) var(--ease-plate);
+}
+
+/* One pass of light across it, once the card has landed, to say "here". */
+.save::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
+  transform: translateX(-110%);
+  animation: pass 1400ms var(--ease-plate) 1500ms;
+  pointer-events: none;
+}
+
+@keyframes pass {
+  to {
+    transform: translateX(110%);
+  }
+}
+
+.save:hover,
+.save:focus-visible {
+  background: var(--accent);
+}
+
+.save:active {
+  transform: scale(0.985);
+}
+
+.save:focus-visible {
+  outline: var(--lw-thick) solid var(--accent);
+  outline-offset: 3px;
+}
+
+.saveIcon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: var(--lw-thin) solid color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.saveIcon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.saveText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.saveLabel {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.saveNote {
+  font-size: var(--t-sm);
+  line-height: 1.35;
+  opacity: 0.72;
+}
+
+.saveArrow {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-top: var(--lw-thick) solid currentColor;
+  border-right: var(--lw-thick) solid currentColor;
+  rotate: 135deg;
+  translate: 0 -0.2rem;
+  transition: translate var(--d-2) var(--ease-plate);
+}
+
+.save:hover .saveArrow {
+  translate: 0 0.05rem;
+}
+
+/* ---- The other ways in ------------------------------------------------------ */
+
+.ways {
+  display: grid;
+  grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr));
+  gap: var(--s-2);
+}
+
+.ways[data-count='2'] {
+  --count: 2;
+}
+
+.way {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 4.5rem;
+  padding: var(--s-3) var(--s-2);
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule);
+  box-shadow: var(--shadow-lift);
+  color: var(--ink);
+  transition:
+    background-color var(--d-1),
+    color var(--d-1),
+    border-color var(--d-1),
+    transform var(--d-1) var(--ease-plate);
+}
+
+.wayGlyph {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: var(--accent);
+  transition: color var(--d-1);
+}
+
+.wayLabel {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.way:hover,
+.way:focus-visible {
+  border-color: var(--accent);
+}
+
+.way:active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper-raised);
+  transform: scale(0.97);
+}
+
+.way:active .wayGlyph {
+  color: inherit;
+}
+
+/* ---- The record --------------------------------------------------------------- */
+
+.record {
+  background: var(--paper-raised);
+  border: var(--lw-thin) solid var(--rule-ink);
+  box-shadow: var(--shadow-lift);
+}
+
+.recordHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-3) var(--pad);
+  border-bottom: var(--lw-med) solid var(--ink);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.recordCount {
+  padding: 2px 6px;
+  border: var(--lw-thin) solid var(--rule-strong);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  border-bottom: var(--lw-thin) solid var(--rule-faint);
+}
+
+.line:last-child {
+  border-bottom: none;
+}
+
+.lineLink {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  grid-template-areas:
+    'no label'
+    'no value';
+  column-gap: var(--s-2);
+  row-gap: 2px;
+  align-content: center;
+  min-height: 3.75rem;
+  padding: var(--s-3) var(--s-2) var(--s-3) var(--pad);
+  transition: background-color var(--d-1);
+}
+
+.lineLink:hover,
+.lineLink:focus-visible {
+  background: var(--accent-soft);
+}
+
+.lineLink:focus-visible {
+  outline-offset: -3px;
+}
+
+.lineNo {
+  grid-area: no;
+  align-self: start;
+  padding-top: 1px;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.lineLabel {
+  grid-area: label;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.lineValue {
+  grid-area: value;
+  min-width: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.lineLink:hover .lineValue {
+  color: var(--accent);
+}
+
+.lineAction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 4rem;
+  border-left: var(--lw-thin) solid var(--rule-faint);
+  font-family: var(--font-label), monospace;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  transition:
+    color var(--d-1),
+    background-color var(--d-1);
+}
+
+.lineAction svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--ink-2);
+  transition: color var(--d-1);
+}
+
+.lineAction:hover,
+.lineAction:focus-visible,
+.lineAction:active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.lineAction:hover svg,
+.lineAction:focus-visible svg {
+  color: var(--accent);
+}
+
+.lineAction[data-done] {
+  color: var(--paper-raised);
+  background: var(--accent);
+}
+
+.lineAction[data-done] svg {
+  color: inherit;
+}
+
+.lineAction:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---- The way into the set: the cover, in miniature ---------------------------
+   The same three states the cover lays side by side, cut on the same slant
+   and joined by the same two coloured edges. They are not the mode tokens:
+   this is a picture of all three at once, whatever the card is printed in. */
+
+.enter {
+  display: block;
+  border: var(--lw-thin) solid var(--rule-ink);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-lift);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.enter:focus-visible {
+  outline: var(--lw-thick) solid var(--accent);
+  outline-offset: 3px;
+}
+
+.bands {
+  --cut-a: 40%;
+  --cut-b: 72%;
+  --lean: 10%;
+  position: relative;
+  display: block;
+  height: 9.5rem;
+  overflow: hidden;
+  border-bottom: var(--lw-thin) solid var(--rule-ink);
+}
+
+.enter:hover .bands,
+.enter:focus-visible .bands,
+.enter:active .bands {
+  --cut-a: 24%;
+  --cut-b: 60%;
+}
+
+.band {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: clip-path var(--d-4) var(--ease-plate);
+}
+
+.band[data-band='a'] {
+  background:
+    linear-gradient(rgba(20, 20, 23, 0.07) 1px, transparent 1px) 0 0 / 100% 16px,
+    linear-gradient(90deg, rgba(20, 20, 23, 0.07) 1px, transparent 1px) 0 0 / 16px 100%,
+    #ded2b8;
+  color: #141417;
+  clip-path: polygon(0 0, var(--cut-a) 0, calc(var(--cut-a) - var(--lean)) 100%, 0 100%);
+}
+
+.band[data-band='b'] {
+  background:
+    linear-gradient(rgba(140, 195, 255, 0.16) 1px, transparent 1px) 0 0 / 100% 16px,
+    linear-gradient(90deg, rgba(140, 195, 255, 0.16) 1px, transparent 1px) 0 0 / 16px 100%,
+    radial-gradient(circle at 50% 40%, #0e3358, #05182a 75%);
+  color: transparent;
+  clip-path: polygon(
+    var(--cut-a) 0,
+    var(--cut-b) 0,
+    calc(var(--cut-b) - var(--lean)) 100%,
+    calc(var(--cut-a) - var(--lean)) 100%
+  );
+}
+
+.band[data-band='c'] {
+  background: #000;
+  color: #8fe388;
+  clip-path: polygon(var(--cut-b) 0, 100% 0, 100% 100%, calc(var(--cut-b) - var(--lean)) 100%);
+}
+
+.bandTitle {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 1.9rem;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.band[data-band='b'] .bandTitle {
+  -webkit-text-stroke: 1px #e6f1fc;
+}
+
+/* The two edges where one state gives way to the next: vermilion, amber. */
+.bands::before,
+.bands::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: clip-path var(--d-4) var(--ease-plate);
+}
+
+.bands::before {
+  background: #c2513f;
+  clip-path: polygon(
+    var(--cut-a) 0,
+    calc(var(--cut-a) + 2px) 0,
+    calc(var(--cut-a) - var(--lean) + 2px) 100%,
+    calc(var(--cut-a) - var(--lean)) 100%
+  );
+}
+
+.bands::after {
+  background: #ffc75a;
+  clip-path: polygon(
+    var(--cut-b) 0,
+    calc(var(--cut-b) + 2px) 0,
+    calc(var(--cut-b) - var(--lean) + 2px) 100%,
+    calc(var(--cut-b) - var(--lean)) 100%
+  );
+}
+
+.bandRevs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--s-2);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  z-index: 1;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.bandRevs span:nth-child(1) {
+  color: #983729;
+  text-align: left;
+  padding-left: var(--s-3);
+}
+
+.bandRevs span:nth-child(2) {
+  color: #ffc75a;
+}
+
+.bandRevs span:nth-child(3) {
+  color: #8fe388;
+  text-align: right;
+  padding-right: var(--s-3);
+}
+
+.enterFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--pad);
+}
+
+.enterText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.enterKicker {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.enterTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+html[data-mode='annotated'] .enterTitle,
+html[data-mode='raw'] .enterTitle {
+  font-size: var(--t-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.enterNote {
+  font-size: var(--t-sm);
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+.enterArrow {
+  position: relative;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--lw-thin) solid var(--ink);
+  border-radius: 50%;
+  transition:
+    background-color var(--d-2) var(--ease-plate),
+    color var(--d-2) var(--ease-plate),
+    border-color var(--d-2) var(--ease-plate);
+}
+
+.enterArrow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-top: var(--lw-thick) solid currentColor;
+  border-right: var(--lw-thick) solid currentColor;
+  rotate: 45deg;
+  translate: -0.12rem 0;
+}
+
+.enter:hover .enterArrow,
+.enter:focus-visible .enterArrow,
+.enter:active .enterArrow {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper-raised);
+}
+
+/* ---- Foot ----------------------------------------------------------------------- */
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding-top: var(--s-2);
+}
+
+.footActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-2);
+}
+
+.footButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 3rem;
+  padding: 0 var(--s-3);
+  border: var(--lw-thin) solid var(--rule-strong);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  transition:
+    color var(--d-1),
+    border-color var(--d-1),
+    background-color var(--d-1);
+}
+
+.footButton svg {
+  flex: 0 0 auto;
+  color: var(--accent);
+  transition: color var(--d-1);
+}
+
+.footButton:hover,
+.footButton:focus-visible,
+.footButton:active {
+  color: var(--paper-raised);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.footButton:hover svg,
+.footButton:active svg {
+  color: inherit;
+}
+
+/* Re-issue the card: the three states as a segmented switch. */
+.reissue {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: var(--lw-thin) solid var(--rule-strong);
+}
+
+.rev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 2.75rem;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  transition:
+    color var(--d-1),
+    background-color var(--d-1);
+}
+
+.rev + .rev {
+  border-left: var(--lw-thin) solid var(--rule-strong);
+}
+
+.revSwatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: var(--lw-thin) solid var(--rule-strong);
+}
+
+.rev[data-rev='artifact'] .revSwatch {
+  background: #ded2b8;
+}
+
+.rev[data-rev='annotated'] .revSwatch {
+  background: #082139;
+}
+
+.rev[data-rev='raw'] .revSwatch {
+  background: #000;
+  border-color: #8fe388;
+}
+
+.revLetter {
+  color: var(--accent);
+}
+
+.rev:hover {
+  color: var(--ink);
+}
+
+.rev[aria-checked='true'] {
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.rev[aria-checked='true'] .revLetter {
+  color: inherit;
+}
+
+.stamp {
+  font-family: var(--font-label), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-4);
+}
+
+/* ---- Received: the stamp the card takes when the contact is saved --------------
+   A rubber stamp, struck a little off square the way they always are, with
+   the date it was kept. It comes down from above the card and the card gives
+   under it. */
+
+.stampMark {
+  position: absolute;
+  left: 47cqw;
+  top: 41cqw;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4cqw;
+  padding: 1.3cqw 2.6cqw;
+  border: 0.45cqw double var(--accent);
+  border-radius: 1cqw;
+  font-family: var(--font-label), monospace;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--accent);
+  transform-origin: 50% 50%;
+  rotate: -12deg;
+  opacity: 0.88;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  animation: strike-stamp 420ms var(--ease-snap) both;
+}
+
+html[data-mode='annotated'] .stampMark,
+html[data-mode='raw'] .stampMark {
+  mix-blend-mode: normal;
+}
+
+.stampMark span:first-child {
+  font-size: 3.6cqw;
+}
+
+.stampMark span:last-child {
+  font-size: 2.1cqw;
+  letter-spacing: 0.18em;
+}
+
+@keyframes strike-stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+  70% {
+    opacity: 0.95;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 0.88;
+    transform: scale(1);
+  }
+}
+
+/* The card gives under the stamp. */
+.object[data-stamped] .drift {
+  animation:
+    thump 520ms var(--ease-snap) both,
+    drift 16s ease-in-out 520ms infinite;
+}
+
+@keyframes thump {
+  0% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(0.35rem) rotateX(-6deg) scale(0.985);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* The back is read by a camera: one scan line passes over it as it comes
+   round, the way the code will be read. */
+.back::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 48%,
+    color-mix(in srgb, var(--accent) 55%, transparent) 50%,
+    transparent 52%,
+    transparent 100%
+  ) 0 0 / 100% 300%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.object[data-turned] .back::after {
+  animation: scan 1400ms var(--ease-mech) 500ms both;
+}
+
+@keyframes scan {
+  0% {
+    opacity: 0;
+    background-position: 0 100%;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    background-position: 0 0;
+  }
+}
+
+/* ---- Arrival: the card lands, then everything under it follows in order ---- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.9rem);
+  }
+}
+
+.sheet [data-rise] {
+  animation: rise 800ms var(--ease-plate) backwards;
+}
+
+.sheet [data-rise='1'] {
+  animation-delay: 650ms;
+}
+.sheet [data-rise='2'] {
+  animation-delay: 720ms;
+}
+.sheet [data-rise='3'] {
+  animation-delay: 790ms;
+}
+.sheet [data-rise='4'] {
+  animation-delay: 860ms;
+}
+.sheet [data-rise='5'] {
+  animation-delay: 930ms;
+}
+.sheet [data-rise='6'] {
+  animation-delay: 1000ms;
+}
+
+/* ---- A wide screen: the card on the left, held still, the lines beside it -- */
+
+@media (min-width: 60rem) {
+  .sheet {
+    --col: 27rem;
+    grid-template-columns: minmax(0, 34rem) minmax(0, var(--col));
+    grid-template-areas:
+      'strip strip'
+      'card when'
+      'card save'
+      'card ways'
+      'card record'
+      'card enter'
+      'card foot';
+    grid-template-rows: auto auto auto auto auto auto 1fr;
+    column-gap: clamp(3rem, 6vw, 6rem);
+    align-content: center;
+    min-height: 100svh;
+  }
+
+  .strip {
+    grid-area: strip;
+    margin-bottom: var(--s-6);
+  }
+
+  .stage {
+    grid-area: card;
+    align-self: start;
+    position: sticky;
+    top: calc(var(--sheet-margin) + var(--s-12));
+  }
+
+  .when {
+    grid-area: when;
+  }
+  .save {
+    grid-area: save;
+  }
+  .ways {
+    grid-area: ways;
+  }
+  .record {
+    grid-area: record;
+  }
+  .enter {
+    grid-area: enter;
+  }
+  .foot {
+    grid-area: foot;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .ink,
+  .foil,
+  .mark,
+  .strip,
+  .frontTop,
+  .name span,
+  .role,
+  .caption,
+  .sheet [data-rise],
+  .save::after,
+  .pulse::after {
+    animation: none;
+  }
+
+  .turn {
+    transition-duration: 1ms;
+  }
+
+  .stampMark,
+  .object[data-stamped] .drift,
+  .object[data-turned] .back::after {
+    animation: none;
+  }
+
+  .object[data-turned] .back::after {
+    opacity: 0;
+  }
+}
+
+@media print {
+  .sheet {
+    display: block;
+  }
+
+  .stage {
+    max-width: 85mm;
+  }
+
+  .caption,
+  .save,
+  .ways,
+  .enter,
+  .foot,
+  .strip {
+    display: none;
+  }
+}

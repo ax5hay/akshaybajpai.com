@@ -133,6 +133,9 @@ export function TitleBlock() {
         <Link href="/set/" className={styles.copy} onClick={() => setExpanded(false)}>
           Issue the whole set as PDF
         </Link>
+        <Link href="/card/" className={styles.copy} onClick={() => setExpanded(false)}>
+          The calling card · C-701
+        </Link>
 
         {route.length > 0 && (
           <p className={styles.route}>

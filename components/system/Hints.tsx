@@ -243,6 +243,11 @@ export function Hints() {
     }
 
     const parts = pathname.split('/').filter(Boolean);
+    // The calling card has no instruments to learn.
+    if (parts[0] === 'card') {
+      setQueue([]);
+      return;
+    }
     const where: Where =
       parts.length === 0
         ? 'plan'
