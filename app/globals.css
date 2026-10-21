@@ -1090,6 +1090,11 @@ html[data-hidden] *::after {
    number, and the sheet offers its own way into the set.
    ========================================================================== */
 
+/* A scan on its way to the card: nothing of the set is painted first. */
+html[data-to-card] body {
+  visibility: hidden;
+}
+
 html[data-card] body > header,
 html[data-card] body > aside[aria-label='Title block'] {
   display: none !important;

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { keyPlanPlates } from '@/lib/plates';
+import { KEY_PLAN_HEIGHT, KEY_PLAN_SHEETS_WIDTH, keyPlanPlates } from '@/lib/plates';
 import { PlateFigure, hasFigure } from '@/components/figures/PlateFigure';
 import { Levels, Voice } from '@/components/system/Voice';
 import { disciplineName, plateSubtitle, plateTitle } from '@/lib/voice';
@@ -25,12 +25,41 @@ export function SetPile() {
         </span>
         <span className={styles.headNote}>
           <Levels
-            a="Seven pages. Scroll, and they stack; tap any one to open it."
-            b="Seven sheets on the plan. Scroll, and they pile; tap one to open it."
-            c="Seven section routes. Scroll to stack; tap to navigate."
+            a="Seven pages. Tap any one to open it."
+            b="Seven sheets on the plan. Tap one to open it."
+            c="Seven section routes. Tap to navigate."
           />
         </span>
       </h2>
+
+      {/* On a desk: the plan itself, small, every sheet where it is on the
+          home page, so the card shows the shape of the site at a glance. */}
+      <nav className={styles.plan} aria-label="The site, as a plan">
+        {plates.map((plate) => (
+          <Link
+            key={plate.sheet}
+            href={plate.href}
+            className={styles.planSheet}
+            data-id={plate.id}
+            style={{
+              left: `${(plate.rect.x / KEY_PLAN_SHEETS_WIDTH) * 100}%`,
+              top: `${(plate.rect.y / KEY_PLAN_HEIGHT) * 100}%`,
+              width: `${(plate.rect.w / KEY_PLAN_SHEETS_WIDTH) * 100}%`,
+              height: `${(plate.rect.h / KEY_PLAN_HEIGHT) * 100}%`,
+            }}
+          >
+            <span className={styles.planTag}>{plate.sheet}</span>
+            <span className={styles.planTitle}>
+              <Levels a={plateTitle(plate, 'a')} b={plate.title} c={plateTitle(plate, 'c')} />
+            </span>
+            {hasFigure(plate.id) && (
+              <span className={styles.planFigure} aria-hidden="true">
+                <PlateFigure id={plate.id} />
+              </span>
+            )}
+          </Link>
+        ))}
+      </nav>
 
       <ol className={styles.sheets}>
         {plates.map((plate, i) => (

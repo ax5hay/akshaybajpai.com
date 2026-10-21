@@ -28,7 +28,15 @@ import { MODE_STORAGE_KEY } from '@/lib/mode';
  * reader who asks for reduced motion, never for one who arrived through
  * the search endpoint (`?q=`), who is owed the index at once, and never on
  * the calling card (`/card/`), which is reached by scanning the printed card
- * and owes its reader a phone number, not a show. The card is also marked on
+ * and owes its reader a phone number, not a show.
+ *
+ * And a scan of the printed card lands here first. The card's code is a
+ * dynamic one that forwards to the bare address with nothing to mark it, so
+ * the scan is recognised by its shape: a phone, on the bare home address, in
+ * a fresh tab, with no referrer and nothing yet seen this session. That
+ * visit is sent to the card before anything is painted. A phone arriving
+ * from a search, a post or a link carries a referrer and gets the set as
+ * usual; anyone who has seen the card this session is never sent back. The card is also marked on
  * the root (`data-card`) before first paint, which is what strikes the rail
  * and the title block from it without a flash. When it will play, `data-cover`
  * holds the set's own entrance animations until the cover reports the set
@@ -48,6 +56,9 @@ for(var i=0;i<ls.length;i++){var l=ls[i],ok=0;
 if(!(l.compareDocumentPosition(me)&4))continue;
 try{ok=l.sheet&&l.sheet.cssRules.length}catch(x){ok=1}
 if(!ok)again(l)}
+try{
+if(location.pathname==='/'&&!location.search&&!location.hash&&!document.referrer&&history.length<2&&matchMedia('(pointer: coarse) and (max-width: 48rem)').matches&&!sessionStorage.getItem('card.seen')&&!sessionStorage.getItem('plate.booted')){document.documentElement.dataset.toCard='';location.replace('/card/');return}
+}catch(e){}
 var card=/^\\/card(\\/|$)/.test(location.pathname);
 if(card){document.documentElement.dataset.card=''}
 try{

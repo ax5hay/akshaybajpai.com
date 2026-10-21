@@ -209,10 +209,117 @@ html[data-mode='raw'] .title {
   background: linear-gradient(135deg, transparent 50%, var(--rule-ink) 50%);
 }
 
+/* ---- On a desk: the plan, small ------------------------------------------- */
+
+.plan {
+  display: none;
+}
+
 @media (min-width: 60rem) {
-  /* Beside the card there is no scroll to stack against: a plain list. */
-  .slot {
-    position: static;
+  .sheets {
+    display: none;
+  }
+
+  .plan {
+    position: relative;
+    display: block;
+    aspect-ratio: 1700 / 900;
+    margin-top: var(--s-2);
+    background:
+      linear-gradient(var(--grid-minor) 1px, transparent 1px) 0 0 / 100% 12px,
+      linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px) 0 0 / 12px 100%;
+  }
+
+  .planSheet {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px 7px;
+    overflow: hidden;
+    background: var(--paper-raised);
+    border: var(--lw-thin) solid var(--rule-ink);
+    box-shadow: var(--shadow-lift);
+    color: var(--ink);
+    transition:
+      transform var(--d-3) var(--ease-plate),
+      border-color var(--d-2),
+      box-shadow var(--d-3) var(--ease-plate);
+  }
+
+  /* The plan's own gutters, kept: each sheet sits inside its rectangle. */
+  .planSheet {
+    margin: 0 3px 3px 0;
+  }
+
+  .planSheet[data-id='contact'] {
+    background: #141417;
+    color: #fcfaf4;
+    border-color: #141417;
+  }
+
+  html[data-mode='annotated'] .planSheet[data-id='contact'] {
+    background: #ffc75a;
+    color: #05182a;
+    border-color: #ffc75a;
+  }
+
+  html[data-mode='raw'] .planSheet[data-id='contact'] {
+    background: #8fe388;
+    color: #05120a;
+    border-color: #8fe388;
+  }
+
+  .planSheet:hover,
+  .planSheet:focus-visible {
+    z-index: 1;
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-deep);
+  }
+
+  .planTag {
+    align-self: flex-start;
+    padding: 1px 4px;
+    font-family: var(--font-label), monospace;
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--paper-raised);
+    background: var(--ink);
+  }
+
+  .planSheet[data-id='contact'] .planTag {
+    color: inherit;
+    background: transparent;
+    border: 1px solid currentColor;
+  }
+
+  .planTitle {
+    font-family: var(--font-display), Georgia, serif;
+    font-size: 0.875rem;
+    line-height: 1.05;
+  }
+
+  html[data-mode='annotated'] .planTitle,
+  html[data-mode='raw'] .planTitle {
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .planFigure {
+    flex: 1;
+    min-height: 0;
+    margin-top: 2px;
+    opacity: 0.8;
+    --fw: 0.9;
+    --fig-delay: 0ms;
+  }
+
+  .planFigure svg {
+    width: 100%;
+    height: 100%;
   }
 }
 

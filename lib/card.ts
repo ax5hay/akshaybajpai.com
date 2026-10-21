@@ -19,8 +19,8 @@ export const CARD = {
   given: 'Akshay',
   family: 'Bajpai',
   role: ROLE,
-  /** TODO: the number on the printed card, with its country code. */
-  phone: '' as string,
+  /** The number on the printed card, with its country code. */
+  phone: '+91 84482 17769' as string,
   email: SOCIAL.email,
   city: 'New Delhi',
   region: 'Delhi',
