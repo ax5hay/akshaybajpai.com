@@ -1268,7 +1268,6 @@ meeting. The errand is short: keep the number, or use it. The code resolves to
 | **The other ways in** | Call, WhatsApp and Email as tiles a thumb can find; with no number set, Email and LinkedIn |
 | **Schedule of lines** | Phone, email, LinkedIn, GitHub, X and the site, each a full-width row with its own copy or open control. A copy is confirmed on the control itself |
 | **The way in** | The cover in miniature: paper, cyanotype and source cut on the same slant, with the vermilion and amber edges. It opens the set as a full navigation, so it arrives on its cover |
-| **The site, rising** | The card is landscape and the site is portrait, so the join is made the way the phone's home makes it: the seven section sheets as a pile under the door. Scroll and they stack, each a little lower than the last; tap any to open it. On a desk they list beside the card |
 | **The foot** | Share (the system share sheet, or a copied link), Show code, and the A · B · C switch that re-issues the card in any of the three states |
 | **Received** | Saving the contact stamps the card received, with the date, and the card gives under the stamp; turning it and saving each tick through the hand where the phone has haptics |
 | **Ways to it** | On the home sheet, a stamp-sized card under the name, on a phone and a desk alike; `components/plate/CardTicket.tsx`, the card in miniature, among the direct lines on the Correspondence sheet; and a line in every sheet's title block |
@@ -1312,11 +1311,10 @@ in the room. A scan line passes over it as it comes round.
 <tr>
 <td width="50%" valign="top">
 
-<img src="docs/media/card-pile.jpg" alt="Under the card, the site's seven sheets stacking as the page scrolls" />
+<img src="docs/media/card-desktop.jpg" alt="The card on a wide screen: the card held still on the left, the lines beside it" />
 
-**The site, under the card.** Scroll past the door and the seven sheets pile up, as they do
-on the phone's own home; each is the page it names. On a desk the same seven are the plan
-itself in miniature, every sheet where it is on the home page.
+**On a desk.** The card sits on the left and leans toward the pointer; the lines are set
+beside it.
 
 </td>
 <td width="50%" valign="top">
@@ -1330,10 +1328,23 @@ normal site, with the card offered under the name on the first sheet.
 </tr>
 </table>
 
-**Cost.** The card's only continuous motion is on the compositor: the drift and the foil's
-sheen are transforms, the masks and gradients are still until a pointer or a tilt moves
-them. On a throttled phone profile the sheet idles at about a fifth of the CPU its first
-draft did, and the home sheet is unchanged.
+**Cost.** Every continuous motion on the card is a `transform` or an `opacity`, so the
+compositor runs it and nothing is painted again:
+
+- **The turn on arrival** is a CSS scroll-driven animation (`animation-timeline: scroll()`),
+  which runs off the main thread and reverses exactly as the reader scrolls back. Script
+  only measures, once, how far and how large the card starts, from offsets the scroll and
+  the collapsing address bar do not change. Where the timeline is not supported, a scroll
+  listener writes one number instead.
+- **The lean** (pointer, finger, or the phone's own tilt) only sets a target. One animation
+  frame eases toward it and stops, writing a transform straight onto the card, the foil's
+  sheen and the light. Nothing is written to a custom property, which would restyle the
+  whole card.
+- **The masks never move.** The rosette is a mask twice over, and Chrome re-rasterises a
+  mask that changes. The foil's colour slides under a still mask instead.
+- **No `preserve-3d`, no `backface-visibility`.** Each layer is flattened into the card's
+  plane, and the faces trade places at the half-turn. Layers sorted in depth were what
+  made the mark flicker out of the rosette as the card leaned.
 
 The rosette is drawn in `lib/card-art.ts` and issued at build time as `/card/rosette.svg`,
 which the card uses as a mask twice: once in the mode's ink, once in foil. The QR code is

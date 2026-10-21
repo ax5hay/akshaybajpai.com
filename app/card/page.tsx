@@ -6,7 +6,6 @@ import { CARD, VCARD_PATH, telHref, whatsappHref, phoneDigits } from '@/lib/card
 import { cardCode } from '@/lib/card-art';
 import { CardFlag, CardIntro, CardObject, CopyLine, Reissue, SaveContact, ShareCard, ShowCode } from './CardActions';
 import { Voice } from '@/components/system/Voice';
-import { SetPile } from './SetPile';
 import styles from './card.module.css';
 
 const SHEET = 'C-701';
@@ -84,9 +83,11 @@ function Front() {
     <>
       <span className={styles.ink} aria-hidden="true" />
       <span className={styles.foil} aria-hidden="true">
-        <span className={styles.foilSheen} />
+        <span className={styles.foilSheen} data-sheen />
       </span>
-      <span className={styles.glare} aria-hidden="true" />
+      <span className={styles.glare} aria-hidden="true">
+        <span className={styles.glareLight} data-light />
+      </span>
 
       {/* The same mark that is on the card in their hand, at the heart of the rosette. */}
       <img src="/card-mark.png" alt="" width={240} height={240} className={styles.mark} />
@@ -288,11 +289,6 @@ export default function CardPage() {
           <span className={styles.enterArrow} aria-hidden="true" />
         </span>
       </a>
-
-      {/* ---- The site, rising under the card ------------------------------- */}
-      <div className={styles.set} data-rise="5">
-        <SetPile />
-      </div>
 
       {/* ---- The record ---------------------------------------------------- */}
       <section className={styles.record} aria-labelledby="card-record" data-rise="6">

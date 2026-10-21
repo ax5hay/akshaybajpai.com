@@ -136,22 +136,15 @@ html[data-mode='raw'] .sheet {
   padding-block: var(--s-2) 0;
 }
 
+/* The card's lean is written onto it by script, as a transform and nothing
+   else (CardObject). Nothing inside is preserve-3d: each layer is flattened
+   into the card's plane, so the browser never has to sort them in depth,
+   which is what made the mark flicker out of the rosette as the card leaned. */
 .object {
-  --rx: 0deg;
-  --ry: 0deg;
-  --gx: 50%;
-  --gy: 30%;
-  --tx: 0;
   position: relative;
   aspect-ratio: 85 / 55;
   container-type: inline-size;
-  transform: rotateX(var(--rx)) rotateY(var(--ry));
-  transform-style: preserve-3d;
-  transition: transform 900ms var(--ease-plate);
-}
-
-.object[data-live] {
-  transition: transform 140ms linear;
+  will-change: transform;
 }
 
 /* The slow drift a card has when it is held, never still. It runs on every
@@ -160,7 +153,7 @@ html[data-mode='raw'] .sheet {
 .drift {
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d;
+  will-change: transform;
   animation:
     arrive 1200ms var(--ease-plate) backwards,
     drift 16s ease-in-out 1200ms infinite;
@@ -169,7 +162,7 @@ html[data-mode='raw'] .sheet {
 @keyframes arrive {
   from {
     opacity: 0;
-    transform: translateY(2.5rem) rotateX(52deg) rotateZ(-4deg) scale(0.9);
+    transform: perspective(1100px) translateY(2.5rem) rotateX(52deg) rotateZ(-4deg) scale(0.9);
   }
 }
 
@@ -177,25 +170,43 @@ html[data-mode='raw'] .sheet {
 @keyframes drift {
   0%,
   100% {
-    transform: rotateX(0deg) rotateY(0deg);
+    transform: perspective(1100px) rotateX(0deg) rotateY(0deg);
   }
   25% {
-    transform: rotateX(-2.5deg) rotateY(5deg);
+    transform: perspective(1100px) rotateX(-2.5deg) rotateY(5deg);
   }
   75% {
-    transform: rotateX(2.5deg) rotateY(-5deg);
+    transform: perspective(1100px) rotateX(2.5deg) rotateY(-5deg);
   }
 }
 
+/* Turning over, without backface-visibility: the faces trade places at the
+   half-turn, when the card is edge-on and neither can be seen. The turn is
+   eased symmetrically so the half-turn falls at half the time. */
 .turn {
+  --turn-ms: 820ms;
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d;
-  transition: transform 1000ms var(--ease-plate);
+  transform: perspective(1400px) rotateY(0deg);
+  transition: transform var(--turn-ms) cubic-bezier(0.6, 0, 0.4, 1);
 }
 
 .object[data-turned] .turn {
-  transform: rotateY(180deg);
+  transform: perspective(1400px) rotateY(180deg);
+}
+
+.front,
+.back {
+  transition: visibility 0s linear calc(var(--turn-ms) / 2);
+}
+
+.back,
+.object[data-turned] .front {
+  visibility: hidden;
+}
+
+.object[data-turned] .back {
+  visibility: visible;
 }
 
 .face {
@@ -207,8 +218,8 @@ html[data-mode='raw'] .sheet {
     linear-gradient(165deg, var(--sheet-sheen) 0%, transparent 55%),
     var(--face);
   color: var(--face-ink);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  /* Nothing on a face paints outside it or changes its size. */
+  contain: layout paint;
   box-shadow:
     inset 0 0 0 1px var(--edge),
     0 1px 0 rgba(46, 35, 18, 0.12),
@@ -227,8 +238,9 @@ html[data-mode='raw'] .face {
   box-shadow: inset 0 0 0 1px var(--edge);
 }
 
+/* Drawn mirrored, so it reads true once the card has turned half round. */
 .back {
-  transform: rotateY(180deg);
+  transform: scaleX(-1);
 }
 
 /* The engraving and its foil: the same rosette, used as a mask twice. Laid
@@ -243,6 +255,7 @@ html[data-mode='raw'] .face {
   -webkit-mask: var(--rosette) center / contain no-repeat;
   mask: var(--rosette) center / contain no-repeat;
   pointer-events: none;
+  will-change: transform;
   animation: strike 1600ms var(--ease-plate) 150ms backwards;
 }
 
@@ -264,19 +277,19 @@ html[data-mode='raw'] .face {
   mask-composite: intersect;
 }
 
-/* Foil catches the light only where the light is: the rosette, intersected
-   with a pool that follows the lean of the card. The mask is still; the
-   colour moves under it, as a transform, so nothing is repainted. */
+/* Foil: the rosette, intersected with a pool of light high on the right.
+   The mask never moves (a moving mask is re-rasterised on every frame); the
+   colour slides under it, as a transform, and the card's lean drives it. */
 .foil {
   overflow: hidden;
   opacity: var(--foil-o);
   -webkit-mask:
     var(--rosette) center / contain no-repeat,
-    radial-gradient(circle at var(--gx) var(--gy), #000 0, transparent 58%);
+    radial-gradient(circle at 62% 34%, #000 0, transparent 62%);
   -webkit-mask-composite: source-in;
   mask:
     var(--rosette) center / contain no-repeat,
-    radial-gradient(circle at var(--gx) var(--gy), #000 0, transparent 58%);
+    radial-gradient(circle at 62% 34%, #000 0, transparent 62%);
   mask-composite: intersect;
 }
 
@@ -294,8 +307,6 @@ html[data-mode='raw'] .face {
     #ff7ad9 84%,
     #b48cff 100%
   );
-  transform: translateX(calc(var(--tx) * -20%));
-  transition: transform 140ms linear;
   animation: sheen 14s ease-in-out infinite;
   will-change: transform;
 }
@@ -317,18 +328,26 @@ html[data-mode='raw'] .face {
   }
 }
 
-/* Light across the whole card, following the lean. */
+/* Light across the whole card, following the lean: a soft pool painted
+   once, larger than the card, and slid about by transform. No blend mode,
+   which would have to be resolved again on every frame. */
 .glare {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    circle at var(--gx) var(--gy),
-    rgba(255, 255, 255, 0.85) 0%,
-    rgba(255, 255, 255, 0) 55%
-  );
-  mix-blend-mode: soft-light;
-  opacity: var(--glare-o);
+  overflow: hidden;
+  opacity: calc(var(--glare-o) * 0.55);
   pointer-events: none;
+}
+
+.glareLight {
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0) 32%
+  );
+  will-change: transform;
 }
 
 .mark {
@@ -406,8 +425,7 @@ html[data-mode='raw'] .mark {
   animation: rise 900ms var(--ease-plate) backwards;
 }
 
-/* On paper the name is pressed in and the ink has a gloss: a highlight slides
-   across the letterforms as the card leans, and nowhere else. */
+/* On paper the name is pressed in and the ink has a gloss, painted once. */
 html[data-mode='artifact'] .name {
   /* The gloss is clipped to the glyphs, and the box it is clipped from has
      to hold the descenders, or the tail of the y goes with it. */
@@ -419,7 +437,7 @@ html[data-mode='artifact'] .name {
       #5c4a2c 50%,
       var(--face-ink) 65%
     )
-    calc(50% + var(--tx) * -60%) 0 / 300% 100%;
+    40% 0 / 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -559,6 +577,8 @@ html[data-mode='raw'] .backTitle {
   position: absolute;
   inset: 0;
   z-index: 2;
+  /* A tap is a tap at once: no double-tap zoom to wait out. */
+  touch-action: manipulation;
   border-radius: 1.6cqw;
   -webkit-tap-highlight-color: transparent;
 }
@@ -1389,27 +1409,30 @@ html[data-mode='raw'] .stampMark {
 .back::after {
   content: '';
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 18%;
   background: linear-gradient(
     180deg,
     transparent 0%,
-    transparent 48%,
     color-mix(in srgb, var(--accent) 55%, transparent) 50%,
-    transparent 52%,
     transparent 100%
-  ) 0 0 / 100% 300%;
+  );
   opacity: 0;
   pointer-events: none;
+  will-change: transform;
 }
 
 .object[data-turned] .back::after {
-  animation: scan 1400ms var(--ease-mech) 500ms both;
+  animation: scan 1400ms var(--ease-mech) 450ms both;
 }
 
+/* A transform, not a moving background: the line is painted once. */
 @keyframes scan {
   0% {
     opacity: 0;
-    background-position: 0 100%;
+    transform: translateY(-100%);
   }
   15%,
   85% {
@@ -1417,7 +1440,7 @@ html[data-mode='raw'] .stampMark {
   }
   100% {
     opacity: 0;
-    background-position: 0 0;
+    transform: translateY(560%);
   }
 }
 
@@ -1511,14 +1534,24 @@ html[data-mode='raw'] .stampMark {
   }
 
   /* The card itself: on its side, large, in the middle of the screen, and
-     stood up by the scroll into its place at the head of the column. */
+     stood up by the scroll into its place at the head of the column. It is
+     rasterised once, at the size it starts, and only ever scaled down. */
   .pin .stage {
     position: relative;
     z-index: 2;
-    transform: translateY(calc((1 - var(--p)) * var(--dy)))
-      rotate(calc((1 - var(--p)) * 90deg))
-      scale(calc(1 + (1 - var(--p)) * (var(--s) - 1)));
     transform-origin: 50% var(--oy, 45%);
+    will-change: transform;
+  }
+
+  /* The size of the screen the address bar does not change, for measuring. */
+  .probe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100svh;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   /* Light from above the board, strongest while the card is the only thing
@@ -1533,27 +1566,12 @@ html[data-mode='raw'] .stampMark {
       ellipse 70% 55% at 50% 50%,
       color-mix(in srgb, var(--paper-raised) 85%, transparent) 0%,
       transparent 70%
-    );
-    opacity: calc(1 - var(--p));
+    );    /* Fixed, so it must be its own layer, or every scroll repaints the page. */
+    will-change: opacity;
   }
 
   html[data-mode='raw'] .light {
     display: none;
-  }
-
-  /* The page rises under the card: the strip, the time and the save, once the
-     card is most of the way up. */
-  .pin > .strip,
-  .pin > .when,
-  .pin > .save,
-  .pin > .ways {
-    opacity: var(--rise);
-    transform: translateY(calc((1 - var(--rise)) * 1.5rem));
-  }
-
-  /* The caption turns with the card, so it waits until the card is upright. */
-  .pin .caption {
-    opacity: clamp(0, calc((var(--p) - 0.92) * 12.5), 1);
   }
 
   .pin > .strip,
@@ -1562,6 +1580,15 @@ html[data-mode='raw'] .stampMark {
   .pin > .ways {
     position: relative;
     z-index: 3;
+  }
+
+  /* Nothing under the card can be pressed until it can be seen. */
+  .intro:not([data-up]) .pin > .strip,
+  .intro:not([data-up]) .pin > .when,
+  .intro:not([data-up]) .pin > .save,
+  .intro:not([data-up]) .pin > .ways,
+  .intro:not([data-up]) .pin .caption {
+    pointer-events: none;
   }
 
   .introHint {
@@ -1580,9 +1607,8 @@ html[data-mode='raw'] .stampMark {
     letter-spacing: var(--track-label-wide);
     text-transform: uppercase;
     color: var(--ink-3);
-    opacity: clamp(0, calc(1 - var(--p) * 4), 1);
     pointer-events: none;
-    animation: rise 900ms var(--ease-plate) 1300ms backwards;
+    will-change: opacity;
   }
 
   .introArrow {
@@ -1604,10 +1630,92 @@ html[data-mode='raw'] .stampMark {
     }
   }
 
-  .intro[data-upright] .introHint {
-    display: none;
+}
+
+/* The turn, run by the browser on the compositor from the page's scroll:
+   transform and opacity only, and as smooth backwards as forwards. */
+@supports (animation-timeline: scroll()) {
+  @media (max-width: 40rem) and (orientation: portrait) and (prefers-reduced-motion: no-preference) {
+    .intro .pin .stage,
+    .intro .light,
+    .intro .introHint,
+    .intro .pin > .strip,
+    .intro .pin > .when,
+    .intro .pin > .save,
+    .intro .pin > .ways,
+    .intro .pin .caption {
+      animation-timeline: scroll(root block);
+      animation-fill-mode: both;
+      animation-duration: 1ms;
+    }
+
+    .intro .pin .stage {
+      animation-name: stand;
+      animation-timing-function: cubic-bezier(0.25, 0.6, 0.35, 1);
+      animation-range: 0 var(--run);
+    }
+
+    .intro .light {
+      animation-name: fade-out;
+      animation-timing-function: linear;
+      animation-range: 0 var(--run);
+    }
+
+    .intro .introHint {
+      animation-name: fade-out;
+      animation-timing-function: linear;
+      animation-range: 0 calc(var(--run) * 0.2);
+    }
+
+    /* The page rises under the card once it is most of the way up. */
+    .intro .pin > .strip,
+    .intro .pin > .when,
+    .intro .pin > .save,
+    .intro .pin > .ways {
+      animation-name: rise-in;
+      animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+      animation-range: calc(var(--run) * 0.45) var(--run);
+    }
+
+    /* The caption turns with the card, so it waits until the card is upright. */
+    .intro .pin .caption {
+      animation-name: fade-in;
+      animation-timing-function: linear;
+      animation-range: calc(var(--run) * 0.85) var(--run);
+    }
   }
 }
+
+@keyframes stand {
+  from {
+    transform: translateY(var(--dy)) rotate(90deg) scale(var(--s));
+  }
+  to {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+/* Without scroll-driven animations, CardIntro writes the same turn straight
+   onto the elements from the scroll. */
 
 /* A phone on its side reads the card as it lies: large, alone, upright. */
 @media (max-height: 30rem) and (orientation: landscape) {
@@ -1628,10 +1736,9 @@ html[data-mode='raw'] .stampMark {
       'card save'
       'card ways'
       'card enter'
-      'card set'
       'card record'
       'card foot';
-    grid-template-rows: auto auto auto auto auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto auto auto 1fr;
     column-gap: clamp(3rem, 6vw, 6rem);
     align-content: center;
     min-height: 100svh;
@@ -1660,9 +1767,6 @@ html[data-mode='raw'] .stampMark {
   }
   .record {
     grid-area: record;
-  }
-  .set {
-    grid-area: set;
   }
   .enter {
     grid-area: enter;

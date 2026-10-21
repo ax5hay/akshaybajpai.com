@@ -52,87 +52,109 @@ function today(): string {
 }
 
 /**
- * The card as an object. It leans toward a pointer, toward the tilt of a
- * phone where the phone reports one without asking (Android does; iOS asks
- * for permission, and a first contact is no place for a permission prompt,
- * so there it drifts on its own), and it turns over when pressed, to show
- * the code on its back.
+ * The card as an object. It leans toward a pointer, toward a finger dragged
+ * across it, and toward the tilt of a phone where the phone reports one
+ * without asking (Android does; iOS asks for permission, and a first contact
+ * is no place for a permission prompt, so there it drifts on its own). It
+ * turns over when pressed, to show the code on its back.
  *
- * The lean is written as four custom properties on the card and nothing else
- * re-renders: --rx and --ry tilt it, --gx and --gy place the light on it,
- * and the foil reads the same numbers so the engraving catches the light as
- * the card moves.
+ * Everything that moves is a transform written straight onto the element
+ * that moves: the card, the foil's sheen, the light. Nothing is written to a
+ * custom property, which would restyle the whole card, and no mask or
+ * gradient is touched, which would repaint it. Sensor and pointer only set
+ * a target; one animation frame eases toward it and stops when it arrives,
+ * so a noisy gyroscope reads as a hand, not a tremor.
  */
 export function CardObject({ front, back }: { front: ReactNode; back: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const dragged = useRef(false);
   const [turned, setTurned] = useState(false);
   const [stamped, setStamped] = useState<string | null>(null);
-
-  const lean = useCallback((x: number, y: number) => {
-    const el = ref.current;
-    if (!el) return;
-    // x and y run from -1 to 1 across the card.
-    el.style.setProperty('--rx', `${(-y * 9).toFixed(2)}deg`);
-    el.style.setProperty('--ry', `${(x * 13).toFixed(2)}deg`);
-    el.style.setProperty('--gx', `${(50 + x * 45).toFixed(1)}%`);
-    el.style.setProperty('--gy', `${(50 + y * 45).toFixed(1)}%`);
-    el.style.setProperty('--tx', x.toFixed(3));
-  }, []);
-
-  const rest = useCallback(() => {
-    const el = ref.current;
-    if (!el) return;
-    for (const name of ['--rx', '--ry', '--gx', '--gy', '--tx']) el.style.removeProperty(name);
-    delete el.dataset.live;
-  }, []);
 
   useEffect(() => {
     const el = ref.current;
     if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const sheens = el.querySelectorAll<HTMLElement>('[data-sheen]');
+    const lights = el.querySelectorAll<HTMLElement>('[data-light]');
 
+    // Where the card is leaning, and where it is asked to lean: -1 to 1.
+    const now = { x: 0, y: 0 };
+    const want = { x: 0, y: 0 };
     let frame = 0;
-    const schedule = (x: number, y: number) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        el.dataset.live = '';
-        lean(x, y);
-      });
+
+    const draw = () => {
+      now.x += (want.x - now.x) * 0.14;
+      now.y += (want.y - now.y) * 0.14;
+      el.style.transform = `rotateX(${(-now.y * 9).toFixed(2)}deg) rotateY(${(now.x * 13).toFixed(2)}deg)`;
+      for (const s of sheens) s.style.transform = `translate3d(${(now.x * -18).toFixed(2)}%, 0, 0)`;
+      for (const l of lights) l.style.transform = `translate3d(${(now.x * 30).toFixed(2)}%, ${(now.y * 30).toFixed(2)}%, 0)`;
+      if (Math.abs(want.x - now.x) + Math.abs(want.y - now.y) > 0.002) frame = requestAnimationFrame(draw);
+      else frame = 0;
+    };
+    const aim = (x: number, y: number) => {
+      want.x = Math.max(-1, Math.min(1, x));
+      want.y = Math.max(-1, Math.min(1, y));
+      if (!frame) frame = requestAnimationFrame(draw);
     };
 
+    // A mouse or a pen: lean toward it.
     const onMove = (event: PointerEvent) => {
       if (event.pointerType === 'touch') return;
       const box = el.getBoundingClientRect();
-      const x = ((event.clientX - box.left) / box.width) * 2 - 1;
-      const y = ((event.clientY - box.top) / box.height) * 2 - 1;
-      schedule(Math.max(-1, Math.min(1, x)), Math.max(-1, Math.min(1, y)));
+      aim(((event.clientX - box.left) / box.width) * 2 - 1, ((event.clientY - box.top) / box.height) * 2 - 1);
     };
-    const onLeave = () => {
-      cancelAnimationFrame(frame);
-      rest();
+    const onLeave = (event: PointerEvent) => {
+      if (event.pointerType !== 'touch') aim(0, 0);
+    };
+
+    // A finger: dragged sideways, the card follows it; up and down is the
+    // page's, and scrolls. A drag is not a press, so it does not turn it.
+    let start: { x: number; y: number } | null = null;
+    const onDown = (event: PointerEvent) => {
+      if (event.pointerType !== 'touch') return;
+      start = { x: event.clientX, y: event.clientY };
+      dragged.current = false;
+    };
+    const onTouchMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'touch' || !start) return;
+      const dx = event.clientX - start.x;
+      if (Math.abs(dx) > 8) dragged.current = true;
+      aim(dx / 140, (event.clientY - start.y) / 240);
+    };
+    const onUp = (event: PointerEvent) => {
+      if (event.pointerType !== 'touch') return;
+      start = null;
+      aim(0, 0);
     };
 
     // The phone's tilt, measured from however it was held when the page
     // opened, so holding it at any angle reads as level.
     let base: { beta: number; gamma: number } | null = null;
     const onTilt = (event: DeviceOrientationEvent) => {
-      if (event.beta == null || event.gamma == null) return;
+      if (start || event.beta == null || event.gamma == null) return;
       base ??= { beta: event.beta, gamma: event.gamma };
-      const x = Math.max(-1, Math.min(1, (event.gamma - base.gamma) / 22));
-      const y = Math.max(-1, Math.min(1, (event.beta - base.beta) / 22));
-      schedule(x, y);
+      aim((event.gamma - base.gamma) / 20, (event.beta - base.beta) / 20);
     };
 
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerleave', onLeave);
+    el.addEventListener('pointerdown', onDown);
+    el.addEventListener('pointermove', onTouchMove);
+    el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointercancel', onUp);
     const asks = typeof (DeviceOrientationEvent as unknown as { requestPermission?: unknown }).requestPermission === 'function';
     if (!asks) window.addEventListener('deviceorientation', onTilt);
     return () => {
       cancelAnimationFrame(frame);
       el.removeEventListener('pointermove', onMove);
       el.removeEventListener('pointerleave', onLeave);
+      el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointermove', onTouchMove);
+      el.removeEventListener('pointerup', onUp);
+      el.removeEventListener('pointercancel', onUp);
       window.removeEventListener('deviceorientation', onTilt);
     };
-  }, [lean, rest]);
+  }, []);
 
   useEffect(() => {
     const onTurn = () => {
@@ -145,7 +167,6 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
       setTurned(false);
       setStamped(today());
       tick(18);
-      ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
     window.addEventListener(TURN_EVENT, onTurn);
     window.addEventListener(STAMP_EVENT, onStamp);
@@ -186,6 +207,10 @@ export function CardObject({ front, back }: { front: ReactNode; back: ReactNode 
           aria-pressed={turned}
           aria-label={turned ? 'Turn the card face up' : 'Turn the card over to show its QR code'}
           onClick={() => {
+            if (dragged.current) {
+              dragged.current = false;
+              return;
+            }
             tick();
             setTurned((t) => !t);
           }}
@@ -237,13 +262,17 @@ export function SaveContact({
  * The card arrives the way it is held: on its side, filling the phone, the
  * long edge down the screen. The page under it is portrait, so the first
  * scroll stands the card up, brings it down to the width of the column and
- * lets the page rise under it: one continuous turn, driven by the scroll and
- * by nothing else. Turning the phone sideways reads the card as it lies.
+ * lets the page rise under it: one continuous turn, driven by the scroll.
+ *
+ * The turn is a CSS scroll-driven animation of `transform` and `opacity`,
+ * which the browser runs on the compositor, off the main thread, and runs
+ * backwards as faithfully as forwards. This component only measures, once,
+ * how far and how large the card has to start (--dy, --s), from layout that
+ * scrolling and the collapsing address bar do not change. Where scroll-driven
+ * animations are not supported it also drives --p from the scroll itself.
  *
  * Only on a phone held upright, and never for a reader who asks for less
  * motion; everywhere else the card simply sits at the head of the column.
- * The turn is written as three numbers on the intro (--p, --dy, --s) and the
- * stylesheet does the rest, as transforms, so it costs the compositor alone.
  */
 export function CardIntro({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -252,68 +281,99 @@ export function CardIntro({ children }: { children: ReactNode }) {
     const intro = ref.current;
     if (!intro) return;
     const when = matchMedia('(max-width: 40rem) and (orientation: portrait) and (prefers-reduced-motion: no-preference)');
+    const native = CSS.supports('animation-timeline: scroll()');
+    const pin = intro.firstElementChild as HTMLElement;
+    const stage = intro.querySelector<HTMLElement>('[data-card-stage]');
+    const object = stage?.firstElementChild as HTMLElement | null;
+    const probe = intro.querySelector<HTMLElement>('[data-probe]');
+    if (!pin || !stage || !object || !probe) return;
+
     let frame = 0;
     let run = 1;
+    let dy = 0;
+    let scale = 1;
+    const risers = [...pin.querySelectorAll<HTMLElement>(':scope > p, :scope > a, :scope > nav')];
+    const light = pin.querySelector<HTMLElement>('[data-intro-light]');
+    const hint = pin.querySelector<HTMLElement>('[data-intro-hint]');
+    const caption = stage.querySelector<HTMLElement>('p');
 
-    // Where the card sits once upright, and so how far and how large it
-    // has to start to lie on its side across the middle of the screen.
+    // From offsets, which neither the scroll nor the sticky pin moves.
     const measure = () => {
       if (!when.matches) return;
-      const stage = intro.querySelector<HTMLElement>('[data-card-stage]');
-      const object = stage?.firstElementChild as HTMLElement | null;
-      if (!stage || !object) return;
-      intro.style.setProperty('--p', '1');
-      const box = object.getBoundingClientRect();
-      // Turn about the card's own centre, not the stage's, which runs on
-      // below the card to hold its caption.
-      intro.style.setProperty('--oy', `${(box.top + box.height / 2 - stage.getBoundingClientRect().top).toFixed(1)}px`);
-      const introTop = intro.getBoundingClientRect().top + window.scrollY;
-      const center = box.top + window.scrollY + box.height / 2 - introTop;
-      const w = box.width;
-      const h = box.height;
-      const s = Math.min((window.innerHeight * 0.8) / w, (window.innerWidth - 28) / h);
-      intro.style.setProperty('--dy', `${(window.innerHeight / 2 - introTop - center).toFixed(1)}px`);
+      const vh = probe.offsetHeight;
+      const center = stage.offsetTop + object.offsetTop + object.offsetHeight / 2;
+      const top = intro.getBoundingClientRect().top + window.scrollY;
+      const s = Math.min((vh * 0.8) / object.offsetWidth, (window.innerWidth - 28) / object.offsetHeight);
+      dy = vh / 2 - top - center;
+      scale = s;
+      intro.style.setProperty('--dy', `${dy.toFixed(1)}px`);
       intro.style.setProperty('--s', s.toFixed(3));
-      run = Math.max(1, intro.offsetHeight - (intro.firstElementChild as HTMLElement).offsetHeight);
+      intro.style.setProperty('--oy', `${(object.offsetTop + object.offsetHeight / 2).toFixed(1)}px`);
+      run = Math.max(1, intro.offsetHeight - pin.offsetHeight);
       update();
     };
 
+    // The page under the card cannot be pressed until it can be seen: below
+    // the threshold it is transparent, and a tap on the card would otherwise
+    // land on the Call and WhatsApp tiles lying invisible over it.
+    let up = false;
+    const settle = (raw: number) => {
+      const next = raw > 0.62;
+      if (next !== up) {
+        up = next;
+        intro.toggleAttribute('data-up', up);
+      }
+    };
+
+    // Where the browser cannot run the turn from the scroll, the same turn
+    // written straight onto the elements that move: transforms and opacity,
+    // nothing inherited, so nothing else is restyled.
+    const draw = (raw: number) => {
+      const p = 1 - Math.pow(1 - raw, 1.7);
+      const q = 1 - p;
+      stage.style.transform = `translate3d(0, ${(q * dy).toFixed(1)}px, 0) rotate(${(q * 90).toFixed(2)}deg) scale(${(1 + q * (scale - 1)).toFixed(4)})`;
+      const rise = Math.min(1, Math.max(0, (p - 0.55) / 0.45));
+      for (const r of risers) {
+        r.style.opacity = rise.toFixed(3);
+        r.style.transform = `translate3d(0, ${((1 - rise) * 24).toFixed(1)}px, 0)`;
+      }
+      if (light) light.style.opacity = q.toFixed(3);
+      if (hint) hint.style.opacity = Math.max(0, 1 - p * 4).toFixed(3);
+      if (caption) caption.style.opacity = Math.min(1, Math.max(0, (p - 0.92) * 12.5)).toFixed(3);
+    };
+
     const update = () => {
-      cancelAnimationFrame(frame);
+      if (frame || !when.matches) return;
       frame = requestAnimationFrame(() => {
-        const top = intro.getBoundingClientRect().top;
-        const raw = Math.min(1, Math.max(0, -top / run));
-        // Ease out: the card answers the first touch of the scroll at once.
-        const p = 1 - Math.pow(1 - raw, 1.7);
-        intro.style.setProperty('--p', p.toFixed(4));
-        intro.toggleAttribute('data-upright', p > 0.98);
+        frame = 0;
+        const raw = Math.min(1, Math.max(0, window.scrollY / run));
+        settle(raw);
+        if (!native) draw(raw);
       });
     };
 
-    const onScroll = () => when.matches && update();
     measure();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', measure);
-    when.addEventListener('change', measure);
     document.fonts?.ready.then(measure);
+    when.addEventListener('change', measure);
+    window.addEventListener('scroll', update, { passive: true });
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', measure);
       when.removeEventListener('change', measure);
+      window.removeEventListener('scroll', update);
     };
   }, []);
 
   return (
     <div ref={ref} className={styles.intro}>
       <div className={styles.pin}>
-        <span className={styles.light} aria-hidden="true" />
+        <span className={styles.light} data-intro-light aria-hidden="true" />
         {children}
-        <p className={styles.introHint} aria-hidden="true">
+        <p className={styles.introHint} data-intro-hint aria-hidden="true">
           <span>Scroll</span>
           <span className={styles.introArrow} />
         </p>
       </div>
+      <span className={styles.probe} data-probe aria-hidden="true" />
     </div>
   );
 }
