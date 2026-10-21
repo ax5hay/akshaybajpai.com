@@ -123,6 +123,7 @@ out/
 ├── set/index.html              # the whole set as one document, for print
 ├── card/index.html             # C-701, the calling card behind the printed card's QR code
 ├── card/rosette.svg            # the card's guilloché engraving, from lib/card-art.ts
+├── card/art/*.svg              # the engraving baked per mode, and the foil in three phases
 ├── akshay-bajpai.vcf           # the contact as a vCard, from lib/card.ts; what "Save contact" hands a phone
 ├── 404.html                    # X-999, Sheet Not Issued
 ├── _next/static/               # hashed JS, CSS and self-hosted fonts

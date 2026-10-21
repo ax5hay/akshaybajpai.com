@@ -81,9 +81,13 @@ function Front() {
   const c = CARD;
   return (
     <>
-      <span className={styles.ink} aria-hidden="true" />
+      <Ink side="front" />
+      {/* Three phases of the foil. The first is printed; the second breathes
+          in and out on its own; the third answers the card's lean. */}
       <span className={styles.foil} aria-hidden="true">
-        <span className={styles.foilSheen} data-sheen />
+        <img src="/card/art/foil-0.svg" alt="" className={styles.art} decoding="async" />
+        <img src="/card/art/foil-1.svg" alt="" className={`${styles.art} ${styles.foilBreath}`} decoding="async" />
+        <img src="/card/art/foil-2.svg" alt="" className={`${styles.art} ${styles.foilLean}`} decoding="async" data-sheen />
       </span>
       <span className={styles.glare} aria-hidden="true">
         <span className={styles.glareLight} data-light />
@@ -121,6 +125,29 @@ function Front() {
   );
 }
 
+/**
+ * The engraving in the ink of each mode. All three are in the page and the
+ * stylesheet shows the one the mode calls for; the others, lazy and never
+ * laid out, are never fetched until the mode changes.
+ */
+function Ink({ side }: { side: 'front' | 'back' }) {
+  return (
+    <span className={styles.ink} aria-hidden="true">
+      {(['artifact', 'annotated', 'raw'] as const).map((mode) => (
+        <img
+          key={mode}
+          src={`/card/art/ink-${side}-${mode}.svg`}
+          alt=""
+          className={styles.art}
+          data-art-mode={mode}
+          loading={mode === 'artifact' ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      ))}
+    </span>
+  );
+}
+
 function Back({ url }: { url: string }) {
   const code = cardCode(url);
   const quiet = 2;
@@ -128,7 +155,7 @@ function Back({ url }: { url: string }) {
   const { at, size } = code.clear;
   return (
     <>
-      <span className={styles.ink} aria-hidden="true" />
+      <Ink side="back" />
       <span className={styles.backBody}>
         <span className={styles.plate}>
           <svg viewBox={`${-quiet} ${-quiet} ${box} ${box}`} className={styles.qr} role="img" aria-label={`QR code for ${url}`}>
