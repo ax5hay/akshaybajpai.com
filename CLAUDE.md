@@ -54,7 +54,9 @@ A-103's "Who is Akshay Bajpai?" answer (`data/engagements.json`) follows it too,
 
 **Research.** He researches world models and reinforcement learning and writes essays on systems, cost and trust. Present him as a researcher and a careful thinker without making a point of it: never say whether the research is independent, personal, funded or affiliated. The evidence is the writing (`content/blog/world-models-as-issued-2026.md`, `reinforcement-learning-after-the-reward-model.md`, `content/essays/the-model-that-refuses-to-draw.md`) and R-301, which leads with what he is working through now. When a new research note is published, add it to R-301's "Now" row if it supersedes the current one.
 
-**No domain lock.** His training is in AI as a whole (MSc in Artificial Intelligence & Intelligent Systems). Medical AI was the thesis and early research topic, not his field: never describe him, his training or his research as medical, healthcare or any one domain. Client work in a domain (health, finance, defence) is described as that piece of work, never as who he is.
+**No domain lock.** His training is in AI as a whole (MSc in Artificial Intelligence & Intelligent Systems). Medical AI was the thesis topic, not the field of the degree. Healthcare AI is one of his most important domains, and he has worked across most industries: name healthcare alongside others (finance, defence, insurance, hospitality), never as the only one, and never describe his training or research as one domain.
+
+**About (A-101) is about him, not the software.** It leads with the entity facts in plain words (the work by industry and kind of AI, not by component), then how he works, credentials and three results with links to their sheets. Technical depth belongs on the case studies and A-102; link to them instead of repeating it.
 
 **No city.** Location is the country only (India): in the address, `occupationLocation`, the vCard, `llms.txt` and the contact sheet. The entity sentence names no place.
 
@@ -182,7 +184,7 @@ npm run sync:stack    # refresh data/stack.json from the profile repo
 
 ## 7. Open items
 
-- "Team of eight" (restaurant platform) comes from an older résumé. The owner has not reconfirmed it.
+- "Team of eight" (restaurant platform) comes from an older résumé and is unconfirmed, so the About elevation says "the team that built it". Restore the number only if the owner confirms it.
 - The "prototype to federal SaaS" work has no metric, so it has no sheet. Add one only with a sourced number.
 - Safari and Firefox have not been tested. Do it, and say what you found in the README.
 - From the brief, not yet built: a detail-callout bubble on the Works sheet ("1/W-401") that opens a case study at a larger scale.

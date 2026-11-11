@@ -171,8 +171,9 @@ export default function ResearchPage() {
           recall-weighted evaluation.
         </p>
         <p>
-          The work since has run wherever the problem was: language models and agents, computer
-          vision, document AI, forecasting, data agents and native software. The principle carried
+          The work since has run wherever the problem was, in healthcare, finance, defence and
+          well beyond: language models and agents, computer vision, document AI, forecasting and
+          native software. The principle carried
           over intact: rigour in data, honest metrics, and systems that the people running them
           can override. How it
           was built is under <Link href="/work/">Works</Link>; the arguments are in the{' '}
