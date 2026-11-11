@@ -4,9 +4,8 @@ Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (vo
 
 ## Where things stand
 
-- **Branch:** `rev-e/boardroom-to-bare-metal`, pushed, open as PR #30 against `main`.
-  - **Not merged.** A merge to `main` deploys to www.akshaybajpai.com.
-  - Merge only when the owner says so.
+- **Merged and live.** PR #30 merged to `main` on 2026-11-12 and deployed to www.akshaybajpai.com.
+  - A push to `main` deploys. Push only when the owner says so.
 - **Build:** `npm run typecheck` and `npm run build` both pass. `out/` holds the last build.
 - **Checked by eye** with headless Edge screenshots:
   - key plan, About, Works, A-102 and A-103
@@ -58,7 +57,7 @@ The case study is 1 kB over the brief's floor: a slightly larger plate registry 
 
 ## Waiting on the owner
 
-- **Push.** Merge the branch to `main` and push. Then submit these in Google Search Console:
+- **Search Console.** Rev E is live. Submit these in Google Search Console:
   - `/`
   - `/about/`
   - `/engagements/`

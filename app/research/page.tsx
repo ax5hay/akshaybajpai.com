@@ -8,12 +8,12 @@ import { JsonLd } from '@/components/JsonLd';
 const PLATE = getPlateByHref('/research/')!;
 
 const META = {
-  title: 'Research · World models, reinforcement learning and medical AI',
+  title: 'Research · World models, reinforcement learning, publication and thesis',
   description:
-    "Akshay Bajpai's research: world models and reinforcement learning, a Springer chapter on machine learning for medical diagnosis, and an MSc thesis on dementia classification.",
+    "Akshay Bajpai's research: world models and reinforcement learning now; before that a Springer chapter and an MSc thesis, from a master's degree in artificial intelligence and intelligent systems.",
   path: '/research/',
   card: 'research',
-  keywords: ['Akshay Bajpai research', 'world models', 'reinforcement learning', 'JEPA', 'AI researcher', 'machine learning for medical diagnosis', 'Springer chapter', 'Alzheimer\'s classification', 'MSc thesis AI'],
+  keywords: ['Akshay Bajpai research', 'world models', 'reinforcement learning', 'JEPA', 'AI researcher', 'MSc Artificial Intelligence', 'machine learning for medical diagnosis', 'Springer chapter', 'Alzheimer\'s classification', 'MSc thesis AI'],
 };
 
 export const metadata = buildMetadata(META);
@@ -68,9 +68,11 @@ export default function ResearchPage() {
     >
       <div className="prose prose-lead">
         <p>
-          My formal training is in intelligent systems and medical AI. I completed a Master of
-          Science in Artificial Intelligence &amp; Intelligent Systems at Lviv Polytechnic National
-          University (2021–2023) with a CGPA of 9.8/10 and distinction. Before that, a B.Tech in
+          My training covers artificial intelligence as a whole, and the systems built on it: a
+          Master of Science in Artificial Intelligence &amp; Intelligent
+          Systems at Lviv Polytechnic National University (2021–2023), with a CGPA of 9.8/10 and
+          distinction. The thesis and my early research took one hard problem, dementia
+          classification, and worked it properly. Before that, a B.Tech in
           Computer Science &amp; Engineering from Rajiv Gandhi Prodyogiki Vishwavidyalaya, Bhopal
           (2017–2021), with honours.
         </p>
@@ -169,9 +171,10 @@ export default function ResearchPage() {
           recall-weighted evaluation.
         </p>
         <p>
-          Production work since then (insurance document intelligence, EHR variable extraction,
-          multimodal diagnostic imaging, programme KPI engines) extends the same principle: rigor
-          in data, honest metrics, and systems that clinicians and operators can override. How it
+          The work since has run wherever the problem was: language models and agents, computer
+          vision, document AI, forecasting, data agents and native software. The principle carried
+          over intact: rigour in data, honest metrics, and systems that the people running them
+          can override. How it
           was built is under <Link href="/work/">Works</Link>; the arguments are in the{' '}
           <Link href="/blog/">field notes</Link> and <Link href="/essays/">essays</Link>.
         </p>
