@@ -4,8 +4,10 @@ Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (vo
 
 ## Where things stand
 
-- **Merged and live.** PR #30 merged to `main` on 2026-11-12 and deployed to www.akshaybajpai.com.
-  - A push to `main` deploys. Push only when the owner says so.
+- **Merged and live.** PRs #30 and #31 are on `main` and live at www.akshaybajpai.com.
+- **Hosting moved to Cloudflare on 2026-11-12.** GitHub Actions stopped starting the Pages deploy (two runs, 43095611960 and 43096479360, sat queued with no jobs and could not be cancelled). The site now deploys with `npm run ship` as Workers static assets (`wrangler.jsonc`), `www` is the Worker's custom domain, and the apex redirects to `www` with a Cloudflare redirect rule. See `DEPLOYMENT.md`.
+  - **Deploy on push is waiting on the owner:** connect Workers Builds (Worker `akshaybajpai` → Settings → Build → Connect, authorise GitHub; build `npm run build`, deploy `npm run deploy`). Until then, deploy by hand after merging.
+  - Deploy only when the owner says so.
 - **Build:** `npm run typecheck` and `npm run build` both pass. `out/` holds the last build.
 - **Checked by eye** with headless Edge screenshots:
   - key plan, About, Works, A-102 and A-103

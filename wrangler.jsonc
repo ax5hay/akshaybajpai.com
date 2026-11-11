@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // The set, served from Cloudflare as static assets: no Worker script, so no
+  // request is billed and nothing runs at the edge but the file lookup.
+  "name": "akshaybajpai",
+  "compatibility_date": "2026-11-12",
+  "assets": {
+    "directory": "./out",
+    // Next exports each sheet as <route>/index.html (trailingSlash: true), so
+    // /about redirects to /about/ and files keep their own names.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "www.akshaybajpai.com", "custom_domain": true }],
+  "workers_dev": true,
+  "observability": { "enabled": false }
+}

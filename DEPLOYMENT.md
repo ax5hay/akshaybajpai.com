@@ -4,35 +4,41 @@
 
 **How the set gets from a commit to [www.akshaybajpai.com](https://www.akshaybajpai.com).**
 
-Static files, built by GitHub Actions, served by GitHub Pages, for free.
+Static files, built and served by Cloudflare, for free.
 
-[![Deploy](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml/badge.svg)](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml)
-![Hosting](https://img.shields.io/badge/hosting-GitHub_Pages-141417?style=flat-square&logo=github)
+![Hosting](https://img.shields.io/badge/hosting-Cloudflare_Workers_static_assets-141417?style=flat-square&logo=cloudflare)
 ![Cost](https://img.shields.io/badge/hosting_cost-%240-2d6a4f?style=flat-square)
 ![HTTPS](https://img.shields.io/badge/HTTPS-enforced-2d6a4f?style=flat-square)
-![Deploy time](https://img.shields.io/badge/push_to_live-about_1_min-5c5548?style=flat-square)
 
 </div>
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  DEPLOYMENT RUNBOOK                            SHEET   C-701    REV    B   │
-│  Drawing set · Akshay Bajpai                   HOST    GitHub Pages        │
-│  Source of truth: .github/workflows/deploy.yml                             │
+│  DEPLOYMENT RUNBOOK                            SHEET   C-701    REV    C   │
+│  Drawing set · Akshay Bajpai                   HOST    Cloudflare          │
+│  Source of truth: wrangler.jsonc                                           │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
+
+> [!NOTE]
+> **Rev C, 2026-11-12: moved from GitHub Pages to Cloudflare.** GitHub Actions stopped
+> starting the Pages deploy (runs sat queued with no jobs and could be neither cancelled
+> nor re-run), so the set now deploys with Wrangler as Workers static assets, which is
+> Cloudflare's current home for Pages sites. `.github/workflows/deploy.yml` is gone. The
+> GitHub Pages site still exists at `ax5hay.github.io/akshaybajpai.com` but no DNS record
+> points at it.
 
 ## At a glance
 
 | | |
 |:--|:--|
 | **Live URL** | https://www.akshaybajpai.com |
-| **Host** | GitHub Pages, deployed from GitHub Actions (not from a branch) |
-| **Trigger** | Any push to `main`, which in practice means merging a pull request |
-| **Time to live** | About one minute; the last six deploys took 55 to 90 seconds |
-| **What is deployed** | The `out/` directory from `npm run build`: static HTML, CSS, JS, fonts |
-| **Server-side code** | None. No functions, no database, no secrets; three optional build variables for search-engine verification and IndexNow |
-| **Cost** | Nothing for hosting, CI or the certificate. The domain registration is the only bill |
+| **Host** | Cloudflare Workers static assets, Worker `akshaybajpai`, account `a03b65e14fa160528953a7cdb7b8625b`. No Worker script: every request is a file lookup, and none is billed |
+| **Trigger** | A push to `main` once Workers Builds is connected to the repository ([§7](#7--one-time-setup)); until then, `npm run ship` from a checkout of `main` |
+| **Time to live** | Seconds after the upload; only changed files are sent |
+| **What is deployed** | The `out/` directory from `npm run build`: static HTML, CSS, JS, fonts, plus `_headers` |
+| **Server-side code** | None. No functions, no database, no secrets |
+| **Cost** | Nothing for hosting, builds or the certificate. The domain registration is the only bill |
 | **Third-party runtime service** | Formspree, for the contact form |
 
 ## Contents
@@ -54,57 +60,36 @@ Static files, built by GitHub Actions, served by GitHub Pages, for free.
 
 ```mermaid
 flowchart TD
-  PUSH["push to main"] --> Q{"another deploy<br/>running?"}
-  Q -->|yes| CANCEL["cancel it<br/>newest commit wins"]
-  Q -->|no| BUILD
-  CANCEL --> BUILD
-
-  subgraph BUILD["job: build · ubuntu-latest · Node 20"]
-    direction TB
-    B1["checkout"] --> B2["npm ci<br/>npm cache restored"]
-    B2 --> B3["npm run build<br/>next build, then RSS"]
-    B3 --> B4["write out/CNAME"]
-    B4 --> B5["verify out/index.html<br/>and out/CNAME exist"]
-    B5 --> B6["upload-pages-artifact"]
-  end
-
-  BUILD --> DEPLOY
-
-  subgraph DEPLOY["job: deploy · environment github-pages"]
-    direction TB
-    D1["deploy-pages"] -->|fails| D2["wait 60 s, retry"]
-    D2 -->|fails| D3["wait 60 s, retry"]
-    D3 -->|fails| D4["job fails"]
-  end
-
-  DEPLOY --> LIVE["www.akshaybajpai.com"]
+  PUSH["push to main"] --> BUILD["Workers Builds<br/>npm ci · npm run build"]
+  LOCAL["npm run ship<br/>(by hand)"] --> BUILD2["npm run build"]
+  BUILD --> DEPLOY["npm run deploy<br/>wrangler deploy"]
+  BUILD2 --> DEPLOY
+  DEPLOY --> UP["upload changed files<br/>to the asset store"]
+  UP --> LIVE["new version serves<br/>www.akshaybajpai.com"]
+  LIVE --> PING["scripts/indexnow.mjs<br/>tell Bing and the rest"]
 ```
 
-The workflow is [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). Two jobs:
+| Step | What it does |
+|:--|:--|
+| `npm run build` | `next build`, then the feed and `llms.txt`, the share cards and the polyfill strip ([§2](#2--what-gets-built)) |
+| `wrangler deploy` | Reads `wrangler.jsonc`, hashes every file in `out/`, uploads only the ones Cloudflare does not already have, and makes the new version live on the Worker and its custom domain in one step |
+| `node scripts/indexnow.mjs` | Waits for the key file to be live, then POSTs every URL in `out/sitemap.xml` to IndexNow. Warns, never fails ([§8](#8--filing-with-the-search-engines)) |
 
-| Job | Step | What it does | Why |
-|:----|:-----|:-------------|:----|
-| `build` | Checkout | `actions/checkout@v4` | |
-| | Setup Node | Node 20 with the npm cache | Keeps installs to a few seconds |
-| | Install | `npm ci` | Exact versions from `package-lock.json` |
-| | Build | `npm run build` | `next build` exports to `out/`; then `scripts/generate-rss.mjs` writes `out/rss.xml` and `out/llms.txt`, `scripts/generate-og.mjs` draws a share card per sheet into `out/og/`, and `scripts/strip-polyfills.mjs` removes the `nomodule` polyfill bundle from every page |
-| | Preserve CNAME | Writes `www.akshaybajpai.com` to `out/CNAME` | Pages reads the custom domain from the artifact. Without this file a deploy would drop the domain |
-| | Issue the IndexNow key file | Writes `out/<key>.txt` when `INDEXNOW_KEY` is set | IndexNow fetches it to prove the key belongs to the host |
-| | Verify artifact | Fails unless `out/index.html` and `out/CNAME` exist | Stops an empty or domainless site from going live |
-| | Upload | `actions/upload-pages-artifact@v4` | Hands `out/` to the deploy job |
-| `deploy` | Deploy | `actions/deploy-pages@v4`, up to three attempts 60 s apart | Pages deploys occasionally fail transiently; retrying is cheaper than re-running the build |
-| `notify` | Submit the sitemap's URLs | After a successful deploy, when `INDEXNOW_KEY` is set: waits for the key file to be live, then POSTs every sitemap URL to `api.indexnow.org` | Bing and the engines that share IndexNow learn of the change in minutes instead of waiting to recrawl. Warns, never fails ([§8](#8--filing-with-the-search-engines)) |
+`npm run deploy` is the last two; `npm run ship` is all three.
 
-**Permissions.** The workflow asks for `contents: read`, `pages: write` and
-`id-token: write`, and nothing else. The deploy job runs in the `github-pages` environment,
-which only accepts deployments from `main`.
+**`wrangler.jsonc`, the only deploy config:**
 
-**Concurrency.** Deploys share one group with `cancel-in-progress: true`. If two merges land
-close together, the older run is cancelled and only the newest commit is deployed.
+| Key | Value | Why |
+|:--|:--|:--|
+| `assets.directory` | `./out` | The static export |
+| `assets.html_handling` | `auto-trailing-slash` | Matches `trailingSlash: true`: `/about` redirects to `/about/`, files keep their names |
+| `assets.not_found_handling` | `404-page` | Anything missing gets `404.html` (X-999) with a real 404 status |
+| `routes` | `www.akshaybajpai.com`, `custom_domain: true` | The Worker is the origin for `www`; Cloudflare owns its DNS record and certificate |
+| `workers_dev` | `true` | Also served at `akshaybajpai.akshaybajpai-com.workers.dev`, useful for checking a deploy before DNS |
 
-**What CI checks.** `next build` type-checks the project, so a type error fails the
-deploy. There is no separate test step, and nothing runs on pull requests: a branch is
-only built when it reaches `main`.
+**`public/_headers`** gives the content-hashed files under `/_next/static/` a year's
+`immutable` cache. Pages and everything else are revalidated on every visit
+(`max-age=0, must-revalidate`), so a deploy shows at once.
 
 ---
 
@@ -132,13 +117,13 @@ out/
 ├── rss.xml · llms.txt          # from scripts/generate-rss.mjs: one feed of every sheet, and the set described for models
 ├── og/<sheet>.png              # from scripts/generate-og.mjs: one share card per sheet
 ├── og.jpg · logo.png · favicon.svg · site.webmanifest · humans.txt
-└── CNAME                       # written by the workflow
+└── _headers                    # from public/: a year's cache on /_next/static/*
 ```
 
 | Setting | Value | Consequence |
 |:--------|:------|:------------|
 | `output` | `'export'` | Static files only; nothing can run on a server |
-| `trailingSlash` | `true` | Every route is a folder with an `index.html`, which is how Pages serves clean URLs |
+| `trailingSlash` | `true` | Every route is a folder with an `index.html`; `html_handling` serves it at the clean URL |
 | `images.unoptimized` | `true` | No image optimisation service exists on a static host |
 
 The export is 33 HTML pages and about 7.5 MB in total, most of it the per-sheet payloads and
@@ -159,12 +144,12 @@ If a page ever appears with the tag, that step did not run: check the build log 
 vendored under `scripts/fonts/`. The build log says *Drew N share cards into out/og/*; N
 should equal the number of sheets minus one (the key plan keeps `public/og.jpg`). The
 resvg binary is a platform-specific optional dependency; `package-lock.json` pins the
-Linux x64 build the runner needs, so do not prune optional dependencies from it.
+Linux x64 build a Linux builder needs, so do not prune optional dependencies from it.
 
 **The calling card and its vCard are built like any sheet.** `app/card/page.tsx` is the
 page the printed card's QR code resolves to, and `app/akshay-bajpai.vcf/route.ts` is a
 static route handler that writes the contact as a vCard, both from `lib/card.ts`;
-`app/card/rosette.svg/route.ts` writes the card's engraving the same way. Pages
+`app/card/rosette.svg/route.ts` writes the card's engraving the same way. Cloudflare
 serves `.vcf` as `text/x-vcard`, which iOS and Android open into the address book. The
 QR code itself is a Vistaprint dynamic code on vqr.vc that forwards to the bare address;
 the site recognises a scan on arrival and sends it to the card (see README C-704), so
@@ -178,9 +163,9 @@ is a CSS change and the export carries no per-level pages.
 the layout as a hidden `<nav>` listing all thirty-six sheets, so a crawler finds the whole
 set from any page it lands on. It adds about 6 kB of HTML per page and nothing on screen.
 
-**Search-engine verification is a build variable.** The build step passes
-`GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` from the repository's Actions
-variables into `app/layout.tsx`, which issues the ownership `<meta>` tags when they are
+**Search-engine verification is a build variable.** The build reads
+`GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` from its environment (Workers
+Builds build variables) into `app/layout.tsx`, which issues the ownership `<meta>` tags when they are
 set and nothing when they are not. See [§8](#8--filing-with-the-search-engines).
 
 ---
@@ -190,32 +175,24 @@ set and nothing when they are not. See [§8](#8--filing-with-the-search-engines)
 ```mermaid
 flowchart LR
   V["visitor"] --> A{"which host?"}
-  A -->|"akshaybajpai.com"| CF["Cloudflare<br/>301 redirect"]
-  CF --> WWW
-  A -->|"www.akshaybajpai.com"| WWW["CNAME<br/>ax5hay.github.io"]
-  WWW --> GH["GitHub Pages<br/>HTTPS enforced"]
+  A -->|"akshaybajpai.com"| R["Cloudflare redirect rule<br/>301 to www, path and query kept"]
+  R --> WWW
+  A -->|"www.akshaybajpai.com"| WWW["Workers custom domain<br/>Worker akshaybajpai"]
+  WWW --> ASSETS["static assets<br/>out/"]
 ```
 
-| Record | Observed value | Purpose |
+| Record or rule | Value | Purpose |
 |:-------|:---------------|:--------|
-| Nameservers | `*.ns.cloudflare.com` | DNS is managed in Cloudflare |
-| `www` `CNAME` | `ax5hay.github.io` | Points the site at GitHub Pages. This is the canonical host |
-| Apex `akshaybajpai.com` | Cloudflare addresses, answering `301 → https://www.akshaybajpai.com/` | The bare domain redirects to `www` at Cloudflare and never reaches Pages |
-| `http://` on either host | `301 → https://www.akshaybajpai.com/` | HTTPS is enforced in the Pages settings |
+| Nameservers | `bailey.ns.cloudflare.com`, `damiete.ns.cloudflare.com` | DNS is managed in Cloudflare (zone `2fed72b2860ebb0734b1c7747d656b72`) |
+| `www` | Workers custom domain, managed by Cloudflare | Created when the domain was attached to the Worker. Do not add a `www` record by hand: Cloudflare refuses to attach a custom domain over an existing record |
+| Apex `akshaybajpai.com` | Proxied `A` records (GitHub's old Pages addresses, never reached) plus a **Single Redirect** rule, *Apex to www, path and query kept* | `301 → https://www.akshaybajpai.com<path>?<query>` at the edge |
+| `http://` on either host | `301` to `https://` | Cloudflare's *Always Use HTTPS* |
+| MX, SPF, DKIM, DMARC, verification `TXT` | Unchanged | Mail (Google Workspace) and the Search Console Domain property |
 
-**The custom domain is declared in two places, and both matter:**
+**The certificate** for `www` is issued and renewed by Cloudflare with the custom domain.
+Nothing needs doing.
 
-- `CNAME` in the repository root, containing `www.akshaybajpai.com`.
-- `out/CNAME`, written by the workflow on every deploy. This is the one Pages reads.
-
-**The certificate** is issued and renewed by GitHub for `www.akshaybajpai.com`. Nothing
-needs doing; if it ever lapses, re-saving the custom domain in the Pages settings requests
-a new one.
-
-> [!NOTE]
-> The apex redirect lives in the Cloudflare account, not in this repository. The values
-> above are what the live domain returns; the exact Cloudflare rule that produces them was
-> not read from the dashboard.
+**The repository's `CNAME` file** was for GitHub Pages and is no longer read by anything.
 
 ---
 
@@ -226,10 +203,17 @@ a new one.
 ```bash
 git checkout -b my-change
 # edit
-npm run build            # the same build CI runs; catches type errors before the PR
+npm run build            # the same build the deploy runs; catches type errors before the PR
 git commit -am "…" && git push -u origin my-change
 gh pr create --fill
-gh pr merge --merge      # this is the deploy
+gh pr merge --merge      # with Workers Builds connected, this is the deploy
+```
+
+Until Workers Builds is connected, deploy by hand after merging:
+
+```bash
+git checkout main && git pull
+npm run ship             # build, upload, ping IndexNow
 ```
 
 ### Publishing writing
@@ -242,34 +226,38 @@ posts) the RSS feed, with no other change. See
 ### Watching a deploy
 
 ```bash
-gh run list --workflow deploy.yml --limit 5
-gh run watch                       # follow the newest run
+npx wrangler deployments list     # the last ten, newest first
 ```
 
-Or open the [Actions tab](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml).
+Or the Worker's **Deployments** tab in the Cloudflare dashboard, which also shows Workers
+Builds logs once it is connected.
 
 ---
 
 ## 5 · Verifying a deploy
 
 ```bash
-# The run for your commit succeeded
-gh run list --workflow deploy.yml --limit 1
+# The newest deployment is yours
+npx wrangler deployments list | head -12
 
-# The site answers, over HTTPS, from GitHub
-curl -sI https://www.akshaybajpai.com/ | grep -iE '^HTTP|^server|^last-modified'
+# The site answers, over HTTPS, from Cloudflare
+curl -sI https://www.akshaybajpai.com/ | grep -iE '^HTTP|^server'
 
 # The apex and plain HTTP both redirect to the canonical host
 curl -sI https://akshaybajpai.com/      | grep -iE '^HTTP|^location'
 curl -sI http://www.akshaybajpai.com/   | grep -iE '^HTTP|^location'
 
 # The supporting files are there
-for p in sitemap.xml robots.txt rss.xml llms.txt humans.txt og.jpg og/about.png; do
+for p in sitemap.xml robots.txt rss.xml llms.txt humans.txt og.jpg og/about.png akshay-bajpai.vcf; do
   curl -s -o /dev/null -w "%{http_code}  $p\n" "https://www.akshaybajpai.com/$p"
 done
 
 # An unknown path returns the X-999 sheet with a real 404 status
 curl -s -o /dev/null -w "%{http_code}\n" https://www.akshaybajpai.com/no-such-sheet/
+
+# Hashed assets are cached for a year
+css=$(curl -s https://www.akshaybajpai.com/ | grep -o '/_next/static/css/[^"]*\.css' | head -1)
+curl -sI "https://www.akshaybajpai.com$css" | grep -i '^cache-control'
 ```
 
 Then look at it:
@@ -282,87 +270,78 @@ Then look at it:
 - [ ] Press <kbd>/</kbd>; the index opens with a preview beside the list.
 - [ ] On a phone, or a narrow window: the pile scrolls, the dock is at the foot, and on an
       article the section strip rides under the rail.
-- [ ] Read two sheets for a few seconds each, then return to the key plan: a traverse joins them.
-- [ ] Press **▶ Tour** on the key plan; it visits each sheet and stops on <kbd>Esc</kbd>.
 - [ ] Open `/set/` and print to PDF; every sheet starts a new page.
 - [ ] Follow a link to a path that does not exist; the unissued sheet offers the nearest ones.
-- [ ] Open `/?q=rag`; the index opens on the query, with no cover sheet first.
 - [ ] Paste a sheet's URL into a chat or social app; its own card appears, not the home card.
-- [ ] If the verification variables are set, `curl -s https://www.akshaybajpai.com/ | grep -c 'site-verification\|msvalidate'` prints the number set.
-
-> [!TIP]
-> If the site looks unchanged after a successful run, it is almost always the cache. Pages
-> serves every file with `cache-control: max-age=600`, so a browser or the CDN may hold the
-> previous version for up to ten minutes. A hard reload settles it.
 
 ---
 
 ## 6 · Rolling back
 
-There is no deploy history to click through; the live site is always the newest successful
-build of `main`. To go back, put `main` back.
-
-**Preferred: revert the merge.** This keeps history honest and deploys in a minute.
+Every deploy is a version of the Worker, and any of the recent ones can be put back
+in seconds without a build:
 
 ```bash
-git checkout main && git pull
-git log --oneline -5                 # find the merge commit to undo
-git revert -m 1 <merge-sha>
-git push                             # triggers a deploy of the reverted tree
-```
-
-**Alternative: re-run an older deploy.** Re-running a past workflow run rebuilds and
-redeploys the commit it ran on, without touching `main`.
-
-```bash
-gh run list --workflow deploy.yml --limit 10
-gh run rerun <run-id>
+npx wrangler deployments list           # find the version that was good
+npx wrangler rollback <version-id>       # serve it again
 ```
 
 > [!WARNING]
-> After a re-run the live site no longer matches `main`, and the next push to `main` will
-> replace it again. Use this to buy time, then land a proper revert.
+> After a rollback the live site no longer matches `main`, and the next deploy replaces
+> it again. Use it to buy time, then land a proper revert:
+> `git revert -m 1 <merge-sha>` on `main` and deploy.
 
 ---
 
 ## 7 · One-time setup
 
-Already done for this repository. Recorded for a fork, or for rebuilding from nothing.
+Done for this site except where marked. Recorded for a fork, or for rebuilding from nothing.
 
-1. **Pages source.** Settings → Pages → Build and deployment → Source: **GitHub Actions**.
-2. **Custom domain.** Settings → Pages → Custom domain: `www.akshaybajpai.com`, and tick
-   **Enforce HTTPS** once the certificate has been issued.
-3. **`CNAME` file.** Keep `CNAME` in the repository root, and keep the workflow step that
-   writes `out/CNAME`.
-4. **DNS.** A `CNAME` record for `www` pointing at `<user>.github.io`. Redirect the apex to
-   `www` at the DNS provider, or point it at GitHub's Pages addresses.
-5. **Environment.** The `github-pages` environment is created by the first deploy. Its
-   branch policy should allow `main` only.
+1. **Worker.** `npx wrangler deploy` from the repository creates the Worker
+   `akshaybajpai` from `wrangler.jsonc`. Wrangler 4.160 and later route
+   `wrangler pages project create` to Workers; do not use `--force` to make a classic
+   Pages project.
+2. **Custom domain.** Delete any existing `www` record, then let the deploy attach
+   `www.akshaybajpai.com` (the `routes` entry), or add it under the Worker's
+   **Settings → Domains & Routes**.
+3. **Apex redirect.** Rules → Redirect Rules → a Single Redirect: when hostname equals
+   `akshaybajpai.com`, dynamic redirect to
+   `concat("https://www.akshaybajpai.com", http.request.uri.path)`, status 301, preserve
+   the query string. The apex needs a proxied record for the rule to run; the old `A`
+   records serve that purpose.
+4. **Deploy on push: not yet connected.** Workers & Pages → `akshaybajpai` → Settings →
+   **Build** → **Connect**, authorise the Cloudflare GitHub app for `ax5hay/akshaybajpai.com`,
+   then:
 
-6. **Search engines.** Optional, and the only configuration that is not in the code:
-   two ownership tokens stored as repository variables. The full procedure is
-   [§8](#8--filing-with-the-search-engines).
+   | Field | Value |
+   |:--|:--|
+   | Branch | `main` |
+   | Build command | `npm run build` |
+   | Deploy command | `npm run deploy` |
+   | Root directory | `/` |
+   | Non-production branch builds | Off |
 
-No secrets are required. The workflow authenticates with the `id-token` permission GitHub
-grants it; the verification variables above and `INDEXNOW_KEY` are optional and public by
-nature.
+   The GitHub authorisation is a browser sign-in, which is why it could not be done from
+   the command line. After that, every push to `main` builds and deploys, and
+   `npm run ship` is only needed for an out-of-band deploy.
+5. **IndexNow key.** `public/<key>.txt`; public by design ([§8](#8--filing-with-the-search-engines)).
+
+No secrets are stored in the repository. Workers Builds creates its own deploy token when
+it is connected.
 
 <details>
 <summary><b>Changing the domain</b></summary>
 
 <br/>
 
-Five places name it, and all five have to change together:
-
 | Where | What |
 |:------|:-----|
-| `CNAME` | The domain |
-| `.github/workflows/deploy.yml` | The `echo "…" > out/CNAME` step |
+| `wrangler.jsonc` | `routes[0].pattern` |
 | `lib/constants.ts` | `SITE_URL`, used for canonical URLs, the sitemap, the structured data and share cards |
 | `scripts/generate-rss.mjs` | `SITE`, used for feed links and `llms.txt` |
 | `scripts/generate-og.mjs` | The domain printed on every card |
-
-Then update the custom domain in the Pages settings and the DNS record.
+| `scripts/indexnow.mjs` | `HOST` |
+| Cloudflare | The apex redirect rule's target |
 
 </details>
 
@@ -376,10 +355,10 @@ the site has an owner; that needs a token from each console, and the owner's han
 about fifteen minutes in all. Bing's index also feeds DuckDuckGo, Yahoo, Ecosia and the
 search layers of Copilot and ChatGPT, so the second console matters more than it looks.
 
-How the token reaches the page: the deploy workflow passes two repository variables into
-the build, and `app/layout.tsx` issues `<meta name="google-site-verification">` and
+How the token reaches the page: the build reads two environment variables (Workers
+Builds build variables, or exported before `npm run ship`), and `app/layout.tsx` issues `<meta name="google-site-verification">` and
 `<meta name="msvalidate.01">` when they are set. Neither is a secret; a verification token
-is public by design, which is why they are **Variables** and not Secrets.
+is public by design, so they need not be stored as secrets.
 
 ### Google Search Console
 
@@ -405,17 +384,16 @@ is public by design, which is why they are **Variables** and not Secrets.
 
 **Hand the token to the build**
 
-5. Open the repository's **Settings → Secrets and variables → Actions → Variables** tab.
-6. **New repository variable**: name `GOOGLE_SITE_VERIFICATION`, value the token.
-7. Run a deploy: **Actions → Deploy to GitHub Pages → Run workflow → `main`**, or push
-   any commit. Wait for the green tick.
+5. In Cloudflare: Workers & Pages → `akshaybajpai` → Settings → **Build** → *Variables*.
+6. Add `GOOGLE_SITE_VERIFICATION`, value the token.
+7. Deploy: push any commit, or `GOOGLE_SITE_VERIFICATION=… npm run ship`.
 8. Confirm the tag is live:
 
    ```bash
    curl -s https://www.akshaybajpai.com/ | grep -o '<meta name="google-site-verification"[^>]*>'
    ```
 
-   If it prints nothing, the CDN is still serving the previous build; wait ten minutes.
+   If it prints nothing, the variable did not reach the build.
 
 **Verify and submit**
 
@@ -453,9 +431,8 @@ structured data has been read; green there means the graph parsed.
 3. **Add your site manually** → `https://www.akshaybajpai.com/` → **Add**.
 4. Of the three verification methods choose **HTML Meta Tag**. Copy the value inside
    `content="…"` of `<meta name="msvalidate.01" …>` (32 hexadecimal characters).
-5. Repository **Variables** → **New repository variable**: `BING_SITE_VERIFICATION`,
-   value the token.
-6. Run a deploy and wait for green. Confirm:
+5. Add the build variable `BING_SITE_VERIFICATION`, value the token, as for Google.
+6. Deploy. Confirm:
 
    ```bash
    curl -s https://www.akshaybajpai.com/ | grep -o '<meta name="msvalidate.01"[^>]*>'
@@ -479,23 +456,19 @@ share for being told about a change rather than finding it; Bing's index then ca
 to DuckDuckGo and the Copilot and ChatGPT search layers. Google does not take it and
 reads the sitemap instead.
 
-The deploy workflow has a third job, **Notify IndexNow**, which runs after a successful
-deploy when the repository variable `INDEXNOW_KEY` is set, and is skipped otherwise:
+`npm run deploy` ends with `node scripts/indexnow.mjs`:
 
-1. The build writes the key to `out/<key>.txt`; IndexNow fetches that file to prove the
-   key belongs to the host, which is why the key is a *Variable* and not a *Secret*: the
-   file is public by design.
-2. After the deploy, the job waits for the CDN to serve the key file (up to ten
-   minutes, the Pages cache), reads the live `sitemap.xml`, and POSTs every URL in it to
-   `api.indexnow.org`. The set is small and the protocol allows ten thousand URLs a
-   call; a changed sheet is usually several (its neighbours, the index, the feed).
-3. `200` or `202` is success and is written to the run's summary. Anything else is a
-   warning on the run, never a failure: a missed ping costs a crawl, not the site.
+1. The key file is `public/<key>.txt`, so every build ships it at `/<key>.txt`. IndexNow
+   fetches it to prove the key belongs to the host; it is public by design, which is why
+   it is committed.
+2. After `wrangler deploy`, the script waits for the key file to be live, reads
+   `out/sitemap.xml`, and POSTs every URL in it to `api.indexnow.org`.
+3. `200` or `202` is success and is printed. Anything else is a warning, never a
+   failure: a missed ping costs a crawl, not the site.
 
-The key is any 8–128 character string of `a–z`, `A–Z`, `0–9` and `-`; it was generated
-with `openssl rand -hex 16`. To rotate it, set the variable to a new value and deploy;
-the old file stops being issued and the new one is checked on the next ping. Bing
-Webmaster Tools → **IndexNow** shows what has been received.
+The key was generated with `openssl rand -hex 16`. To rotate it, replace the file in
+`public/` with a new `<key>.txt` holding the new key, and deploy. Bing Webmaster Tools →
+**IndexNow** shows what has been received.
 
 ### Leave alone
 
@@ -505,7 +478,7 @@ visible.
 
 ### Rotating or removing a token
 
-Delete the repository variable and run a deploy; the tag is no longer issued. The
+Delete the build variable and deploy; the tag is no longer issued. The
 consoles keep the property verified for a while and then ask again, at which point a
 new token goes in the same way.
 
@@ -515,14 +488,11 @@ new token goes in the same way.
 
 | Symptom | Likely cause | Fix |
 |:--------|:-------------|:----|
-| **Build fails with a type error in a file you did not touch** | A stray, untracked `.ts` or `.tsx` file locally. `tsc` checks every file in the tree, tracked or not | Delete or fix the stray file. CI is unaffected, because it only has tracked files |
+| **Build fails with a type error in a file you did not touch** | A stray, untracked `.ts` or `.tsx` file locally. `tsc` checks every file in the tree, tracked or not | Delete or fix the stray file. A clean checkout is unaffected |
 | **Build fails locally at the export step** | Something is holding `out/` open, usually a preview server | Stop the server, build, start it again |
-| **Site loads unstyled just after a deploy** (plain text, no layout) | A CDN edge served the new HTML but answered 404 for the newly named CSS, and cached that 404 for ten minutes | The page now retries a failed stylesheet under a fresh URL by itself (`ModeScript`). If it is ever seen again, a reload a minute later clears it |
-| **Run succeeded, site unchanged** | `max-age=600` caching | Hard reload, or wait ten minutes |
-| **Site serves on `ax5hay.github.io` but not the custom domain** | `out/CNAME` was missing from the artifact | Check the *Preserve CNAME* step ran; re-save the custom domain in Pages settings |
-| **Certificate warning** | Custom domain was removed and re-added, and the new certificate is still being issued | Wait; then re-tick **Enforce HTTPS** |
-| **Deploy job fails three times** | A GitHub Pages incident | Check [githubstatus.com](https://www.githubstatus.com/), then `gh run rerun <run-id> --failed` |
-| **A new post is missing** | `draft: true` in its frontmatter, or a missing `title`, `description` or `pubDate` | Fix the frontmatter and merge |
+| **`wrangler deploy`: hostname already has externally managed DNS records** | A `www` record was added by hand | Delete it; the deploy re-attaches the custom domain |
+| **Deployed, site unchanged** | A browser holding the old HTML | Pages are `max-age=0`, so a reload settles it |
+| **A new post is missing** | `draft: true` in its frontmatter, or a missing `title`, `description` or `pubDate` | Fix the frontmatter, merge and deploy |
 | **A sheet's number changed** | Detail sheets are numbered by publication date, so adding or re-dating one renumbers the series | Expected. Link to sheets by URL, not by number |
 | **Contact form fails** | Formspree is unreachable or its endpoint changed | The form already tells the visitor to email instead. The endpoint is in `components/plate/CorrespondenceForm.tsx` |
 | **A hint note never appears** | Each is shown once per browser, ever, and "No more notes" turns them off | Clear `plate.notes` and `plate.notes.off` from the site's local storage |
@@ -532,22 +502,17 @@ new token goes in the same way.
 
 ## 10 · Known limits
 
-These come with the host, and are accepted trade-offs for a free static site.
-
 | Limit | Effect |
 |:------|:-------|
-| **One cache policy for every file** | Pages sends `max-age=600` for everything, including content-hashed assets that could be cached forever. Returning visitors revalidate after ten minutes |
-| **No custom headers** | No Content-Security-Policy, HSTS preload or custom caching can be set from this repository |
 | **No server** | Anything dynamic has to be a third-party service called from the browser, as the contact form is |
-| **Deploys are not atomic across the CDN** | For a short while after a deploy, an edge can hold new HTML and old assets. Hashed file names change every build, so the mismatch shows as missing CSS; the page retries those requests |
-| **No preview deployments** | A pull request is not built anywhere until it merges. Build locally before merging |
-| **One site per repository** | There is no staging copy; `main` is production |
-| **Compression** | Pages serves gzip. Brotli is not offered |
+| **Deploy on push needs Workers Builds connected** | Until it is, a merge does not deploy; run `npm run ship` |
+| **One production site** | There is no staging copy; `main` is production. The `workers.dev` URL serves the same version |
+| **Asset limits** | 25 MiB per file and 20,000 files per version; the set is far under both |
 
 ---
 
 <div align="center">
 
-<sub>Back to the <a href="README.md">README</a> · Workflow: <a href=".github/workflows/deploy.yml"><code>deploy.yml</code></a></sub>
+<sub>Back to the <a href="README.md">README</a> · Config: <a href="wrangler.jsonc"><code>wrangler.jsonc</code></a></sub>
 
 </div>
