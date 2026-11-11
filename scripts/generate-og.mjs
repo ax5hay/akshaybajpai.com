@@ -170,13 +170,15 @@ async function render(name, props) {
 }
 
 const SECTIONS = [
-  { id: 'about', sheet: 'A-101', discipline: 'Architectural', title: 'The Architect', description: 'Biography, trajectory, and operating principles. Forward-deployed AI engineering: multi-tenant platforms, governed agents, clinical and operational intelligence.' },
-  { id: 'research', sheet: 'R-301', discipline: 'Research', title: 'Research', description: 'Published medical AI research, a Master’s thesis on dementia classification, and ongoing work in governed agentic retrieval.' },
+  { id: 'about', sheet: 'A-101', discipline: 'Architectural', title: 'Boardroom to bare metal', issued: '2026.11', description: 'Akshay Bajpai, technology leader and systems architect. Clients, teams, architecture, AI and the code underneath, from the first client conversation to the runbook.' },
+  { id: 'engagements', sheet: 'A-103', discipline: 'Architectural', title: 'Terms of Engagement', issued: '2026.11', description: 'What I take on: technology end to end, AI platforms in production, data agents a finance team can trust, vision where the data cannot leave.' },
+  { id: 'schedule', sheet: 'A-102', discipline: 'Architectural', title: 'Schedule of Materials', issued: '2026.11', description: 'Every tool and practice, from every repository and engagement. Leadership and delivery first, then the stack, from LLM systems to Rust.' },
+  { id: 'research', sheet: 'R-301', discipline: 'Research', title: 'Research', description: 'World models and reinforcement learning, published medical AI research, and a Master’s thesis on dementia classification.' },
   { id: 'architecture', sheet: 'S-201', discipline: 'Structural', title: 'Structural Principles', description: 'The decisions that outlast implementation: governed agents, hybrid retrieval, event-driven inference, and infrastructure as product.' },
-  { id: 'work', sheet: 'W-400', discipline: 'Works', title: 'Works', description: 'Case studies in forward-deployed AI, as built: what was made, the constraints it was made under, and the numbers it was measured by.' },
+  { id: 'work', sheet: 'W-400', discipline: 'Works', title: 'Works', issued: '2026.11', description: 'Case studies, as built: what was made, the constraints it was made under, and the numbers it was measured by. From text-to-SQL to native Rust.' },
   { id: 'blog', sheet: 'B-500', discipline: 'Field Notes', title: 'Field Notes', description: 'What the work taught, written down while it was fresh: AI infrastructure, healthcare AI, performance engineering, world models, reinforcement learning.' },
   { id: 'essays', sheet: 'E-600', discipline: 'Essays', title: 'Essays', description: 'Longer arguments about systems, cost, and trust.' },
-  { id: 'contact', sheet: 'C-700', discipline: 'Correspondence', title: 'Correspondence', description: 'Open a line. Forward-deployed AI work, architecture reviews, speaking, or collaboration on systems design and performance engineering.' },
+  { id: 'contact', sheet: 'C-700', discipline: 'Correspondence', title: 'Correspondence', description: 'Open a line. Technology leadership, systems architecture, AI that has to hold in production, architecture reviews, or speaking.' },
 ];
 
 const SERIES = {
@@ -193,7 +195,7 @@ const stamp = (d) => {
 fs.mkdirSync(OUT, { recursive: true });
 let n = 0;
 for (const s of SECTIONS) {
-  await render(s.id, { ...s, kicker: `${s.discipline} · General arrangement`, issued: '2026.09' });
+  await render(s.id, { ...s, kicker: `${s.discipline} · General arrangement`, issued: s.issued ?? '2026.09' });
   n += 1;
 }
 for (const [collection, series] of Object.entries(SERIES)) {

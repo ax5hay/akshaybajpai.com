@@ -6,9 +6,8 @@ import styles from './CareerElevation.module.css';
 /**
  * The career, as an elevation the reader can operate.
  *
- * Each role is a volume standing on the datum, set out along the years it
- * ran and drawn taller than the one before. Selecting a volume reads out the
- * role. All six are in the markup, so without script, and on paper, the
+ * Each kind of work is a volume standing on the datum, drawn taller than the
+ * one before. Selecting a volume reads it out. All six are in the markup, so without script, and on paper, the
  * elevation is followed by the full chronology in order.
  */
 
@@ -16,73 +15,68 @@ interface Role {
   from: number;
   to: number;
   height: number;
-  year: string;
   role: string;
   context: string;
   description: string;
 }
 
-/* Oldest first: the order they stand in along the datum. */
+/* Oldest first: the order they stand in along the datum. Each volume is a
+   kind of work. No job titles, employers or years: the work carries it. The
+   spans only set each volume's width. */
 const ROLES: Role[] = [
   {
     from: 2021,
     to: 2023,
     height: 46,
-    year: '2021–2023',
-    role: 'MSc Artificial Intelligence',
-    context: 'Lviv Polytechnic National University',
+    role: 'MSc in Artificial Intelligence',
+    context: 'Research · with distinction',
     description:
-      "Graduated with Distinction (9.8/10). Master's thesis on Alzheimer's disease classification benchmarking 9 machine learning models on longitudinal biomarkers.",
+      "Graduated with distinction (9.8/10). The thesis benchmarked nine machine learning models for Alzheimer's classification on longitudinal biomarkers.",
   },
   {
     from: 2023,
     to: 2025,
     height: 70,
-    year: '2023–2025',
-    role: 'Data Scientist II',
-    context: 'Insurance · Document Intelligence',
+    role: 'Insurance document AI',
+    context: 'Extraction and underwriting on AWS',
     description:
-      'Shipped document intelligence on AWS Bedrock (Claude, LayoutLMv3) achieving 95%+ extraction accuracy. Built ensemble underwriting models improving efficiency by 78%.',
+      'Document intelligence on AWS Bedrock (Claude, LayoutLMv3) at 95%+ extraction accuracy and 10K+ queries a day. Underwriting efficiency up 78%.',
   },
   {
     from: 2025,
     to: 2025.45,
     height: 90,
-    year: '2025',
-    role: 'Founding Engineer',
-    context: 'Restaurant SaaS',
+    role: 'A restaurant platform',
+    context: 'Forecasting and event pipelines',
     description:
-      'Validated demand forecasting across 200+ pilot sites using XGBoost and Prophet, reducing food waste by 32%. Scaled event-driven pipelines to process 2M+ events/day.',
+      'The AI and full-stack engineering, and the team of eight that built it. Forecasting validated across 200+ restaurants cut food waste 32%; event pipelines carry 2M+ events a day under 100 ms.',
   },
   {
     from: 2025.45,
     to: 2026,
     height: 108,
-    year: '2025–2026',
-    role: 'Senior AI Consultant',
-    context: 'Finance & Healthcare',
+    role: 'Finance and healthcare AI',
+    context: 'Agents and clinical pipelines',
     description:
-      'Built stateful LangGraph finance workflows reducing manual touchpoints by 60%. Deployed multimodal clinical pipelines (QLoRA, hybrid RAG) on HIPAA-aware AWS, maintaining sub-800ms p95 latency.',
+      'LangGraph finance agents with 60% fewer manual touchpoints. Multimodal clinical pipelines on QLoRA-tuned open models in HIPAA- and GDPR-compliant AWS: 94% precision, inference cost down 80%, under 800 ms at p95.',
   },
   {
     from: 2026,
     to: 2026.4,
     height: 124,
-    year: '2026',
-    role: 'AI Lead',
-    context: 'Defense-Adjacent · Video Intelligence',
+    role: 'Defence video intelligence',
+    context: 'Government defence deployments',
     description:
-      'Architected an agentic video-intelligence platform over 24/7 CCTV using LangGraph and MCP, cutting analyst intervention by ~70%. Engineered Kafka ingestion for sub-200ms latency on air-gapped infrastructure.',
+      'An agentic platform over round-the-clock CCTV on air-gapped hardware: LangGraph and MCP agents triage and escalate, Kafka feeds the inference. Analyst intervention down 70%; under 200 ms from ingestion to decision.',
   },
   {
     from: 2026.4,
     to: 2026.9,
     height: 142,
-    year: '2026–Present',
-    role: 'Lead Full-Stack AI Engineer',
-    context: 'Forward Deployment · Multi-Tenant AI',
+    role: 'Multi-tenant health AI',
+    context: 'Forward-deployed, several programmes at once',
     description:
-      'Owning roadmap-to-production across multiple client programs. Architecting shared LLM gateways, governed reporting agents, and Python microservices on AWS CDK. Delivering multi-tenant workflows that survive C-suite UAT.',
+      'Lead engineer and the main technical voice to product and executive teams: a governed natural-language-to-SQL agent, three coordinated assistants and the shared LLM layer under them, on AWS CDK. Reporting rebuilt on 8,000+ approved columns across 193 tables.',
   },
 ];
 
@@ -124,12 +118,12 @@ export function CareerElevation() {
             for (let y = GROUND - 14; y > top + 5; y -= 14) floors += `M${left} ${y}H${right}`;
             return (
               <g
-                key={r.year + r.role}
+                key={r.role}
                 className={styles.volume}
                 data-on={i === at || undefined}
                 role="button"
                 tabIndex={i === at ? 0 : -1}
-                aria-label={`${r.year}: ${r.role}, ${r.context}`}
+                aria-label={`${i + 1} of ${ROLES.length}: ${r.role}, ${r.context}`}
                 aria-pressed={i === at}
                 onClick={() => setAt(i)}
                 onMouseEnter={() => setAt(i)}
@@ -150,21 +144,13 @@ export function CareerElevation() {
             <path d={`M${W - 30} 0l6 -7h-12z`} className={styles.levelMark} />
           </g>
 
-          {[2021, 2023, 2025, 2026].map((year) => (
-            <g key={year}>
-              <path d={`M${x(year)} ${GROUND + 10}v6`} className={styles.tick} />
-              <text x={x(year)} y={GROUND + 28} textAnchor="middle" className={styles.year}>
-                {year}
-              </text>
-            </g>
-          ))}
         </svg>
       </div>
 
       <ol className={styles.roles}>
         {ROLES.map((r, i) => (
-          <li key={r.year + r.role} className={styles.role} data-on={i === at || undefined}>
-            <span className={styles.roleYear}>{r.year}</span>
+          <li key={r.role} className={styles.role} data-on={i === at || undefined}>
+            <span className={styles.roleYear}>{String(i + 1).padStart(2, '0')}</span>
             <h3 className={styles.roleTitle}>{r.role}</h3>
             <span className={styles.roleContext}>{r.context}</span>
             <p className={styles.roleText}>{r.description}</p>
@@ -190,8 +176,8 @@ export function CareerElevation() {
 
       <figcaption className={styles.caption}>
         <span className={styles.captionNo}>Fig. 1</span>
-        Elevation along the career datum. Choose a volume to read the role; each stands on the
-        one before.
+        The record as an elevation. Choose a volume to read what the work was; each stands on
+        the one before.
       </figcaption>
     </figure>
   );

@@ -10,6 +10,15 @@ import { adjacentSheets, crossReferences, detailSheetFor } from '@/lib/sheet-ind
 import { article, breadcrumbs, buildMetadata } from '@/lib/metadata';
 import { Schematic } from '@/components/figures/Schematic';
 import { SCHEMATICS } from '@/components/figures/schematics';
+import { CASE_FIGURE_SLUGS } from '@/components/figures';
+import { CaseFigure } from '@/components/figures/CaseFigure';
+import { SOFTWARE } from '@/lib/software';
+
+/** A hand-drafted figure where the study has one, else its operable schematic. */
+function figureFor(slug: string) {
+  if (CASE_FIGURE_SLUGS.has(slug)) return <CaseFigure slug={slug} />;
+  return SCHEMATICS[slug] ? <Schematic spec={SCHEMATICS[slug]} /> : undefined;
+}
 
 export async function generateStaticParams() {
   const slugs = await getAllSlugs('work');
@@ -73,6 +82,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
           kind: 'TechArticle',
           keywords: fm.stack,
         }),
+        ...(SOFTWARE[slug] ?? []),
         breadcrumbs([
           { name: 'W-400 Works', path: '/work/' },
           { name: `${sheet} ${study.frontmatter.title}`, path: `/work/${slug}/` },
@@ -80,7 +90,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
       ]}
       adjacent={adjacent}
       xrefs={xrefs}
-      figure={SCHEMATICS[slug] ? <Schematic spec={SCHEMATICS[slug]} /> : undefined}
+      figure={figureFor(slug)}
     />
   );
 }

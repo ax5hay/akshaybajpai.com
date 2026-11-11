@@ -34,6 +34,7 @@ for (const [collection, series] of Object.entries(SERIES)) {
       category: series.name,
       title: data.title,
       description: data.description,
+      metric: data.metrics?.[0],
       date: new Date(data.pubDate),
       link: `${SITE}/${collection}/${slug}/`,
       image: `${SITE}/og/${collection}-${slug}.png`,
@@ -47,7 +48,7 @@ const rss = `<?xml version="1.0" encoding="UTF-8"?>
   <channel>
     <title>Akshay Bajpai · The Architecture of Intelligence</title>
     <link>${SITE}/</link>
-    <description>Essays, field notes and case studies on AI systems, forward-deployed engineering, world models and reinforcement learning, by Akshay Bajpai.</description>
+    <description>Case studies, essays and field notes on systems architecture, AI in production, world models and reinforcement learning, by Akshay Bajpai.</description>
     <language>en</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <image><url>${SITE}/apple-touch-icon.png</url><title>Akshay Bajpai</title><link>${SITE}/</link></image>
@@ -72,30 +73,69 @@ ${items
 fs.writeFileSync(path.join(OUT, 'rss.xml'), rss);
 console.log(`Generated out/rss.xml with ${items.length} items`);
 
-/* ---- llms.txt: the set, as a text index for language-model crawlers ---- */
+/* ---- llms.txt: the set, as plain text for language-model crawlers ----
+ *
+ * Order matters and is shared with the Person node (lib/identity.ts ONE_LINE)
+ * and the first paragraph of the About sheet: the entity sentence, the facts,
+ * the work with its strongest number, then the sheets. Change them together.
+ */
+// What he takes on, and the questions answered plainly: the same file A-103
+// is drawn from, so the page and this text cannot drift apart.
+const ENGAGE = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'engagements.json'), 'utf-8'));
+const ENTITY =
+  'Akshay Bajpai is a technology leader and systems architect. He leads technology end to end, from client and executive strategy to production code: multi-tenant LLM platforms, governed natural-language-to-SQL agents, agentic video intelligence for government defence deployments, document AI on AWS, and native desktop software in Rust. He has co-founded three companies and run engineering as CTO at two others. He researches world models and reinforcement learning, and writes essays on systems, cost and trust. Springer author; MSc in Artificial Intelligence with distinction.';
 const sections = [
-  ['/about/', 'A-101 The Architect', 'Biography, trajectory, and operating principles.'],
-  ['/research/', 'R-301 Research', 'Springer chapter on ML for medical diagnosis, MSc thesis on Alzheimer’s classification, current interests.'],
+  ['/about/', 'A-101 Boardroom to bare metal', 'Who Akshay Bajpai is, the record of his work by kind, and how he works.'],
+  ['/engagements/', 'A-103 Terms of Engagement', 'What he takes on, how the work runs, and questions answered plainly.'],
+  ['/schedule/', 'A-102 Schedule of Materials', 'Every tool and practice, counted from every repository and engagement: 352 items in 14 disciplines, leadership first.'],
+  ['/research/', 'R-301 Research', 'World models and reinforcement learning, a Springer chapter on ML for medical diagnosis, and an MSc thesis on Alzheimer’s classification.'],
   ['/architecture/', 'S-201 Structural Principles', 'How the platforms are designed: governed agents, hybrid retrieval, gateway-first routing, infrastructure as product.'],
-  ['/work/', 'W-400 Works', 'Case studies in forward-deployed AI, each with an operable schematic.'],
+  ['/work/', 'W-400 Works', 'Case studies, each with an operable figure.'],
   ['/blog/', 'B-500 Field Notes', 'Shorter technical pieces.'],
   ['/essays/', 'E-600 Essays', 'Longer arguments about systems, cost, and trust.'],
   ['/contact/', 'C-700 Correspondence', 'How to reach Akshay Bajpai.'],
 ];
-const byCat = (name) => items.filter((p) => p.category === name).map((p) => `- [${p.sheet} ${p.title}](${p.link}): ${p.description}`).join('\n');
-const llms = `# Akshay Bajpai · The Architecture of Intelligence
+const byCat = (name) =>
+  items
+    .filter((p) => p.category === name)
+    .map((p) => `- [${p.sheet} ${p.title}](${p.link}): ${p.metric ? `${p.metric}. ` : ''}${p.description}`)
+    .join('\n');
+const llms = `# Akshay Bajpai
 
-> Akshay Bajpai (ax5hay) is an AI architect and forward-deployed AI engineer based in New Delhi, India: multi-tenant LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical and insurance document AI. Springer author (ML for Medical Diagnosis, 3rd ed., 2024); MSc Artificial Intelligence with distinction. This site is issued as an architectural drawing set: every page is a numbered sheet.
+> ${ENTITY}
 
-Site: ${SITE}/ · Email: hello@akshaybajpai.com · GitHub: https://github.com/ax5hay · LinkedIn: https://linkedin.com/in/ax5hay
+## Facts
+
+- Based in: India
+- Role: Technology leader and systems architect. Leads technology end to end: clients, teams, architecture, AI and code.
+- Companies: co-founded three; CTO at two others
+- Research: world models and reinforcement learning; essays on systems, cost and trust
+- Education: MSc in Artificial Intelligence and Intelligent Systems, with distinction (Lviv Polytechnic National University); B.Tech in Computer Science and Engineering, with honours
+- Publication: Chapter 17, "Machine learning approaches to medical diagnosis", in ML for Medical Diagnosis in Data-Centric Business and Application, 3rd edition, Springer, 2024 (ISBN 978-3-031-60815-5)
+- Contact: hello@akshaybajpai.com · ${SITE}/contact/
+- Profiles: https://github.com/ax5hay · https://linkedin.com/in/ax5hay · https://x.com/ax5hay
+
+## What he takes on
+
+${ENGAGE.offers.map((o) => `- **${o.name}.** ${o.text}`).join('\n')}
+
+How the work runs, in his words:
+
+${ENGAGE.method.map((m, i) => `${i + 1}. **${m.name}.** ${m.text}`).join('\n')}
+
+To engage him: ${SITE}/engagements/
+
+## Work
+
+${byCat('Works')}
 
 ## Sheets
 
 ${sections.map(([p, t, d]) => `- [${t}](${SITE}${p}): ${d}`).join('\n')}
 
-## Case studies (Works)
+## Questions
 
-${byCat('Works')}
+${ENGAGE.questions.map((x) => `### ${x.q}\n\n${x.a}`).join('\n\n')}
 
 ## Essays
 
@@ -110,6 +150,8 @@ ${byCat('Field Notes')}
 - [RSS](${SITE}/rss.xml)
 - [Sitemap](${SITE}/sitemap.xml)
 - [The complete set as one printable document](${SITE}/set/)
+
+This site is issued as an architectural drawing set: every page is a numbered sheet. Company and client names are left out on purpose; the numbers are as measured.
 `;
 fs.writeFileSync(path.join(OUT, 'llms.txt'), llms);
 console.log('Generated out/llms.txt');

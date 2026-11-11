@@ -1,4 +1,4 @@
-import { buildMetadata, HOME_KEYWORDS } from '@/lib/metadata';
+import { buildMetadata, HOME_KEYWORDS, ONE_LINE } from '@/lib/metadata';
 import { KeyPlan, type KeyPlanContents } from '@/components/keyplan/KeyPlan';
 import { getCollection, type WorkFrontmatter } from '@/lib/content';
 import { detailSheetNumber, PLATES } from '@/lib/plates';
@@ -9,9 +9,8 @@ import { PERSON_ID, webPage } from '@/lib/metadata';
 import { keyPlanPlates } from '@/lib/plates';
 
 export const metadata = buildMetadata({
-  title: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
-  description:
-    'Akshay Bajpai (ax5hay): AI architect and forward-deployed AI engineer in New Delhi. LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical and insurance document AI. Case studies, research, essays and field notes, issued as a drawing set.',
+  title: 'Akshay Bajpai · Technology leader and systems architect',
+  description: ONE_LINE,
   path: '/',
   keywords: HOME_KEYWORDS,
 });
@@ -31,19 +30,19 @@ export default async function Page() {
 
   const contents: KeyPlanContents = {
     about: [
-      { sheet: '2026', title: 'Lead Full-Stack AI Engineer', meta: 'Forward deployment' },
-      { sheet: '2026', title: 'AI Lead · video intelligence', meta: 'Defense-adjacent' },
-      { sheet: '2025', title: 'Senior AI Consultant', meta: 'Finance & health' },
-      { sheet: '2025', title: 'Founding Engineer', meta: 'Restaurant SaaS' },
-      { sheet: '2023', title: 'Data Scientist II', meta: 'Insurance' },
-      { sheet: '2021', title: 'MSc Artificial Intelligence', meta: 'Distinction' },
+      { title: 'Boardroom to bare metal', meta: 'Clients to code' },
+      { title: 'Multi-tenant health AI', meta: 'Forward-deployed' },
+      { title: 'Defence video intelligence', meta: 'Air-gapped' },
+      { title: 'Finance and healthcare AI', meta: 'Agents' },
+      { title: 'A restaurant platform', meta: 'Forecasting' },
+      { title: 'Insurance document AI', meta: 'AWS' },
     ],
 
     research: [
       { title: 'ML for Medical Diagnosis, Ch. 17', meta: 'Springer 2024' },
       { title: 'Alzheimer\u2019s classification thesis', meta: 'OASIS' },
       { title: 'MSc AI · 9.8/10, distinction', meta: 'Lviv Poly' },
-      { title: 'Governed agentic retrieval', meta: 'Current' },
+      { title: 'World models and RL', meta: 'Current' },
     ],
 
     architecture: [
@@ -77,6 +76,7 @@ export default async function Page() {
     })),
 
     contact: [
+      { title: 'What I take on', meta: 'A-103', href: '/engagements/' },
       { title: SOCIAL.email, meta: 'Email' },
       { title: 'linkedin.com/in/ax5hay', meta: 'LinkedIn' },
       { title: 'github.com/ax5hay', meta: 'GitHub' },

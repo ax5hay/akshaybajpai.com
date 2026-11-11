@@ -4,17 +4,18 @@ import { getCollection, estimateReadingTime, type WorkFrontmatter } from '@/lib/
 import { detailSheetNumber, getPlateByHref } from '@/lib/plates';
 import { SITE_URL } from '@/lib/constants';
 import { buildMetadata, breadcrumbs, webPage } from '@/lib/metadata';
-import { JsonLd } from '@/components/JsonLd';
+import { RepoCards } from '@/components/plate/RepoCards';
+import { REPO_CARDS } from '@/lib/repos';
 
 const PLATE = getPlateByHref('/work/')!;
 
 const META = {
-  title: 'Works · AI case studies',
+  title: 'Works · case studies, as built',
   description:
-    'Case studies in forward-deployed AI: agentic platforms, clinical and insurance document intelligence, demand forecasting, and multi-tenant LLM systems.',
+    'Case studies, as built: a self-learning text-to-SQL agent behind five walls, a Rust tray app, offline video analytics, defence video intelligence, multi-tenant LLM platforms and document AI.',
   path: '/work/',
   card: 'work',
-  keywords: ['AI case studies', 'forward-deployed AI', 'conversational AI orchestration', 'NL2SQL', 'document AI', 'Akshay Bajpai work'],
+  keywords: ['AI case studies', 'forward-deployed AI', 'text-to-SQL', 'NL2SQL', 'computer vision', 'Rust', 'Tauri', 'document AI', 'Akshay Bajpai work'],
 };
 
 export const metadata = buildMetadata(META);
@@ -42,6 +43,7 @@ export default async function WorkIndexPage() {
       discipline={PLATE.discipline}
       scale={PLATE.scale}
       revision={PLATE.revision}
+      issued="2026.11"
       refs={PLATE.refs}
       jsonLd={[
         webPage({
@@ -65,18 +67,23 @@ export default async function WorkIndexPage() {
         breadcrumbs([{ name: 'W-400 Works', path: META.path }]),
       ]}
       figure={PLATE.id}
-      facts={[{ k: 'Sheets', v: String(rows.length) }]}
+      facts={[
+        { k: 'Sheets', v: String(rows.length) },
+        { k: 'Cards', v: String(REPO_CARDS.length) },
+      ]}
       record={[{ k: 'series', v: 'W-4xx' }, { k: 'count', v: String(rows.length) }]}
       wide
       lead={
         <p>
-          Engagements where the model was the easy part. Each sheet records what was built, the
-          constraints it was built under, and the numbers it was measured by. Organisation names
-          are generalised; the engineering is not.
+          What was built, the constraints it was built under, and the numbers it was measured by.
+          The newest three are my own: a reports agent, a tray app in Rust and an offline video
+          console. The others are client engagements, where the model was usually the easy
+          part, and open work and research. Company names are left out; the engineering is not.
         </p>
       }
     >
       <SheetSchedule rows={rows} unit="case studies" filterable />
+      <RepoCards cards={REPO_CARDS} />
     </PlateShell>
   );
 }

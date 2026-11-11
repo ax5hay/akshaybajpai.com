@@ -1,0 +1,566 @@
+/* A-103 · Fig. 1, the construction sequence. Built courses in ink, the
+   chosen one poched in the accent, the courses still to come drawn dashed
+   and lifted clear of the work, as a proposed element is on a phasing plan. */
+
+.figure {
+  margin: var(--s-6) 0 var(--s-10);
+}
+
+.bench {
+  display: grid;
+  border: var(--lw-thin) solid var(--rule-strong);
+}
+
+@media (min-width: 56rem) {
+  .bench {
+    grid-template-columns: minmax(0, 1fr) 16rem;
+  }
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  padding: clamp(0.75rem, 3vw, 1.5rem) clamp(0.5rem, 2vw, 1rem) var(--s-2);
+  background-image:
+    linear-gradient(var(--grid-minor) var(--lw-hair), transparent var(--lw-hair)),
+    linear-gradient(90deg, var(--grid-minor) var(--lw-hair), transparent var(--lw-hair));
+  background-size: 16px 16px;
+  overflow-x: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  min-width: 30rem;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-label), monospace;
+}
+
+.ground {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.earth {
+  fill: none;
+  stroke: var(--ink-4);
+  stroke-width: 0.6;
+}
+
+/* ---- Courses ----------------------------------------------------------------- */
+
+.course {
+  cursor: pointer;
+  outline: none;
+}
+
+.hit {
+  fill: transparent;
+}
+
+.mass {
+  transform-box: view-box;
+  transition:
+    transform var(--d-3) var(--ease-plate),
+    opacity var(--d-3) var(--ease-plate);
+}
+
+.solid {
+  fill: var(--paper-raised);
+  stroke: var(--ink);
+  stroke-width: 1.3;
+  transition:
+    fill var(--d-2) var(--ease-plate),
+    stroke var(--d-2) var(--ease-plate);
+}
+
+.slab {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 1;
+  transition:
+    fill var(--d-2) var(--ease-plate),
+    stroke var(--d-2) var(--ease-plate);
+}
+
+.fine {
+  fill: none;
+  stroke: var(--ink-4);
+  stroke-width: 0.6;
+  transition: stroke var(--d-2) var(--ease-plate);
+}
+
+.glass {
+  fill: var(--grid-minor);
+  stroke: var(--ink-3);
+  stroke-width: 0.8;
+}
+
+.seal {
+  fill: var(--paper-raised);
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.sealTick {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Proposed: not yet placed. Dashed, faint, held above where it will go. */
+.course[data-state='proposed'] .mass {
+  opacity: 0.28;
+  transform: translateY(-10px);
+}
+
+.course[data-state='proposed'] .solid,
+.course[data-state='proposed'] .slab {
+  fill: none;
+  stroke-dasharray: 4 3;
+}
+
+/* The chosen stage, poched as the one under discussion. */
+.course[data-state='on'] .solid {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+  stroke-width: 1.8;
+}
+
+.course[data-state='on'] .slab {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.course[data-state='on'] .fine {
+  stroke: var(--accent);
+}
+
+.course:focus-visible .solid,
+.course:focus-visible .slab {
+  stroke-width: 3;
+}
+
+.leader {
+  fill: none;
+  stroke: var(--ink-4);
+  stroke-width: 0.7;
+  transition: stroke var(--d-2) var(--ease-plate);
+}
+
+.leaderDot {
+  fill: var(--ink-4);
+}
+
+.label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--ink-2);
+  transition: fill var(--d-2) var(--ease-plate);
+}
+
+.labelNo {
+  fill: var(--accent);
+}
+
+.labelSub {
+  font-size: 7.5px;
+  letter-spacing: 0.08em;
+  fill: var(--ink-4);
+}
+
+.course[data-state='proposed'] .label,
+.course[data-state='proposed'] .labelSub {
+  opacity: 0.45;
+}
+
+.course[data-state='on'] .label {
+  fill: var(--accent);
+}
+
+.course[data-state='on'] .leader {
+  stroke: var(--accent);
+}
+
+/* ---- Datum and level ---------------------------------------------------------- */
+
+.datum path {
+  fill: none;
+  stroke: var(--ink-4);
+  stroke-width: 0.8;
+  stroke-dasharray: 8 3 2 3;
+  opacity: 0.4;
+  transition: opacity var(--d-2) var(--ease-plate);
+}
+
+.datum[data-state='set'] path {
+  opacity: 1;
+}
+
+.datum .datumMark {
+  fill: var(--ink-3);
+  stroke: none;
+  stroke-dasharray: none;
+}
+
+.datumText {
+  font-size: 7.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--ink-3);
+}
+
+.level {
+  transition: transform var(--d-3) var(--ease-plate);
+}
+
+.level path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.level .levelMark {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.levelText {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--accent);
+}
+
+/* ---- Delivered schedule ------------------------------------------------------- */
+
+.delivered {
+  display: flex;
+  flex-direction: column;
+  border-top: var(--lw-thin) solid var(--rule-strong);
+  background: var(--paper-raised);
+}
+
+@media (min-width: 56rem) {
+  .delivered {
+    border-top: none;
+    border-left: var(--lw-thin) solid var(--rule-strong);
+  }
+}
+
+.deliveredHead {
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  background: var(--ink);
+  color: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.deliveredList {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deliveredList li {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr auto;
+  align-items: baseline;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+  border-top: var(--lw-thin) solid var(--rule-faint);
+  font-size: var(--t-sm);
+  transition:
+    opacity var(--d-2) var(--ease-plate),
+    background-color var(--d-2) var(--ease-plate);
+}
+
+.deliveredList li[data-state='pending'] {
+  opacity: 0.38;
+}
+
+.deliveredList li[data-on] {
+  background: var(--accent-soft);
+}
+
+.deliveredNo {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.deliveredName {
+  color: var(--ink);
+}
+
+.deliveredMark {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+li[data-state='issued'] .deliveredMark {
+  color: var(--ink-2);
+}
+
+li[data-state='issued'] .markPending,
+li[data-state='pending'] .markIssued {
+  display: none;
+}
+
+/* ---- Readout ------------------------------------------------------------------ */
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-top: none;
+  background: var(--paper-raised);
+}
+
+.step {
+  padding: var(--s-5);
+  border-top: var(--lw-thin) solid var(--rule-faint);
+}
+
+.step:first-child {
+  border-top: none;
+}
+
+/* With script only the chosen stage is read out; without it, and in print,
+   all six follow the drawing in order. */
+:global(html[data-js]) .step:not([data-on]) {
+  display: none;
+}
+
+:global(html[data-js]) .step[data-on] {
+  border-top: none;
+  min-height: 9.5rem;
+  animation: step-in var(--d-3) var(--ease-plate);
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media print {
+  :global(html[data-js]) .step:not([data-on]) {
+    display: block;
+  }
+}
+
+.stepNo {
+  display: block;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepName {
+  margin: var(--s-2) 0 var(--s-2);
+  font-family: var(--font-display), serif;
+  font-size: var(--t-2xl);
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  color: var(--ink);
+}
+
+.stepText {
+  margin: 0;
+  max-width: var(--measure);
+  font-size: var(--t-base);
+  line-height: var(--lh-normal);
+  color: var(--ink-2);
+}
+
+.stepLeaves {
+  margin: var(--s-3) 0 0;
+  font-size: var(--t-sm);
+  color: var(--ink);
+}
+
+.stepLeaves span {
+  margin-right: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ---- Stepper ------------------------------------------------------------------ */
+
+.stepper {
+  display: flex;
+  align-items: stretch;
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-top: none;
+  background: var(--paper-deep);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.stepper > span {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--s-3);
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepper button {
+  padding: var(--s-3) var(--s-4);
+  font-weight: 600;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink);
+  transition:
+    color var(--d-1) var(--ease-plate),
+    background-color var(--d-1) var(--ease-plate);
+}
+
+.stepper button:first-child {
+  border-right: var(--lw-thin) solid var(--rule);
+}
+
+.stepper button:last-child {
+  margin-left: auto;
+  border-left: var(--lw-thin) solid var(--rule);
+}
+
+.stepper button:hover:not(:disabled) {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.stepper button:focus-visible {
+  outline: var(--lw-thick) solid var(--accent);
+  outline-offset: -2px;
+}
+
+.stepper button:disabled {
+  color: var(--ink-4);
+  cursor: default;
+}
+
+.stepper .build {
+  border-right: var(--lw-thin) solid var(--rule);
+  color: var(--accent);
+}
+
+.stepper .build[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--paper-raised);
+}
+
+.buildBusy,
+.build[aria-pressed='true'] .buildIdle {
+  display: none;
+}
+
+.build[aria-pressed='true'] .buildBusy {
+  display: inline;
+}
+
+/* The controls do nothing without script, so they are not offered. */
+:global(html:not([data-js])) .stepper {
+  display: none;
+}
+
+/* ---- Raw: the record the drawing is made from ---------------------------------- */
+
+.raw {
+  display: none;
+  margin: 0;
+  padding: var(--s-4);
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-top: none;
+  background: var(--paper-sunk);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  line-height: var(--lh-normal);
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+:global(html[data-mode='raw']) .raw {
+  display: block;
+}
+
+.caption {
+  display: flex;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  font-size: var(--t-xs);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+
+.captionNo {
+  flex: none;
+  font-family: var(--font-label), monospace;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+@media (max-width: 30rem) {
+  .stepper {
+    flex-wrap: wrap;
+  }
+
+  .stepper .build {
+    order: -1;
+    flex-basis: 100%;
+    border-right: none;
+    border-bottom: var(--lw-thin) solid var(--rule);
+  }
+}
+
+.swipe {
+  display: none;
+  margin: 0;
+  padding: var(--s-2) var(--s-3);
+  border-top: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+@media (max-width: 40rem) {
+  .swipe {
+    display: block;
+  }
+}

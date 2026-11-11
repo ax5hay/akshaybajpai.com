@@ -18,9 +18,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       Math.max(...lists.flat().map((e) => new Date(e.frontmatter.pubDate).getTime()), 0)
     );
   const issued = new Date('2026-10-06');
+  const reissued = new Date('2026-11-11');
   const staticRoutes: Array<[string, Date, number]> = [
     ['/', newest(blog, essays, work), 1],
-    ['/about/', issued, 0.9],
+    ['/about/', reissued, 0.9],
+    ['/schedule/', reissued, 0.8],
+    ['/engagements/', reissued, 0.9],
     ['/work/', newest(work), 0.9],
     ['/research/', issued, 0.8],
     ['/architecture/', issued, 0.8],

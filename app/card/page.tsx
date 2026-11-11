@@ -147,7 +147,7 @@ function Front() {
 
       {/* Microprint, as on any document worth forging: legible under a loupe. */}
       <span className={styles.micro} aria-hidden="true">
-        {Array.from({ length: 4 }, () => `${c.name} · ${c.site.replace('https://', '')} · ${c.city} · ${SHEET} · `).join('')}
+        {Array.from({ length: 4 }, () => `${c.name} · ${c.site.replace('https://', '')} · ${c.country} · ${SHEET} · `).join('')}
       </span>
     </>
   );

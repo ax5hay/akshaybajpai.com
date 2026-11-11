@@ -5,24 +5,32 @@ import { SITE_NAME, SITE_URL, SOCIAL } from './constants';
 
 export const PERSON_ID = `${SITE_URL}/#person`;
 export const SITE_ID = `${SITE_URL}/#website`;
-export const NAME = 'Akshay Bajpai';
-export const HANDLE = 'ax5hay';
-export const ROLE = 'AI Architect · Forward-Deployed AI Engineer';
-export const ONE_LINE =
-  'Akshay Bajpai is an AI architect and forward-deployed AI engineer: multi-tenant LLM platforms, governed agents, hybrid RAG, NL2SQL, clinical and insurance document AI. Springer author; MSc AI with distinction.';
+export { NAME, HANDLE, ROLE, ROLE_LINE, JOB_TITLE, STANDFIRST, ONE_LINE } from './identity';
+import { NAME, HANDLE, JOB_TITLE, ONE_LINE } from './identity';
+import { ENGAGEMENTS } from './engagements';
 
 /** What the key plan is filed under; the sheets each carry their own. */
 export const HOME_KEYWORDS = [
   'Akshay Bajpai',
   'ax5hay',
+  'technology leader',
+  'systems architect',
+  'co-founder',
+  'CTO',
+  'AI researcher',
+  'world models',
+  'reinforcement learning',
   'AI architect',
   'forward-deployed AI engineer',
   'LLM platforms',
+  'text-to-SQL',
+  'computer vision',
+  'Rust',
   'RAG',
   'agentic AI',
   'NL2SQL',
   'healthcare AI',
-  'New Delhi',
+  'India',
 ];
 
 /* ------------------------------------------------------------- page metadata --- */
@@ -125,14 +133,12 @@ export function identityGraph(): Thing[] {
       alternateName: [HANDLE, 'Akshay Bajpai AI'],
       url: SITE_URL,
       image: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png`, width: 1024, height: 1024 },
-      jobTitle: 'Lead Full-Stack AI Engineer · Forward Deployment',
+      jobTitle: JOB_TITLE,
       description: ONE_LINE,
       email: SOCIAL.email,
       sameAs: [SOCIAL.linkedin, SOCIAL.github, SOCIAL.twitter],
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'New Delhi',
-        addressRegion: 'Delhi',
         addressCountry: 'IN',
       },
       alumniOf: [
@@ -162,6 +168,11 @@ export function identityGraph(): Thing[] {
         },
       ],
       knowsAbout: [
+        'Technical leadership',
+        'Company building and executive leadership',
+        'Client and stakeholder delivery',
+        'Product strategy',
+        'Systems architecture',
         'Large language models',
         'Forward-deployed AI engineering',
         'Retrieval-augmented generation',
@@ -170,12 +181,40 @@ export function identityGraph(): Thing[] {
         'Clinical NLP and healthcare AI',
         'Document intelligence',
         'MLOps on AWS',
-        'World models and reinforcement learning',
+        'AI research',
+        'World models',
+        'Reinforcement learning',
+        'Text-to-SQL and SQL safety',
+        'LLM evaluation and cost engineering',
+        'Computer vision at the edge',
+        'Air-gapped deployment',
+        'Multi-tenant SaaS architecture',
+        'Native desktop software in Rust and Tauri',
+        'Technical writing and decision records',
         'FastAPI',
         'React and Next.js',
-        'System architecture',
       ],
       knowsLanguage: ['en'],
+      // The roles behind the title, stated plainly for machines and once on
+      // About for people. No company names, no dates.
+      hasOccupation: [
+        {
+          '@type': 'Occupation',
+          name: JOB_TITLE,
+          occupationLocation: { '@type': 'Country', name: 'India' },
+          skills: ENGAGEMENTS.offers.map((o) => o.name).join(', '),
+        },
+        { '@type': 'Occupation', name: 'Co-founder', description: 'Co-founded three companies.' },
+        { '@type': 'Occupation', name: 'Chief technology officer', description: 'Ran engineering as CTO at two companies.' },
+        { '@type': 'Occupation', name: 'Researcher', description: 'Researches world models and reinforcement learning.' },
+      ],
+      // What he takes on, from the same file as A-103, so the offer in the
+      // graph and the offer on the page are the same words.
+      makesOffer: ENGAGEMENTS.offers.map((o) => ({
+        '@type': 'Offer',
+        url: `${SITE_URL}/engagements/`,
+        itemOffered: { '@type': 'Service', name: o.name, description: o.text, provider: { '@id': PERSON_ID } },
+      })),
     },
     {
       '@type': 'WebSite',

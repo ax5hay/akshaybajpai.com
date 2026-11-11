@@ -1,0 +1,564 @@
+/* A-103 · Start a brief. The questions on the sheet's own stock, the draft
+   on the reversed stock the set keeps for correspondence, with its stamp. */
+
+.composer [hidden] {
+  display: none !important;
+}
+
+.composer {
+  margin-top: var(--s-6);
+  border: var(--lw-thin) solid var(--rule-strong);
+  background: var(--paper-raised);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  background: var(--ink);
+  color: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+.headTitle {
+  font-weight: 600;
+}
+
+.headNote {
+  opacity: 0.7;
+}
+
+.body {
+  display: grid;
+  gap: var(--s-6);
+  padding: var(--s-5) var(--s-4);
+}
+
+@media (min-width: 56rem) {
+  .body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+    gap: var(--s-8);
+    padding: var(--s-6);
+  }
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.legend {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  padding: 0;
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.legendNo {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Offers: a ruled list of radios ----------------------------------------- */
+
+.offers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--lw-thin);
+  background: var(--rule);
+  border: var(--lw-thin) solid var(--rule);
+}
+
+.offer {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  background: var(--paper-raised);
+  font-family: var(--font-display), serif;
+  font-size: var(--t-md);
+  line-height: var(--lh-snug);
+  text-align: left;
+  color: var(--ink);
+  transition:
+    background-color var(--d-1) var(--ease-plate),
+    color var(--d-1) var(--ease-plate);
+}
+
+.offer::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--lw-thick);
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform var(--d-2) var(--ease-plate);
+}
+
+.offer:hover {
+  background: var(--accent-soft);
+}
+
+.offer:hover::after,
+.offer[aria-checked='true']::after {
+  transform: scaleY(1);
+}
+
+.offer[aria-checked='true'] {
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+
+.offerNo {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.offer:focus-visible,
+.segmentButton:focus-visible,
+.chip:focus-visible,
+.primary:focus-visible,
+.secondary:focus-visible,
+.line:focus-visible {
+  outline: var(--lw-thick) solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Build or review --------------------------------------------------------- */
+
+.segment {
+  display: inline-flex;
+  align-self: flex-start;
+  border: var(--lw-thin) solid var(--rule-strong);
+}
+
+.segmentButton {
+  padding: var(--s-2) var(--s-4);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition:
+    background-color var(--d-1) var(--ease-plate),
+    color var(--d-1) var(--ease-plate);
+}
+
+.segmentButton + .segmentButton {
+  border-left: var(--lw-thin) solid var(--rule-strong);
+}
+
+.segmentButton:hover {
+  color: var(--accent);
+}
+
+.segmentButton[aria-checked='true'] {
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+
+/* ---- Loads: toggle chips, a ticked box drawn by hand -------------------------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 6px 11px 6px 9px;
+  border: var(--lw-thin) solid var(--rule);
+  background: var(--paper);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-mini);
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  transition:
+    background-color var(--d-1) var(--ease-plate),
+    border-color var(--d-1) var(--ease-plate),
+    color var(--d-1) var(--ease-plate);
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chipBox {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border: var(--lw-thin) solid currentColor;
+}
+
+.chipBox::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: -1px;
+  width: 4px;
+  height: 7px;
+  border: solid var(--accent);
+  border-width: 0 2px 2px 0;
+  rotate: 40deg;
+  transform: scale(0);
+  transition: transform var(--d-2) var(--ease-snap);
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+
+.chip[aria-pressed='true'] .chipBox::after {
+  transform: scale(1);
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  margin: 0;
+  padding: var(--s-3) 0 0;
+  border-top: var(--lw-thin) dashed var(--rule);
+  list-style: none;
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+
+.notes li {
+  animation: note-in var(--d-2) var(--ease-plate);
+}
+
+.notes b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@keyframes note-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.line {
+  width: 100%;
+  padding: var(--s-2) 0;
+  border: none;
+  border-bottom: var(--lw-thin) solid var(--rule-strong);
+  background: transparent;
+  font: inherit;
+  font-size: var(--t-base);
+  color: var(--ink);
+}
+
+.line::placeholder {
+  color: var(--ink-4);
+}
+
+/* ---- The slip ------------------------------------------------------------------ */
+
+.slipWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+@media (min-width: 56rem) {
+  .slipWrap {
+    position: sticky;
+    top: calc(var(--rail-h, 64px) + var(--s-4));
+    align-self: start;
+  }
+}
+
+.slip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 var(--s-4);
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-lift);
+}
+
+.slipHead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-bottom: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* Struck by hand, as on the key plan: off square, slightly under-inked. */
+.stamp {
+  align-self: flex-end;
+  margin: var(--s-4) var(--s-5) 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 10px 5px;
+  border: 2px solid var(--accent);
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+  font-family: var(--font-label), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.5;
+  rotate: -6deg;
+  pointer-events: none;
+}
+
+.stamp span:last-child {
+  font-size: 0.8em;
+  letter-spacing: 0.24em;
+}
+
+.stampReady,
+.stamp[data-ready] .stampDraft {
+  display: none;
+}
+
+.stamp[data-ready] .stampReady {
+  display: inline;
+}
+
+.stamp[data-ready] {
+  opacity: 0.9;
+  animation: stamp-strike 380ms var(--ease-snap);
+}
+
+@keyframes stamp-strike {
+  from {
+    opacity: 0;
+    scale: 1.5;
+  }
+}
+
+.slipFacts {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--s-3) var(--s-4) 0;
+}
+
+.slipFacts div {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--s-3);
+  padding: var(--s-2) 0;
+  border-bottom: var(--lw-thin) solid var(--rule-faint);
+}
+
+.slipFacts dt {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.slipFacts dd {
+  margin: 0;
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+
+.blank {
+  margin: 0;
+  font-style: italic;
+  color: var(--ink-4);
+}
+
+.precedents {
+  padding: var(--s-3) var(--s-4) 0;
+}
+
+.precedentsHead {
+  display: block;
+  margin-bottom: var(--s-2);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.precedents ul {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.precedents li {
+  animation: note-in var(--d-2) var(--ease-plate);
+}
+
+.precedents a {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: var(--s-2);
+  padding: 4px 0;
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-2);
+}
+
+.precedents a:hover {
+  color: var(--accent);
+}
+
+.precedentNo {
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+/* ---- Actions --------------------------------------------------------------------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--s-3) var(--s-4);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  transition:
+    background-color var(--d-1) var(--ease-plate),
+    color var(--d-1) var(--ease-plate),
+    opacity var(--d-1) var(--ease-plate);
+}
+
+.primary {
+  flex: 1;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--paper-raised);
+}
+
+.primary:hover:not([aria-disabled]) {
+  background: var(--ink);
+}
+
+.secondary {
+  border: var(--lw-thin) solid var(--rule-strong);
+  color: var(--ink);
+}
+
+.secondary:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.primary[aria-disabled],
+.secondary[aria-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fallback {
+  margin: 0;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.fallback a {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.raw {
+  display: none;
+  margin: 0;
+  padding: var(--s-3);
+  border: var(--lw-thin) solid var(--rule);
+  background: var(--paper-sunk);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  line-height: var(--lh-normal);
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+:global(html[data-mode='raw']) .raw:not([hidden]) {
+  display: block;
+}
+
+/* Without script the choices cannot be made, so only the direct line is
+   offered; the rest is drawn for the reader who has it. */
+:global(html:not([data-js])) .questions,
+:global(html:not([data-js])) .actions,
+:global(html:not([data-js])) .foot {
+  display: none;
+}
+
+.foot {
+  margin: 0;
+  padding: var(--s-2) var(--s-4);
+  border-top: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}

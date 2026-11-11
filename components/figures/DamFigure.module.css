@@ -1,0 +1,214 @@
+/* ReBo's five walls, as a section through a dam. Tokens only, so the
+   drawing follows the mode it is read in. */
+
+.label,
+.sql,
+.wallName,
+.wallSub,
+.bubbleNo,
+.dbState {
+  font-family: var(--font-label), monospace;
+  letter-spacing: 0.06em;
+}
+
+.label {
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  fill: var(--ink-3);
+}
+
+.surface {
+  fill: none;
+  stroke: var(--accent-2);
+  stroke-width: 1.4;
+}
+
+.surfaceMark {
+  fill: none;
+  stroke: var(--accent-2);
+  stroke-width: 1;
+}
+
+.water {
+  fill: none;
+  stroke: var(--accent-2);
+  stroke-width: 0.8;
+  opacity: 0.55;
+}
+
+.sqlPlate {
+  fill: var(--paper-raised);
+  stroke: var(--rule);
+  stroke-width: 0.6;
+}
+
+.sql {
+  font-size: 6.5px;
+  fill: var(--ink);
+}
+
+.ground {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1.2;
+}
+
+.hatch {
+  fill: none;
+  stroke: var(--ink-4);
+  stroke-width: 0.6;
+}
+
+/* ---- the walls ---- */
+
+.block {
+  fill: var(--paper-raised);
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+  transition:
+    fill var(--d-2) var(--ease-plate),
+    stroke var(--d-2) var(--ease-plate);
+}
+
+.joints {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 0.6;
+}
+
+.bubble {
+  fill: var(--paper-raised);
+  stroke: var(--ink-3);
+  stroke-width: 0.8;
+}
+
+.bubbleNo {
+  font-size: 7px;
+  font-weight: 600;
+  fill: var(--ink-3);
+}
+
+.wallName {
+  font-size: 6px;
+  font-weight: 600;
+  fill: var(--ink-3);
+}
+
+.wallSub {
+  font-size: 5.2px;
+  fill: var(--ink-4);
+}
+
+.wall[data-on] .block {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+}
+
+.wall[data-on] .joints {
+  stroke: var(--accent-line);
+}
+
+.wall[data-on] .bubble {
+  stroke: var(--accent);
+}
+
+.wall[data-on] .bubbleNo,
+.wall[data-on] .wallName {
+  fill: var(--accent);
+}
+
+/* The first wall in the way takes the full weight of the line. */
+.wall[data-first] .block {
+  stroke-width: 2;
+}
+
+.wall[data-first] .bubble {
+  fill: var(--accent);
+}
+
+.wall[data-first] .bubbleNo {
+  fill: var(--paper-raised);
+}
+
+/* Plain names on paper and cyanotype; the mechanism in Raw. */
+.raw {
+  display: none;
+}
+
+html[data-mode='raw'] .raw {
+  display: inline;
+}
+
+html[data-mode='raw'] .plain {
+  display: none;
+}
+
+/* ---- the flow ---- */
+
+.flow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-dasharray: 7 4;
+  animation: flow 700ms linear infinite;
+}
+
+.flow[data-passed] {
+  stroke: var(--accent-2);
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -11;
+  }
+}
+
+.arrow {
+  fill: var(--accent-2);
+}
+
+.stopBar {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.4;
+}
+
+/* ---- downstream ---- */
+
+.db path {
+  fill: var(--paper-raised);
+  stroke: var(--ink-3);
+  stroke-width: 1;
+  transition: stroke var(--d-2) var(--ease-plate);
+}
+
+.db .dbRing {
+  fill: none;
+  stroke: var(--rule);
+}
+
+.db[data-on] path {
+  stroke: var(--accent-2);
+}
+
+.db[data-on] .dbRing {
+  stroke: var(--accent-2);
+  opacity: 0.6;
+}
+
+.dbState {
+  font-size: 6.5px;
+  font-weight: 600;
+  fill: var(--ink-3);
+}
+
+.dbState[data-on] {
+  fill: var(--accent-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow {
+    animation: none;
+  }
+}

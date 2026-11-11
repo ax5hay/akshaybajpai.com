@@ -1,5 +1,5 @@
 export const SITE_URL = 'https://www.akshaybajpai.com';
-export const SITE_NAME = 'Akshay Bajpai | AI Architect & Technology Leader';
+export const SITE_NAME = 'Akshay Bajpai | Technology leader and systems architect';
 export const SITE_TAGLINE = 'The Architecture of Intelligence';
 
 export const SOCIAL = {

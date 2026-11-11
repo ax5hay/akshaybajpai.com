@@ -1,0 +1,137 @@
+/* KeepMeAwake's engine loop. Tokens only. */
+
+.hint {
+  padding: var(--s-2) var(--s-3);
+  border: var(--lw-thin) solid var(--rule-strong);
+  border-bottom: none;
+  background: var(--paper-raised);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.track {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 6;
+}
+
+/* The loop running, in the direction of travel. */
+.run {
+  fill: none;
+  stroke: var(--accent-2);
+  stroke-width: 1.2;
+  stroke-dasharray: 6 5;
+  animation: run 1400ms linear infinite;
+}
+
+@keyframes run {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+
+.arrow {
+  fill: var(--accent-2);
+}
+
+.panelHead,
+.platform,
+.call,
+.name,
+.sub {
+  font-family: var(--font-label), monospace;
+  letter-spacing: 0.06em;
+}
+
+.panelHead {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  fill: var(--ink);
+}
+
+.platform {
+  font-size: 6px;
+  letter-spacing: 0.2em;
+  fill: var(--ink-4);
+}
+
+.call {
+  font-size: 7px;
+  fill: var(--ink-3);
+}
+
+.call[data-os] {
+  fill: var(--accent);
+  font-weight: 600;
+}
+
+/* ---- steps ---- */
+
+.node {
+  cursor: pointer;
+  outline: none;
+}
+
+.node rect {
+  fill: var(--paper-raised);
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+  transition:
+    stroke var(--d-2) var(--ease-plate),
+    fill var(--d-2) var(--ease-plate);
+}
+
+.node[data-on] rect {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.node[data-os][data-on] rect {
+  stroke: var(--accent);
+  stroke-width: 2.4;
+}
+
+.node:focus-visible rect {
+  stroke: var(--accent);
+  stroke-width: 2.4;
+  stroke-dasharray: 3 2;
+}
+
+.name {
+  font-size: 7.5px;
+  font-weight: 600;
+  fill: var(--ink-3);
+  transition: fill var(--d-2) var(--ease-plate);
+}
+
+.node[data-on] .name {
+  fill: var(--ink);
+}
+
+.no {
+  fill: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.sub {
+  font-size: 6.5px;
+  fill: var(--ink-4);
+}
+
+.node[data-on] .sub {
+  fill: var(--accent);
+}
+
+.osDot {
+  fill: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .run {
+    animation: none;
+  }
+}

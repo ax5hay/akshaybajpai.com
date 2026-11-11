@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { PlateShell } from '@/components/plate/PlateShell';
 import { CorrespondenceForm } from '@/components/plate/CorrespondenceForm';
 import { CopyValue } from '@/components/kit/CopyValue';
@@ -14,10 +15,10 @@ const PLATE = getPlateByHref('/contact/')!;
 
 const META = {
   title: 'Correspondence · Contact Akshay Bajpai',
-  description: 'Get in touch for AI systems, architecture, or performance-critical product work.',
+  description: 'Write to Akshay Bajpai about technology leadership, an AI platform or agent that has to hold in production, an architecture review, or speaking.',
   path: '/contact/',
   card: 'contact',
-  keywords: ['contact Akshay Bajpai', 'hire AI architect', 'forward-deployed AI engineer contact', 'Akshay Bajpai email'],
+  keywords: ['contact Akshay Bajpai', 'hire Akshay Bajpai', 'hire AI architect', 'technology leader', 'forward-deployed AI engineer contact', 'Akshay Bajpai email'],
 };
 
 export const metadata = buildMetadata(META);
@@ -67,8 +68,10 @@ export default function ContactPage() {
           </div>
 
           <p className={styles.intro}>
-            For forward-deployed AI work, architecture reviews, speaking, or collaboration on
-            systems design and performance engineering. Write here, or use a direct line.
+            For technology leadership, an AI platform or agent that has to hold in production,
+            an architecture review, or speaking. What I take on is on the{' '}
+            <Link href="/engagements/">terms of engagement</Link>. Write here, or use a direct
+            line.
           </p>
 
           {/* The one line most people want, set at the size of a headline. */}
@@ -105,7 +108,7 @@ export default function ContactPage() {
           <dl className={styles.facts}>
             <div>
               <dt>Based</dt>
-              <dd>New Delhi, India</dd>
+              <dd>India</dd>
             </div>
             <div>
               <dt>Local time</dt>

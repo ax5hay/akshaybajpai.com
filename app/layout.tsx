@@ -50,13 +50,13 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   ...buildMetadata({
-    title: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
+    title: 'Akshay Bajpai · Technology leader and systems architect',
     description: ONE_LINE,
     path: '/',
     keywords: HOME_KEYWORDS,
   }),
   title: {
-    default: 'Akshay Bajpai · AI Architect & Forward-Deployed AI Engineer',
+    default: 'Akshay Bajpai · Technology leader and systems architect',
     template: '%s · Akshay Bajpai',
   },
   applicationName: SITE_TAGLINE,

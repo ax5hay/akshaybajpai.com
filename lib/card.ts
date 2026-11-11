@@ -1,5 +1,5 @@
 import { SITE_URL, SOCIAL } from './constants';
-import { NAME, ROLE } from './metadata';
+import { NAME } from './identity';
 
 /**
  * C-701, the calling card.
@@ -18,12 +18,11 @@ export const CARD = {
   name: NAME,
   given: 'Akshay',
   family: 'Bajpai',
-  role: ROLE,
+  /** On the card one part to a line; in the vCard, the TITLE field. */
+  role: 'Technology leader · Systems architect',
   /** The number on the printed card, with its country code. */
   phone: '+91 84482 17769' as string,
   email: SOCIAL.email,
-  city: 'New Delhi',
-  region: 'Delhi',
   country: 'India',
   site: SITE_URL,
   /** Where the card points. The vqr.vc code should redirect here. */
@@ -100,7 +99,7 @@ export function vCard({ photo }: { photo?: string } = {}): string {
   lines.push(
     `EMAIL;TYPE=INTERNET,PREF:${c.email}`,
     `URL:${c.site}`,
-    `ADR;TYPE=WORK:;;;${text(c.city)};${text(c.region)};;${text(c.country)}`,
+    `ADR;TYPE=WORK:;;;;;;${text(c.country)}`,
     ...c.links.map((l) => `X-SOCIALPROFILE;TYPE=${l.type}:${l.href}`),
     `NOTE:${text(`${c.site}${c.path} · the card, as scanned`)}`
   );
