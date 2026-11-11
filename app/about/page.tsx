@@ -86,8 +86,9 @@ export default function AboutPage() {
           <Link href="/work/">case studies</Link> show how it was used, and the{' '}
           <Link href="/blog/">field notes</Link> and <Link href="/essays/">essays</Link> show how I
           think about scope, architecture and delivery. Company names are left out on purpose; the
-          engineering is specific. For technology leadership, systems architecture, or AI that has
-          to hold in production, <Link href="/contact/">write to me</Link>.
+          engineering is specific. What I take on, and how the work runs, is on the{' '}
+          <Link href="/engagements/">terms of engagement</Link>; to start one,{' '}
+          <Link href="/contact/">write to me</Link>.
         </p>
       </div>
     </PlateShell>

@@ -87,7 +87,7 @@ export const PLATES: Plate[] = [
     href: '/about/',
     scale: '1:1',
     revision: 'E',
-    refs: ['A-102', 'R-301', 'W-400', 'C-700'],
+    refs: ['A-102', 'A-103', 'R-301', 'W-400', 'C-700'],
     voice: {
       a: { title: 'About me', subtitle: 'Who I am, what I have done, and how I work' },
       c: { title: 'Profile', subtitle: 'ProfilePage · biography, chronology, principles' },
@@ -109,6 +109,22 @@ export const PLATES: Plate[] = [
       c: { title: 'Schedule', subtitle: 'data/stack.json, by discipline, heaviest use drawn heavier' },
     },
     // Not drawn on the key plan: it is reached from A-101, W-400 and the index.
+  },
+  {
+    id: 'engagements',
+    sheet: 'A-103',
+    discipline: 'A',
+    title: 'Terms of Engagement',
+    subtitle: 'What I take on, how the work runs, and what it leaves behind',
+    href: '/engagements/',
+    scale: 'NTS',
+    revision: 'E',
+    refs: ['A-101', 'W-400', 'C-700'],
+    voice: {
+      a: { title: 'Work with me', subtitle: 'What I take on, and how the work runs' },
+      c: { title: 'Engagements', subtitle: 'Offers, method and FAQPage, from data/engagements.json' },
+    },
+    // Not drawn on the key plan: reached from the title strip, A-101 and C-700.
   },
   {
     id: 'research',
@@ -198,8 +214,8 @@ export const PLATES: Plate[] = [
     subtitle: 'Open a line',
     href: '/contact/',
     scale: 'NTS',
-    revision: 'B',
-    refs: ['A-101', 'W-400'],
+    revision: 'E',
+    refs: ['A-103', 'A-101', 'W-400'],
     voice: {
       a: { title: 'Contact', subtitle: 'Send me a message' },
       c: { title: 'Correspondence', subtitle: 'Form POST, plus the direct lines' },
@@ -215,7 +231,7 @@ export const PLATES: Plate[] = [
  * the plates the issue touched.
  */
 export const ISSUES = [
-  { rev: 'E', date: '2026.11', what: 'ReBo, KeepMeAwake, FlowState · schedule of materials' },
+  { rev: 'E', date: '2026.11', what: 'ReBo, KeepMeAwake, FlowState · skills · terms of engagement' },
   { rev: 'D', date: '2026.10', what: 'Calling card · operable schematics · the route' },
   { rev: 'C', date: '2026.09', what: 'The site reissued as a drawing set' },
 ] as const;

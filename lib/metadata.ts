@@ -7,6 +7,7 @@ export const PERSON_ID = `${SITE_URL}/#person`;
 export const SITE_ID = `${SITE_URL}/#website`;
 export { NAME, HANDLE, ROLE, ROLE_LINE, JOB_TITLE, STANDFIRST, ONE_LINE } from './identity';
 import { NAME, HANDLE, JOB_TITLE, ONE_LINE } from './identity';
+import { ENGAGEMENTS } from './engagements';
 
 /** What the key plan is filed under; the sheets each carry their own. */
 export const HOME_KEYWORDS = [
@@ -188,6 +189,19 @@ export function identityGraph(): Thing[] {
         'React and Next.js',
       ],
       knowsLanguage: ['en'],
+      hasOccupation: {
+        '@type': 'Occupation',
+        name: JOB_TITLE,
+        occupationLocation: { '@type': 'City', name: 'New Delhi' },
+        skills: ENGAGEMENTS.offers.map((o) => o.name).join(', '),
+      },
+      // What he takes on, from the same file as A-103, so the offer in the
+      // graph and the offer on the page are the same words.
+      makesOffer: ENGAGEMENTS.offers.map((o) => ({
+        '@type': 'Offer',
+        url: `${SITE_URL}/engagements/`,
+        itemOffered: { '@type': 'Service', name: o.name, description: o.text, provider: { '@id': PERSON_ID } },
+      })),
     },
     {
       '@type': 'WebSite',

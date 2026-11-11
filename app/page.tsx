@@ -76,6 +76,7 @@ export default async function Page() {
     })),
 
     contact: [
+      { title: 'What I take on', meta: 'A-103', href: '/engagements/' },
       { title: SOCIAL.email, meta: 'Email' },
       { title: 'linkedin.com/in/ax5hay', meta: 'LinkedIn' },
       { title: 'github.com/ax5hay', meta: 'GitHub' },

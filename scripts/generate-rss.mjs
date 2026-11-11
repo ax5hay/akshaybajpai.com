@@ -79,10 +79,14 @@ console.log(`Generated out/rss.xml with ${items.length} items`);
  * and the first paragraph of the About sheet: the entity sentence, the facts,
  * the work with its strongest number, then the sheets. Change them together.
  */
+// What he takes on, and the questions answered plainly: the same file A-103
+// is drawn from, so the page and this text cannot drift apart.
+const ENGAGE = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'engagements.json'), 'utf-8'));
 const ENTITY =
   'Akshay Bajpai is a technology leader and systems architect in New Delhi. He leads technology end to end, from client and executive strategy to production code: multi-tenant LLM platforms, governed natural-language-to-SQL agents, agentic video intelligence for government defence deployments, document AI on AWS, and native desktop software in Rust. He has run engineering as CTO. Springer author; MSc in Artificial Intelligence with distinction.';
 const sections = [
   ['/about/', 'A-101 Boardroom to bare metal', 'Who Akshay Bajpai is, the record of his work by kind, and how he works.'],
+  ['/engagements/', 'A-103 Terms of Engagement', 'What he takes on, how the work runs, and questions answered plainly.'],
   ['/schedule/', 'A-102 Schedule of Materials', 'Every tool and practice, counted from every repository and engagement: 352 items in 14 disciplines, leadership first.'],
   ['/research/', 'R-301 Research', 'Springer chapter on ML for medical diagnosis, MSc thesis on Alzheimer’s classification, current interests.'],
   ['/architecture/', 'S-201 Structural Principles', 'How the platforms are designed: governed agents, hybrid retrieval, gateway-first routing, infrastructure as product.'],
@@ -109,6 +113,16 @@ const llms = `# Akshay Bajpai
 - Contact: hello@akshaybajpai.com · ${SITE}/contact/
 - Profiles: https://github.com/ax5hay · https://linkedin.com/in/ax5hay · https://x.com/ax5hay
 
+## What he takes on
+
+${ENGAGE.offers.map((o) => `- **${o.name}.** ${o.text}`).join('\n')}
+
+How the work runs, in his words:
+
+${ENGAGE.method.map((m, i) => `${i + 1}. **${m.name}.** ${m.text}`).join('\n')}
+
+To engage him: ${SITE}/engagements/
+
 ## Work
 
 ${byCat('Works')}
@@ -116,6 +130,10 @@ ${byCat('Works')}
 ## Sheets
 
 ${sections.map(([p, t, d]) => `- [${t}](${SITE}${p}): ${d}`).join('\n')}
+
+## Questions
+
+${ENGAGE.questions.map((x) => `### ${x.q}\n\n${x.a}`).join('\n\n')}
 
 ## Essays
 

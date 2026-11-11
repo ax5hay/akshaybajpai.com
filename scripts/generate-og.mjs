@@ -171,6 +171,7 @@ async function render(name, props) {
 
 const SECTIONS = [
   { id: 'about', sheet: 'A-101', discipline: 'Architectural', title: 'Boardroom to bare metal', issued: '2026.11', description: 'Akshay Bajpai, technology leader and systems architect. Clients, teams, architecture, AI and the code underneath, from the first client conversation to the runbook.' },
+  { id: 'engagements', sheet: 'A-103', discipline: 'Architectural', title: 'Terms of Engagement', issued: '2026.11', description: 'What I take on: technology end to end, AI platforms in production, data agents a finance team can trust, vision where the data cannot leave.' },
   { id: 'schedule', sheet: 'A-102', discipline: 'Architectural', title: 'Schedule of Materials', issued: '2026.11', description: 'Every tool and practice, from every repository and engagement. Leadership and delivery first, then the stack, from LLM systems to Rust.' },
   { id: 'research', sheet: 'R-301', discipline: 'Research', title: 'Research', description: 'Published medical AI research, a Master’s thesis on dementia classification, and ongoing work in governed agentic retrieval.' },
   { id: 'architecture', sheet: 'S-201', discipline: 'Structural', title: 'Structural Principles', description: 'The decisions that outlast implementation: governed agents, hybrid retrieval, event-driven inference, and infrastructure as product.' },

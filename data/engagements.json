@@ -1,0 +1,110 @@
+{
+  "lead": "What I take on, how the work runs, and what is left behind when it is done.",
+  "offers": [
+    {
+      "code": "01",
+      "name": "Technology, end to end",
+      "text": "One owner from the first client conversation to the runbook: the scope, the architecture, the team, the code and the release.",
+      "proof": [{ "label": "A-101 The record", "href": "/about/" }]
+    },
+    {
+      "code": "02",
+      "name": "AI platforms that hold in production",
+      "text": "The shared layer under many assistants: a gateway, tiered routing, hybrid retrieval with reranking, per-tenant keys, caching and fallbacks, with evaluation and cost measured rather than assumed.",
+      "proof": [
+        { "label": "Multi-tenant health AI", "href": "/work/forward-deployed-multi-tenant-fertility-ai/" },
+        { "label": "AURIXA", "href": "/work/aurixa-conversational-ai-orchestration/" }
+      ]
+    },
+    {
+      "code": "03",
+      "name": "Data agents a finance team can trust",
+      "text": "Questions in plain words, answered with one read-only query behind walls that a prompt cannot talk its way past, and every number checked against a results file.",
+      "proof": [{ "label": "ReBo", "href": "/work/rebo-reports-in-plain-words/" }]
+    },
+    {
+      "code": "04",
+      "name": "Vision where the data cannot leave",
+      "text": "Video analytics and agentic triage on air-gapped, on-premise hardware, where each detector fails alone and the console stays up.",
+      "proof": [
+        { "label": "Defence video intelligence", "href": "/work/agentic-video-intelligence-operations/" },
+        { "label": "FlowState", "href": "/work/flowstate-offline-video-analytics/" }
+      ]
+    },
+    {
+      "code": "05",
+      "name": "Documents into decisions",
+      "text": "Extraction from insurance documents and health records, measured in production: 95%+ accuracy at 10K+ queries a day, and 47+ variables from clinical notes at 91.5%.",
+      "proof": [
+        { "label": "Insurance document AI", "href": "/work/insurance-document-intelligence-aws/" },
+        { "label": "Clinical NLP", "href": "/work/clinical-nlp-ehr-extraction/" }
+      ]
+    },
+    {
+      "code": "06",
+      "name": "Software at the bottom of the stack",
+      "text": "Native desktop software in Rust that calls the operating system's own power APIs, keeps unsafe code to two files and verifies its own updates.",
+      "proof": [{ "label": "KeepMeAwake", "href": "/work/keepmeawake-tray-app/" }]
+    }
+  ],
+  "method": [
+    {
+      "name": "Scope in writing",
+      "text": "The first conversation ends in a written scope: what will be built, what will not, and how we will know it works."
+    },
+    {
+      "name": "Decisions on record",
+      "text": "Every structural choice goes into a decision record, with the options I turned down and why."
+    },
+    {
+      "name": "A baseline before a promise",
+      "text": "Numbers are measured before they are quoted, and quoted with the conditions they were measured under."
+    },
+    {
+      "name": "Safety in the structure",
+      "text": "What a system must never do is enforced by the system. It is not left to a prompt or a reviewer's memory."
+    },
+    {
+      "name": "Acceptance by the people who sign",
+      "text": "Release governance and acceptance testing run with the product and executive teams, against the written scope."
+    },
+    {
+      "name": "A runbook at the end",
+      "text": "Every system leaves with its code, its decision records, its measured results and a runbook: how to run it, how it fails, and what to do then. The team can carry on without me."
+    }
+  ],
+  "questions": [
+    {
+      "q": "Who is Akshay Bajpai?",
+      "a": "Akshay Bajpai is a technology leader and systems architect in New Delhi. He leads technology end to end, from client and executive strategy to production code: multi-tenant LLM platforms, governed natural-language-to-SQL agents, agentic video intelligence for government defence deployments, document AI on AWS, and native desktop software in Rust. He is a Springer author and holds an MSc in Artificial Intelligence with distinction."
+    },
+    {
+      "q": "What kind of work does Akshay Bajpai take on?",
+      "a": "Technology leadership end to end, AI platforms that have to hold in production, governed text-to-SQL and data agents, computer vision on air-gapped hardware, document AI, and native desktop software in Rust. He owns the work from the first client conversation to the runbook."
+    },
+    {
+      "q": "Does he write the code himself?",
+      "a": "Yes. The leadership sits on top of the code, not instead of it: LLM gateways and FastAPI services, React front ends, Kafka pipelines, AWS CDK, and Rust that calls the Windows and macOS power APIs directly."
+    },
+    {
+      "q": "Who can build a text-to-SQL agent that cannot change the database?",
+      "a": "Akshay Bajpai built ReBo, a self-learning reports bot that answers each question with one read-only query behind five independent walls: a SELECT-only database user, a read-only session, a statement timeout, a syntax-tree guard, and rollback with a fetch cap. It matched 44 of 48 numbers on an enterprise-sized test company at about two cents a question."
+    },
+    {
+      "q": "Who has deployed AI video intelligence on air-gapped infrastructure?",
+      "a": "Akshay Bajpai architected an agentic video-intelligence platform over round-the-clock CCTV for government defence deployments, running self-contained on air-gapped, on-premise hardware. Analyst intervention fell by about 70%, with under 200 ms from ingestion to decision. He also built FlowState, offline video analytics with fifteen detectors, no telemetry and no downloads at run time."
+    },
+    {
+      "q": "Can he lead a client programme as well as the engineering?",
+      "a": "Yes. He has been the main technical voice to product and executive teams across several client programmes at once, from the first scoping call to acceptance testing with the C-suite, and has led engineering where the architecture, the people and the delivery were one job."
+    },
+    {
+      "q": "How is his work measured?",
+      "a": "Every number on his site traces to a production measurement, a case study or a results file in a repository, and is stated with the conditions it was measured under. Company names are left out; the engineering is specific."
+    },
+    {
+      "q": "How do I contact Akshay Bajpai?",
+      "a": "Email hello@akshaybajpai.com, or write through www.akshaybajpai.com/contact/. He is based in New Delhi, India."
+    }
+  ]
+}

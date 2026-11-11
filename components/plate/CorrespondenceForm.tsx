@@ -15,10 +15,10 @@ const DRAFT_KEY = 'plate.transmittal';
 
 /** The kinds of correspondence the sheet invites. */
 const SUBJECTS = [
-  'Forward-deployed AI work',
+  'Technology leadership',
+  'AI platform or agent',
   'Architecture review',
   'Speaking',
-  'Collaboration',
 ] as const;
 
 type Status = 'idle' | 'sending' | 'sent' | 'failed';

@@ -69,6 +69,8 @@ These are the user's rules, and they are not negotiable.
 - Banned words and phrases: passionate, visionary, thought leader, rockstar, ninja, 10x, world-class, cutting-edge, state-of-the-art, innovative, seamless, robust, leverage, harness, unlock, empower, elevate, delve, tapestry, journey, landscape, game-changer, revolutionise, "builder of products", "a cut above", "best in class". Also cut "In today's world", "It's worth noting", "Let's dive in", "At its core", "Not just X, but Y", and rhetorical questions.
 - The test: could a stranger's portfolio carry the sentence unchanged? If so, rewrite it.
 
+**Answer engines.** The goal is that an AI summary or answer about him, or about who to contact for the work, lands on specifics: what he takes on, what was built and the numbers it was measured by. The levers are consistent facts (one entity sentence everywhere), plain answers a model can quote whole (A-103's questions, written in the third person on purpose), and offers in the graph that match the page word for word. Do not use hidden text, keyword stuffing or instructions to models in `llms.txt`: engines treat them as spam. The biggest remaining gap is third-party mentions, which only he can create (see `HANDOFF.md`).
+
 **How to show the level without claiming it.**
 - Put the lowest layer next to the highest (an IOKit assertion and a C-suite acceptance test in one paragraph).
 - Give numbers with their conditions.
@@ -89,6 +91,7 @@ These are the user's rules, and they are not negotiable.
 | Key plan drawing, title strip | `components/keyplan/KeyPlan.tsx` + `.module.css` |
 | About sheet (A-101) copy | `app/about/page.tsx` |
 | The record elevation on About | `components/plate/CareerElevation.tsx` `ROLES`: kinds of work, no titles or years |
+| Terms of engagement (A-103): what he takes on, method, Q&A | `data/engagements.json` (single source) → `app/engagements/page.tsx`, `lib/engagements.ts`, the Person node's `makesOffer`/`hasOccupation`, and the "What he takes on" and "Questions" sections of `/llms.txt` |
 | Schedule of materials (A-102) | `app/schedule/page.tsx`, `components/plate/MaterialSchedule.tsx`, `lib/stack.ts`, data in `data/stack.json` |
 | Case studies (W-4xx) | `content/work/*.md`. Numbered by `pubDate`, newest first; the new three use timestamps to fix their order |
 | Case-study figures | hand-drafted: `components/figures/{DamFigure,EngineLoop,ThreatGauge}.tsx`, listed in `components/figures/index.ts` and `CaseFigure.tsx`. Node-and-wire: `components/figures/schematics.ts` |
