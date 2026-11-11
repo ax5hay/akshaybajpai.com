@@ -42,6 +42,10 @@ export default function AboutPage() {
         breadcrumbs([{ name: 'A-101 The Architect', path: META.path }]),
       ]}
       lead={<p>{STANDFIRST}</p>}
+      facts={[
+        { k: 'MSc AI', v: '9.8/10, distinction' },
+        { k: 'Springer', v: 'Lead author' },
+      ]}
       record={[
         { k: 'name', v: 'Akshay Bajpai' },
         { k: 'role', v: JOB_TITLE },
@@ -50,31 +54,48 @@ export default function AboutPage() {
     >
       <div className="prose prose-lead">
         <p>
-          I am a technology leader and systems architect. I lead technology end to
-          end, from client and executive strategy to production code: multi-tenant LLM platforms,
-          governed natural-language-to-SQL agents, agentic video intelligence for government
-          defence deployments, document AI on AWS, and native desktop software in Rust. I co-founded
-          three companies, and I have run engineering as CTO at two others. In both seats the
-          architecture, the people and the delivery were one job. Outside client
+          I am a technology leader and systems architect, and I work end to end, from the
+          executive table to production code. I have worked across most industries,
+          with the deepest runs in healthcare, finance, defence and insurance, and across most
+          kinds of AI, from language models and agents to computer vision and forecasting. I co-founded three companies, and I have run engineering as CTO at two others.
+          In both seats the architecture, the people and the delivery were one job. Outside client
           work I research world models and reinforcement learning, and write essays on systems,
           cost and trust. I am a Springer author and hold an MSc in Artificial Intelligence with
           distinction.
         </p>
         <p>
-          The range is the point. In one programme I was the client&rsquo;s main technical voice,
-          from the first scoping call to acceptance testing with the C-suite. In another I wrote
-          the Rust that holds a Windows power request and an IOKit assertion, with{' '}
-          <code>unsafe</code> kept to two files. Both got the same treatment: decisions written
-          down, numbers measured with their conditions, safety built into the structure.
+          Most of my work sits where two rooms meet. In one, a founder or an executive team
+          decides what is worth building and what it has to survive. In the other, engineers make
+          it hold. I have spent years in both, often in the same week, and I am most useful where
+          a decision in the first room changes what gets written in the second. I write decisions
+          down, measure what I claim, and leave behind a system someone else can run.
         </p>
+
+        <h2>Credentials</h2>
         <p>
-          Day to day that means LLMs and agentic orchestration, hybrid retrieval, schema-grounded
-          text-to-SQL, computer vision at the edge, FastAPI, React, Kafka, Docker and AWS CDK. I
-          care most about the unglamorous middle: evaluation, cost-aware routing, auth, audit logs
-          and the regression suite. That is the part an executive signs and an operator lives with.
+          An MSc in Artificial Intelligence &amp; Intelligent Systems from Lviv Polytechnic National
+          University, awarded with distinction at 9.8 out of 10. Lead author of a chapter in a
+          Springer book, now in its third edition. Undergraduate research at IIT Gandhinagar, and a
+          B.Tech in Computer Science &amp; Engineering with honours. The{' '}
+          <Link href="/research/">research sheet</Link> has the detail, and what I am working
+          through now.
         </p>
 
         <h2>The record</h2>
+        <p>
+          The record is drawn by kind of work, not by employer. Three results I would point to
+          first: analyst intervention down by about 70% on a{' '}
+          <Link href="/work/agentic-video-intelligence-operations/">
+            defence video platform
+          </Link>{' '}
+          that can run with no outside connection; food waste down 32% across 200+ restaurants on a{' '}
+          <Link href="/work/restaurant-saas-demand-forecasting/">forecasting platform</Link>; and
+          reporting rebuilt on 8,000+ approved columns for a{' '}
+          <Link href="/work/forward-deployed-multi-tenant-fertility-ai/">
+            multi-tenant health platform
+          </Link>
+          , where I was the main technical voice to the executive team.
+        </p>
       </div>
 
       <Callout note="Read as an elevation: each volume is a kind of work, standing on the one before it.">
@@ -83,15 +104,13 @@ export default function AboutPage() {
 
       <div className="prose">
         <p>
-          The whole range is drawn on one sheet, the{' '}
-          <Link href="/schedule/">schedule of materials</Link>: every tool and practice, counted
-          from the repositories I pushed and the work I led. The{' '}
-          <Link href="/work/">case studies</Link> show how it was used, and the{' '}
-          <Link href="/blog/">field notes</Link> and <Link href="/essays/">essays</Link> show how I
-          think about scope, architecture and delivery. Company names are left out on purpose; the
-          engineering is specific. What I take on, and how the work runs, is on the{' '}
-          <Link href="/engagements/">terms of engagement</Link>; to start one,{' '}
-          <Link href="/contact/">write to me</Link>.
+          How each piece was built is under <Link href="/work/">Works</Link>, and the whole range
+          of tools and practice is on one sheet, the{' '}
+          <Link href="/schedule/">schedule of materials</Link>. How I think about scope,
+          architecture and delivery is in the <Link href="/essays/">essays</Link> and{' '}
+          <Link href="/blog/">field notes</Link>. Company names are left out on purpose. What I
+          take on is on the <Link href="/engagements/">terms of engagement</Link>; to start
+          something, <Link href="/contact/">write to me</Link>.
         </p>
       </div>
     </PlateShell>

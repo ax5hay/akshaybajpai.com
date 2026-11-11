@@ -88,7 +88,7 @@ const sections = [
   ['/about/', 'A-101 Boardroom to bare metal', 'Who Akshay Bajpai is, the record of his work by kind, and how he works.'],
   ['/engagements/', 'A-103 Terms of Engagement', 'What he takes on, how the work runs, and questions answered plainly.'],
   ['/schedule/', 'A-102 Schedule of Materials', 'Every tool and practice, counted from every repository and engagement: 352 items in 14 disciplines, leadership first.'],
-  ['/research/', 'R-301 Research', 'World models and reinforcement learning, a Springer chapter on ML for medical diagnosis, and an MSc thesis on Alzheimer’s classification.'],
+  ['/research/', 'R-301 Research', 'World models and reinforcement learning now; a Springer chapter, an MSc thesis, and the MSc in AI and intelligent systems they came from.'],
   ['/architecture/', 'S-201 Structural Principles', 'How the platforms are designed: governed agents, hybrid retrieval, gateway-first routing, infrastructure as product.'],
   ['/work/', 'W-400 Works', 'Case studies, each with an operable figure.'],
   ['/blog/', 'B-500 Field Notes', 'Shorter technical pieces.'],

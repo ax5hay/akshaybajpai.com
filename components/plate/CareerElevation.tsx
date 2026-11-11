@@ -31,34 +31,34 @@ const ROLES: Role[] = [
     role: 'MSc in Artificial Intelligence',
     context: 'Research · with distinction',
     description:
-      "Graduated with distinction (9.8/10). The thesis benchmarked nine machine learning models for Alzheimer's classification on longitudinal biomarkers.",
+      "Graduated with distinction (9.8/10). The thesis compared nine machine learning models on one hard diagnostic problem, Alzheimer's classification.",
   },
   {
     from: 2023,
     to: 2025,
     height: 70,
     role: 'Insurance document AI',
-    context: 'Extraction and underwriting on AWS',
+    context: 'Extraction and underwriting',
     description:
-      'Document intelligence on AWS Bedrock (Claude, LayoutLMv3) at 95%+ extraction accuracy and 10K+ queries a day. Underwriting efficiency up 78%.',
+      'Document AI for underwriting: 95%+ extraction accuracy at 10K+ queries a day, and underwriting efficiency up 78%.',
   },
   {
     from: 2025,
     to: 2025.45,
     height: 90,
     role: 'A restaurant platform',
-    context: 'Forecasting and event pipelines',
+    context: 'Forecasting',
     description:
-      'The AI and full-stack engineering, and the team of eight that built it. Forecasting validated across 200+ restaurants cut food waste 32%; event pipelines carry 2M+ events a day under 100 ms.',
+      'The AI and full-stack engineering, and the team that built it. Forecasting validated across 200+ restaurants cut food waste 32%, with 2M+ events a day running through it.',
   },
   {
     from: 2025.45,
     to: 2026,
     height: 108,
     role: 'Finance and healthcare AI',
-    context: 'Agents and clinical pipelines',
+    context: 'Agents and clinical AI',
     description:
-      'LangGraph finance agents with 60% fewer manual touchpoints. Multimodal clinical pipelines on QLoRA-tuned open models in HIPAA- and GDPR-compliant AWS: 94% precision, inference cost down 80%, under 800 ms at p95.',
+      'AI agents for finance that removed 60% of the manual touchpoints, and clinical AI built inside health-data privacy rules: 94% precision at a fifth of the inference cost.',
   },
   {
     from: 2026,
@@ -67,7 +67,7 @@ const ROLES: Role[] = [
     role: 'Defence video intelligence',
     context: 'Government defence deployments',
     description:
-      'An agentic platform over round-the-clock CCTV on air-gapped hardware: LangGraph and MCP agents triage and escalate, Kafka feeds the inference. Analyst intervention down 70%; under 200 ms from ingestion to decision.',
+      'A platform that watches round-the-clock CCTV and runs with no outside connection. Analyst intervention down 70%, under 200 ms from frame to decision.',
   },
   {
     from: 2026.4,
@@ -76,7 +76,7 @@ const ROLES: Role[] = [
     role: 'Multi-tenant health AI',
     context: 'Forward-deployed, several programmes at once',
     description:
-      'Lead engineer and the main technical voice to product and executive teams: a governed natural-language-to-SQL agent, three coordinated assistants and the shared LLM layer under them, on AWS CDK. Reporting rebuilt on 8,000+ approved columns across 193 tables.',
+      'Lead engineer across several client programmes at once, and their main technical voice to product and executive teams. Reporting rebuilt on 8,000+ approved columns; 100+ legacy prompts retired.',
   },
 ];
 

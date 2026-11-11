@@ -4,9 +4,8 @@ Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (vo
 
 ## Where things stand
 
-- **Branch:** `rev-e/boardroom-to-bare-metal`, pushed, open as PR #30 against `main`.
-  - **Not merged.** A merge to `main` deploys to www.akshaybajpai.com.
-  - Merge only when the owner says so.
+- **Merged and live.** PR #30 merged to `main` on 2026-11-12 and deployed to www.akshaybajpai.com.
+  - A push to `main` deploys. Push only when the owner says so.
 - **Build:** `npm run typecheck` and `npm run build` both pass. `out/` holds the last build.
 - **Checked by eye** with headless Edge screenshots:
   - key plan, About, Works, A-102 and A-103
@@ -58,7 +57,7 @@ The case study is 1 kB over the brief's floor: a slightly larger plate registry 
 
 ## Waiting on the owner
 
-- **Push.** Merge the branch to `main` and push. Then submit these in Google Search Console:
+- **Search Console.** Rev E is live. Submit these in Google Search Console:
   - `/`
   - `/about/`
   - `/engagements/`
@@ -76,7 +75,7 @@ The case study is 1 kB over the brief's floor: a slightly larger plate registry 
   - the FlowState air-gap story
   - talks
 - **Facts to confirm:**
-  - "team of eight" (restaurant platform), from an older résumé
+  - "team of eight" (restaurant platform), from an older résumé. Taken off the About elevation until confirmed; put it back in `CareerElevation.tsx` if it is
   - whether he offers fractional or interim CTO work. If yes, add it to `data/engagements.json` and the contact subjects.
 - **Dates on the Works schedule.** The schedule and article heads show each case study's date (e.g. "Jun 1, 2022"), which reads as a timeline next to client work. It was kept because the brief said to leave existing case studies as they are. Decide whether to hide dates for client work.
 
