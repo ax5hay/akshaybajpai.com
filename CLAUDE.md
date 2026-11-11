@@ -8,7 +8,7 @@ The longer brief this came from is the Claude Doc "Website brief for the builder
 
 ## 1. What the site is
 
-A personal site issued as an architectural drawing set. Next.js 15 (App Router), React 19, TypeScript, static export to `out/`, hosted on GitHub Pages at www.akshaybajpai.com. No server, no edge functions and no analytics script.
+A personal site issued as an architectural drawing set. Next.js 15 (App Router), React 19, TypeScript, static export to `out/`, served by Cloudflare as Workers static assets at www.akshaybajpai.com (moved from GitHub Pages on 2026-11-12). No server, no edge functions and no analytics script.
 
 - Every route is a numbered **sheet** (plate). The homepage is the **key plan** (G-000), a general arrangement of the whole set.
 - The chrome never leaves: frame, rulers, rail and title block. A route change reads as a new sheet laid on the same board (View Transitions).
@@ -168,9 +168,10 @@ npm run dev           # local dev server
 npm run typecheck     # tsc --noEmit
 npm run build         # next build + rss/llms.txt + share cards + polyfill strip → out/
 npm run sync:stack    # refresh data/stack.json from the profile repo
+npm run ship          # build, deploy to Cloudflare, ping IndexNow
 ```
 
-**Deploy.** A push to `main` runs `.github/workflows/deploy.yml` (build, CNAME, IndexNow key, Pages deploy). Details are in `DEPLOYMENT.md`. Never push without the owner's go-ahead. After a deploy that changes positioning, submit in Google Search Console:
+**Deploy.** `npm run ship` builds, deploys `out/` with Wrangler (`wrangler.jsonc`) and pings IndexNow; `npm run deploy` skips the build. Once Workers Builds is connected in the Cloudflare dashboard, a push to `main` does the same. There is no GitHub Actions workflow. Rollback is `npx wrangler rollback <version-id>`. Details are in `DEPLOYMENT.md`. Never push without the owner's go-ahead. After a deploy that changes positioning, submit in Google Search Console:
 - the key plan
 - `/about/`
 - `/work/`

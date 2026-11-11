@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/generate-rss.mjs && node scripts/generate-og.mjs && node scripts/strip-polyfills.mjs",
+    "deploy": "wrangler deploy && node scripts/indexnow.mjs",
+    "ship": "npm run build && npm run deploy",
     "typecheck": "tsc --noEmit",
     "sync:stack": "node scripts/sync-stack.mjs"
   },

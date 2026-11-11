@@ -17,7 +17,6 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 
 [![Open the live site](https://img.shields.io/badge/open_the_set-www.akshaybajpai.com-141417?style=for-the-badge&labelColor=ded2b8&color=983729)](https://www.akshaybajpai.com)
 
-[![Deploy](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml/badge.svg)](https://github.com/ax5hay/akshaybajpai.com/actions/workflows/deploy.yml)
 ![Next.js 15](https://img.shields.io/badge/Next.js_15-141417?style=flat-square&logo=next.js)
 ![React 19](https://img.shields.io/badge/React_19-20232a?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript_5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)
@@ -39,7 +38,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  ARCHITECTURE OF INTELLIGENCE                  SHEET   G-000    REV    E   │
 │  Drawing set · Akshay Bajpai                   SCALE   1:50     ISSUED     │
-│  Next.js 15 · static export · GitHub Pages                      2026.11    │
+│  Next.js 15 · static export · Cloudflare                        2026.11    │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -68,7 +67,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 | [`S-202`](#s-202--content-pipeline) | **Content pipeline** | Markdown in, numbered sheets out |
 | [`W-401`](#w-401--run-it-locally) | **Run it locally** | Quick start and scripts |
 | [`W-402`](#w-402--project-structure) | **Project structure** | Where everything lives |
-| [`C-701`](#c-701--deployment) | **Deployment** | GitHub Pages, for free. Full runbook in [DEPLOYMENT.md](DEPLOYMENT.md) |
+| [`C-701`](#c-701--deployment) | **Deployment** | Cloudflare static assets, for free. Full runbook in [DEPLOYMENT.md](DEPLOYMENT.md) |
 | [`C-702`](#c-702--measured) | **Measured** | Weight, frame rate, accessibility |
 | [`C-703`](#c-703--visibility) | **Visibility** | How the set is found: structured data, share cards, feeds, the search endpoint |
 | [`C-704`](#c-704--the-calling-card) | **The calling card** | The sheet behind the QR code on the printed card, and the vCard it hands over |
@@ -839,7 +838,7 @@ flowchart TD
     PROV --> PLAN["KeyPlan"]
     PROV --> SHELL["PlateShell"]
   end
-  OUT --> PAGES["GitHub Pages"]
+  OUT --> PAGES["Cloudflare static assets"]
 ```
 
 ### Sheet registry
@@ -939,7 +938,7 @@ flowchart LR
 | Fonts | Instrument Serif, IBM Plex Sans (regular only) and Mono, via `next/font`; self-hosted |
 | Share cards | [satori](https://github.com/vercel/satori) and `@resvg/resvg-js`, at build time only |
 | Contact form | [Formspree](https://formspree.io/) (the only third-party runtime service) |
-| Hosting | GitHub Pages, deployed by GitHub Actions |
+| Hosting | Cloudflare Workers static assets, deployed with Wrangler |
 
 ---
 
@@ -1073,7 +1072,7 @@ scripts/
 └── fonts/                # the three faces the cards are set in
 public/                   # favicon, logo, home share card, manifest, humans.txt
 docs/media/               # the screenshots on this page
-.github/workflows/        # deploy.yml, with the two optional verification variables
+wrangler.jsonc            # the deploy: out/ as static assets, www as the custom domain
 CNAME                     # www.akshaybajpai.com
 ```
 
@@ -1081,16 +1080,17 @@ CNAME                     # www.akshaybajpai.com
 
 ## C-701 · Deployment
 
-The site is hosted on **GitHub Pages, for free**, at
-[www.akshaybajpai.com](https://www.akshaybajpai.com). A push to `main` builds and deploys
-it in about a minute. Nothing is manual after the one-time setup.
+The site is served by **Cloudflare as static assets, for free**, at
+[www.akshaybajpai.com](https://www.akshaybajpai.com): a Worker with no script, so every
+request is a file lookup. It moved from GitHub Pages on 2026-11-12, when GitHub Actions
+stopped starting deploys. `npm run deploy` uploads only the changed files and pings
+IndexNow; with Workers Builds connected, a push to `main` does it.
 
 ```mermaid
 flowchart LR
-  PUSH["push to main"] --> CI["npm ci"] --> BUILD["npm run build"]
-  BUILD --> CNAME["write out/CNAME"] --> VERIFY["verify the artifact"]
-  VERIFY --> UPLOAD["upload-pages-artifact"] --> DEPLOY["deploy-pages<br/>up to 3 attempts"]
-  DEPLOY --> LIVE["www.akshaybajpai.com"]
+  PUSH["push to main"] --> BUILD["npm run build"]
+  BUILD --> DEPLOY["wrangler deploy<br/>changed files only"]
+  DEPLOY --> LIVE["www.akshaybajpai.com"] --> PING["IndexNow"]
 ```
 
 **The full runbook is in [DEPLOYMENT.md](DEPLOYMENT.md):** how the pipeline works, DNS and
@@ -1277,7 +1277,7 @@ argument; those are the evidence.
 | Sheet register: every sheet linked from every page | `components/sheet/Register.tsx`, a hidden `<nav>` in the layout; the index is its screen form |
 | Search endpoint | `InstrumentProvider` reads `?q=`; `ModeScript` skips the cover for it |
 | Verification tags | `app/layout.tsx`, from `GOOGLE_SITE_VERIFICATION` and `BING_SITE_VERIFICATION` |
-| IndexNow ping on every deploy | `.github/workflows/deploy.yml`, job `notify`, from `INDEXNOW_KEY` |
+| IndexNow ping on every deploy | `scripts/indexnow.mjs`, run by `npm run deploy`, key in `public/<key>.txt` |
 
 ---
 
