@@ -8,7 +8,7 @@ import { PrintButton } from '@/components/kit/PrintButton';
 import { getCollection, estimateReadingTime, type WorkFrontmatter } from '@/lib/content';
 import { buildSheetIndex } from '@/lib/sheet-index';
 import { detailSheetNumber, getPlateByHref, type Discipline, type SeriesName } from '@/lib/plates';
-import { buildMetadata } from '@/lib/metadata';
+import { buildMetadata, ROLE, ROLE_LINE } from '@/lib/metadata';
 import { SITE_URL, SOCIAL } from '@/lib/constants';
 import AboutPage from '@/app/about/page';
 import ResearchPage from '@/app/research/page';
@@ -72,7 +72,7 @@ export default async function CompleteSet() {
           <span>G-000</span> The Architecture of Intelligence
         </p>
         <h1 className={styles.coverName}>Akshay Bajpai</h1>
-        <p className={styles.coverRole}>Architect of systems · Builder of intelligence</p>
+        <p className={styles.coverRole}>{ROLE} · {ROLE_LINE}</p>
 
         <div className={styles.coverFigures} aria-hidden="true">
           {['architecture', 'work', 'about', 'research'].map((id) => (

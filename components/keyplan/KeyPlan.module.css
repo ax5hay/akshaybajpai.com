@@ -441,6 +441,13 @@ html[data-mode='raw'] .plateTitle {
   color: var(--accent);
 }
 
+.headlineStand {
+  margin-top: 12px;
+  font-size: calc(11.5px * var(--inv-soft, 1));
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
 .headlineNote {
   margin-top: 16px;
   font-size: calc(11px * var(--inv-soft, 1));
@@ -1479,7 +1486,8 @@ html[data-mode='raw'] .tourTitle {
 .plane[data-lod='far'] .rows,
 .plane[data-lod='far'] .figCap,
 .plane[data-lod='far'] .plateRecord,
-.plane[data-lod='far'] .headlineNote {
+.plane[data-lod='far'] .headlineNote,
+.plane[data-lod='far'] .headlineStand {
   opacity: 0;
   pointer-events: none;
 }

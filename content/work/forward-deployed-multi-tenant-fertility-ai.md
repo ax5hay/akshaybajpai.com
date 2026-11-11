@@ -13,7 +13,7 @@ Fertility and surrogacy operations run on sensitive intake, deep domain knowledg
 
 ## Role & delivery model
 
-Forward-deployed as **lead full-stack AI engineer**, I owned architecture through UAT: workbook reviews with product, Jira and Slack decision logs, SQL reviews with product owners, and evidence-backed scope negotiation when stakeholders disagreed. I also extended a personal real-estate AI prototype into a **production SaaS platform for a US federal use case**: prototype to deployed product across workflows, application architecture, and infrastructure.
+Forward-deployed as the **lead engineer**, I owned architecture through UAT: workbook reviews with product, Jira and Slack decision logs, SQL reviews with product owners, and evidence-backed scope negotiation when stakeholders disagreed. I also extended a personal real-estate AI prototype into a **production SaaS platform for a US federal use case**: prototype to deployed product across workflows, application architecture, and infrastructure.
 
 ## Platform architecture
 

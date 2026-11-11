@@ -3,18 +3,18 @@ import { PlateShell } from '@/components/plate/PlateShell';
 import { CareerElevation } from '@/components/plate/CareerElevation';
 import { Callout } from '@/components/kit/Callout';
 import { getPlateByHref } from '@/lib/plates';
-import { buildMetadata, breadcrumbs, webPage, PERSON_ID } from '@/lib/metadata';
+import { buildMetadata, breadcrumbs, webPage, PERSON_ID, JOB_TITLE, NAME, STANDFIRST } from '@/lib/metadata';
 import { JsonLd } from '@/components/JsonLd';
 
 const PLATE = getPlateByHref('/about/')!;
 
 const META = {
-  title: 'The Architect · About Akshay Bajpai',
+  title: `${NAME} · ${JOB_TITLE}`,
   description:
-    'Forward-deployed AI engineer: multi-tenant platforms, governed agents, clinical and operational intelligence from research to production.',
+    'Akshay Bajpai leads technology end to end, from client and executive strategy to production code: LLM platforms, governed text-to-SQL agents, defence video intelligence, document AI and native software in Rust.',
   path: '/about/',
   card: 'about',
-  keywords: ['Akshay Bajpai', 'about Akshay Bajpai', 'ax5hay', 'AI architect New Delhi', 'forward-deployed AI engineer', 'MSc Artificial Intelligence'],
+  keywords: ['Akshay Bajpai', 'about Akshay Bajpai', 'ax5hay', 'technology leader', 'systems architect', 'AI architect New Delhi', 'forward-deployed AI engineer', 'text-to-SQL', 'computer vision', 'Rust', 'MSc Artificial Intelligence'],
 };
 
 export const metadata = buildMetadata(META);
@@ -28,6 +28,7 @@ export default function AboutPage() {
       discipline={PLATE.discipline}
       scale={PLATE.scale}
       revision={PLATE.revision}
+      issued="2026.11"
       refs={PLATE.refs}
       jsonLd={[
         webPage({
@@ -40,41 +41,53 @@ export default function AboutPage() {
         }),
         breadcrumbs([{ name: 'A-101 The Architect', path: META.path }]),
       ]}
-      lead={<p>Architect of systems. Builder of intelligence.</p>}
+      lead={<p>{STANDFIRST}</p>}
       record={[
         { k: 'name', v: 'Akshay Bajpai' },
-        { k: 'role', v: 'Senior Full Stack AI Engineer · Forward Deployment' },
+        { k: 'role', v: JOB_TITLE },
         { k: 'based', v: 'New Delhi, India' },
       ]}
     >
       <div className="prose prose-lead">
         <p>
-          I work where product stakes, model behavior, and infrastructure meet. The through-line in
-          my career is taking ambiguous domain problems (multi-tenant fertility platforms,
-          defense-adjacent video intelligence, and clinical NLP) and making them operable.
+          I am a technology leader and systems architect in New Delhi. I lead technology end to
+          end, from client and executive strategy to production code: multi-tenant LLM platforms,
+          governed natural-language-to-SQL agents, agentic video intelligence for government
+          defence deployments, document AI on AWS, and native desktop software in Rust. I have run
+          engineering as CTO, where the architecture, the people and the delivery were one job. I
+          am a Springer author and hold an MSc in Artificial Intelligence with distinction.
         </p>
         <p>
-          Technically, I live in the stack you actually run in production: LLMs and SLMs, agentic
-          orchestration, hybrid RAG, schema-grounded NL2SQL, FastAPI, React, Kafka, Docker, and AWS
-          CDK. I care about evaluation, cost-aware routing, and the boring parts: JWT auth, audit
-          logs, and Playwright regression. That is what separates a demo from something a
-          C-suite can sign off on.
+          The range is the point. In one programme I was the client&rsquo;s main technical voice,
+          from the first scoping call to acceptance testing with the C-suite. In another I wrote
+          the Rust that holds a Windows power request and an IOKit assertion, with{' '}
+          <code>unsafe</code> kept to two files. Both got the same treatment: decisions written
+          down, numbers measured with their conditions, safety built into the structure.
+        </p>
+        <p>
+          Day to day that means LLMs and agentic orchestration, hybrid retrieval, schema-grounded
+          text-to-SQL, computer vision at the edge, FastAPI, React, Kafka, Docker and AWS CDK. I
+          care most about the unglamorous middle: evaluation, cost-aware routing, auth, audit logs
+          and the regression suite. That is the part an executive signs and an operator lives with.
         </p>
 
-        <h2>Chronology</h2>
+        <h2>The record</h2>
       </div>
 
-      <Callout note="Read as an elevation, not a list: the datum runs along the years and each role is a volume standing on it.">
+      <Callout note="Read as an elevation: each volume is a kind of work, standing on the one before it.">
         <CareerElevation />
       </Callout>
 
       <div className="prose">
         <p>
-          This site is a thinking laboratory: <Link href="/work/">case studies</Link>,{' '}
-          <Link href="/blog/">technical writing</Link>, and <Link href="/essays/">essays</Link> that
-          mirror how I negotiate scope, architecture, and delivery. Organization names are
-          generalized on this site; the engineering is specific. For AI systems, forward-deployed
-          engineering, or performance-critical products, <Link href="/contact/">get in touch</Link>.
+          The whole range is drawn on one sheet, the{' '}
+          <Link href="/schedule/">schedule of materials</Link>: every tool and practice, counted
+          from the repositories I pushed and the work I led. The{' '}
+          <Link href="/work/">case studies</Link> show how it was used, and the{' '}
+          <Link href="/blog/">field notes</Link> and <Link href="/essays/">essays</Link> show how I
+          think about scope, architecture and delivery. Company names are left out on purpose; the
+          engineering is specific. For technology leadership, systems architecture, or AI that has
+          to hold in production, <Link href="/contact/">write to me</Link>.
         </p>
       </div>
     </PlateShell>

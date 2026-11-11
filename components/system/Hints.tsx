@@ -73,8 +73,8 @@ function notesFor(where: Where, phone: boolean, docked: boolean, level: Level): 
       </>
     ) : (
       <>
-        <b>Fig. 1</b> on this sheet is operable. Choose a scenario and its path is traced through
-        the system.
+        <b>Fig. 1</b> on this sheet is operable. Choose a case, a step or a channel and the drawing
+        follows it through the system.
       </>
     ),
   };
@@ -124,13 +124,13 @@ function notesFor(where: Where, phone: boolean, docked: boolean, level: Level): 
         id: phone ? 'phone-elevation' : 'elevation',
         text: phone ? (
           <>
-            The <b>elevation</b> under Chronology is operable. Tap a volume, or use Earlier and
-            Later, to read each role.
+            The <b>elevation</b> under The record is operable. Tap a volume, or use Earlier and
+            Later, to read each kind of work.
           </>
         ) : (
           <>
-            The <b>elevation</b> under Chronology is operable. Hover or click a volume, or step
-            through with <K>←</K> <K>→</K>, to read each role.
+            The <b>elevation</b> under The record is operable. Hover or click a volume, or step
+            through with <K>←</K> <K>→</K>, to read each kind of work.
           </>
         ),
       },

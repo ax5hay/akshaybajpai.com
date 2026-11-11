@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSheetSet } from './SheetSet';
 import styles from './Preloader.module.css';
+import { ROLE } from '@/lib/identity';
 
 /**
  * The cover sheet. Shown once per visit, and it earns the time it takes.
@@ -104,7 +105,7 @@ function Print({ total }: { total: number }) {
       <span className={styles.dim}>
         <span className={styles.tick} />
         <span className={styles.line} />
-        <span className={styles.role}>Architect of systems · Builder of intelligence</span>
+        <span className={styles.role}>{ROLE}</span>
         <span className={styles.line} />
         <span className={styles.tick} />
       </span>

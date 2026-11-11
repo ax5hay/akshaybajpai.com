@@ -2,7 +2,7 @@
 title: "Agentic Video Intelligence for 24/7 Operations"
 description: "Real-time CCTV triage with LangGraph and MCP: Kafka ingestion, sub-200ms paths, and defense-grade on-prem deployment."
 pubDate: 2026-04-01
-client: "Defense-adjacent · video intelligence"
+client: "Government defence deployments · video intelligence"
 stack: ["LangGraph", "MCP", "FastAPI", "Kafka", "WebSockets", "React", "Next.js", "Python"]
 metrics: ["~70% less analyst intervention", "Sub-200ms ingestion-to-decision", "On-prem defense deployments"]
 ---

@@ -1,0 +1,221 @@
+/* FlowState's threat index, as a pressure gauge. Tokens only. */
+
+/* Channel toggles: on is ink, off is paper, missing is struck through. */
+.toggle[aria-pressed='true'] {
+  color: var(--paper-raised);
+  background: var(--ink);
+}
+
+.toggle[aria-pressed='true'] > span {
+  color: inherit;
+  opacity: 0.6;
+}
+
+.toggle[data-missing] {
+  color: var(--ink-4);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.toggle[data-missing]:hover {
+  color: var(--ink-4);
+  background: var(--paper-raised);
+}
+
+.bezel {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2;
+}
+
+.face {
+  fill: var(--paper-raised);
+  stroke: var(--rule);
+  stroke-width: 0.6;
+}
+
+.guide {
+  fill: none;
+  stroke: none;
+}
+
+.bandArc {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: 5;
+  transition: stroke var(--d-2) var(--ease-plate);
+}
+
+.band[data-on] .bandArc {
+  stroke: var(--accent);
+}
+
+.bandName,
+.number,
+.segmentNo,
+.value,
+.bandNow,
+.head,
+.rowName,
+.rowMath,
+.rowAdds,
+.reason,
+.total {
+  font-family: var(--font-label), monospace;
+  letter-spacing: 0.06em;
+}
+
+.bandName {
+  font-size: 5.6px;
+  letter-spacing: 0.18em;
+  fill: var(--ink-4);
+}
+
+.band[data-on] .bandName {
+  fill: var(--accent);
+  font-weight: 600;
+}
+
+.tick,
+.tickMajor {
+  fill: none;
+  stroke: var(--ink-3);
+}
+
+.tick {
+  stroke-width: 0.6;
+}
+
+.tickMajor {
+  stroke-width: 1.2;
+}
+
+.number {
+  font-size: 7px;
+  fill: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.stackTrack {
+  fill: none;
+  stroke: var(--rule-faint);
+  stroke-width: 12;
+}
+
+.segment {
+  fill: none;
+  stroke-width: 12;
+}
+
+.segment[data-tone='a'] {
+  stroke: var(--accent-2);
+}
+
+.segment[data-tone='b'] {
+  stroke: var(--ink-3);
+}
+
+.segmentNo {
+  font-size: 6px;
+  font-weight: 600;
+  fill: var(--paper-raised);
+}
+
+/* Turned by transform alone, about the hub. */
+.needle {
+  transform-box: view-box;
+  transform-origin: 150px 126px;
+  transition: transform var(--d-4) var(--ease-snap);
+}
+
+.needle path {
+  fill: var(--accent);
+}
+
+.hub {
+  fill: var(--ink);
+  stroke: var(--paper-raised);
+  stroke-width: 1.5;
+}
+
+.window {
+  fill: var(--paper-sunk);
+  stroke: var(--rule-strong);
+  stroke-width: 0.8;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 600;
+  fill: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.bandNow {
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  fill: var(--accent);
+}
+
+/* ---- the working ---- */
+
+.head {
+  font-size: 6px;
+  letter-spacing: 0.16em;
+  fill: var(--ink-4);
+}
+
+.rule {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: 0.6;
+}
+
+.rowName {
+  font-size: 7px;
+  font-weight: 600;
+  fill: var(--ink-4);
+}
+
+.rowNo {
+  fill: var(--accent);
+}
+
+.rowMath,
+.rowAdds {
+  font-size: 7px;
+  fill: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.row[data-on] .rowName,
+.row[data-on] .rowAdds {
+  fill: var(--ink);
+}
+
+.row[data-on] .rowMath {
+  fill: var(--ink-3);
+}
+
+.row[data-missing] .rowName {
+  text-decoration: line-through;
+}
+
+.reason {
+  font-size: 6px;
+  fill: var(--accent);
+}
+
+.total {
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .needle {
+    transition: none;
+  }
+}

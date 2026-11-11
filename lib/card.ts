@@ -1,5 +1,5 @@
 import { SITE_URL, SOCIAL } from './constants';
-import { NAME, ROLE } from './metadata';
+import { NAME } from './identity';
 
 /**
  * C-701, the calling card.
@@ -18,7 +18,8 @@ export const CARD = {
   name: NAME,
   given: 'Akshay',
   family: 'Bajpai',
-  role: ROLE,
+  /** On the card one part to a line; in the vCard, the TITLE field. */
+  role: 'Technology leader · Systems architect',
   /** The number on the printed card, with its country code. */
   phone: '+91 84482 17769' as string,
   email: SOCIAL.email,

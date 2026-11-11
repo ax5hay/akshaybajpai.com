@@ -13,6 +13,7 @@ import {
   KEY_PLAN_WIDTH,
   keyPlanPlates,
   PLATES,
+  ISSUES,
   type KeyPlanRect,
   type PlacedPlate,
 } from '@/lib/plates';
@@ -20,6 +21,7 @@ import { useInstruments } from '@/components/system/InstrumentProvider';
 import { useMode } from '@/components/system/ModeProvider';
 import { useToast } from '@/components/system/ToastProvider';
 import { MODE_INFO, MODES } from '@/lib/mode';
+import { ROLE, STANDFIRST } from '@/lib/identity';
 import { useVoice } from '@/components/system/useVoice';
 import { LEVEL, LEVEL_INFO, plateSubtitle, plateTitle } from '@/lib/voice';
 import { CardFace } from '@/components/plate/CardTicket';
@@ -69,7 +71,7 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 
 /** Sheets wide enough to set their figure beside the contents, not above. */
 const SIDE_FIGURE = new Set(['work', 'essays', 'contact']);
-const ISSUE_STAMP = '2026.09';
+const ISSUE_STAMP = ISSUES[0].date;
 
 /** Plan-space rectangle to absolute CSS geometry. */
 const place = (r: { x: number; y: number; w: number; h: number }) => ({
@@ -717,17 +719,6 @@ export function KeyPlan({
     [plates],
   );
 
-  /** Which sheets stand at which revision, newest issue first. */
-  const revisions = useMemo(() => {
-    const byRev = new Map<string, string[]>();
-    for (const plate of plates) {
-      const list = byRev.get(plate.revision) ?? [];
-      list.push(plate.sheet);
-      byRev.set(plate.revision, list);
-    }
-    return [...byRev.entries()].sort((a, b) => b[0].localeCompare(a[0]));
-  }, [plates]);
-
   /**
    * Leaders are drawn between plate edges, not centres: a line that runs
    * under an opaque sheet is never seen, so each end is pulled back to the
@@ -989,10 +980,9 @@ export function KeyPlan({
             <div className={styles.header}>
               <h1 className={styles.headline}>
                 <span className={styles.headlineName}>Akshay Bajpai</span>
-                <span className={styles.headlineRole}>
-                  Architect of systems · Builder of intelligence
-                </span>
+                <span className={styles.headlineRole}>{ROLE}</span>
               </h1>
+              <p className={styles.headlineStand}>{STANDFIRST}</p>
               <p className={styles.headlineNote}>
                 {t('planNote')}{' '}
                 <span className={styles.hintKeys}>
@@ -1155,11 +1145,13 @@ export function KeyPlan({
                 down twice. */}
             {wide && (
             <div className={styles.revs} aria-hidden="true">
-              <span className={styles.revTitle}>Revision schedule</span>
-              {revisions.map(([rev, sheets]) => (
-                <span key={rev} className={styles.revRow}>
-                  <span className={styles.revLetter}>{rev}</span>
-                  <span className={styles.revSheets}>{sheets.join('  ')}</span>
+              <span className={styles.revTitle}>Revisions</span>
+              {ISSUES.map((issue) => (
+                <span key={issue.rev} className={styles.revRow}>
+                  <span className={styles.revLetter}>{issue.rev}</span>
+                  <span className={styles.revSheets}>
+                    {issue.date} · {issue.what}
+                  </span>
                 </span>
               ))}
             </div>

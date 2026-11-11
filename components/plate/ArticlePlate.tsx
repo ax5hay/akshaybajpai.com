@@ -138,7 +138,13 @@ export function ArticlePlate({
       )}
 
       {metrics && metrics.length > 0 ? (
-        <Callout note="Measured in production, not in a benchmark. Each row is the figure the engagement was signed off against.">
+        <Callout
+          note={
+            client && /^(Open source|Private repository)/.test(client)
+              ? 'Each row is as the repository records it: a release, a budget or a results file.'
+              : 'Measured in production, not in a benchmark. Each row is the figure the engagement was signed off against.'
+          }
+        >
           <MetricSchedule metrics={metrics} />
         </Callout>
       ) : (

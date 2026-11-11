@@ -21,7 +21,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 ![Next.js 15](https://img.shields.io/badge/Next.js_15-141417?style=flat-square&logo=next.js)
 ![React 19](https://img.shields.io/badge/React_19-20232a?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript_5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Static export](https://img.shields.io/badge/static_export-32_sheets-5c5548?style=flat-square)
+![Static export](https://img.shields.io/badge/static_export-39_sheets-5c5548?style=flat-square)
 ![Shared JS](https://img.shields.io/badge/shared_JS-103_kB-2d6a4f?style=flat-square)
 ![Animation and 3D libraries](https://img.shields.io/badge/animation_%2F_3D_libs-none-983729?style=flat-square)
 ![Hosting](https://img.shields.io/badge/hosting-GitHub_Pages,_free-141417?style=flat-square&logo=github)
@@ -37,9 +37,9 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  ARCHITECTURE OF INTELLIGENCE                  SHEET   G-000    REV    D   │
+│  ARCHITECTURE OF INTELLIGENCE                  SHEET   G-000    REV    E   │
 │  Drawing set · Akshay Bajpai                   SCALE   1:50     ISSUED     │
-│  Next.js 15 · static export · GitHub Pages                      2026.09    │
+│  Next.js 15 · static export · GitHub Pages                      2026.11    │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -63,6 +63,7 @@ The whole set re-issues in three states, and a lens shows what any part of it is
 | [`A-107`](#a-107--margin-notes) | **Margin notes** | How a reader learns the set can be operated |
 | [`A-109`](#a-109--the-route-the-tour-the-set) | **The route, the tour, the set** | The site remembers what you read; walks you round; and issues itself as one PDF |
 | [`A-108`](#a-108--inside-a-sheet) | **Inside a sheet** | Section profile, citable headings, operable figures on every page |
+| [`A-110`](#a-110--rev-e-boardroom-to-bare-metal) | **Rev E · Boardroom to bare metal** | The new title, three new case studies with drafted figures, the schedule of materials |
 | [`S-201`](#s-201--how-it-is-built) | **How it is built** | Architecture, sheet registry, component kit |
 | [`S-202`](#s-202--content-pipeline) | **Content pipeline** | Markdown in, numbered sheets out |
 | [`W-401`](#w-401--run-it-locally) | **Run it locally** | Quick start and scripts |
@@ -801,6 +802,24 @@ prefetching, and marked `noindex`.
 
 ---
 
+## A-110 · Rev E: Boardroom to bare metal
+
+Issued 2026.11. The set was describing its author by a job title, and the title was too
+small for the work on the sheets. Rev E changes how he is described, adds the work that
+had no sheet, and puts the whole range on one page. The rules behind it are in
+[CLAUDE.md](CLAUDE.md).
+
+| | What changed |
+|:--|:--|
+| **The title** | "AI Architect · Forward-Deployed AI Engineer" is gone as a title. The set now reads **Boardroom to bare metal**, with *Clients · teams · architecture · AI · code* beneath it, on the cover, the key plan's title strip and About. Where a field needs a plain role (schema `jobTitle`, page titles, the vCard) it says *Technology leader and systems architect*. One source: `lib/identity.ts` |
+| **One entity** | The Person node, the first paragraph of About and the first line of `/llms.txt` now state the same facts in the same order. `/llms.txt` is rewritten: entity sentence, facts, one line per piece of work with its strongest number, then the sheets |
+| **The record on About** | The elevation keeps its rising shape, but each volume is now a kind of work (insurance document AI, a restaurant platform, finance and healthcare AI, defence video intelligence, multi-tenant health AI). No job titles, employers or years |
+| **Three new sheets** | `W-401` ReBo, `W-402` KeepMeAwake and `W-403` FlowState lead the Works schedule, each with a figure drafted for it: the five walls against a write as a section through a dam, the engine loop with the OS call each step makes, and the threat index as a pressure gauge with toggleable channels. Each figure is split into its own chunk with `React.lazy`, so it ships only with its sheet |
+| **Repositories without a sheet** | Eight cards under the Works schedule (Vigilix, DADM, MirrorState, GHDA-SaaS, JobSlave, OCR-LLM-DIST, TracePulse, shelf). Public ones link to their code; private ones are described only |
+| **`A-102` Schedule of materials** | A new sheet, drawn as a door-and-window schedule: 352 items in 14 disciplines, leadership and practice first. It is read at build time from `data/stack.json`, which belongs to the profile repository and is refreshed with `npm run sync:stack`. Items found in three or more places are drawn heavier; Raw prints where each was found |
+| **Revisions in the title strip** | The key plan's title strip lists the last three issues (`lib/plates.ts` `ISSUES`), so a returning reader can see what is new |
+| **Software as things** | KeepMeAwake carries `SoftwareApplication` and `SoftwareSourceCode` nodes; ReBo and FlowState carry `SoftwareApplication` with no code link (`lib/software.ts`) |
+
 ## S-201 · How it is built
 
 ```mermaid
@@ -1085,11 +1104,11 @@ compression, so its load figures are pessimistic.
 
 | Metric | Value |
 |:-------|:------|
-| Sheets in the set | 35 |
+| Sheets in the set | 39 |
 | Runtime dependencies | 8, none of them animation, state or 3D |
 | Shared JavaScript | 103 kB; no legacy polyfill bundle is shipped |
 | First-load JavaScript, key plan | 126 kB |
-| First-load JavaScript, a sheet | 109 to 115 kB |
+| First-load JavaScript, a sheet | 110 to 120 kB; a case study 116 kB (Rev D: 115) |
 | Downloaded on a cold load, key plan | 718 kB desktop · 229 kB phone (fonts, CSS, JS, HTML) |
 | First paint, key plan | 0.54 s desktop · 0.29 s phone |
 | Cumulative layout shift | 0 |
@@ -1101,7 +1120,7 @@ compression, so its load figures are pessimistic.
 | Lighthouse accessibility | 100 on the key plan, an article, About, Works, Essays and Contact |
 | Lighthouse best practices · SEO | 100 · 100 |
 | Internal links in the HTML of any page | 36, one to every sheet, via the register |
-| Share cards | 34, drawn at build, about 75 kB each |
+| Share cards | 38, drawn at build, about 75 kB each |
 | Lighthouse performance (mobile, uncompressed) | 73 to 81 |
 | Prefetched by the cover | 31 sheets on a desktop; the 7 section sheets on a phone or a metered link |
 | Requests on navigation after the cover | None for pages; the set is already cached |
@@ -1172,6 +1191,11 @@ sheets name him as their `mainEntity`; the Research sheet describes the Springer
 and the book it is part of. An engine that reads any two pages can tell they are about
 the same person, which is what a knowledge panel is built from.
 
+The Person node's `description` is the entity sentence from `lib/identity.ts`, and its
+`jobTitle` is *Technology leader and systems architect*. The same facts, in the same order,
+open the About sheet in plain words and open `/llms.txt`, because answer engines quote
+what a person can read as well as what is in the JSON-LD.
+
 | Sheet | Schema |
 |:------|:-------|
 | Key plan | `WebPage` with the person as `mainEntity` and an `ItemList` of the plates |
@@ -1179,6 +1203,8 @@ the same person, which is what a knowledge panel is built from.
 | R-301 | `WebPage` whose `mainEntity` is the `Chapter`, inside the `Book`, from the publisher |
 | W-400 · B-500 · E-600 | `CollectionPage` with an `ItemList` of the sheets in the series |
 | A case study · a note · an essay | `TechArticle` · `BlogPosting`, with dates, word count, reading time, keywords and its card |
+| A-102 | `WebPage` whose `mainEntity` is an `ItemList` of the disciplines and their items |
+| W-401 · W-402 · W-403 | Also `SoftwareApplication`; KeepMeAwake adds its version, operating systems, download page and `SoftwareSourceCode` |
 | Every sheet | `BreadcrumbList` back to the key plan, and the `Person` and `WebSite` nodes |
 
 The `Person` node carries the names he is searched by (`alternateName`), the role, the
@@ -1191,7 +1217,7 @@ links to, so the engine's picture of him matches the site's.
   Bajpai` by a template, so the name is on every result and never typed twice.
 - **Share cards** are drawn by `scripts/generate-og.mjs` from the same frontmatter that
   makes the page: sheet number, series, title, description, issue date, in the set's
-  three faces. Thirty-four cards, about 75 kB each, at `/og/<sheet>.png`.
+  three faces. Thirty-eight cards, about 75 kB each, at `/og/<sheet>.png`.
 - **One feed** at `/rss.xml` carries the essays, the notes and the case studies, newest
   first, each with its card as `media:content`. Feed readers and aggregators are the
   slowest-decaying links on the web.
