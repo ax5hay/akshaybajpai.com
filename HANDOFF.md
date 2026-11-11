@@ -1,12 +1,12 @@
 # Handoff · Rev E
 
-Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (voice, no names, no dates, CTO once) and the map of where everything lives. This file is the state of the work: what is done, what is waiting, and what to do next.
+Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (voice, no names, no dates, co-founder and CTO once, research without making a point of it) and the map of where everything lives. This file is the state of the work: what is done, what is waiting, and what to do next.
 
 ## Where things stand
 
-- **Branch:** `rev-e/boardroom-to-bare-metal`, committed locally.
-  - **Not pushed and not merged.** A push to `main` deploys to www.akshaybajpai.com.
-  - Merge and push only when the owner says so.
+- **Branch:** `rev-e/boardroom-to-bare-metal`, pushed, open as PR #30 against `main`.
+  - **Not merged.** A merge to `main` deploys to www.akshaybajpai.com.
+  - Merge only when the owner says so.
 - **Build:** `npm run typecheck` and `npm run build` both pass. `out/` holds the last build.
 - **Checked by eye** with headless Edge screenshots:
   - key plan, About, Works, A-102 and A-103
@@ -33,6 +33,9 @@ Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (vo
   - what he takes on, how the work runs, and eight questions answered plainly
   - one source, `data/engagements.json`, which also feeds the `FAQPage`, Person `makesOffer` and `hasOccupation`, and `/llms.txt`
   - linked from the key plan's Contact room, About and Contact
+- **Leader and researcher.** The entity sentence, the Person node, About, `/llms.txt` and R-301 now carry two more facts, without names or detail:
+  - he co-founded three companies and ran engineering as CTO at two others. Said once in visible text (About's first paragraph), plainly in the machine layer (`hasOccupation`, the entity sentence, About's meta description, `llms.txt` Facts)
+  - he researches world models and reinforcement learning and writes essays on systems, cost and trust. R-301 now leads with a "Now" row and paragraph linking the world-models survey, the RL note and the JEPA essay; the key plan's Research room lists "World models and RL · Current"; A-103's "Who is" answer gains the research sentence
 - **Revisions block** in the key plan's title strip (`lib/plates.ts` `ISSUES`).
 - **Software JSON-LD** in `lib/software.ts`.
 - **Contact sheet.** Copy and form subjects updated.
@@ -63,7 +66,10 @@ The case study is 1 kB over the brief's floor: a slightly larger plate registry 
   - `/schedule/`
   - the three new `/work/…/` sheets
 - **Pin on GitHub.** On github.com/ax5hay, under "Customize your pins": KeepMeAwake, AURIXA, Vigilix, akshaybajpai.com, AIDA, MirrorState. There is no API for profile pins. DADM is left out because its repository name carries the company name.
-- **Profiles, set aside for now.** Paste matching text into the LinkedIn headline and About, the GitHub bio and the X bio. Use the bios in the brief doc, or ask for drafts.
+- **Profiles.** Paste matching text into the LinkedIn headline and About, the GitHub bio, the X bio and the profile README (ax5hay/ax5hay, which still says only "Two of these I ran as CTO"). Drafts that match the site:
+  - GitHub, X (under 160): *Boardroom to bare metal. I lead technology end to end and still write the code. Co-founder and CTO. Researching world models and RL. New Delhi.*
+  - LinkedIn headline: *Technology Leader & Systems Architect · Co-founder and CTO · Boardroom to bare metal · Production AI · World models and RL research*
+- **Research profiles.** If he has a Google Scholar, ORCID or Springer author page, add each to `sameAs` in `lib/metadata.ts` (the `SOCIAL` list in `lib/constants.ts`). They are the strongest outside confirmation of "researcher".
 - **Third-party mentions, set aside for now.** These are what answer engines trust most, and only he can publish them. Drafts can be written on request:
   - a Show HN post for KeepMeAwake
   - a ReBo write-up ("five walls against a write")

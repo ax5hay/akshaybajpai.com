@@ -40,12 +40,19 @@ These are the user's rules, and they are not negotiable.
 **Standfirst** (under the name: key plan title strip, About lead):
 > I lead technology from the first client conversation to the release: the architecture, the team, the code, and the runbook after. Built to hold under load and fail loud.
 
-**Entity sentence.** Third person, for metadata. It lives in three places that must state the same facts in the same order; change all three together:
+**Entity sentence.** Third person, for metadata. Its facts run in this order: role, the work, the companies (co-founder, CTO), the research, the credentials. It lives in three places that must state the same facts in the same order; change all three together:
 1. `lib/identity.ts` `ONE_LINE`, used by the Person node, layout and key plan descriptions.
 2. `scripts/generate-rss.mjs` `ENTITY`, the first line of `/llms.txt`.
 3. `app/about/page.tsx`, the first paragraph, in first person.
 
-**CTO.** He has run engineering as CTO at two companies. Say it **once** in visible text on the whole site, inside a sentence about the work. Today that sentence is in the About sheet's first paragraph. Never put it in a title, headline, tagline or count ("twice a CTO" is out).
+A-103's "Who is Akshay Bajpai?" answer (`data/engagements.json`) follows it too, minus the co-founder and CTO sentence.
+
+**Co-founder and CTO.** He co-founded three companies and ran engineering as CTO at two others. Do not call him a CEO or founder-CEO anywhere. No names and no further detail: not the companies, the years, the sizes or the outcomes.
+- In visible text, say it **once** on the whole site, softly, inside a sentence about the work. Today that is the About sheet's first paragraph ("In both seats the architecture, the people and the delivery were one job").
+- In the machine layer, state it plainly: the entity sentence, the Person node's `hasOccupation`, the About meta description and `/llms.txt` Facts. Answer engines repeat what is stated, not what is implied.
+- Keep it out of A-103's visible answers, titles, headlines, taglines and badges ("twice a CTO", "3× founder" are out).
+
+**Research.** He researches world models and reinforcement learning and writes essays on systems, cost and trust. Present him as a researcher and a careful thinker without making a point of it: never say whether the research is independent, personal, funded or affiliated. The evidence is the writing (`content/blog/world-models-as-issued-2026.md`, `reinforcement-learning-after-the-reward-model.md`, `content/essays/the-model-that-refuses-to-draw.md`) and R-301, which leads with what he is working through now. When a new research note is published, add it to R-301's "Now" row if it supersedes the current one.
 
 **No names, no dates in the record.**
 - No employer, client, agency or product-brand names, and no years or date ranges beside the work. Describe what the work was and what it changed, with numbers.

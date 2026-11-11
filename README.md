@@ -813,6 +813,7 @@ had no sheet, and puts the whole range on one page. The rules behind it are in
 |:--|:--|
 | **The title** | "AI Architect · Forward-Deployed AI Engineer" is gone as a title. The set now reads **Boardroom to bare metal**, with *Clients · teams · architecture · AI · code* beneath it, on the cover, the key plan's title strip and About. Where a field needs a plain role (schema `jobTitle`, page titles, the vCard) it says *Technology leader and systems architect*. One source: `lib/identity.ts` |
 | **One entity** | The Person node, the first paragraph of About and the first line of `/llms.txt` now state the same facts in the same order. `/llms.txt` is rewritten: entity sentence, facts, one line per piece of work with its strongest number, then the sheets |
+| **Leader and researcher** | The entity sentence now carries the companies (co-founded three; CTO at two others) and the research (world models, reinforcement learning, essays on systems, cost and trust), with no names or detail. People read it once, on About; machines read it in the Person node's `hasOccupation`, the entity sentence and `/llms.txt`. `R-301` leads with what is being worked through now |
 | **The record on About** | The elevation keeps its rising shape, but each volume is now a kind of work (insurance document AI, a restaurant platform, finance and healthcare AI, defence video intelligence, multi-tenant health AI). No job titles, employers or years |
 | **Three new sheets** | `W-401` ReBo, `W-402` KeepMeAwake and `W-403` FlowState lead the Works schedule, each with a figure drafted for it: the five walls against a write as a section through a dam, the engine loop with the OS call each step makes, and the threat index as a pressure gauge with toggleable channels. Each figure is split into its own chunk with `React.lazy`, so it ships only with its sheet |
 | **Repositories without a sheet** | Eight cards under the Works schedule (Vigilix, DADM, MirrorState, GHDA-SaaS, JobSlave, OCR-LLM-DIST, TracePulse, shelf). Public ones link to their code; private ones are described only |
@@ -1193,7 +1194,8 @@ and the book it is part of. An engine that reads any two pages can tell they are
 the same person, which is what a knowledge panel is built from.
 
 The Person node's `description` is the entity sentence from `lib/identity.ts`, and its
-`jobTitle` is *Technology leader and systems architect*. The same facts, in the same order,
+`jobTitle` is *Technology leader and systems architect*. Its `hasOccupation` lists that role,
+co-founder, CTO and researcher, each without a company name. The same facts, in the same order,
 open the About sheet in plain words and open `/llms.txt`, because answer engines quote
 what a person can read as well as what is in the JSON-LD.
 

@@ -11,10 +11,10 @@ const PLATE = getPlateByHref('/about/')!;
 const META = {
   title: `${NAME} · ${JOB_TITLE}`,
   description:
-    'Akshay Bajpai leads technology end to end, from client and executive strategy to production code: LLM platforms, governed text-to-SQL agents, defence video intelligence, document AI and native software in Rust.',
+    'Akshay Bajpai leads technology from the client room to production code. He co-founded three companies, ran engineering as CTO at two more, and researches world models and reinforcement learning.',
   path: '/about/',
   card: 'about',
-  keywords: ['Akshay Bajpai', 'about Akshay Bajpai', 'ax5hay', 'technology leader', 'systems architect', 'AI architect New Delhi', 'forward-deployed AI engineer', 'text-to-SQL', 'computer vision', 'Rust', 'MSc Artificial Intelligence'],
+  keywords: ['Akshay Bajpai', 'about Akshay Bajpai', 'ax5hay', 'technology leader', 'systems architect', 'co-founder', 'CTO', 'AI researcher', 'AI architect New Delhi', 'forward-deployed AI engineer', 'text-to-SQL', 'computer vision', 'Rust', 'MSc Artificial Intelligence'],
 };
 
 export const metadata = buildMetadata(META);
@@ -53,9 +53,12 @@ export default function AboutPage() {
           I am a technology leader and systems architect in New Delhi. I lead technology end to
           end, from client and executive strategy to production code: multi-tenant LLM platforms,
           governed natural-language-to-SQL agents, agentic video intelligence for government
-          defence deployments, document AI on AWS, and native desktop software in Rust. I have run
-          engineering as CTO, where the architecture, the people and the delivery were one job. I
-          am a Springer author and hold an MSc in Artificial Intelligence with distinction.
+          defence deployments, document AI on AWS, and native desktop software in Rust. I co-founded
+          three companies, and I have run engineering as CTO at two others. In both seats the
+          architecture, the people and the delivery were one job. Outside client
+          work I research world models and reinforcement learning, and write essays on systems,
+          cost and trust. I am a Springer author and hold an MSc in Artificial Intelligence with
+          distinction.
         </p>
         <p>
           The range is the point. In one programme I was the client&rsquo;s main technical voice,

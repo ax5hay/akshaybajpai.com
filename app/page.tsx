@@ -42,7 +42,7 @@ export default async function Page() {
       { title: 'ML for Medical Diagnosis, Ch. 17', meta: 'Springer 2024' },
       { title: 'Alzheimer\u2019s classification thesis', meta: 'OASIS' },
       { title: 'MSc AI · 9.8/10, distinction', meta: 'Lviv Poly' },
-      { title: 'Governed agentic retrieval', meta: 'Current' },
+      { title: 'World models and RL', meta: 'Current' },
     ],
 
     architecture: [

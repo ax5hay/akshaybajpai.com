@@ -15,6 +15,11 @@ export const HOME_KEYWORDS = [
   'ax5hay',
   'technology leader',
   'systems architect',
+  'co-founder',
+  'CTO',
+  'AI researcher',
+  'world models',
+  'reinforcement learning',
   'AI architect',
   'forward-deployed AI engineer',
   'LLM platforms',
@@ -166,6 +171,7 @@ export function identityGraph(): Thing[] {
       ],
       knowsAbout: [
         'Technical leadership',
+        'Company building and executive leadership',
         'Client and stakeholder delivery',
         'Product strategy',
         'Systems architecture',
@@ -177,7 +183,9 @@ export function identityGraph(): Thing[] {
         'Clinical NLP and healthcare AI',
         'Document intelligence',
         'MLOps on AWS',
-        'World models and reinforcement learning',
+        'AI research',
+        'World models',
+        'Reinforcement learning',
         'Text-to-SQL and SQL safety',
         'LLM evaluation and cost engineering',
         'Computer vision at the edge',
@@ -189,12 +197,19 @@ export function identityGraph(): Thing[] {
         'React and Next.js',
       ],
       knowsLanguage: ['en'],
-      hasOccupation: {
-        '@type': 'Occupation',
-        name: JOB_TITLE,
-        occupationLocation: { '@type': 'City', name: 'New Delhi' },
-        skills: ENGAGEMENTS.offers.map((o) => o.name).join(', '),
-      },
+      // The roles behind the title, stated plainly for machines and once on
+      // About for people. No company names, no dates.
+      hasOccupation: [
+        {
+          '@type': 'Occupation',
+          name: JOB_TITLE,
+          occupationLocation: { '@type': 'City', name: 'New Delhi' },
+          skills: ENGAGEMENTS.offers.map((o) => o.name).join(', '),
+        },
+        { '@type': 'Occupation', name: 'Co-founder', description: 'Co-founded three companies.' },
+        { '@type': 'Occupation', name: 'Chief technology officer', description: 'Ran engineering as CTO at two companies.' },
+        { '@type': 'Occupation', name: 'Researcher', description: 'Researches world models and reinforcement learning.' },
+      ],
       // What he takes on, from the same file as A-103, so the offer in the
       // graph and the offer on the page are the same words.
       makesOffer: ENGAGEMENTS.offers.map((o) => ({

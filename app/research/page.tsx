@@ -8,12 +8,12 @@ import { JsonLd } from '@/components/JsonLd';
 const PLATE = getPlateByHref('/research/')!;
 
 const META = {
-  title: 'Research · Medical AI, thesis and publication',
+  title: 'Research · World models, reinforcement learning and medical AI',
   description:
-    "Published medical AI research, Master's thesis on dementia classification, and ongoing work in robust AI infrastructure.",
+    "Akshay Bajpai's research: world models and reinforcement learning, a Springer chapter on machine learning for medical diagnosis, and an MSc thesis on dementia classification.",
   path: '/research/',
   card: 'research',
-  keywords: ['Akshay Bajpai research', 'machine learning for medical diagnosis', 'Springer chapter', 'Alzheimer\'s classification', 'MSc thesis AI'],
+  keywords: ['Akshay Bajpai research', 'world models', 'reinforcement learning', 'JEPA', 'AI researcher', 'machine learning for medical diagnosis', 'Springer chapter', 'Alzheimer\'s classification', 'MSc thesis AI'],
 };
 
 export const metadata = buildMetadata(META);
@@ -54,8 +54,9 @@ export default function ResearchPage() {
         breadcrumbs([{ name: 'R-301 Research', path: META.path }]),
       ]}
       figure={PLATE.id}
-      lead={<p>Published work and experimental directions.</p>}
+      lead={<p>What I am working through now, and the published work under it.</p>}
       facts={[
+        { k: 'Current', v: 'World models · RL' },
         { k: 'Degree', v: 'MSc AI, 9.8/10' },
         { k: 'Publication', v: 'Springer 2024' },
       ]}
@@ -78,6 +79,23 @@ export default function ResearchPage() {
       <RecordSchedule
         title="Schedule of record"
         rows={[
+          {
+            when: 'Now',
+            kind: 'Research notes',
+            title: (
+              <Link href="/blog/world-models-as-issued-2026/">World models, as issued</Link>
+            ),
+            detail: (
+              <>
+                What has shipped and what it cost, read from the papers. With{' '}
+                <Link href="/blog/reinforcement-learning-after-the-reward-model/">
+                  reinforcement learning after the reward model
+                </Link>{' '}
+                and an essay on{' '}
+                <Link href="/essays/the-model-that-refuses-to-draw/">the model that refuses to draw</Link>.
+              </>
+            ),
+          },
           {
             when: '2024',
             kind: 'Publication · lead author',
@@ -125,6 +143,14 @@ export default function ResearchPage() {
 
       <div className="prose">
         <p>
+          <strong>Now.</strong> I am working through world models and reinforcement learning:
+          what a model learns when it predicts meaning instead of pixels, and how reasoning models
+          are trained once a verifier replaces the judge. I write it up as I go, keep to what the
+          papers say, and mark where I am inferring. Nearer the client work: governed agentic
+          retrieval, schema-grounded text-to-SQL, and evaluation that survives an executive
+          readout.
+        </p>
+        <p>
           <strong>Peer-reviewed publication.</strong> I am lead author on Chapter 17, machine
           learning approaches to medical diagnosis, in{' '}
           <em>ML for Medical Diagnosis in Data-Centric Business and Application</em>, 3rd edition
@@ -145,14 +171,9 @@ export default function ResearchPage() {
         <p>
           Production work since then (insurance document intelligence, EHR variable extraction,
           multimodal diagnostic imaging, programme KPI engines) extends the same principle: rigor
-          in data, honest metrics, and systems that clinicians and operators can override. Deeper
-          build narratives live under <Link href="/work/">Work</Link>; opinion and infrastructure
-          philosophy under <Link href="/blog/">Blog</Link> and <Link href="/essays/">Essays</Link>.
-        </p>
-        <p>
-          Current research interests include governed agentic retrieval, schema-grounded
-          text-to-SQL, minimal-dependency edge deployments, and evaluation pipelines that survive
-          executive readouts, the same problems I ship against in forward-deployed engagements.
+          in data, honest metrics, and systems that clinicians and operators can override. How it
+          was built is under <Link href="/work/">Works</Link>; the arguments are in the{' '}
+          <Link href="/blog/">field notes</Link> and <Link href="/essays/">essays</Link>.
         </p>
       </div>
     </PlateShell>
