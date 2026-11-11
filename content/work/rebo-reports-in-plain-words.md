@@ -49,6 +49,8 @@ Python 3.13 and Pydantic AI, with Claude, Gemini, OpenAI or LM Studio behind it.
 
 It ships as one container, with 179 tests and 27 design documents.
 
+Every tool it uses is on the [schedule of materials, traced](/schedule/?trace=r-rebo).
+
 ## What it proves
 
 An LLM system can be trusted by a finance or operations team with real data, as long as the safety is structural and the receipts are kept.

@@ -8,6 +8,7 @@
   justify-content: space-between;
   gap: var(--s-4);
   padding-bottom: var(--s-2);
+  margin-bottom: var(--s-4);
   border-bottom: var(--lw-med) solid var(--rule-strong);
 }
 
@@ -29,30 +30,153 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: var(--lw-thin);
-  margin: var(--s-4) 0 0;
+  grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
+  gap: var(--s-4);
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
   padding: var(--s-4);
   border: var(--lw-thin) solid var(--rule);
   background: var(--paper-raised);
+  transition:
+    border-color var(--d-2) var(--ease-plate),
+    transform var(--d-2) var(--ease-plate),
+    box-shadow var(--d-2) var(--ease-plate);
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* Crop marks at the four corners, drawn in on hover. */
+.crop,
+.crop::before,
+.crop::after,
+.card::before,
+.card::after {
+  pointer-events: none;
+}
+
+.card::before,
+.card::after,
+.crop::before,
+.crop::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 0 solid var(--accent);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity var(--d-2) var(--ease-plate),
+    transform var(--d-2) var(--ease-plate);
+}
+
+.card::before {
+  top: -7px;
+  left: -7px;
+  border-top-width: 1.5px;
+  border-left-width: 1.5px;
+  transform-origin: 100% 100%;
+}
+
+.card::after {
+  top: -7px;
+  right: -7px;
+  border-top-width: 1.5px;
+  border-right-width: 1.5px;
+  transform-origin: 0 100%;
+}
+
+.crop::before {
+  bottom: -7px;
+  left: -7px;
+  border-bottom-width: 1.5px;
+  border-left-width: 1.5px;
+  transform-origin: 100% 0;
+}
+
+.crop::after {
+  bottom: -7px;
+  right: -7px;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
+  transform-origin: 0 0;
+}
+
+.card:hover::before,
+.card:hover::after,
+.card:hover .crop::before,
+.card:hover .crop::after,
+.card:focus-within::before,
+.card:focus-within::after,
+.card:focus-within .crop::before,
+.card:focus-within .crop::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.strip {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding-bottom: var(--s-2);
+  border-bottom: var(--lw-thin) solid var(--rule-faint);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.no {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.access[data-private] {
+  color: var(--ink-3);
 }
 
 .name {
-  margin: 0;
-  font-family: var(--font-label), monospace;
-  font-size: var(--t-sm);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
+  margin: var(--s-1) 0 0;
+  font-family: var(--font-display), serif;
+  font-size: var(--t-xl);
+  font-weight: 400;
+  line-height: var(--lh-snug);
   color: var(--ink);
+}
+
+/* The whole card answers to the name's link. */
+.cover {
+  color: inherit;
+}
+
+.cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.cover:focus-visible {
+  outline: none;
+}
+
+.card:has(.cover:focus-visible) {
+  outline: var(--lw-thick) solid var(--accent);
+  outline-offset: 3px;
 }
 
 .line {
@@ -70,36 +194,85 @@
   color: var(--accent);
 }
 
-.foot {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--s-2);
-  margin: auto 0 0;
-  padding-top: var(--s-2);
-  border-top: var(--lw-thin) solid var(--rule-faint);
+.record {
+  display: none;
+  margin: 0;
   font-family: var(--font-label), monospace;
   font-size: var(--t-micro);
-  letter-spacing: 0.06em;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+
+:global(html[data-mode='raw']) .record {
+  display: block;
+}
+
+.block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin: auto 0 0;
+  border: var(--lw-thin) solid var(--rule);
+  font-family: var(--font-label), monospace;
+  font-size: var(--t-micro);
+}
+
+.block > div {
+  padding: 6px 8px;
+}
+
+.block > div + div {
+  border-left: var(--lw-thin) solid var(--rule);
+}
+
+.block dt {
+  margin-bottom: 2px;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink-4);
 }
 
-.link {
+.block dd {
+  margin: 0;
+  letter-spacing: 0.04em;
   color: var(--ink-2);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+}
+
+/* Above the card's cover link, so it stays its own target. */
+.trace {
+  position: relative;
+  z-index: 2;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.trace:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.link:hover {
-  color: var(--accent);
-}
-
-.link:focus-visible {
+.trace:focus-visible {
   outline: var(--lw-thick) solid var(--accent);
   outline-offset: 2px;
 }
 
-.private {
-  text-transform: uppercase;
-  letter-spacing: var(--track-label);
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::before,
+  .card::after,
+  .crop::before,
+  .crop::after {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    transform: none;
+  }
 }

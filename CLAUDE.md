@@ -91,12 +91,12 @@ These are the user's rules, and they are not negotiable.
 | Key plan drawing, title strip | `components/keyplan/KeyPlan.tsx` + `.module.css` |
 | About sheet (A-101) copy | `app/about/page.tsx` |
 | The record elevation on About | `components/plate/CareerElevation.tsx` `ROLES`: kinds of work, no titles or years |
-| Terms of engagement (A-103): what he takes on, method, Q&A | `data/engagements.json` (single source) → `app/engagements/page.tsx`, `lib/engagements.ts`, the Person node's `makesOffer`/`hasOccupation`, and the "What he takes on" and "Questions" sections of `/llms.txt` |
-| Schedule of materials (A-102) | `app/schedule/page.tsx`, `components/plate/MaterialSchedule.tsx`, `lib/stack.ts`, data in `data/stack.json` |
+| Terms of engagement (A-103): what he takes on, method, Q&A, brief composer | `data/engagements.json` (single source: `offers[]` with `subject` = the correspondence subject, `method[]` with `course` and `leaves` for Fig. 1, `constraints[]` with `note` and `proof` for the composer's loads, `questions[]`). It feeds `app/engagements/page.tsx`, `lib/engagements.ts`, the Person node's `makesOffer`/`hasOccupation`, and the "What he takes on" and "Questions" sections of `/llms.txt`. Components: `ConstructionSequence` + `SequenceControl` (Fig. 1), `BriefComposer` + `BriefControl` ("Start a brief"), `AnswerCite` (copyable Q-0n anchors), `Say` (per-mode text without `lib/voice`). Any number in a note must already appear in a case study |
+| Schedule of materials (A-102) | `app/schedule/page.tsx`, `components/plate/MaterialSchedule.tsx` (elevation + blocks, server), `components/plate/ScheduleTracer.tsx` (the only script: "trace a project"), `lib/stack.ts` (`traceSources`, `traceId`), data in `data/stack.json`. `/schedule/?trace=<id>` arrives with a project pinned (`r-<repo>` or `e-<engagement>`, slugged) |
 | Case studies (W-4xx) | `content/work/*.md`. Numbered by `pubDate`, newest first; the new three use timestamps to fix their order |
 | Case-study figures | hand-drafted: `components/figures/{DamFigure,EngineLoop,ThreatGauge}.tsx`, listed in `components/figures/index.ts` and `CaseFigure.tsx`. Node-and-wire: `components/figures/schematics.ts` |
 | Software JSON-LD (SoftwareApplication / SourceCode) | `lib/software.ts`. Update `KEEPMEAWAKE_VERSION` from the releases page on each issue |
-| Repository cards on Works | `lib/repos.ts` `REPO_CARDS`, rendered by `components/plate/RepoCards.tsx` |
+| Repository cards on Works | `lib/repos.ts` `REPO_CARDS` (`repo` is the raw name in stack.json, which drives each card's "Trace in A-102" link), rendered by `components/plate/RepoCards.tsx`, static, crop marks on hover |
 | Works sheet lead and meta | `app/work/page.tsx` |
 | Share cards (OG PNGs) | `scripts/generate-og.mjs` (`SECTIONS` for section sheets; articles are automatic) |
 | `/llms.txt`, `/rss.xml` | `scripts/generate-rss.mjs` |
@@ -131,7 +131,7 @@ The current build is the floor. Measure before and after on the production build
 |:--|:--|
 | Runtime dependencies | 8, none for animation, state or 3D |
 | Shared JS | 103 kB, no legacy polyfill bundle (`scripts/strip-polyfills.mjs`) |
-| First-load JS | 132 kB key plan · 111 to 116 kB on a sheet (Rev E) |
+| First-load JS | 133 kB key plan · 111 to 116 kB on a sheet, 120 kB contact (Rev E) |
 | CLS | 0 |
 | Pan, zoom, scroll, lens drag | 60 fps, median frame about 16.7 ms, CPU throttled 4× |
 | Lighthouse a11y · best practices · SEO | 100 · 100 · 100 |
@@ -141,6 +141,8 @@ Rules that keep it there:
 - Animate only `transform`, `opacity` and clip, and respect reduced motion everywhere.
 - No layout reads in scroll or pointer handlers.
 - New figures are hand-drawn inline SVG with a few lines of plain TypeScript. Interactive figures shared by one route must be code-split: `CaseFigure.tsx` uses `React.lazy` so each figure ships only with its own sheet (a static import added 7 kB to every case study).
+- Interactive pieces on a single-route sheet render complete on the server; a small client controller only sets attributes and text on what is already drawn (`ScheduleTracer`, `SequenceControl`, `BriefControl`). In those client components use `components/plate/Say.tsx`, not `Voice`/`useVoice`: importing `lib/voice` or the mode provider adds 5 to 7 kB to the route.
+- `BriefControl` writes `{ email, subject, message }` into the `plate.transmittal` key that `CorrespondenceForm` reads. Change both sides together; the subject must be one of the form's four subjects.
 - Images are AVIF or WebP with explicit dimensions, lazy below the fold, under 120 kB each.
 - Every sheet works by keyboard alone, with visible focus and passing contrast in all three modes, at phone and desktop width.
 - The README is part of the set: update its sheets (A-1xx, C-702 Measured, C-703 Visibility) when you change what they describe.

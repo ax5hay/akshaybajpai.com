@@ -27,6 +27,8 @@ Tauri 2 around a Rust core in strict layers: app, engine, core, platform. `core`
 
 One engine thread waits on a condvar, so nothing polls while it rests. The Svelte 5 window exists only while it is open. In the tray, the whole app is about 5 MB.
 
+Every tool it uses is on the [schedule of materials, traced](/schedule/?trace=r-keepmeawake).
+
 ## What holds it upright
 
 `unsafe` lives in two files, one per operating system, and Clippy refuses any block without a `SAFETY:` note. Updates are verified against a public key built into the app. The content security policy is `default-src 'self'`. It installs per user and never asks for administrator rights.

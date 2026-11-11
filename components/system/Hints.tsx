@@ -26,7 +26,7 @@ interface Note {
 
 const K = ({ children }: { children: ReactNode }) => <kbd className={styles.key}>{children}</kbd>;
 
-type Where = 'plan' | 'study' | 'article' | 'about' | 'works' | 'architecture' | 'sheet';
+type Where = 'plan' | 'study' | 'article' | 'about' | 'works' | 'architecture' | 'engagements' | 'sheet';
 
 /**
  * What there is to say on one kind of sheet, most particular first. A page
@@ -131,6 +131,31 @@ function notesFor(where: Where, phone: boolean, docked: boolean, level: Level): 
           <>
             The <b>elevation</b> under The record is operable. Hover or click a volume, or step
             through with <K>←</K> <K>→</K>, to read each kind of work.
+          </>
+        ),
+      },
+    ],
+    engagements: [
+      {
+        id: phone ? 'phone-sequence' : 'sequence',
+        text: phone ? (
+          <>
+            The <b>building</b> under How the work runs is operable. Tap a stage, or press{' '}
+            <b>▶ Build it in order</b>, to see what each one leaves you with.
+          </>
+        ) : (
+          <>
+            The <b>building</b> under How the work runs is operable. Hover a stage, step with{' '}
+            <K>↑</K> <K>↓</K>, or press <b>▶ Build it in order</b>.
+          </>
+        ),
+      },
+      {
+        id: 'brief',
+        text: (
+          <>
+            At the foot of the page, <b>Start a brief</b> writes the message for you. Nothing is
+            sent until you send it.
           </>
         ),
       },
@@ -274,7 +299,9 @@ export function Hints() {
               ? 'works'
               : parts[0] === 'architecture'
                 ? 'architecture'
-                : 'sheet';
+                : parts[0] === 'engagements'
+                  ? 'engagements'
+                  : 'sheet';
     // `phone`: the stacked plan and no keyboard to speak of. `docked`: narrow
     // enough that the instruments have moved to the bar at the foot.
     const phone = window.matchMedia('(max-width: 59.999rem), (hover: none)').matches;

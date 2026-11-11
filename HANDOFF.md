@@ -23,9 +23,13 @@ Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (vo
   - `ThreatGauge.tsx`
 
   They are code-split per sheet through `CaseFigure.tsx` (`React.lazy`).
-- **Repository cards.** Eight cards on W-400 for the repositories without a sheet (`lib/repos.ts`).
-- **A-102 Schedule of materials.** Reads `data/stack.json`, which is owned by the profile repo and refreshed with `npm run sync:stack`.
-- **A-103 Terms of engagement** (`/engagements/`):
+- **Repository cards.** Eight cards on W-400 for the repositories without a sheet (`lib/repos.ts`): title-block cards, crop marks on hover, the whole card links to the code, and "Trace in A-102" opens the schedule with that repository traced.
+- **A-102 Schedule of materials.** Reads `data/stack.json`, which is owned by the profile repo and refreshed with `npm run sync:stack`. It opens with an elevation of the schedule (one bay per discipline, heavy items solid at the foot; bays link to their blocks). "Trace a project" lights every item a repository or engagement used: hover to preview, click to pin, Esc to clear, `?trace=` to arrive pinned. The tracer never re-renders the 352 cells; it writes one style rule and the bay transforms. Route: 113 kB first load.
+- **A-103 Terms of engagement** (`/engagements/`), operable throughout:
+  - offers as a numbered schedule with leaders to the sheets that prove them (sheet numbers resolved at build)
+  - Fig. 1, a construction sequence: six courses from foundation (written scope) to roof (runbook), with a "what you have by now" schedule; hover, arrow keys, Home/End, or "Build it in order"
+  - questions with Q-01… anchors that copy a citable link
+  - "Start a brief": pick an offer, new or review, and loads to survive; a live transmittal slip with matching case studies; "Open it as a message" pre-fills C-700's form, "Email it" opens a mailto
   - what he takes on, how the work runs, and eight questions answered plainly
   - one source, `data/engagements.json`, which also feeds the `FAQPage`, Person `makesOffer` and `hasOccupation`, and `/llms.txt`
   - linked from the key plan's Contact room, About and Contact
@@ -39,11 +43,11 @@ Status as of 2026-11-12. Read `CLAUDE.md` first: it holds the standing rules (vo
 | Route | Rev D | Rev E |
 |:--|:--|:--|
 | Shared JS | 103 kB | 103 kB |
-| Key plan | 132 kB | 132 kB |
+| Key plan | 132 kB | 133 kB (the new margin notes in the hints bundle) |
 | A case study (`/work/[slug]`) | 115 kB | 116 kB |
 | About | 112 kB | 113 kB |
 | Works | 111 kB | 112 kB |
-| A-102 / A-103 (new) | n/a | 111 kB / 111 kB |
+| A-102 / A-103 (new) | n/a | 113 kB / 115 kB |
 
 The case study is 1 kB over the brief's floor: a slightly larger plate registry on every page, plus the lazy wrapper. A static import of the three figures had made it 123 kB.
 
@@ -78,6 +82,9 @@ The case study is 1 kB over the brief's floor: a slightly larger plate registry 
 4. Brief items not built yet: the detail-callout bubble on the Works sheet, and a FlowState gauge with real weights if they are ever published.
 
 ## Gotchas
+
+- **Frozen colour transitions.** Headless Edge with `--virtual-time-budget` freezes CSS colour transitions, so buttons pressed by script can look unpressed in a capture. Disable transitions in the harness before trusting the colour.
+- **Builds wipe `out/`.** `npm run build` clears `out/`, so recreate `_boot.html` or any harness page after each build.
 
 - **Preloader.** It runs on every fresh tab. For headless screenshots, set `sessionStorage['plate.booted']='1'` and `localStorage['plate.notes.off']='1'` first. A throwaway `out/_boot.html` that sets them and redirects works well.
 - **Scroll reveal.** Schedule rows use a scroll reveal and look blank in headless captures. Add `--force-prefers-reduced-motion`.

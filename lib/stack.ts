@@ -70,3 +70,53 @@ export function readStack(): StackDiscipline[] {
   const file = path.join(process.cwd(), 'data', 'stack.json');
   return JSON.parse(fs.readFileSync(file, 'utf8')) as StackDiscipline[];
 }
+
+/* ------------------------------------------------------------ tracing --- */
+
+/** A token safe to put in a `data-in` list and a CSS attribute selector. */
+export function traceId(source: string, kind: 'repo' | 'engagement'): string {
+  const slug = source.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return kind === 'engagement' ? `e-${slug}` : `r-${slug}`;
+}
+
+export interface TraceSource {
+  id: string;
+  label: string;
+  kind: 'repo' | 'engagement';
+  /** Items found in this source. */
+  count: number;
+  /** Items per discipline code, for the readout. */
+  byCode: Record<string, number>;
+}
+
+/** Every repository and engagement, with what it contributed, largest first. */
+export function traceSources(stack: StackDiscipline[]): TraceSource[] {
+  const found = new Map<string, TraceSource>();
+  for (const discipline of stack) {
+    const code = codeFor(discipline.category);
+    for (const item of discipline.items) {
+      const sources: Array<[string, 'repo' | 'engagement']> = [
+        ...item.repos.map((r) => [r, 'repo'] as [string, 'repo']),
+        ...(item.engagements ?? []).map((e) => [e, 'engagement'] as [string, 'engagement']),
+      ];
+      for (const [raw, kind] of sources) {
+        const id = traceId(raw, kind);
+        const entry =
+          found.get(id) ??
+          { id, label: kind === 'repo' ? repoName(raw) : raw, kind, count: 0, byCode: {} };
+        entry.count += 1;
+        entry.byCode[code] = (entry.byCode[code] ?? 0) + 1;
+        found.set(id, entry);
+      }
+    }
+  }
+  return [...found.values()].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+
+/** The `data-in` value for one item: every source it was found in. */
+export function traceList(item: StackItem): string {
+  return [
+    ...item.repos.map((r) => traceId(r, 'repo')),
+    ...(item.engagements ?? []).map((e) => traceId(e, 'engagement')),
+  ].join(' ');
+}

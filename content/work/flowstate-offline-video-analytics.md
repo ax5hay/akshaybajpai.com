@@ -33,6 +33,8 @@ Air-gapped. A relocatable CPython runtime, bundled weights with their provenance
 
 Thirteen documents ship with it, including the engine API, the threat formula, an operator guide and a runbook.
 
+Every tool it uses is on the [schedule of materials, traced](/schedule/?trace=r-flowstate).
+
 ## What it proves
 
 Computer vision can live where the data lives, with nothing leaving the building.

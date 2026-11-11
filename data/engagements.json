@@ -5,72 +5,123 @@
       "code": "01",
       "name": "Technology, end to end",
       "text": "One owner from the first client conversation to the runbook: the scope, the architecture, the team, the code and the release.",
-      "proof": [{ "label": "A-101 The record", "href": "/about/" }]
+      "proof": [
+        {
+          "label": "A-101 The record",
+          "href": "/about/"
+        }
+      ],
+      "subject": "Technology leadership"
     },
     {
       "code": "02",
       "name": "AI platforms that hold in production",
       "text": "The shared layer under many assistants: a gateway, tiered routing, hybrid retrieval with reranking, per-tenant keys, caching and fallbacks, with evaluation and cost measured rather than assumed.",
       "proof": [
-        { "label": "Multi-tenant health AI", "href": "/work/forward-deployed-multi-tenant-fertility-ai/" },
-        { "label": "AURIXA", "href": "/work/aurixa-conversational-ai-orchestration/" }
-      ]
+        {
+          "label": "Multi-tenant health AI",
+          "href": "/work/forward-deployed-multi-tenant-fertility-ai/"
+        },
+        {
+          "label": "AURIXA",
+          "href": "/work/aurixa-conversational-ai-orchestration/"
+        }
+      ],
+      "subject": "AI platform or agent"
     },
     {
       "code": "03",
       "name": "Data agents a finance team can trust",
       "text": "Questions in plain words, answered with one read-only query behind walls that a prompt cannot talk its way past, and every number checked against a results file.",
-      "proof": [{ "label": "ReBo", "href": "/work/rebo-reports-in-plain-words/" }]
+      "proof": [
+        {
+          "label": "ReBo",
+          "href": "/work/rebo-reports-in-plain-words/"
+        }
+      ],
+      "subject": "AI platform or agent"
     },
     {
       "code": "04",
       "name": "Vision where the data cannot leave",
       "text": "Video analytics and agentic triage on air-gapped, on-premise hardware, where each detector fails alone and the console stays up.",
       "proof": [
-        { "label": "Defence video intelligence", "href": "/work/agentic-video-intelligence-operations/" },
-        { "label": "FlowState", "href": "/work/flowstate-offline-video-analytics/" }
-      ]
+        {
+          "label": "Defence video intelligence",
+          "href": "/work/agentic-video-intelligence-operations/"
+        },
+        {
+          "label": "FlowState",
+          "href": "/work/flowstate-offline-video-analytics/"
+        }
+      ],
+      "subject": "AI platform or agent"
     },
     {
       "code": "05",
       "name": "Documents into decisions",
       "text": "Extraction from insurance documents and health records, measured in production: 95%+ accuracy at 10K+ queries a day, and 47+ variables from clinical notes at 91.5%.",
       "proof": [
-        { "label": "Insurance document AI", "href": "/work/insurance-document-intelligence-aws/" },
-        { "label": "Clinical NLP", "href": "/work/clinical-nlp-ehr-extraction/" }
-      ]
+        {
+          "label": "Insurance document AI",
+          "href": "/work/insurance-document-intelligence-aws/"
+        },
+        {
+          "label": "Clinical NLP",
+          "href": "/work/clinical-nlp-ehr-extraction/"
+        }
+      ],
+      "subject": "AI platform or agent"
     },
     {
       "code": "06",
       "name": "Software at the bottom of the stack",
       "text": "Native desktop software in Rust that calls the operating system's own power APIs, keeps unsafe code to two files and verifies its own updates.",
-      "proof": [{ "label": "KeepMeAwake", "href": "/work/keepmeawake-tray-app/" }]
+      "proof": [
+        {
+          "label": "KeepMeAwake",
+          "href": "/work/keepmeawake-tray-app/"
+        }
+      ],
+      "subject": "Technology leadership"
     }
   ],
   "method": [
     {
       "name": "Scope in writing",
-      "text": "The first conversation ends in a written scope: what will be built, what will not, and how we will know it works."
+      "text": "The first conversation ends in a written scope: what will be built, what will not, and how we will know it works.",
+      "course": "Foundation",
+      "leaves": "Written scope"
     },
     {
       "name": "Decisions on record",
-      "text": "Every structural choice goes into a decision record, with the options I turned down and why."
+      "text": "Every structural choice goes into a decision record, with the options I turned down and why.",
+      "course": "Frame",
+      "leaves": "Decision records"
     },
     {
       "name": "A baseline before a promise",
-      "text": "Numbers are measured before they are quoted, and quoted with the conditions they were measured under."
+      "text": "Numbers are measured before they are quoted, and quoted with the conditions they were measured under.",
+      "course": "Datum",
+      "leaves": "Measured baseline"
     },
     {
       "name": "Safety in the structure",
-      "text": "What a system must never do is enforced by the system. It is not left to a prompt or a reviewer's memory."
+      "text": "What a system must never do is enforced by the system. It is not left to a prompt or a reviewer's memory.",
+      "course": "Structure",
+      "leaves": "Structural guards"
     },
     {
       "name": "Acceptance by the people who sign",
-      "text": "Release governance and acceptance testing run with the product and executive teams, against the written scope."
+      "text": "Release governance and acceptance testing run with the product and executive teams, against the written scope.",
+      "course": "Inspection",
+      "leaves": "Signed acceptance"
     },
     {
       "name": "A runbook at the end",
-      "text": "Every system leaves with its code, its decision records, its measured results and a runbook: how to run it, how it fails, and what to do then. The team can carry on without me."
+      "text": "Every system leaves with its code, its decision records, its measured results and a runbook: how to run it, how it fails, and what to do then. The team can carry on without me.",
+      "course": "Roof",
+      "leaves": "Runbook and handover"
     }
   ],
   "questions": [
@@ -105,6 +156,65 @@
     {
       "q": "How do I contact Akshay Bajpai?",
       "a": "Email hello@akshaybajpai.com, or write through www.akshaybajpai.com/contact/. He is based in New Delhi, India."
+    }
+  ],
+  "constraints": [
+    {
+      "id": "airgap",
+      "name": "Air-gapped or on-premise",
+      "note": "Self-contained stacks on hardware that may not call home: no telemetry, no runtime downloads.",
+      "proof": [
+        "/work/agentic-video-intelligence-operations/",
+        "/work/flowstate-offline-video-analytics/"
+      ]
+    },
+    {
+      "id": "regulated",
+      "name": "Regulated data",
+      "note": "Health and insurance records, in HIPAA- and GDPR-compliant AWS, with audit-friendly execution.",
+      "proof": [
+        "/work/agentic-finance-healthcare-ai/",
+        "/work/clinical-nlp-ehr-extraction/",
+        "/work/forward-deployed-multi-tenant-fertility-ai/"
+      ]
+    },
+    {
+      "id": "tenants",
+      "name": "Many tenants",
+      "note": "One platform under several client programmes, with per-tenant keys and one authentication model.",
+      "proof": [
+        "/work/forward-deployed-multi-tenant-fertility-ai/",
+        "/work/aurixa-conversational-ai-orchestration/"
+      ]
+    },
+    {
+      "id": "latency",
+      "name": "A latency budget",
+      "note": "Under 200 ms from ingestion to decision; 2M+ events a day under 100 ms; under 800 ms at p95.",
+      "proof": [
+        "/work/agentic-video-intelligence-operations/",
+        "/work/restaurant-saas-demand-forecasting/",
+        "/work/agentic-finance-healthcare-ai/"
+      ]
+    },
+    {
+      "id": "cost",
+      "name": "A cost ceiling",
+      "note": "About two cents a question; inference cost down 80%; saved reports rerun with zero model calls.",
+      "proof": [
+        "/work/rebo-reports-in-plain-words/",
+        "/work/agentic-finance-healthcare-ai/"
+      ]
+    },
+    {
+      "id": "handover",
+      "name": "A team to take it over",
+      "note": "Decision records, specs, an operator guide and a runbook ship with the code.",
+      "proof": [
+        "/work/flowstate-offline-video-analytics/",
+        "/work/keepmeawake-tray-app/",
+        "/work/rebo-reports-in-plain-words/"
+      ]
     }
   ]
 }
