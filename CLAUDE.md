@@ -54,6 +54,8 @@ A-103's "Who is Akshay Bajpai?" answer (`data/engagements.json`) follows it too,
 
 **Research.** He researches world models and reinforcement learning and writes essays on systems, cost and trust. Present him as a researcher and a careful thinker without making a point of it: never say whether the research is independent, personal, funded or affiliated. The evidence is the writing (`content/blog/world-models-as-issued-2026.md`, `reinforcement-learning-after-the-reward-model.md`, `content/essays/the-model-that-refuses-to-draw.md`) and R-301, which leads with what he is working through now. When a new research note is published, add it to R-301's "Now" row if it supersedes the current one.
 
+**No city.** Location is the country only (India): in the address, `occupationLocation`, the vCard, `llms.txt` and the contact sheet. The entity sentence names no place.
+
 **No names, no dates in the record.**
 - No employer, client, agency or product-brand names, and no years or date ranges beside the work. Describe what the work was and what it changed, with numbers.
 - Defence work is "government defence deployments". Never name the agency.

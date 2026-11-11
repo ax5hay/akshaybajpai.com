@@ -127,7 +127,7 @@
   "questions": [
     {
       "q": "Who is Akshay Bajpai?",
-      "a": "Akshay Bajpai is a technology leader and systems architect in New Delhi. He leads technology end to end, from client and executive strategy to production code: multi-tenant LLM platforms, governed natural-language-to-SQL agents, agentic video intelligence for government defence deployments, document AI on AWS, and native desktop software in Rust. He researches world models and reinforcement learning, and writes essays on systems, cost and trust. He is a Springer author and holds an MSc in Artificial Intelligence with distinction."
+      "a": "Akshay Bajpai is a technology leader and systems architect. He leads technology end to end, from client and executive strategy to production code: multi-tenant LLM platforms, governed natural-language-to-SQL agents, agentic video intelligence for government defence deployments, document AI on AWS, and native desktop software in Rust. He researches world models and reinforcement learning, and writes essays on systems, cost and trust. He is a Springer author and holds an MSc in Artificial Intelligence with distinction."
     },
     {
       "q": "What kind of work does Akshay Bajpai take on?",
@@ -155,7 +155,7 @@
     },
     {
       "q": "How do I contact Akshay Bajpai?",
-      "a": "Email hello@akshaybajpai.com, or write through www.akshaybajpai.com/contact/. He is based in New Delhi, India."
+      "a": "Email hello@akshaybajpai.com, or write through www.akshaybajpai.com/contact/. He is based in India."
     }
   ],
   "constraints": [

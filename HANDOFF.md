@@ -67,7 +67,7 @@ The case study is 1 kB over the brief's floor: a slightly larger plate registry 
   - the three new `/work/…/` sheets
 - **Pin on GitHub.** On github.com/ax5hay, under "Customize your pins": KeepMeAwake, AURIXA, Vigilix, akshaybajpai.com, AIDA, MirrorState. There is no API for profile pins. DADM is left out because its repository name carries the company name.
 - **Profiles.** Paste matching text into the LinkedIn headline and About, the GitHub bio, the X bio and the profile README (ax5hay/ax5hay, which still says only "Two of these I ran as CTO"). Drafts that match the site:
-  - GitHub, X (under 160): *Boardroom to bare metal. I lead technology end to end and still write the code. Co-founder and CTO. Researching world models and RL. New Delhi.*
+  - GitHub, X (under 160): *Boardroom to bare metal. I lead technology end to end and still write the code. Co-founder and CTO. Researching world models and RL.*
   - LinkedIn headline: *Technology Leader & Systems Architect · Co-founder and CTO · Boardroom to bare metal · Production AI · World models and RL research*
 - **Research profiles.** If he has a Google Scholar, ORCID or Springer author page, add each to `sameAs` in `lib/metadata.ts` (the `SOCIAL` list in `lib/constants.ts`). They are the strongest outside confirmation of "researcher".
 - **Third-party mentions, set aside for now.** These are what answer engines trust most, and only he can publish them. Drafts can be written on request:

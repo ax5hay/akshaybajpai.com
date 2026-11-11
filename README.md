@@ -717,7 +717,7 @@ everything drawn inside follows.
 | **If it fails** | The message stays where it is, and the direct address is offered |
 
 Beside it: the email address at headline size with a copy control, the other
-lines, and the **local time in New Delhi** with how far that is from the reader's
+lines, and the **local time in India (IST)** with how far that is from the reader's
 own clock.
 
 The section widths, counts and reading times come from the Markdown at build time

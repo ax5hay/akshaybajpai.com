@@ -2,7 +2,7 @@
   Architect, author, draughtsman: Akshay Bajpai
   Handle: ax5hay
   Site: https://www.akshaybajpai.com
-  Location: New Delhi, India
+  Location: India
 
 /* THE SET */
   Issued as an architectural drawing set. Every route is a numbered sheet;

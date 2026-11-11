@@ -83,7 +83,7 @@ console.log(`Generated out/rss.xml with ${items.length} items`);
 // is drawn from, so the page and this text cannot drift apart.
 const ENGAGE = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'engagements.json'), 'utf-8'));
 const ENTITY =
-  'Akshay Bajpai is a technology leader and systems architect in New Delhi. He leads technology end to end, from client and executive strategy to production code: multi-tenant LLM platforms, governed natural-language-to-SQL agents, agentic video intelligence for government defence deployments, document AI on AWS, and native desktop software in Rust. He has co-founded three companies and run engineering as CTO at two others. He researches world models and reinforcement learning, and writes essays on systems, cost and trust. Springer author; MSc in Artificial Intelligence with distinction.';
+  'Akshay Bajpai is a technology leader and systems architect. He leads technology end to end, from client and executive strategy to production code: multi-tenant LLM platforms, governed natural-language-to-SQL agents, agentic video intelligence for government defence deployments, document AI on AWS, and native desktop software in Rust. He has co-founded three companies and run engineering as CTO at two others. He researches world models and reinforcement learning, and writes essays on systems, cost and trust. Springer author; MSc in Artificial Intelligence with distinction.';
 const sections = [
   ['/about/', 'A-101 Boardroom to bare metal', 'Who Akshay Bajpai is, the record of his work by kind, and how he works.'],
   ['/engagements/', 'A-103 Terms of Engagement', 'What he takes on, how the work runs, and questions answered plainly.'],
@@ -106,7 +106,7 @@ const llms = `# Akshay Bajpai
 
 ## Facts
 
-- Based in: New Delhi, India
+- Based in: India
 - Role: Technology leader and systems architect. Leads technology end to end: clients, teams, architecture, AI and code.
 - Companies: co-founded three; CTO at two others
 - Research: world models and reinforcement learning; essays on systems, cost and trust

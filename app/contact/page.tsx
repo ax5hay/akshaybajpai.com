@@ -108,7 +108,7 @@ export default function ContactPage() {
           <dl className={styles.facts}>
             <div>
               <dt>Based</dt>
-              <dd>New Delhi, India</dd>
+              <dd>India</dd>
             </div>
             <div>
               <dt>Local time</dt>

@@ -30,7 +30,7 @@ export const HOME_KEYWORDS = [
   'agentic AI',
   'NL2SQL',
   'healthcare AI',
-  'New Delhi',
+  'India',
 ];
 
 /* ------------------------------------------------------------- page metadata --- */
@@ -139,8 +139,6 @@ export function identityGraph(): Thing[] {
       sameAs: [SOCIAL.linkedin, SOCIAL.github, SOCIAL.twitter],
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'New Delhi',
-        addressRegion: 'Delhi',
         addressCountry: 'IN',
       },
       alumniOf: [
@@ -203,7 +201,7 @@ export function identityGraph(): Thing[] {
         {
           '@type': 'Occupation',
           name: JOB_TITLE,
-          occupationLocation: { '@type': 'City', name: 'New Delhi' },
+          occupationLocation: { '@type': 'Country', name: 'India' },
           skills: ENGAGEMENTS.offers.map((o) => o.name).join(', '),
         },
         { '@type': 'Occupation', name: 'Co-founder', description: 'Co-founded three companies.' },
